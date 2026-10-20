@@ -1,5 +1,5 @@
 {
-  "count": 2782,
+  "count": 2770,
   "listings": [
     {
       "id": "apify-b9b18084f762",
@@ -4346,23 +4346,6 @@
       "categoryKey": "buy-and-sell"
     },
     {
-      "id": "kijiji-1744998687",
-      "slug": "one-bedroom-luxury-condo-in-thornhill-1744998687",
-      "url": "https://6ixo.com/listing/one-bedroom-luxury-condo-in-thornhill-1744998687/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/8b/8b03187c-7eac-40e2-8e82-4fd547b54282?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/9b/9b166b29-9ce6-499c-a196-a064afda5125?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/72/72a62d58-4197-4d69-ab70-4cba502eb983?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/54/542705b8-d4f8-409d-8581-743492d51d36?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/41/41e2a1ce-c76b-4a70-831f-479015334fa4?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/af/af8a0386-118b-44ab-97bc-faf02d396d1f?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/3d/3d228124-66c9-4f86-89c2-37606481c9e8?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/0d/0dad6db5-617a-426b-887f-6cbf193b5733?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/03/031d3e50-f870-49a1-945f-8efe67c2c472?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "real-estate"
-    },
-    {
       "id": "kijiji-1744998680",
       "slug": "cordless-drill-for-sale-1744998680",
       "url": "https://6ixo.com/listing/cordless-drill-for-sale-1744998680/",
@@ -4546,41 +4529,6 @@
       "categoryKey": "electronics"
     },
     {
-      "id": "kijiji-1744995737",
-      "slug": "demolition-sale-1744995737",
-      "url": "https://6ixo.com/listing/demolition-sale-1744995737/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/eb/ebe13430-b723-4221-b6eb-b1c479e57e14?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/00/007cb58f-038a-4f5b-a6c2-0410bb7f0a40?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/54/5490f202-3f75-42f3-9d94-e514d2bf47a4?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/b4/b4ab1b02-8788-4c83-b2d4-0e7794f3f9af?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/04/0438dad3-ea87-4cb0-b2d6-829699049b81?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/5b/5b07e464-e4a2-4c72-aae5-6d716d32c36c?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/55/55543850-10fb-4a40-b273-b7e1de927c01?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/da/dacddf16-1bed-416b-8117-cf44105132e8?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/de/de15693e-83ed-456e-bff6-9f49b8835b6a?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "community"
-    },
-    {
-      "id": "kijiji-1744995031",
-      "slug": "your-oasis-large-3-bedroom-in-highly-desired-west-mountain-1744995031",
-      "url": "https://6ixo.com/listing/your-oasis-large-3-bedroom-in-highly-desired-west-mountain-1744995031/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/d9/d9742f52-edff-4a30-a2b2-46b0f5063109?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/4e/4e80b1ee-982c-4127-aab2-8283f3c04970?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/28/28f8ef15-4abe-4cc4-bd2e-239e1041216e?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/7b/7ba04238-a0d8-43c9-b640-b91a64667ef2?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/3a/3a9920f0-d79c-4669-ade7-5464fa502e70?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/44/446575a4-2e49-4f2e-9f82-063f266adb44?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/76/76f8d7a8-baf1-44af-8b05-2deaabd8fd72?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/65/65e50445-b805-44c0-8ccb-ab51280501e8?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/73/73cf674a-d2a9-44e0-b366-30c57fbd3842?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/e5/e54fdf9f-a022-4379-be38-fd0ae8f60a14?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "real-estate"
-    },
-    {
       "id": "kijiji-1744994731",
       "slug": "room-for-rent-in-basement-appartment-in-cambridge-1744994731",
       "url": "https://6ixo.com/listing/room-for-rent-in-basement-appartment-in-cambridge-1744994731/",
@@ -4611,15 +4559,6 @@
         "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/06/06ab8f2c-5e64-42e0-ae73-e546a53c1cea?rule=kijijica-1600-webp"
       ],
       "categoryKey": "buy-and-sell"
-    },
-    {
-      "id": "kijiji-1744994186",
-      "slug": "entretien-menager-de-nuit-1744994186",
-      "url": "https://6ixo.com/listing/entretien-menager-de-nuit-1744994186/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/d8/d83f4fe6-c59a-4032-a90c-a64dc091ee0a?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "jobs"
     },
     {
       "id": "kijiji-1744993321",
@@ -4673,20 +4612,6 @@
       "images": [
         "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/1a/1ad80000-990b-4bec-a121-9c9a1c0001cd?rule=kijijica-1600-webp",
         "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/b0/b0cd9cc5-2611-4963-80c8-b17c197809f2?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "services"
-    },
-    {
-      "id": "kijiji-1744991299",
-      "slug": "handyman-services-2042930472-1744991299",
-      "url": "https://6ixo.com/listing/handyman-services-2042930472-1744991299/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/52/52aead55-fa88-4c80-b11e-7c5d058e0d2a?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/16/16957ce2-14da-4072-ace5-8c97f8876f9c?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/e6/e64a7d9f-aeb6-414f-aaf0-f5034da73d16?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/65/65888a44-d919-4da1-ac59-1df0f7ac1663?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/78/78224deb-e8e7-4695-a474-1166fecc1cab?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/c9/c95e8bda-38e9-4308-949a-7b0901ab4fbc?rule=kijijica-1600-webp"
       ],
       "categoryKey": "services"
     },
@@ -4755,15 +4680,6 @@
         "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/4e/4ea8e077-4b9d-480b-a59e-8463063e0196?rule=kijijica-1600-webp"
       ],
       "categoryKey": "real-estate"
-    },
-    {
-      "id": "kijiji-1744988856",
-      "slug": "hiring-dishwasher-and-kitchen-helper-1744988856",
-      "url": "https://6ixo.com/listing/hiring-dishwasher-and-kitchen-helper-1744988856/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/9b/9b25e538-8679-4728-9f68-d3b19c4a04d1?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "jobs"
     },
     {
       "id": "kijiji-1744987312",
@@ -5746,18 +5662,6 @@
         "https://images.craigslist.org/00G0G_eNef79o1uxd_0CI0t2_600x450.jpg",
         "https://images.craigslist.org/00x0x_aLiJOQ7i7J9_0CI0t2_600x450.jpg",
         "https://images.craigslist.org/00909_4ABd06591GD_0CI0t2_600x450.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "craigslist-pJKe7DH1J22CoKwaZsQbfb",
-      "slug": "2015-chevy-sonic-lt-hatchback-low-73k-miles-2-owner-clean--okwazsqbfb",
-      "url": "https://6ixo.com/listing/2015-chevy-sonic-lt-hatchback-low-73k-miles-2-owner-clean--okwazsqbfb/",
-      "images": [
-        "https://images.craigslist.org/00Z0Z_i3a8QqUSXCM_0Cr0t2_600x450.jpg",
-        "https://images.craigslist.org/00m0m_awNtHpkn5Kc_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/00v0v_5IrfBu2bYj2_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/00M0M_3Zbf6Uq8yFe_0Cn0t2_600x450.jpg"
       ],
       "categoryKey": "vehicles"
     },
@@ -9671,18 +9575,6 @@
       "categoryKey": "vehicles"
     },
     {
-      "id": "craigslist-baq2821G7wsULEdYprjjUk",
-      "slug": "2018-nissan-frontier-sv-4x4-custom-wheels-nice-ledyprjjuk",
-      "url": "https://6ixo.com/listing/2018-nissan-frontier-sv-4x4-custom-wheels-nice-ledyprjjuk/",
-      "images": [
-        "https://images.craigslist.org/00e0e_fAuj3y7tqWT_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/00f0f_e6fymDtPLuN_0CI0sV_600x450.jpg",
-        "https://images.craigslist.org/00404_lpyw7bApJyo_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/00e0e_1kW7ApWhbDA_0CA0t2_600x450.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
       "id": "craigslist-7N2Qh6pV5vVMSsgebLfeLm",
       "slug": "2022-nissan-frontier-sv-call-the-carga-ssgeblfelm",
       "url": "https://6ixo.com/listing/2022-nissan-frontier-sv-call-the-carga-ssgeblfelm/",
@@ -10142,54 +10034,6 @@
         "https://cdn2.jacars.net/media/cache/85/00/8500595a095291ea8dae0e393f35f8a5.webp"
       ],
       "categoryKey": "buy-and-sell"
-    },
-    {
-      "id": "craigslist-cxY6qkFberUVFfECPYaAJQ",
-      "slug": "5ft-x-330ft-x-14ga-sheep-and-goat-fence-285-ea-ffecpyaajq",
-      "url": "https://6ixo.com/listing/5ft-x-330ft-x-14ga-sheep-and-goat-fence-285-ea-ffecpyaajq/",
-      "images": [
-        "https://images.craigslist.org/00L0L_ln1CXZpnoHJ_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/00000_gaK3G7ffNcU_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/00u0u_fPLMJEhiiCi_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/00w0w_emMMISx95Pc_0CI0t2_600x450.jpg"
-      ],
-      "categoryKey": "services"
-    },
-    {
-      "id": "craigslist-wmP3TouwmqxwKoQEaQiYDt",
-      "slug": "6ft-x-50ft-x-12ga-chainlink-fence-rolls-95-dollars-each-koqeaqiydt",
-      "url": "https://6ixo.com/listing/6ft-x-50ft-x-12ga-chainlink-fence-rolls-95-dollars-each-koqeaqiydt/",
-      "images": [
-        "https://images.craigslist.org/00F0F_af4cudEfeV5_0t20CI_600x450.jpg",
-        "https://images.craigslist.org/00m0m_bVr8oy3YP4K_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/01717_ca26cgUNesH_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/01414_jBv8yyJNxgX_0CI0t2_600x450.jpg"
-      ],
-      "categoryKey": "services"
-    },
-    {
-      "id": "craigslist-48YzvqgSbgSToviodvKYwE",
-      "slug": "eagle-1-automatic-gate-openers-drive-way-gates-fence-panel-oviodvkywe",
-      "url": "https://6ixo.com/listing/eagle-1-automatic-gate-openers-drive-way-gates-fence-panel-oviodvkywe/",
-      "images": [
-        "https://images.craigslist.org/01313_29t20PBnM9P_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/00E0E_3pjwq9XBRWn_0CI0lN_600x450.jpg",
-        "https://images.craigslist.org/00l0l_6RuuwxOvtic_0CI0lN_600x450.jpg",
-        "https://images.craigslist.org/00e0e_22SUxKiR7gM_0CI0lN_600x450.jpg"
-      ],
-      "categoryKey": "buy-and-sell"
-    },
-    {
-      "id": "craigslist-tmfRgpQ4zf5Ut6bonJVyVv",
-      "slug": "40x60x16-red-iron-metal-building-kit-24-999-rated-for-150--t6bonjvyvv",
-      "url": "https://6ixo.com/listing/40x60x16-red-iron-metal-building-kit-24-999-rated-for-150--t6bonjvyvv/",
-      "images": [
-        "https://images.craigslist.org/00I0I_7jB2Q87RvHn_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/00E0E_lNA6IUcEkcI_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/00v0v_4V2mz5BVJov_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/00h0h_4tcleR4C7OJ_0t20CI_600x450.jpg"
-      ],
-      "categoryKey": "services"
     },
     {
       "id": "craigslist-aMmzekgpxpUJB2kXDwsuW2",
@@ -11854,18 +11698,6 @@
         "https://images.craigslist.org/00a0a_9dKLd3fLj1v_0nm0hw_600x450.jpg",
         "https://images.craigslist.org/00d0d_k9aBXZmF6ck_0nm0hw_600x450.jpg",
         "https://images.craigslist.org/00X0X_gc92ChkBQDx_0nm0hw_600x450.jpg"
-      ],
-      "categoryKey": "real-estate"
-    },
-    {
-      "id": "craigslist-fu695yXwNZBYcPyUEyBQNL",
-      "slug": "bridgeport-2-bedrooms-2-full-baths-2-075-00-cpyueybqnl",
-      "url": "https://6ixo.com/listing/bridgeport-2-bedrooms-2-full-baths-2-075-00-cpyueybqnl/",
-      "images": [
-        "https://images.craigslist.org/00X0X_kEcqTNox0vL_0fV09f_600x450.jpg",
-        "https://images.craigslist.org/00J0J_fdkhXKYTDdj_0fQ08o_600x450.jpg",
-        "https://images.craigslist.org/00s0s_lLMmBDSfP1N_088066_600x450.jpg",
-        "https://images.craigslist.org/00P0P_5LtF4Kf4ltK_08805v_600x450.jpg"
       ],
       "categoryKey": "real-estate"
     },
@@ -17507,6 +17339,18 @@
         "https://images.craigslist.org/00t0t_bjqsGwmv4wp_0CI0t2_600x450.jpg"
       ],
       "categoryKey": "auto-parts"
+    },
+    {
+      "id": "craigslist-dCH8RHkTFrm6Cv2oEZBoFE",
+      "slug": "2004-chevrolet-silverado-lt-2500hd-6-0l-crewcab-leather-bo-cv2oezbofe",
+      "url": "https://6ixo.com/listing/2004-chevrolet-silverado-lt-2500hd-6-0l-crewcab-leather-bo-cv2oezbofe/",
+      "images": [
+        "https://images.craigslist.org/00101_rE8NWjxMf_0kE0fu_600x450.jpg",
+        "https://images.craigslist.org/00f0f_9OkBvjaavmO_0x20oM_600x450.jpg",
+        "https://images.craigslist.org/00p0p_8wNNQe9vUGJ_0x20oM_600x450.jpg",
+        "https://images.craigslist.org/01111_c4BCXkY3i16_0x20oM_600x450.jpg"
+      ],
+      "categoryKey": "vehicles"
     },
     {
       "id": "craigslist-m1oqgb6jgE8M1r8yWfADd4",
@@ -33959,9 +33803,6 @@
       "url": "https://6ixo.com/listings/page/77/"
     },
     {
-      "url": "https://6ixo.com/listings/page/78/"
-    },
-    {
       "url": "https://6ixo.com/listings/electronics/"
     },
     {
@@ -34353,9 +34194,6 @@
     },
     {
       "url": "https://6ixo.com/listings/country/canada/page/26/"
-    },
-    {
-      "url": "https://6ixo.com/listings/country/canada/page/27/"
     },
     {
       "url": "https://6ixo.com/listings/country/china/electronics/"
@@ -38057,11 +37895,6 @@
       "url": "https://6ixo.com/listing/natural-shiner-sebu155/"
     },
     {
-      "id": "craigslist-dCH8RHkTFrm6Cv2oEZBoFE",
-      "slug": "2004-chevrolet-silverado-lt-2500hd-6-0l-crewcab-leather-bo-cv2oezbofe",
-      "url": "https://6ixo.com/listing/2004-chevrolet-silverado-lt-2500hd-6-0l-crewcab-leather-bo-cv2oezbofe/"
-    },
-    {
       "id": "craigslist-cTzs3vUZr6wvGcFARRzfTs",
       "slug": "2004-volkswagen-passat-manual-gcfarrzfts",
       "url": "https://6ixo.com/listing/2004-volkswagen-passat-manual-gcfarrzfts/"
@@ -38950,6 +38783,71 @@
       "id": "kijiji-1739637685",
       "slug": "2024-lincoln-nautilus-reserve-awd-2-keys-leather-moonroof-1739637685",
       "url": "https://6ixo.com/listing/2024-lincoln-nautilus-reserve-awd-2-keys-leather-moonroof-1739637685/"
+    },
+    {
+      "id": "kijiji-1744998687",
+      "slug": "one-bedroom-luxury-condo-in-thornhill-1744998687",
+      "url": "https://6ixo.com/listing/one-bedroom-luxury-condo-in-thornhill-1744998687/"
+    },
+    {
+      "id": "kijiji-1744995737",
+      "slug": "demolition-sale-1744995737",
+      "url": "https://6ixo.com/listing/demolition-sale-1744995737/"
+    },
+    {
+      "id": "kijiji-1744995031",
+      "slug": "your-oasis-large-3-bedroom-in-highly-desired-west-mountain-1744995031",
+      "url": "https://6ixo.com/listing/your-oasis-large-3-bedroom-in-highly-desired-west-mountain-1744995031/"
+    },
+    {
+      "id": "kijiji-1744994186",
+      "slug": "entretien-menager-de-nuit-1744994186",
+      "url": "https://6ixo.com/listing/entretien-menager-de-nuit-1744994186/"
+    },
+    {
+      "id": "kijiji-1744991299",
+      "slug": "handyman-services-2042930472-1744991299",
+      "url": "https://6ixo.com/listing/handyman-services-2042930472-1744991299/"
+    },
+    {
+      "id": "kijiji-1744988856",
+      "slug": "hiring-dishwasher-and-kitchen-helper-1744988856",
+      "url": "https://6ixo.com/listing/hiring-dishwasher-and-kitchen-helper-1744988856/"
+    },
+    {
+      "id": "craigslist-pJKe7DH1J22CoKwaZsQbfb",
+      "slug": "2015-chevy-sonic-lt-hatchback-low-73k-miles-2-owner-clean--okwazsqbfb",
+      "url": "https://6ixo.com/listing/2015-chevy-sonic-lt-hatchback-low-73k-miles-2-owner-clean--okwazsqbfb/"
+    },
+    {
+      "id": "craigslist-baq2821G7wsULEdYprjjUk",
+      "slug": "2018-nissan-frontier-sv-4x4-custom-wheels-nice-ledyprjjuk",
+      "url": "https://6ixo.com/listing/2018-nissan-frontier-sv-4x4-custom-wheels-nice-ledyprjjuk/"
+    },
+    {
+      "id": "craigslist-cxY6qkFberUVFfECPYaAJQ",
+      "slug": "5ft-x-330ft-x-14ga-sheep-and-goat-fence-285-ea-ffecpyaajq",
+      "url": "https://6ixo.com/listing/5ft-x-330ft-x-14ga-sheep-and-goat-fence-285-ea-ffecpyaajq/"
+    },
+    {
+      "id": "craigslist-wmP3TouwmqxwKoQEaQiYDt",
+      "slug": "6ft-x-50ft-x-12ga-chainlink-fence-rolls-95-dollars-each-koqeaqiydt",
+      "url": "https://6ixo.com/listing/6ft-x-50ft-x-12ga-chainlink-fence-rolls-95-dollars-each-koqeaqiydt/"
+    },
+    {
+      "id": "craigslist-48YzvqgSbgSToviodvKYwE",
+      "slug": "eagle-1-automatic-gate-openers-drive-way-gates-fence-panel-oviodvkywe",
+      "url": "https://6ixo.com/listing/eagle-1-automatic-gate-openers-drive-way-gates-fence-panel-oviodvkywe/"
+    },
+    {
+      "id": "craigslist-tmfRgpQ4zf5Ut6bonJVyVv",
+      "slug": "40x60x16-red-iron-metal-building-kit-24-999-rated-for-150--t6bonjvyvv",
+      "url": "https://6ixo.com/listing/40x60x16-red-iron-metal-building-kit-24-999-rated-for-150--t6bonjvyvv/"
+    },
+    {
+      "id": "craigslist-fu695yXwNZBYcPyUEyBQNL",
+      "slug": "bridgeport-2-bedrooms-2-full-baths-2-075-00-cpyueybqnl",
+      "url": "https://6ixo.com/listing/bridgeport-2-bedrooms-2-full-baths-2-075-00-cpyueybqnl/"
     }
   ]
 }

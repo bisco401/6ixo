@@ -210,8 +210,46 @@ def image_response_is_usable(response):
             or header[4:8] == b"ftyp" and header[8:12] in {b"avif", b"avis"})
 
 
+def jacars_source_category(soup, url):
+    """Use only breadcrumbs belonging to this exact ad, not search recommendations."""
+    own = []
+    for tag in soup.select('script[type="application/ld+json"]'):
+        try:
+            nodes = list(availability.entities(json.loads(tag.get_text())))
+        except (ValueError, TypeError):
+            continue
+        for node in nodes:
+            if node.get('@type') != 'BreadcrumbList':
+                continue
+            items = sorted(node.get('itemListElement') or [], key=lambda item: item.get('position', 0))
+            if not items or availability.source_key(str(items[-1].get('item', ''))) != availability.source_key(url):
+                continue
+            own = [urlsplit(str(item.get('item', ''))).path.strip('/') for item in items[:-1]]
+    if not own:
+        return None
+    path = own[-1].lower()
+    if 'real-estate' in path:
+        return 'real_estate', 'for_rent_long' if 'rent' in path else 'for_sale', path
+    if 'clothing-shoes-and-accessories' in path:
+        sub = 'shoes' if '/shoes' in path else 'kids' if 'kids' in path else 'women' if 'women' in path else 'men' if '/men' in path else 'other'
+        return 'clothing', sub, path
+    if 'auto-parts' in path or 'car-parts' in path:
+        return 'vehicles', 'tires_rims' if re.search('tires|tyres|rims', path) else 'auto_parts', path
+    if path.startswith('vehicles/cars'):
+        return 'vehicles', 'vehicles', path
+    for segment, sub in [('telephones', 'phones_accessories'), ('computers', 'computers_tablets'), ('audio-visual', 'other')]:
+        if segment in path:
+            return 'electronics', sub, path
+    return None
+
+
 def jacars_row(body, url, category, subcategory, checked):
     soup, product = product_schema(body)
+    source_category = jacars_source_category(soup, url)
+    if source_category:
+        # A broad cars breadcrumb does not overrule the specific parts inventory.
+        if not (source_category[:2] == ('vehicles', 'vehicles') and category == 'vehicles' and subcategory in {'auto_parts', 'tires_rims'}):
+            category, subcategory, _ = source_category
     contact = soup.select_one('[data-component="SidebarContacts"]')
     phone = public_phone("phone " + (contact.get_text(" ", strip=True) if contact else ""), "Jamaica")
     offer = product.get("offers") or {}
@@ -227,6 +265,10 @@ def jacars_row(body, url, category, subcategory, checked):
                currency=offer.get("priceCurrency") or "JMD", price_text=f"JA$ {float(offer['price']):,.0f}" if offer.get("price") else "Contact seller",
                year=str(product.get("productionDate") or ""), transmission=product.get("vehicleTransmission") or "",
                mileage_km=str(product.get("mileageFromOdometer", {}).get("value") or ""))
+    if source_category:
+        attrs = json.loads(row['attributes'])
+        attrs.update(sourceCategory=source_category[2], sourceSubcategory=source_category[2].rsplit('/', 1)[-1])
+        row['attributes'] = json.dumps(attrs, separators=(',', ':'))
     return row
 
 

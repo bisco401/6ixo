@@ -2,6 +2,19 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const vm = require('node:vm');
 const integrity = require('./lib/listing-integrity.cjs');
+for (const [item, expected] of [
+ [{title:'External drive',app_category:'other',app_subcategory:'miscellaneous'}, ['electronics','computers_tablets']],
+ [{title:'Samsung a55 5g 256gb',app_category:'electronics',app_subcategory:'computers_tablets'}, ['electronics','phones_accessories']],
+ [{title:'Leather bags',app_category:'clothing',app_subcategory:'women',attributes:{sourceCategory:'clothing-shoes-and-accessories',sourceSubcategory:'womens-clothing'}}, ['clothing','accessories']],
+ [{title:'Pair of 2002 Toyota rav4 headlight',app_category:'other',app_subcategory:'miscellaneous'}, ['vehicles','auto_parts']],
+ [{title:'2019 Toyota RAV4 with LED headlights',app_category:'vehicles',app_subcategory:'vehicles'}, ['vehicles','vehicles']],
+ [{title:'Toyota headlight restoration service',app_category:'services',app_subcategory:'other'}, ['services','other']],
+ [{title:'Brand New Kickers',app_category:'clothing',app_subcategory:'shoes',attributes:{sourceCategory:'other/clothing-shoes-and-accessories/shoes/mens-shoes',sourceSubcategory:'mens-shoes'}}, ['clothing','shoes']],
+ [{title:'Ladies brand new from USA',app_category:'clothing',app_subcategory:'women',attributes:{sourceCategory:'other/clothing-shoes-and-accessories/clothing/womens-clothing/jeans-trousers',sourceSubcategory:'jeans-trousers'}}, ['clothing','women']]
+]) {
+ const route=integrity.classify(item);
+ assert.deepEqual([route.app_category,route.app_subcategory],expected,item.title);
+}
 const sourceResponseRemoval = require('./lib/source-response-removal.cjs');
 const url = 'https://www.kijiji.ca/v-clothing-men/hamilton/leather-jacket/123456';
 const oxUrl='https://oxglow.com.gh/listing/own-helmet';

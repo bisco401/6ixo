@@ -1,7 +1,7 @@
 // BEGIN GENERATED LISTING INTEGRITY
 // Shared by the browser, repair tool and generated n8n workflows. No DOM/URL globals required.
 function createListingIntegrity() {
-  const VERSION = '2026-10-18.1';
+  const VERSION = '2026-10-20.1';
   const decode = (value = '') => String(value || '').replace(/\\u002f/gi, '/').replace(/\\u0026/gi, '&').replace(/\\\//g, '/').replace(/&amp;/gi, '&').replace(/&quot;|&#34;/gi, '"').replace(/&#39;|&apos;/gi, "'");
   const key = (value = '') => decode(value).trim().replace(/^https?:\/\/(?:www\.)?/i, '').replace(/[?#].*$/, '').replace(/\/$/, '').toLowerCase();
   // Ad IDs survive edits to the human-readable portion of a source URL.
@@ -142,6 +142,9 @@ function createListingIntegrity() {
     if (/\b(?:private.{0,30}transport(?:ation)?|pick up drop off transport|personal driver)\b/.test(t0)) return route('services', 'travel', 'title_intent');
     if (/\b(?:car radio (?:unlocking|reprogramming|programming)|radio reprogramming|dpf def egr delete tuning)\b/.test(t0)) return route('vehicles', 'repairs', 'title_intent');
     if (/\b(?:car wash gun|car multimedia player|car emergency starter|jump starter|motor vehicle inverter|car backup camera|bluetooth cassette car player|dodge ram oem radio|daf parts)\b/.test(t0)) return route('vehicles', 'auto_parts', 'product_type');
+    if (['other', 'buy_sell', 'services'].includes(declared) && /\b(?:headlights?|headlamps?)\b/.test(t0)
+        && /\b(?:toyota|honda|nissan|ford|bmw|mercedes|rav4|(?:19|20)\d{2})\b/.test(t0)
+        && !/\b(?:restoration|repair|services?|detailing)\b/.test(t0)) return route('vehicles', 'auto_parts', 'product_type');
     if (/\b(?:heat press|vinyl cutter|creasing perforating machine|badge maker|boring woodworking|hammer.{0,25}crusher|block machine|block making machine|gate operators|gate openers|small man lift)\b/.test(t0) && !/\b(?:photo frame|travel mug)\b/.test(t0)) return route('other', 'tools_equipment', 'product_type');
     if (declared !== 'real_estate' && /^(?:\d+\s*(?:ft|foot)\s*)?containers?$/i.test(title.trim())) return route('other', 'tools_equipment', 'product_type');
     if (/\b(?:bed sheets|wall (?:clock|decor|art)|ceramic (?:hamburger|pineapple)|salt.{0,12}pepper|mosquito.{0,30}curtains|dresser and drawer|desk table lamps)\b/.test(t0) || /^chairs$/i.test(title.trim())) return route('other', 'furniture_home_decor', 'product_type');
@@ -150,7 +153,8 @@ function createListingIntegrity() {
     if (/\b(?:electric massager|electric hairdresser|nail dryer|pepper spray|hair clipper)\b/.test(t0)) return route('other', 'beauty_personal_care', 'product_type');
     if (/\b(?:nursing scrubs)\b/.test(t0)) return route('clothing', 'other', 'product_type');
     if (/\b(?:baby boy clothes|kids crocs)\b/.test(t0)) return route('clothing', 'kids', 'product_type');
-    if (/\b(?:elitebook|probook|victus|pavillon|pavilion|dell latitude|acer aspire|hp envy|hp loptop|gaming monitor|usb adapter|sd memory card)\b/.test(t0)) return route('electronics', 'computers_tablets', 'product_type');
+    if (/\b(?:elitebook|probook|victus|pavillon|pavilion|dell latitude|acer aspire|hp envy|hp loptop|gaming monitor|usb adapter|sd memory card|external (?:hard )?drives?|portable ssd|solid state drive)\b/.test(t0)) return route('electronics', 'computers_tablets', 'product_type');
+    if (/\bsamsung (?:galaxy )?a55\b/.test(t0) && !/\b(?:repair|service)\b/.test(t0)) return route('electronics', 'phones_accessories', 'product_type');
     if (/\b(?:tripod for phone|desktop tripod)\b/.test(t0)) return route('electronics', 'cameras_photography', 'product_type');
     if (/\b(?:fitbit|fitness tracker)\b/.test(t0)) return route('electronics', 'other', 'product_type');
     if (/\b(?:roku|t-con board|home cinema)\b/.test(t0)) return route('electronics', 'tv_video_home_theatre', 'product_type');
@@ -300,7 +304,13 @@ function createListingIntegrity() {
       if (/women/.test(sourceSubcategory)) return route('clothing', 'women');
       if (/men/.test(sourceSubcategory)) return route('clothing', 'men');
     }
-    if (/clothes|clothing|footwear/.test(provider)) return route('clothing', /\b(?:shoe|shoes|sneaker|sneakers|boots)\b/i.test(title) ? 'shoes' : /\b(?:shirt|pants|dress|jacket|apparel)\b/i.test(title) ? 'other' : 'accessories');
+    if (/clothes|clothing|footwear/.test(provider)) {
+      if (/\b(?:shoe|shoes|sneaker|sneakers|boots)\b/i.test(`${sourceSubcategory} ${title}`)) return route('clothing', 'shoes');
+      if (/\b(?:bags?|belts?|hats?|caps?|wallets?|sunglasses|watches?|jewell?ery|earrings?|necklaces?|bracelets?|rings?|scarves|scarfs|glasses)\b/i.test(title)) return route('clothing', 'accessories');
+      if (/jeans|trousers|shirts|dresses|clothing|underwear|jackets|coats|skirts/.test(sourceSubcategory)
+          && category === 'clothing' && ['women','men','kids','other'].includes(row.app_subcategory || row.appSubcategory)) return route('clothing', row.app_subcategory || row.appSubcategory);
+      return route('clothing', /\b(?:shirt|pants|dress|jacket|apparel)\b/i.test(title) ? 'other' : 'accessories');
+    }
     if (/health beauty/.test(provider)) return route('other', 'beauty_personal_care');
     if (/home garden/.test(provider)) return route('other', 'furniture_home_decor');
     if (/hobbies sports/.test(provider)) return route('other', 'sports_outdoors');

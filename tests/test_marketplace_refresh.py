@@ -15,6 +15,22 @@ spec.loader.exec_module(module)
 
 
 class RefreshTest(unittest.TestCase):
+    def test_jacars_uses_own_taxonomy_instead_of_discovery_bucket(self):
+        url = 'https://www.jacars.net/adv/123_kickers/'
+        def crumbs(own_url, path):
+            return {'@type': 'BreadcrumbList', 'itemListElement': [
+                {'position': 1, 'item': 'https://www.jacars.net/' + path},
+                {'position': 2, 'item': own_url}]}
+        data = {'@graph': [crumbs('https://www.jacars.net/adv/999_foreign/', 'other/real-estate/houses-and-villas-rent/'),
+            crumbs(url, 'other/clothing-shoes-and-accessories/shoes/mens-shoes/'),
+            {'@type': 'Product', 'url': url, 'name': 'Brand New Kickers', 'sku': '123',
+             'image': ['https://example.com/shoes.jpg'], 'offers': {'availability': 'https://schema.org/InStock',
+             'seller': {'name': 'Seller', 'address': {'addressLocality': 'Trelawny'}}}}]}
+        body = '<div data-component="SidebarContacts">Call 876-555-0123</div><script type="application/ld+json">' + json.dumps(data) + '</script>'
+        row = module.jacars_row(body, url, 'other', 'miscellaneous', 'today')
+        self.assertEqual((row['app_category'], row['app_subcategory']), ('clothing', 'shoes'))
+        self.assertEqual(json.loads(row['attributes'])['sourceSubcategory'], 'mens-shoes')
+
     def test_blocked_kijiji_discovery_uses_public_browser_and_keeps_resolved_url(self):
         url = 'https://www.kijiji.ca/b-cars-trucks/testville/c174l1?sort=dateDesc'
         canonical = 'https://www.kijiji.ca/b-cars-trucks/canonical-region/c174l1'

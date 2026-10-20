@@ -1,79 +1,6 @@
 {
-  "count": 2793,
+  "count": 2785,
   "listings": [
-    {
-      "id": "kijiji-1745093019",
-      "slug": "2014-ford-expedition-1745093019",
-      "url": "https://6ixo.com/listing/2014-ford-expedition-1745093019/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/64/64451b0b-1416-41f8-87b1-d8147aa9dec5?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/c9/c933afb9-6d42-4709-a950-b57f5bbf2385?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/26/26a09e64-0529-4071-adbf-486f0a618c69?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/5c/5c6ef1da-9229-4a27-aee8-fdcec5a3b8a7?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/ba/ba1af27f-f678-49f9-9aaf-9afbfbc679a2?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/9f/9f892f6f-bde4-4012-b8bd-c57eace4333d?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/72/726539a5-b0bc-411c-aff7-f4adb147edad?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/aa/aa5e58f4-73e5-4b3a-9e54-8f632dca464f?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/66/662a4c6d-f32a-4b91-acfe-4efd2b9336a2?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/41/4178b59c-24ac-4e29-93ba-8929d795e291?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/7c/7c11bc51-9b28-4883-b58f-22bd5285d56f?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/bc/bc4c5e34-45bf-4bce-a626-352f7cdfd4b0?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "kijiji-1745092914",
-      "slug": "trish-romance-star-of-wonder-numbered-plate-1745092914",
-      "url": "https://6ixo.com/listing/trish-romance-star-of-wonder-numbered-plate-1745092914/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/7a/7a7f7774-21c6-43f3-aa3d-20759b21a449?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/be/be5340f1-d6af-4f46-97db-e104fd643b2c?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/6d/6d147e0f-b62b-4be7-904b-b77d7f26e72c?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "buy-and-sell"
-    },
-    {
-      "id": "kijiji-1745092856",
-      "slug": "dell-inspiron-3847-desktop-computer-for-sale-1745092856",
-      "url": "https://6ixo.com/listing/dell-inspiron-3847-desktop-computer-for-sale-1745092856/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/2b/2b52f120-eb3c-4061-870e-630680cdb12f?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/fd/fd72c93f-e10d-40ed-9901-1ab2a7a6d30a?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/b8/b80f8a49-0740-42ce-9068-8718b784d0ca?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/9e/9efe4e8b-41f6-4f1f-9f07-592ca92b1bc2?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "electronics"
-    },
-    {
-      "id": "kijiji-1745092800",
-      "slug": "dell-inspiron-660s-desktop-computer-for-sale-1745092800",
-      "url": "https://6ixo.com/listing/dell-inspiron-660s-desktop-computer-for-sale-1745092800/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/ba/ba7ba8fd-e0db-4443-a54a-c944470726f0?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/55/55619539-b03b-4527-8bd3-6726981125a4?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "electronics"
-    },
-    {
-      "id": "kijiji-1745092782",
-      "slug": "comfort-series-scooter-bike-for-sale-1745092782",
-      "url": "https://6ixo.com/listing/comfort-series-scooter-bike-for-sale-1745092782/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/16/16ad4337-3b64-4043-9a0f-f69f81abb9f5?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "buy-and-sell"
-    },
-    {
-      "id": "kijiji-1745092766",
-      "slug": "asus-u56e-15-6-inch-laptop-computer-for-sale-1745092766",
-      "url": "https://6ixo.com/listing/asus-u56e-15-6-inch-laptop-computer-for-sale-1745092766/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/8f/8fd3e5cf-ffa4-4277-ada8-330ab2cf93f9?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/18/1852347e-06aa-4c45-96de-a351b323429c?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/97/9747c418-c027-45f8-9cc6-b988d2aa0b39?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "electronics"
-    },
     {
       "id": "kijiji-1744233538",
       "slug": "hot-tub-repairs-call-289-933-0693-1744233538",
@@ -1254,26 +1181,6 @@
         "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/5f/5fd3d727-a5ba-4a8f-a4dc-dc90c0bd9998?rule=kijijica-1600-webp"
       ],
       "categoryKey": "auto-parts"
-    },
-    {
-      "id": "kijiji-1744491067",
-      "slug": "2025-subaru-outback-onyx-awd-leather-sunroof-alloys-1744491067",
-      "url": "https://6ixo.com/listing/2025-subaru-outback-onyx-awd-leather-sunroof-alloys-1744491067/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/e9/e9fa2f3a-0f5a-4471-a11a-ff3979e89475?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/b0/b020fd2b-fa40-4490-b971-5614de29fb20?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/e0/e0db306d-7c4e-4646-93e0-82caed01075e?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/63/63e6b7eb-4bfb-4f6a-8cca-26c31111c386?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/7b/7b01668d-6a57-4e21-87f4-6a53da2e1df2?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/95/9575488e-b2db-41a5-b28c-58b691222f57?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/e9/e9f79b74-ee0d-4617-aeb7-dac5faacce72?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/14/14d44e63-d528-4f15-b4c3-3bece97069a6?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/47/4749ba30-478a-41b1-90d7-5786e90a3871?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/e3/e3ea5395-1205-4082-8118-c4814b0ebead?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/5c/5c2a0a9b-1a33-49f3-ad70-86b447ce8be6?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/27/273ec627-cda6-428d-a639-add16accbbb9?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "vehicles"
     },
     {
       "id": "kijiji-1744443588",
@@ -27370,19 +27277,6 @@
       "categoryKey": "real-estate"
     },
     {
-      "id": "kijiji-1717114278",
-      "slug": "40-feet-hq-container-available-for-rent-1717114278",
-      "url": "https://6ixo.com/listing/40-feet-hq-container-available-for-rent-1717114278/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/fb/fb7b3443-94b1-4fe1-bcd4-3d3407253670?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/34/34c6d966-848a-4d24-afd1-14ab9b5f6755?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/01/01abc629-9885-470a-a86e-9744933246a8?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/27/273f0826-c1c8-4d6b-bf85-51adf2a43861?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/a4/a4834a1f-ee96-4052-8c19-3c83f0f1e131?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "buy-and-sell"
-    },
-    {
       "id": "samtronix-gy-15882866229408",
       "slug": "apple-iphone-18-pro-max-e-sim-512gb-storage-2866229408",
       "url": "https://6ixo.com/listing/apple-iphone-18-pro-max-e-sim-512gb-storage-2866229408/",
@@ -34222,9 +34116,6 @@
       "url": "https://6ixo.com/listings/electronics/page/7/"
     },
     {
-      "url": "https://6ixo.com/listings/electronics/page/8/"
-    },
-    {
       "url": "https://6ixo.com/listings/vehicles/"
     },
     {
@@ -34604,9 +34495,6 @@
     },
     {
       "url": "https://6ixo.com/listings/country/canada/page/26/"
-    },
-    {
-      "url": "https://6ixo.com/listings/country/canada/page/27/"
     },
     {
       "url": "https://6ixo.com/listings/country/china/electronics/"
@@ -39697,6 +39585,46 @@
       "id": "kijiji-1744756081",
       "slug": "215-60-16-215-60r16-brand-new-tires-from-only-63-each-1744756081",
       "url": "https://6ixo.com/listing/215-60-16-215-60r16-brand-new-tires-from-only-63-each-1744756081/"
+    },
+    {
+      "id": "kijiji-1745093019",
+      "slug": "2014-ford-expedition-1745093019",
+      "url": "https://6ixo.com/listing/2014-ford-expedition-1745093019/"
+    },
+    {
+      "id": "kijiji-1745092914",
+      "slug": "trish-romance-star-of-wonder-numbered-plate-1745092914",
+      "url": "https://6ixo.com/listing/trish-romance-star-of-wonder-numbered-plate-1745092914/"
+    },
+    {
+      "id": "kijiji-1745092856",
+      "slug": "dell-inspiron-3847-desktop-computer-for-sale-1745092856",
+      "url": "https://6ixo.com/listing/dell-inspiron-3847-desktop-computer-for-sale-1745092856/"
+    },
+    {
+      "id": "kijiji-1745092800",
+      "slug": "dell-inspiron-660s-desktop-computer-for-sale-1745092800",
+      "url": "https://6ixo.com/listing/dell-inspiron-660s-desktop-computer-for-sale-1745092800/"
+    },
+    {
+      "id": "kijiji-1745092782",
+      "slug": "comfort-series-scooter-bike-for-sale-1745092782",
+      "url": "https://6ixo.com/listing/comfort-series-scooter-bike-for-sale-1745092782/"
+    },
+    {
+      "id": "kijiji-1745092766",
+      "slug": "asus-u56e-15-6-inch-laptop-computer-for-sale-1745092766",
+      "url": "https://6ixo.com/listing/asus-u56e-15-6-inch-laptop-computer-for-sale-1745092766/"
+    },
+    {
+      "id": "kijiji-1744491067",
+      "slug": "2025-subaru-outback-onyx-awd-leather-sunroof-alloys-1744491067",
+      "url": "https://6ixo.com/listing/2025-subaru-outback-onyx-awd-leather-sunroof-alloys-1744491067/"
+    },
+    {
+      "id": "kijiji-1717114278",
+      "slug": "40-feet-hq-container-available-for-rent-1717114278",
+      "url": "https://6ixo.com/listing/40-feet-hq-container-available-for-rent-1717114278/"
     }
   ]
 }

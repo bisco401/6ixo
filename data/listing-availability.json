@@ -1,5 +1,5 @@
 {
-  "checkedAt": "2026-10-20T19:04:01.364Z",
+  "checkedAt": "2026-10-20T20:05:54.558Z",
   "listings": {
     "craigslist.org/view/d/bastrop-used-2025-cadillac-xt4-fwd-4d/fuqr_3uo8rgowpq1ctwx-a": {
       "availability": "sold",
@@ -9273,6 +9273,24 @@
       "checkedAt": "2026-10-20T19:04:01.364Z",
       "httpStatus": 200,
       "resolvedUrl": "https://www.kijiji.ca/b-driver-security-jobs/hamilton/c148l80014?radius=50.0&ll=43.23%2C-79.69&adRemoved=1744867606",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "kijiji.ca/v-buy-sell-other/city-of-toronto/sagetra-professional-french-fry-cutter/1745087949": {
+      "id": "kijiji-1745087949",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/sagetra-professional-french-fry-cutter/1745087949",
+      "availability": "gone",
+      "checkedAt": "2026-10-20T20:05:54.558Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1745087949",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "kijiji.ca/v-buy-sell-other/city-of-toronto/eurodib-20-qt-commercial-spiral-mixer/1745087926": {
+      "id": "kijiji-1745087926",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/eurodib-20-qt-commercial-spiral-mixer/1745087926",
+      "availability": "gone",
+      "checkedAt": "2026-10-20T20:05:54.558Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1745087926",
       "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     }
   }

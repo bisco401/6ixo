@@ -2,6 +2,59 @@
   "version": 1,
   "listings": [
     {
+      "id": "312",
+      "url": "https://sebu.co.ke/2-piece-gym-wear-xhq84",
+      "lastmod": "2026-10-20",
+      "title": "2 Piece Gym Wear",
+      "amount": 1000,
+      "negotiable": "yes",
+      "description": "2 piece gym wear (black)",
+      "created_at": "2026-10-20T15:24:28.401Z",
+      "category": "fashion",
+      "category_name": "Fashion",
+      "subcategory": "women-clothing",
+      "subcategory_name": "Women Clothing",
+      "region": "embu",
+      "region_name": "Embu",
+      "area": "runyenjes-central",
+      "area_name": "Runyenjes Central",
+      "images": [
+        "https://pictures.sebu.co.ke/ads/1792509822556-b9fc9b03-f8c1-41f8-aa6d-be2c5c6b51e8.jpg"
+      ],
+      "dynamic": {
+        "size": "free size"
+      },
+      "seller": "SHAMAH CLOSET",
+      "seller_phone_verified": true
+    },
+    {
+      "id": "308",
+      "url": "https://sebu.co.ke/2-piece-wear-4pc6w",
+      "lastmod": "2026-10-20",
+      "title": "2 Piece Wear",
+      "amount": 1200,
+      "negotiable": "yes",
+      "description": "crop top and trouser set",
+      "created_at": "2026-10-20T15:12:40.659Z",
+      "category": "fashion",
+      "category_name": "Fashion",
+      "subcategory": "women-clothing",
+      "subcategory_name": "Women Clothing",
+      "region": "embu",
+      "region_name": "Embu",
+      "area": "runyenjes-central",
+      "area_name": "Runyenjes Central",
+      "images": [
+        "https://pictures.sebu.co.ke/ads/1792508459760-04ca908a-a938-4d1c-926e-d1f01b616260.jpg"
+      ],
+      "dynamic": {
+        "brand": "MJ",
+        "size": "free size"
+      },
+      "seller": "SHAMAH CLOSET",
+      "seller_phone_verified": true
+    },
+    {
       "id": "158",
       "url": "https://sebu.co.ke/3-by-6-bed-for-sale-j0zg8",
       "lastmod": "2026-02-26",
@@ -29,6 +82,33 @@
         "condition": "Used"
       },
       "seller": "Koros Caleb",
+      "seller_phone_verified": true
+    },
+    {
+      "id": "316",
+      "url": "https://sebu.co.ke/3-piece-wear-grtfq",
+      "lastmod": "2026-10-20",
+      "title": "3 Piece Wear",
+      "amount": 1400,
+      "negotiable": "no",
+      "description": "Enjoy effortless style with our stunning three-piece sets. Beautifully coordinated for a chic, fashionable look, they are perfect for outings, brunch dates, parties, and casual occasions.",
+      "created_at": "2026-10-20T15:38:36.591Z",
+      "category": "fashion",
+      "category_name": "Fashion",
+      "subcategory": "women-clothing",
+      "subcategory_name": "Women Clothing",
+      "region": "embu",
+      "region_name": "Embu",
+      "area": "runyenjes-central",
+      "area_name": "Runyenjes Central",
+      "images": [
+        "https://pictures.sebu.co.ke/ads/1792510601884-1229029b-a264-4050-83c1-7f1c271d5208.jpg"
+      ],
+      "dynamic": {
+        "size": "L",
+        "brand": "New"
+      },
+      "seller": "SHAMAH CLOSET",
       "seller_phone_verified": true
     },
     {
@@ -244,6 +324,186 @@
         "os": "Android"
       },
       "seller": "John",
+      "seller_phone_verified": true
+    },
+    {
+      "id": "303",
+      "url": "https://sebu.co.ke/any-jobs-itq3w",
+      "lastmod": "2026-10-20",
+      "title": "Any Jobs",
+      "amount": 3000,
+      "negotiable": "yes",
+      "description": "any work I can do",
+      "created_at": "2026-10-20T13:33:40.383Z",
+      "category": "job-looking-for-work",
+      "category_name": "Job - Looking for Work",
+      "subcategory": "looking-for-job-part-time-and-weekend-jobs",
+      "subcategory_name": "Part Time and Weekend Jobs",
+      "region": "nairobi",
+      "region_name": "Nairobi",
+      "area": "kilimani",
+      "area_name": "Kilimani",
+      "images": [
+        "https://pictures.sebu.co.ke/ads/1792501840736-8169c6c0-5e2f-4f03-b668-1aa5b7e5b695.jpg"
+      ],
+      "dynamic": {
+        "employment_type": "Part-Time",
+        "education_level": "Bachelor's Degree",
+        "experience_level": "3-5 Years",
+        "salary_frequency": "Per Task",
+        "gender": "Prefer Not to Say"
+      },
+      "seller": "Elsie Fidel",
+      "seller_phone_verified": true
+    },
+    {
+      "id": "306",
+      "url": "https://sebu.co.ke/any-work-94qqh",
+      "lastmod": "2026-10-20",
+      "title": "Any Work",
+      "amount": 6000,
+      "negotiable": "yes",
+      "description": "any work can do",
+      "created_at": "2026-10-20T13:30:47.641Z",
+      "category": "gigs-and-freelance",
+      "category_name": "Gigs and Freelance",
+      "subcategory": "house-chores-and-errands",
+      "subcategory_name": "House Chores and Errands",
+      "region": "nairobi",
+      "region_name": "Nairobi",
+      "area": "kasarani",
+      "area_name": "Kasarani",
+      "images": [
+        "https://pictures.sebu.co.ke/ads/1792502949115-686cdb17-93e1-4857-aa68-63bed25724f6.jpg"
+      ],
+      "dynamic": {
+        "task_type": "any work",
+        "location": "kasarani",
+        "preferred_time": "any time"
+      },
+      "seller": "Elsie Fidel",
+      "seller_phone_verified": true
+    },
+    {
+      "id": "304",
+      "url": "https://sebu.co.ke/automotive-spare-parts-and-repair-efr4i",
+      "lastmod": "2026-10-20",
+      "title": "Automotive Spare Parts And Repair",
+      "amount": 12345,
+      "negotiable": "yes",
+      "description": "HOTFIX AUTOMOTIVE GARAGE – NAKURU 🚗🔧\nWelcome to HOTFIX AUTOMOTIVE GARAGE, your trusted partner for professional automotive repair and maintenance services in Nakuru, Kenya.\nWe specialize in engine diagnostics and repairs, engine overhauls, automatic transmission repairs, gearbox services, and general vehicle maintenance. Our goal is to deliver reliable workmanship, quality service, and customer satisfaction.\nWhether your vehicle needs minor repairs, major mechanical work, or professional diagnosis, our team is committed to getting you back on the road with confidence.\n✅ Engine Repairs & Overhauls\n✅ Automatic Transmission & Gearbox Repairs\n✅ Vehicle Diagnostics\n✅ General Mechanical Repairs\n✅ Mobile Mechanic Services\n✅ Automotive Spare Parts Assistance\n📍 Location: Nakuru, Kenya\n📞 Call us: contact via the original listing\nHOTFIX AUTOMOTIVE GARAGE — Your Car, Our Responsibility. Quality Repairs You Can Trust!",
+      "created_at": "2026-10-20T13:35:46.394Z",
+      "category": "vehicles",
+      "category_name": "Vehicles",
+      "subcategory": "auto-repair-and-maintenance",
+      "subcategory_name": "Auto Repair and Maintenance",
+      "region": "nakuru",
+      "region_name": "Nakuru",
+      "area": "mosop",
+      "area_name": "Mosop",
+      "images": [
+        "https://pictures.sebu.co.ke/ads/1792502213571-668cd319-f25a-4134-b620-7175be60fa1f.jpg",
+        "https://pictures.sebu.co.ke/ads/1792502217970-83579347-2d08-452a-9f94-5619d55bf3aa.jpg",
+        "https://pictures.sebu.co.ke/ads/1792502242894-d1d47082-4e2b-49a5-9cdf-9f7e55776726.jpg",
+        "https://pictures.sebu.co.ke/ads/1792502246610-46a2ed78-4682-466b-989f-a9c00e4053b6.jpg"
+      ],
+      "dynamic": {
+        "service_type": [
+          "General Car Service",
+          "Engine Repair",
+          "Electrical & Diagnostics",
+          "Transmission & Gearbox",
+          "Suspension & Steering",
+          "Brake Service",
+          "Oil & Filter Change",
+          "Air Conditioning Repair",
+          "Panel Beating & Spray Painting",
+          "Tyre Change & Repair",
+          "Windscreen Replacement",
+          "Battery Replacement",
+          "Computer Diagnostics",
+          "Mobile Mechanic"
+        ],
+        "vehicle_types_serviced": [
+          "Buses & Vans",
+          "Cars",
+          "Trucks & Lorries"
+        ],
+        "location_type": "Mobile Service",
+        "experience_years": "10",
+        "certifications": "automotive",
+        "availability": "7 Days a Week",
+        "emergency_service": "Yes",
+        "warranty_on_service": "3 Months",
+        "contact_methods": [
+          "Call",
+          "WhatsApp",
+          "SMS"
+        ],
+        "special_notes": "HOTFIX AUTOMOTIVE GARAGE – NAKURU\nSPECIAL NOTES & TERMS\n\n1. All vehicles are inspected before repair, and any additional faults discovered will be communicated to the customer.\n2. No additional repairs will be carried out without the customer's approval.\n3. Customers are advised to confirm all repair costs before work begins.\n4. Spare parts replaced during repair can be retained by the customer upon request.\n5. Repair warranties, where applicable, will be communicated and agreed upon before work begins.\n6. The garage is not responsible for pre-existing faults or issues unrelated to the agreed repair work.\n7. Customers should remove personal belongings from their vehicles before leaving them at the garage.\n8. All outstanding balances should be cleared upon completion of the agreed work, unless otherwise agreed.\n9. Customers are encouraged to report any concerns related to the completed repair promptly.\n\nThank you for trusting HOTFIX AUTOMOTIVE GARAGE.\nQuality Service. Reliable Repairs. Customer Satisfaction."
+      },
+      "seller": "HOT FIX MOBILE GARAGE",
+      "seller_phone_verified": true
+    },
+    {
+      "id": "321",
+      "url": "https://sebu.co.ke/bee-venom-jakb2",
+      "lastmod": "2026-10-20",
+      "title": "Bee Venom",
+      "amount": 1500,
+      "negotiable": "no",
+      "description": "Bee venom is a skin care prodicts for warts,skin tags and logs removal",
+      "created_at": "2026-10-20T17:20:20.410Z",
+      "category": "health-and-beauty",
+      "category_name": "Health and Beauty",
+      "subcategory": "skincare-products",
+      "subcategory_name": "Skincare Products",
+      "region": "nairobi",
+      "region_name": "Nairobi",
+      "area": "zimmerman",
+      "area_name": "Zimmerman",
+      "images": [
+        "https://pictures.sebu.co.ke/ads/1792516653197-2e289f06-d3dc-489e-adc2-6380474dfeef.jpg",
+        "https://pictures.sebu.co.ke/ads/1792516669986-d1c3490e-af80-41aa-bac9-3fdb13494f1c.jpg",
+        "https://pictures.sebu.co.ke/ads/1792516691030-45a4bb12-bdcc-46d8-838f-0d591a32d4ce.jpg",
+        "https://pictures.sebu.co.ke/ads/1792516708023-e4cf4f3e-cf37-45f7-94fb-3b1112fd7d01.jpg"
+      ],
+      "dynamic": {
+        "product_type": "Cleanser",
+        "skin_type": "Dry",
+        "brand": "Bee venom"
+      },
+      "seller": "VINCENT BECAM",
+      "seller_phone_verified": true
+    },
+    {
+      "id": "322",
+      "url": "https://sebu.co.ke/bee-venom-odz2c",
+      "lastmod": "2026-10-20",
+      "title": "Bee Venom",
+      "amount": 1500,
+      "negotiable": "yes",
+      "description": "Bee venom is a skin treament cream for warts ,skin tags and logs",
+      "created_at": "2026-10-20T17:24:49.375Z",
+      "category": "health-and-beauty",
+      "category_name": "Health and Beauty",
+      "subcategory": "skincare-products",
+      "subcategory_name": "Skincare Products",
+      "region": "nairobi",
+      "region_name": "Nairobi",
+      "area": "zimmerman",
+      "area_name": "Zimmerman",
+      "images": [
+        "https://pictures.sebu.co.ke/ads/1792516897899-e2e91761-a348-45ed-a69a-87801e0d851d.jpg",
+        "https://pictures.sebu.co.ke/ads/1792516907326-785d1af2-a168-4e9f-8fc4-5d70dea9a511.jpg",
+        "https://pictures.sebu.co.ke/ads/1792516914545-479678b8-14cd-446a-8d26-cd3acf3026e6.jpg"
+      ],
+      "dynamic": {
+        "product_type": "Cleanser",
+        "skin_type": "Dry",
+        "brand": "Bee venom"
+      },
+      "seller": "VINCENT BECAM",
       "seller_phone_verified": true
     },
     {
@@ -691,6 +951,36 @@
       "seller_phone_verified": true
     },
     {
+      "id": "305",
+      "url": "https://sebu.co.ke/cleaning-0qafc",
+      "lastmod": "2026-10-20",
+      "title": "Cleaning",
+      "amount": 5000,
+      "negotiable": "yes",
+      "description": "cleaning is my priority",
+      "created_at": "2026-10-20T13:25:54.090Z",
+      "category": "job-looking-for-work",
+      "category_name": "Job - Looking for Work",
+      "subcategory": "looking-for-job-housekeeping-and-cleaning",
+      "subcategory_name": "Housekeeping and Cleaning",
+      "region": "nairobi",
+      "region_name": "Nairobi",
+      "area": "kasarani",
+      "area_name": "Kasarani",
+      "images": [
+        "https://pictures.sebu.co.ke/ads/1792502682098-1dce813e-bd42-4390-adf2-4fd4e03b8559.jpg"
+      ],
+      "dynamic": {
+        "employment_type": "Part-Time",
+        "education_level": "Bachelor's Degree",
+        "experience_level": "1-2 Years",
+        "salary_frequency": "Per Task",
+        "gender": "Prefer Not to Say"
+      },
+      "seller": "Elsie Fidel",
+      "seller_phone_verified": true
+    },
+    {
       "id": "247",
       "url": "https://sebu.co.ke/clogs-sandals-6ezhq",
       "lastmod": "2026-08-25",
@@ -1044,6 +1334,111 @@
       "seller_phone_verified": true
     },
     {
+      "id": "310",
+      "url": "https://sebu.co.ke/dress-6ifma",
+      "lastmod": "2026-10-20",
+      "title": "Dress",
+      "amount": 1600,
+      "negotiable": "yes",
+      "description": "Backless dress",
+      "created_at": "2026-10-20T15:17:00.345Z",
+      "category": "fashion",
+      "category_name": "Fashion",
+      "subcategory": "women-clothing",
+      "subcategory_name": "Women Clothing",
+      "region": "embu",
+      "region_name": "Embu",
+      "area": "runyenjes-central",
+      "area_name": "Runyenjes Central",
+      "images": [
+        "https://pictures.sebu.co.ke/ads/1792509358713-d1fad982-ff8e-48b5-9537-a864b275250e.jpg"
+      ],
+      "dynamic": {
+        "size": "L"
+      },
+      "seller": "SHAMAH CLOSET",
+      "seller_phone_verified": true
+    },
+    {
+      "id": "314",
+      "url": "https://sebu.co.ke/dress-azcg3",
+      "lastmod": "2026-10-20",
+      "title": "Dress",
+      "amount": 1000,
+      "negotiable": "yes",
+      "description": "✨😍 WELCOME TO SHAMAH CLOSET! 😍✨\n\n💕 Your Fashion Plug in Embu! 👗🛍️\n\nLooking good has never been this easy! 😍 At SHAMAH CLOSET, we bring you trendy, classy, and affordable outfits that make you stand out wherever you go. 💃❤️\n\n🔥 Slay every occasion\n👗 Stay stylish and elegant\n💖 Shop your favorite looks at affordable prices\n✨ Look good, feel confident, and turn heads!\n\nWhether you love classy, chic, casual, or trendy fashion, SHAMAH CLOSET is here to keep your wardrobe fresh and fabulous! 🥰🛍️\n\n📍 Find us in Embu, Kenya 🇰🇪\n\n💕 Don't just wear clothes, wear confidence!\n👑 SHAMAH CLOSET — Your Style, Your Confidence, Your Fashion Plug! 👑\n\n🛍️ Shop with us today and let your style speak! 😍❤️",
+      "created_at": "2026-10-20T15:30:10.639Z",
+      "category": "fashion",
+      "category_name": "Fashion",
+      "subcategory": "women-clothing",
+      "subcategory_name": "Women Clothing",
+      "region": "embu",
+      "region_name": "Embu",
+      "area": "runyenjes-central",
+      "area_name": "Runyenjes Central",
+      "images": [
+        "https://pictures.sebu.co.ke/ads/1792510110897-7e515459-7d3c-4f28-bb61-ff6e5f685d19.jpg"
+      ],
+      "dynamic": {
+        "size": "L"
+      },
+      "seller": "SHAMAH CLOSET",
+      "seller_phone_verified": true
+    },
+    {
+      "id": "315",
+      "url": "https://sebu.co.ke/dress-of5jk",
+      "lastmod": "2026-10-20",
+      "title": "Dress",
+      "amount": 1200,
+      "negotiable": "yes",
+      "description": "Step out in elegance with our gorgeous ladies’ dresses. Designed to enhance your style and confidence, these dresses are perfect for parties, dates, special occasions, and everyday elegance.",
+      "created_at": "2026-10-20T15:33:50.858Z",
+      "category": "fashion",
+      "category_name": "Fashion",
+      "subcategory": "women-clothing",
+      "subcategory_name": "Women Clothing",
+      "region": "embu",
+      "region_name": "Embu",
+      "area": "runyenjes-central",
+      "area_name": "Runyenjes Central",
+      "images": [
+        "https://pictures.sebu.co.ke/ads/1792510286639-75558b77-f1f1-4ec9-8654-a0c0bf6212cf.jpg"
+      ],
+      "dynamic": {
+        "size": "M&L"
+      },
+      "seller": "SHAMAH CLOSET",
+      "seller_phone_verified": true
+    },
+    {
+      "id": "317",
+      "url": "https://sebu.co.ke/dresses-xqzru",
+      "lastmod": "2026-10-20",
+      "title": "Dresses",
+      "amount": 1200,
+      "negotiable": "yes",
+      "description": "Step out in elegance with our gorgeous ladies’ dresses. Designed to enhance your style and confidence, these dresses are perfect for parties, dates, special occasions, and everyday elegance.",
+      "created_at": "2026-10-20T15:40:15.699Z",
+      "category": "fashion",
+      "category_name": "Fashion",
+      "subcategory": "women-clothing",
+      "subcategory_name": "Women Clothing",
+      "region": "embu",
+      "region_name": "Embu",
+      "area": "runyenjes-central",
+      "area_name": "Runyenjes Central",
+      "images": [
+        "https://pictures.sebu.co.ke/ads/1792510764169-cda31c76-f43b-45b2-9f89-ac9b6a230415.jpg"
+      ],
+      "dynamic": {
+        "brand": "new",
+        "size": "L"
+      },
+      "seller": "SHAMAH CLOSET",
+      "seller_phone_verified": true
+    },
+    {
       "id": "140",
       "url": "https://sebu.co.ke/end-of-year-sale-handbags-collection-3r4g6",
       "lastmod": "2025-11-30",
@@ -1135,6 +1530,63 @@
       "seller_phone_verified": true
     },
     {
+      "id": "290",
+      "url": "https://sebu.co.ke/fridge-zqqaq",
+      "lastmod": "2026-10-20",
+      "title": "Fridge",
+      "amount": 55000,
+      "negotiable": "yes",
+      "description": "two doors refrigerator",
+      "created_at": "2026-10-20T08:07:03.558Z",
+      "category": "home-furniture-and-appliances",
+      "category_name": "Home, Furniture and Appliances",
+      "subcategory": "cookware-and-kitchen",
+      "subcategory_name": "Cookware and Kitchen",
+      "region": "nairobi",
+      "region_name": "Nairobi",
+      "area": "clay-city",
+      "area_name": "Clay City",
+      "images": [
+        "https://pictures.sebu.co.ke/ads/1792483470399-56de67f4-8ef9-4b15-803e-b5e128b543b9.jpg",
+        "https://pictures.sebu.co.ke/ads/1792483528648-71ded49c-810b-4f2e-a406-6095d4f18407.jpg"
+      ],
+      "dynamic": {
+        "item_type": "Cookware",
+        "material": "hard plastic"
+      },
+      "seller": "Kiama Samwel",
+      "seller_phone_verified": true
+    },
+    {
+      "id": "292",
+      "url": "https://sebu.co.ke/graphics-design-work-o002b",
+      "lastmod": "2026-10-20",
+      "title": "Graphics Design Work",
+      "amount": 500,
+      "negotiable": "no",
+      "description": "I creat logo at afford price",
+      "created_at": "2026-10-20T08:11:14.951Z",
+      "category": "services",
+      "category_name": "Services",
+      "subcategory": "graphic-design-and-branding",
+      "subcategory_name": "Graphic Design and Branding",
+      "region": "nairobi",
+      "region_name": "Nairobi",
+      "area": "clay-city",
+      "area_name": "Clay City",
+      "images": [
+        "https://pictures.sebu.co.ke/ads/1792483777663-c8e49574-97ea-4806-a19e-a4ddcd5f99fa.jpg",
+        "https://pictures.sebu.co.ke/ads/1792483795442-2cccf632-6204-44a3-b018-1b75814770af.jpg",
+        "https://pictures.sebu.co.ke/ads/1792483799671-80409f29-c8a3-4f5a-bcd3-1a158a98834e.jpg"
+      ],
+      "dynamic": {
+        "design_type": "Logo",
+        "delivery_time": "1"
+      },
+      "seller": "Kiama Samwel",
+      "seller_phone_verified": true
+    },
+    {
       "id": "282",
       "url": "https://sebu.co.ke/grass-thatching-and-supply-jskiy",
       "lastmod": "2026-10-09",
@@ -1162,6 +1614,59 @@
         "item_type": "Other"
       },
       "seller": "makuti roofing expert",
+      "seller_phone_verified": true
+    },
+    {
+      "id": "320",
+      "url": "https://sebu.co.ke/guest-rooms-afflh",
+      "lastmod": "2026-10-20",
+      "title": "Guest Rooms",
+      "amount": 1500,
+      "negotiable": "no",
+      "description": "we offer rooms\nbeds\n24/7 running water\nFree WiFi\nfree parking\ngood environmental",
+      "created_at": "2026-10-20T16:45:46.366Z",
+      "category": "real-estate",
+      "category_name": "Real Estate",
+      "subcategory": "short-stay-and-airbnb",
+      "subcategory_name": "Short Stay and Airbnb",
+      "region": "kilifi",
+      "region_name": "Kilifi",
+      "area": "sokoni",
+      "area_name": "Sokoni",
+      "images": [
+        "https://pictures.sebu.co.ke/ads/1792513267062-8eb83560-353b-4cbe-ac88-bb014564e1f0.jpg",
+        "https://pictures.sebu.co.ke/ads/1792513295998-08c2c75e-c1d7-4523-a6e5-633d62d56f88.jpg",
+        "https://pictures.sebu.co.ke/ads/1792513304743-d1c804f8-b597-4220-a914-01980794630b.jpg",
+        "https://pictures.sebu.co.ke/ads/1792513331983-6e1dfd11-e0a1-4b77-a700-7ba4187a7cf0.jpg"
+      ],
+      "dynamic": {
+        "property_type": "1 Bedroom Apartment",
+        "occupancy": "6",
+        "bedrooms": "1",
+        "beds": "1",
+        "bathrooms": "1",
+        "furnishing": "Fully Furnished",
+        "rental_rate_type": "Daily",
+        "amenities": [
+          "Wi-Fi",
+          "Smart TV / DSTV",
+          "Free Parking",
+          "Balcony",
+          "24/7 Security / Guard",
+          "Outdoor Seating / Garden"
+        ],
+        "rules": [
+          "No Pets"
+        ],
+        "proximity_to": [
+          "School / University"
+        ],
+        "condition": "Well Maintained",
+        "availability": [
+          "Short Stays"
+        ]
+      },
+      "seller": "Lewis Baya",
       "seller_phone_verified": true
     },
     {
@@ -1318,6 +1823,59 @@
       "seller_phone_verified": true
     },
     {
+      "id": "313",
+      "url": "https://sebu.co.ke/jumpsuit-c9juk",
+      "lastmod": "2026-10-20",
+      "title": "Jumpsuit",
+      "amount": 1200,
+      "negotiable": "yes",
+      "description": "classy",
+      "created_at": "2026-10-20T15:27:16.898Z",
+      "category": "fashion",
+      "category_name": "Fashion",
+      "subcategory": "women-clothing",
+      "subcategory_name": "Women Clothing",
+      "region": "embu",
+      "region_name": "Embu",
+      "area": "runyenjes-central",
+      "area_name": "Runyenjes Central",
+      "images": [
+        "https://pictures.sebu.co.ke/ads/1792509991394-b30fae18-378f-44e5-b91c-f87e95ed5b54.jpg"
+      ],
+      "dynamic": {
+        "brand": "new",
+        "size": "all sizes"
+      },
+      "seller": "SHAMAH CLOSET",
+      "seller_phone_verified": true
+    },
+    {
+      "id": "309",
+      "url": "https://sebu.co.ke/jumpsuit-dm0gt",
+      "lastmod": "2026-10-20",
+      "title": "Jumpsuit",
+      "amount": 1100,
+      "negotiable": "no",
+      "description": "Black jumpsuit",
+      "created_at": "2026-10-20T15:14:53.428Z",
+      "category": "fashion",
+      "category_name": "Fashion",
+      "subcategory": "women-clothing",
+      "subcategory_name": "Women Clothing",
+      "region": "embu",
+      "region_name": "Embu",
+      "area": "runyenjes-central",
+      "area_name": "Runyenjes Central",
+      "images": [
+        "https://pictures.sebu.co.ke/ads/1792509240006-dc0776ac-536f-4821-92ce-03d0c246e461.jpg"
+      ],
+      "dynamic": {
+        "size": "free size"
+      },
+      "seller": "SHAMAH CLOSET",
+      "seller_phone_verified": true
+    },
+    {
       "id": "169",
       "url": "https://sebu.co.ke/junior-school-mathematical-tables-6uh2o",
       "lastmod": "2026-05-09",
@@ -1435,6 +1993,33 @@
         "material": "Leather"
       },
       "seller": "Wamaxi Trendywear and cosmetics",
+      "seller_phone_verified": true
+    },
+    {
+      "id": "311",
+      "url": "https://sebu.co.ke/long-sleeve-tops-84ugl",
+      "lastmod": "2026-10-20",
+      "title": "Long Sleeve Tops",
+      "amount": 1500,
+      "negotiable": "yes",
+      "description": "sweater tops",
+      "created_at": "2026-10-20T15:20:48.802Z",
+      "category": "fashion",
+      "category_name": "Fashion",
+      "subcategory": "women-clothing",
+      "subcategory_name": "Women Clothing",
+      "region": "embu",
+      "region_name": "Embu",
+      "area": "runyenjes-central",
+      "area_name": "Runyenjes Central",
+      "images": [
+        "https://pictures.sebu.co.ke/ads/1792509486811-d8392b7f-e17d-4ee9-90a8-6d4e75f85ef7.jpg"
+      ],
+      "dynamic": {
+        "size": "M",
+        "material": "cotton"
+      },
+      "seller": "SHAMAH CLOSET",
       "seller_phone_verified": true
     },
     {
@@ -3270,6 +3855,34 @@
       "seller_phone_verified": true
     },
     {
+      "id": "318",
+      "url": "https://sebu.co.ke/mummy-jeans-c8uu7",
+      "lastmod": "2026-10-20",
+      "title": "Mummy Jeans",
+      "amount": 1100,
+      "negotiable": "yes",
+      "description": "you may book an order . pay after delivery.",
+      "created_at": "2026-10-20T15:50:49.715Z",
+      "category": "fashion",
+      "category_name": "Fashion",
+      "subcategory": "women-clothing",
+      "subcategory_name": "Women Clothing",
+      "region": "nairobi",
+      "region_name": "Nairobi",
+      "area": "kabiro",
+      "area_name": "Kabiro",
+      "images": [
+        "https://pictures.sebu.co.ke/ads/1792511398440-1d05be3b-5c6b-4589-9286-2fffe26ea089.jpg"
+      ],
+      "dynamic": {
+        "size": "all",
+        "brand": "new",
+        "material": "jeans"
+      },
+      "seller": "Denis Oboi",
+      "seller_phone_verified": true
+    },
+    {
       "id": "258",
       "url": "https://sebu.co.ke/nanny-cook-cleaner-housekeeping-drcbu",
       "lastmod": "2026-09-11",
@@ -4022,6 +4635,33 @@
       "seller_phone_verified": true
     },
     {
+      "id": "307",
+      "url": "https://sebu.co.ke/repair-maintenance-and-spare-parts-6u704",
+      "lastmod": "2026-10-20",
+      "title": "Repair Maintenance And Spare Parts",
+      "amount": 1234,
+      "negotiable": "yes",
+      "description": "call us for more information",
+      "created_at": "2026-10-20T13:55:10.269Z",
+      "category": "services",
+      "category_name": "Services",
+      "subcategory": "movers-and-transport-services",
+      "subcategory_name": "Movers and Transport Services",
+      "region": "nakuru",
+      "region_name": "Nakuru",
+      "area": "mosop",
+      "area_name": "Mosop",
+      "images": [
+        "https://pictures.sebu.co.ke/ads/1792504124830-e24dfd5d-fd31-46e3-a4eb-11b91093a678.jpg"
+      ],
+      "dynamic": {
+        "distance_covered": "123456",
+        "transport_type": "Delivery"
+      },
+      "seller": "HOT FIX MOBILE GARAGE",
+      "seller_phone_verified": true
+    },
+    {
       "id": "115",
       "url": "https://sebu.co.ke/ruffle-hat-available-b2wwh",
       "lastmod": "2025-11-19",
@@ -4232,6 +4872,74 @@
       "seller_phone_verified": true
     },
     {
+      "id": "325",
+      "url": "https://sebu.co.ke/snorkeling-and-dolphin-tour-e80sg",
+      "lastmod": "2026-10-20",
+      "title": "Snorkeling And Dolphin Tour",
+      "amount": 3000,
+      "negotiable": "yes",
+      "description": "Yusfa Restaurant & Dolphin Tour 🐬\nDelicious Food. Amazing Ocean Adventures. Unforgettable Memories!\nWelcome to Yusfa Restaurant & Dolphin Tour, your perfect destination for great food, relaxation, and exciting ocean experiences!\nLocation: Shimoni, Kwale County, Kenya 🇰🇪\n📞 Call Us: contact via the original listing\n💬 WhatsApp: contact via the original listing",
+      "created_at": "2026-10-20T18:20:25.073Z",
+      "category": "travel-and-tourism",
+      "category_name": "Travel and Tourism",
+      "subcategory": "hotel-reservations",
+      "subcategory_name": "Hotel Reservations",
+      "region": "kwale",
+      "region_name": "Kwale",
+      "area": "ukunda",
+      "area_name": "Ukunda",
+      "images": [
+        "https://pictures.sebu.co.ke/ads/1792519131175-231d897e-f9c3-41d3-a95e-9bad76942422.jpg",
+        "https://pictures.sebu.co.ke/ads/1792519153335-273022a7-7e67-4f1a-ab2b-dfe1d6344654.jpg",
+        "https://pictures.sebu.co.ke/ads/1792519204915-3823b67d-f803-4f5b-b11e-d105d78390c6.jpg",
+        "https://pictures.sebu.co.ke/ads/1792519211066-13578214-3f01-4418-b519-deb1e673b77e.jpg"
+      ],
+      "dynamic": {
+        "hotel_name": "Yusfa Restuarant",
+        "location": "Shimoni,wasini",
+        "room_type": "Other"
+      },
+      "seller": "Lukman Hassan",
+      "seller_phone_verified": true
+    },
+    {
+      "id": "300",
+      "url": "https://sebu.co.ke/spare-parts-gkmo7",
+      "lastmod": "2026-10-20",
+      "title": "Spare Parts",
+      "amount": 15000,
+      "negotiable": "yes",
+      "description": "all vehicle spare parts",
+      "created_at": "2026-10-20T11:09:31.665Z",
+      "category": "vehicles",
+      "category_name": "Vehicles",
+      "subcategory": "vehicle-parts-and-accessories",
+      "subcategory_name": "Vehicle Parts and Accessories",
+      "region": "nairobi",
+      "region_name": "Nairobi",
+      "area": "south-c",
+      "area_name": "South C",
+      "images": [
+        "https://pictures.sebu.co.ke/ads/1792494181135-7546191a-f81f-4b5b-b1b4-39a3970c83a0.jpg",
+        "https://pictures.sebu.co.ke/ads/1792494186394-364ddaea-d43e-47c6-9ee5-f29baf4682d4.jpg",
+        "https://pictures.sebu.co.ke/ads/1792494191107-78207c63-5c85-40b4-936f-3009ed636406.jpg",
+        "https://pictures.sebu.co.ke/ads/1792494203324-59ca7cc1-43a4-4993-9684-ee7fccc04155.jpg"
+      ],
+      "dynamic": {
+        "part_type": "Exterior Accessories",
+        "compatible_vehicle_type": "Car",
+        "make": "Toyota",
+        "model": "all models",
+        "year_range": "all",
+        "brand": "all",
+        "condition": "Used",
+        "availability": "In Stock",
+        "warranty": "7 Days"
+      },
+      "seller": "Paul Nganga",
+      "seller_phone_verified": true
+    },
+    {
       "id": "285",
       "url": "https://sebu.co.ke/strapping-machine-oae6j",
       "lastmod": "2026-10-18",
@@ -4286,6 +4994,101 @@
         "condition": "New"
       },
       "seller": "Chly",
+      "seller_phone_verified": true
+    },
+    {
+      "id": "324",
+      "url": "https://sebu.co.ke/tecno-camon-50-cnqr1",
+      "lastmod": "2026-10-20",
+      "title": "Tecno Camon 50",
+      "amount": 8000,
+      "negotiable": "no",
+      "description": "It's a used like new phone",
+      "created_at": "2026-10-20T18:00:17.962Z",
+      "category": "electronics",
+      "category_name": "Electronics",
+      "subcategory": "mobile-phones",
+      "subcategory_name": "Mobile Phones",
+      "region": "kisumu",
+      "region_name": "Kisumu",
+      "area": "kondele",
+      "area_name": "Kondele",
+      "images": [
+        "https://pictures.sebu.co.ke/ads/1792519064753-e41c7305-fdd1-4dbe-9aa6-e99cff2caf2c.jpg"
+      ],
+      "dynamic": {
+        "brand": "Tecno",
+        "model": "Camon 50",
+        "storage": "256GB",
+        "ram": "16GB",
+        "condition": "Brand New",
+        "color": "black",
+        "os": "Android",
+        "battery": "450"
+      },
+      "seller": "Tracy Mauno",
+      "seller_phone_verified": true
+    },
+    {
+      "id": "291",
+      "url": "https://sebu.co.ke/tents-jlcz7",
+      "lastmod": "2026-10-20",
+      "title": "Tents",
+      "amount": 75000,
+      "negotiable": "yes",
+      "description": "Quality tents technology, we are selling tents at an affordable prices.\nBest offers....\n100 seater 85,000\n50 seater 48,000\nGazebo 30,000\nCamping tent 35,000\nCar shade 65,000\nUmbrella 10,000\nWe offer free delivery, Wellcome all.\nFor more information call contact via the original listing\n#tents\n#tents #tentlife #tentcamping #tentsale #tentsetup",
+      "created_at": "2026-10-20T08:06:28.337Z",
+      "category": "events-and-entertainment",
+      "category_name": "Events and Entertainment",
+      "subcategory": "event-decor-and-tents",
+      "subcategory_name": "Event Decor and Tents",
+      "region": "nairobi",
+      "region_name": "Nairobi",
+      "area": "nairobi-cbd",
+      "area_name": "Nairobi CBD",
+      "images": [
+        "https://pictures.sebu.co.ke/ads/1792483496948-2f1598f8-ee81-4a39-822d-ecba21a5583c.jpg",
+        "https://pictures.sebu.co.ke/ads/1792483500126-e000f090-9d3c-4e94-b662-e06647e10dcd.jpg",
+        "https://pictures.sebu.co.ke/ads/1792483502779-be935dc3-0a70-491b-8629-89f0b1796fde.jpg",
+        "https://pictures.sebu.co.ke/ads/1792483510786-5141c4c0-3bd3-4ab9-848d-f5b6d58ec8d2.jpg"
+      ],
+      "dynamic": {
+        "setup_scope": "Tent Only",
+        "guest_capacity": "30-5000",
+        "theme_available": "Yes"
+      },
+      "seller": "Shadrack Marembe 254",
+      "seller_phone_verified": true
+    },
+    {
+      "id": "288",
+      "url": "https://sebu.co.ke/tents-zj070",
+      "lastmod": "2026-10-20",
+      "title": "Tents",
+      "amount": 75000,
+      "negotiable": "yes",
+      "description": "Quality tents technology, we are selling tents at an affordable prices.\nBest offers....\n100 seater 85,000\n50 seater 48,000\nGazebo 30,000\nCamping tent 35,000\nCar shade 65,000\nUmbrella 10,000\nWe offer free delivery, Wellcome all.\nFor more information call contact via the original listing\n#tents\n#tents #tentlife #tentcamping #tentsale #tentsetup",
+      "created_at": "2026-10-20T08:09:01.862Z",
+      "category": "events-and-entertainment",
+      "category_name": "Events and Entertainment",
+      "subcategory": "event-decor-and-tents",
+      "subcategory_name": "Event Decor and Tents",
+      "region": "nairobi",
+      "region_name": "Nairobi",
+      "area": "nairobi-cbd",
+      "area_name": "Nairobi CBD",
+      "images": [
+        "https://pictures.sebu.co.ke/ads/1792482776806-88dafe58-8ffb-4d0b-99d9-0ef4e8092c92.jpg",
+        "https://pictures.sebu.co.ke/ads/1792482819199-6debf131-373d-4a59-ab19-0c3399820ec2.jpg",
+        "https://pictures.sebu.co.ke/ads/1792482822410-65cf4cfe-e2fe-4ccd-853c-57d0cc982825.jpg",
+        "https://pictures.sebu.co.ke/ads/1792482831902-a42989ff-7c9e-4d3e-a4b3-6303732cfc82.jpg"
+      ],
+      "dynamic": {
+        "setup_scope": "Tent Only",
+        "guest_capacity": "30- 5000",
+        "theme_available": "Yes"
+      },
+      "seller": "Shadrack Marembe 254",
       "seller_phone_verified": true
     },
     {
@@ -4697,6 +5500,37 @@
       "seller_phone_verified": true
     },
     {
+      "id": "297",
+      "url": "https://sebu.co.ke/we-sell-women-fashions-at-affordable-price-tmxwd",
+      "lastmod": "2026-10-20",
+      "title": "We Sell Women Fashions At Affordable Price",
+      "amount": 1000,
+      "negotiable": "yes",
+      "description": "we sell all fashionable and brand new women clothes and kids clothes. you can book your order and pay after delivery",
+      "created_at": "2026-10-20T15:45:41.814Z",
+      "category": "fashion",
+      "category_name": "Fashion",
+      "subcategory": "women-clothing",
+      "subcategory_name": "Women Clothing",
+      "region": "nairobi",
+      "region_name": "Nairobi",
+      "area": "kawangware",
+      "area_name": "Kawangware",
+      "images": [
+        "https://pictures.sebu.co.ke/ads/1792489335438-a4ea74cc-6249-453d-ac7f-b741d247133d.jpg",
+        "https://pictures.sebu.co.ke/ads/1792489339516-67ad3a87-2a7f-4435-984a-cbc55b938a83.jpg",
+        "https://pictures.sebu.co.ke/ads/1792489345486-b08dacf7-b113-42ab-9f4c-eaa608845cbc.jpg",
+        "https://pictures.sebu.co.ke/ads/1792489346652-f5ad27f9-dd22-4e88-8ee1-54e4b0f2bf05.jpg"
+      ],
+      "dynamic": {
+        "size": "all size",
+        "brand": "new",
+        "material": "all"
+      },
+      "seller": "Denis Oboi",
+      "seller_phone_verified": true
+    },
+    {
       "id": "174",
       "url": "https://sebu.co.ke/wisdom-for-girls-bmscp",
       "lastmod": "2026-05-11",
@@ -4751,6 +5585,33 @@
         "material": "Cotton"
       },
       "seller": "Jemima R",
+      "seller_phone_verified": true
+    },
+    {
+      "id": "319",
+      "url": "https://sebu.co.ke/women-wear-0qc6c",
+      "lastmod": "2026-10-20",
+      "title": "Women Wear",
+      "amount": 1200,
+      "negotiable": "yes",
+      "description": "we provide delivery and client pay after delivery",
+      "created_at": "2026-10-20T15:53:42.234Z",
+      "category": "fashion",
+      "category_name": "Fashion",
+      "subcategory": "women-clothing",
+      "subcategory_name": "Women Clothing",
+      "region": "nairobi",
+      "region_name": "Nairobi",
+      "area": "gatina",
+      "area_name": "Gatina",
+      "images": [
+        "https://pictures.sebu.co.ke/ads/1792511553590-cb52a513-f347-4442-b206-2669775eefd3.jpg"
+      ],
+      "dynamic": {
+        "size": "all",
+        "brand": "new"
+      },
+      "seller": "Denis Oboi",
       "seller_phone_verified": true
     },
     {

@@ -243,6 +243,54 @@ def jacars_source_category(soup, url):
     return None
 
 
+def retain_vehicle_schema_fields(row, product):
+    if row.get('app_category') != 'vehicles' or availability.source_key(product.get('url') or product.get('@id') or '') != availability.source_key(row['source_url']):
+        return row
+    attrs = json.loads(row['attributes']); facts = list(attrs.get('details') or [])
+    def value(v):
+        if isinstance(v, dict): v = v.get('name') or v.get('value') or ''
+        return clean(v) if v is not None else ''
+    def add(key, label, v):
+        if value(v).lower() not in {'', 'unknown', 'other', 'n/a', 'not specified'} and not attrs.get(key):
+            attrs[key] = v; facts.append({'label': label, 'value': str(v)})
+    engine = product.get('vehicleEngine') or {}
+    if isinstance(engine, dict):
+        displacement = engine.get('engineDisplacement') or {}
+        if isinstance(displacement, dict):
+            amount, unit = displacement.get('value'), value(displacement.get('unitCode') or displacement.get('unitText'))
+            try: number = float(amount)
+            except (TypeError, ValueError): number = 0
+            if number > 0:
+                litres = unit.lower() in {'ltr', 'l', 'liter', 'liters', 'litre', 'litres'}
+                cubic = unit.lower() in {'cmq', 'cc', 'cm3', 'cm³'}
+                if (litres or cubic) and not attrs.get('engineCc'):
+                    cc = number * 1000 if litres else number
+                    attrs['engineCc'] = int(cc) if cc.is_integer() else cc
+                    facts.append({'label': 'Engine', 'value': f"{amount} {'L' if litres else unit}"})
+                elif not (litres or cubic): facts.append({'label': 'Engine displacement (source units)', 'value': f'{amount} {unit}'.strip()})
+        for name, key, label in [('engineType', 'engineType', 'Engine type'), ('name', 'engineModel', 'Engine model')]:
+            add(key, label, value(engine.get(name)))
+    for names, key, label in [(['vehicleSeatingCapacity', 'seatingCapacity', 'numberOfSeats'], 'seats', 'Seats'), (['numberOfDoors'], 'doors', 'Doors'), (['numberOfPreviousOwners', 'numberOfOwners'], 'ownerCount', 'Owners')]:
+        for name in names:
+            v = product.get(name)
+            try: positive = float(v) > 0
+            except (TypeError, ValueError): positive = False
+            if positive: add(key, label, v); break
+    drive = value(product.get('driveWheelConfiguration') or product.get('drivetrain'))
+    if drive:
+        drive = {'FourWheelDriveConfiguration':'4WD','AllWheelDriveConfiguration':'AWD','FrontWheelDriveConfiguration':'FWD','RearWheelDriveConfiguration':'RWD'}.get(drive.rstrip('/').rsplit('/',1)[-1], drive)
+        add('drivetrain', 'Drivetrain', drive)
+    for name, key, label in [('fuelType', 'fuel', 'Fuel'), ('vehicleTransmission', 'transmission', 'Transmission'), ('accidentHistory', 'accidentHistory', 'Accident history')]:
+        add(key, label, value(product.get(name)))
+    if row.get('app_subcategory') == 'vehicles':
+        for key, raw in [('make', product.get('brand') or product.get('manufacturer')), ('model', product.get('model')), ('trim', product.get('trim') or product.get('vehicleTrim'))]:
+            v = value(raw)
+            if v.lower() not in {'', 'unknown', 'other', 'n/a', 'not specified'} and not row.get(key): row[key] = v; add(key, key.title(), v)
+    attrs.update(details=facts, sourceSpecifications=facts, detailsSourceUrl=row['source_url'], detailsVerifiedAt=row['scraped_at'])
+    row['attributes'] = json.dumps(attrs, separators=(',', ':'))
+    return row
+
+
 def jacars_row(body, url, category, subcategory, checked):
     soup, product = product_schema(body)
     source_category = jacars_source_category(soup, url)
@@ -269,7 +317,7 @@ def jacars_row(body, url, category, subcategory, checked):
         attrs = json.loads(row['attributes'])
         attrs.update(sourceCategory=source_category[2], sourceSubcategory=source_category[2].rsplit('/', 1)[-1])
         row['attributes'] = json.dumps(attrs, separators=(',', ':'))
-    return row
+    return retain_vehicle_schema_fields(row, product)
 
 
 def kijiji_row(item, fallback_city, checked):

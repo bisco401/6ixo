@@ -15,6 +15,20 @@ spec.loader.exec_module(module)
 
 
 class RefreshTest(unittest.TestCase):
+    def test_vehicle_schema_fields_preserve_supplied_units_and_capacity(self):
+        row = {'app_category': 'vehicles', 'app_subcategory': 'vehicles', 'source_url': 'https://www.jacars.net/adv/123_car/', 'attributes': '{}', 'scraped_at': 'today'}
+        product = {'url': row['source_url'], 'brand': {'name': 'Toyota'}, 'model': 'Aqua', 'seatingCapacity': 5,
+                   'vehicleEngine': {'engineDisplacement': {'value': 1.3, 'unitCode': 'LTR'}}}
+        result = module.retain_vehicle_schema_fields(dict(row), product)
+        attrs = json.loads(result['attributes'])
+        self.assertEqual((result['make'], result['model'], attrs['engineCc'], attrs['seats']), ('Toyota', 'Aqua', 1300, 5))
+        self.assertIn({'label': 'Engine', 'value': '1.3 L'}, attrs['sourceSpecifications'])
+        product['vehicleEngine']['engineDisplacement'].pop('unitCode')
+        unknown = json.loads(module.retain_vehicle_schema_fields(dict(row), product)['attributes'])
+        self.assertNotIn('engineCc', unknown)
+        foreign = module.retain_vehicle_schema_fields(dict(row), {**product, 'url': 'https://www.jacars.net/adv/999_foreign/'})
+        self.assertEqual(foreign, row)
+
     def test_jacars_uses_own_taxonomy_instead_of_discovery_bucket(self):
         url = 'https://www.jacars.net/adv/123_kickers/'
         def crumbs(own_url, path):

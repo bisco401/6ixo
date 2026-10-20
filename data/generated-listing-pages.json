@@ -1,5 +1,5 @@
 {
-  "count": 2795,
+  "count": 2783,
   "listings": [
     {
       "id": "apify-b9b18084f762",
@@ -291,15 +291,6 @@
       "url": "https://6ixo.com/listing/2024-audi-sq8-e-tron-adubai2150/",
       "images": [
         "https://storage.albacars.ae/vehicles/drafts/2150/1.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "alba-dubai-2149",
-      "slug": "2025-lamborghini-urus-se-adubai2149",
-      "url": "https://6ixo.com/listing/2025-lamborghini-urus-se-adubai2149/",
-      "images": [
-        "https://storage.albacars.ae/vehicles/093659c2-6996-46ec-a67b-44efa8859091/a7cddcba-d61c-4b32-9717-231d7a6a364c.jpeg"
       ],
       "categoryKey": "vehicles"
     },
@@ -14480,15 +14471,6 @@
       "categoryKey": "real-estate"
     },
     {
-      "id": "allsopp-dubai-l-264555",
-      "slug": "studio-apartment-for-rent-sky-gardens-sky-gardens-difc-bail264555",
-      "url": "https://6ixo.com/listing/studio-apartment-for-rent-sky-gardens-sky-gardens-difc-bail264555/",
-      "images": [
-        "https://images.allsoppandallsopp.com/public/temp/a0OdK000000g40oUAA_s_apartment-in-sky-gardens-sky-gardens-difc-aed-95k-allsopp-and-allsopp-chatgpt-image-oct-6-2026-124524-pm.png"
-      ],
-      "categoryKey": "real-estate"
-    },
-    {
       "id": "allsopp-dubai-l-304557",
       "slug": "studio-apartment-for-rent-sky-gardens-difc-bail304557",
       "url": "https://6ixo.com/listing/studio-apartment-for-rent-sky-gardens-difc-bail304557/",
@@ -15976,15 +15958,6 @@
       "url": "https://6ixo.com/listing/studio-apartment-for-rent-carson-damac-hills-bail310747/",
       "images": [
         "https://images.allsoppandallsopp.com/public/temp/a0OdK000003aVzdUAE_s_apartment-in-carson-damac-hills-aed-52k-allsopp-and-allsopp-dsc02899.jpg"
-      ],
-      "categoryKey": "real-estate"
-    },
-    {
-      "id": "allsopp-dubai-l-310958",
-      "slug": "1-bedroom-apartment-for-rent-the-autograph-jumeirah-villag-bail310958",
-      "url": "https://6ixo.com/listing/1-bedroom-apartment-for-rent-the-autograph-jumeirah-villag-bail310958/",
-      "images": [
-        "https://images.allsoppandallsopp.com/public/temp/a0OdK000003awWnUAI_s_1-bedroom-apartment-in-the-autograph-jumeirah-village-circle-aed-130k-allsopp-and-allsopp-whatsapp-image-2026-10-01-at-130057-1.jpeg"
       ],
       "categoryKey": "real-estate"
     },
@@ -20327,15 +20300,6 @@
       "categoryKey": "vehicles"
     },
     {
-      "id": "alba-dubai-2031",
-      "slug": "2025-mercedes-benz-c200-amg-premium-plus-adubai2031",
-      "url": "https://6ixo.com/listing/2025-mercedes-benz-c200-amg-premium-plus-adubai2031/",
-      "images": [
-        "https://storage.albacars.ae/vehicles/drafts/2031/1.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
       "id": "alba-dubai-2029",
       "slug": "2025-toyota-prado-gxl-turbo-adubai2029",
       "url": "https://6ixo.com/listing/2025-toyota-prado-gxl-turbo-adubai2029/",
@@ -23177,7 +23141,7 @@
         "https://oxglow.com.gh/uploads/medium/calico-container-shop-Q6ky8h6-1790853959-2-medium.jpg",
         "https://oxglow.com.gh/uploads/medium/calico-container-shop-Q6ky8h6-1790853959-3-medium.jpg"
       ],
-      "categoryKey": "real-estate"
+      "categoryKey": "buy-and-sell"
     },
     {
       "id": "kijiji-1744213043",
@@ -23971,42 +23935,6 @@
       "categoryKey": "electronics"
     },
     {
-      "id": "craigslist-vejBHeGd44NMmqnY9zVeA7",
-      "slug": "2023-ford-f600-f-600-xlt-4x4-diesel-193-wb-cab-chassis-ful-mqny9zvea7",
-      "url": "https://6ixo.com/listing/2023-ford-f600-f-600-xlt-4x4-diesel-193-wb-cab-chassis-ful-mqny9zvea7/",
-      "images": [
-        "https://images.craigslist.org/00D0D_jv7haqpryE7_0jm0ew_600x450.jpg",
-        "https://images.craigslist.org/01616_9dPWp44dC07_0jm0ew_600x450.jpg",
-        "https://images.craigslist.org/00606_a5Q8BugdoZN_0jm0pO_600x450.jpg",
-        "https://images.craigslist.org/00E0E_3E8Nqlblo8L_0jm0ew_600x450.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "craigslist-64ftpd6banWpWNkHyMRgQz",
-      "slug": "2023-ford-f-550-f550-reefer-cold-car-usa-refrigerated-free-wnkhymrgqz",
-      "url": "https://6ixo.com/listing/2023-ford-f-550-f550-reefer-cold-car-usa-refrigerated-free-wnkhymrgqz/",
-      "images": [
-        "https://images.craigslist.org/00j0j_eTOujGVeZuV_0jm0ew_600x450.jpg",
-        "https://images.craigslist.org/00k0k_4tEQoVMKYYQ_0jm0ew_600x450.jpg",
-        "https://images.craigslist.org/00J0J_cJr1SsMoWY9_0jm0ew_600x450.jpg",
-        "https://images.craigslist.org/00y0y_a1IxHQWbo7v_0jm0ew_600x450.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "craigslist-nqtMrGriytHHqtSS5StZJ2",
-      "slug": "2017-ford-f550-stetco-crane-storm-drain-catch-basin-cleane-qtss5stzj2",
-      "url": "https://6ixo.com/listing/2017-ford-f550-stetco-crane-storm-drain-catch-basin-cleane-qtss5stzj2/",
-      "images": [
-        "https://images.craigslist.org/00202_4THguhvjCdR_0jm0ew_600x450.jpg",
-        "https://images.craigslist.org/00P0P_1N60nvJUJ4a_0jm0ew_600x450.jpg",
-        "https://images.craigslist.org/00s0s_cbzNpl8EhH1_0jm0ew_600x450.jpg",
-        "https://images.craigslist.org/00g0g_fF4pogEUoLy_0jm0ew_600x450.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
       "id": "craigslist-cHDMXbVoXdfRVbKQKDSbew",
       "slug": "2022-chevrolet-k1500-crew-cab-5-3l-4wd-83k-miles-vbkqkdsbew",
       "url": "https://6ixo.com/listing/2022-chevrolet-k1500-crew-cab-5-3l-4wd-83k-miles-vbkqkdsbew/",
@@ -24740,18 +24668,6 @@
         "https://images.craigslist.org/00101_5tsHDwczGIA_0gl0t2_600x450.jpg",
         "https://images.craigslist.org/00W0W_6NmAqqAXxVz_0gl0t2_600x450.jpg",
         "https://images.craigslist.org/00G0G_lw3y9FyfpJB_0gl0t2_600x450.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "craigslist-GDFwMjC08RG5oNX5oMzryA",
-      "slug": "2020-lexus-gx-gx-460-premium-suv-onyx-black-onx5omzrya",
-      "url": "https://6ixo.com/listing/2020-lexus-gx-gx-460-premium-suv-onyx-black-onx5omzrya/",
-      "images": [
-        "https://images.craigslist.org/00d0d_a4Pq64bP0Ib_0ak07K_600x450.jpg",
-        "https://images.craigslist.org/01111_9d0DTlvTcWp_0ak07K_600x450.jpg",
-        "https://images.craigslist.org/00000_fSxQpVYjRIl_0ak07K_600x450.jpg",
-        "https://images.craigslist.org/00U0U_ivqeOAeVlbC_0ak07K_600x450.jpg"
       ],
       "categoryKey": "vehicles"
     },
@@ -27458,27 +27374,6 @@
         "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/54/5475b3c7-dc7d-4173-8cf6-627ca48be00f?rule=kijijica-1600-webp"
       ],
       "categoryKey": "vehicles"
-    },
-    {
-      "id": "apify-81eead5f8cbe",
-      "slug": "brand-new-canon-r50-1845mm-eead5f8cbe",
-      "url": "https://6ixo.com/listing/brand-new-canon-r50-1845mm-eead5f8cbe/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/brand-new-canon-r50-1845mm-69y1Ac5-1789556159-0-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/brand-new-canon-r50-1845mm-69y1Ac5-1789556159-1-medium.jpg"
-      ],
-      "categoryKey": "electronics"
-    },
-    {
-      "id": "apify-640baf61e81b",
-      "slug": "maxbest-soundbar-mbt125-0baf61e81b",
-      "url": "https://6ixo.com/listing/maxbest-soundbar-mbt125-0baf61e81b/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/maxbest-soundbar-mbt125-xDQhP4-1789555373-0-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/maxbest-soundbar-mbt125-xDQhP4-1789555373-1-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/maxbest-soundbar-mbt125-xDQhP4-1789555373-2-medium.jpg"
-      ],
-      "categoryKey": "electronics"
     },
     {
       "id": "apify-38f1944673e5",
@@ -30805,26 +30700,6 @@
       "categoryKey": "vehicles"
     },
     {
-      "id": "kijiji-1738656674",
-      "slug": "2023-ram-1500-classic-tradesman-quad-cab-5-7l-hemi-1738656674",
-      "url": "https://6ixo.com/listing/2023-ram-1500-classic-tradesman-quad-cab-5-7l-hemi-1738656674/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/00/001a72d7-c9dd-4396-9b49-026e192c19bf?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/b9/b9f74024-11f4-4527-b858-54e6a6eb7d67?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/6e/6eae0e72-98fe-4d3a-a2d3-bb97e5f8de17?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/c3/c3171342-9e93-4de5-b09c-3d586bec9931?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/bf/bf96ec10-6033-47f3-bd12-a693b06fb8fc?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/15/1556647e-3927-4ecf-b599-a1d21b17b7ca?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/ee/ee2c573e-a24d-44c1-9680-599641f73d0c?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/2c/2c42c5d6-4f9c-442f-8b72-0a3da3c8f6c5?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/aa/aa630c49-db5f-4431-9858-5c0de8a55ff8?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/7d/7d35c753-48fc-4a85-8eaf-d6caf78425c3?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/94/940d9031-1262-4bbf-b360-f645fb9ee35b?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/bb/bb7f6244-9e9b-44c0-ab53-81396444c141?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
       "id": "kijiji-1738652220",
       "slug": "2024-cadillac-xt4-awd-premium-luxury-4-new-tires-1738652220",
       "url": "https://6ixo.com/listing/2024-cadillac-xt4-awd-premium-luxury-4-new-tires-1738652220/",
@@ -31923,16 +31798,6 @@
         "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/70/7041e649-c677-4a9e-adae-c620c85a1ae8?rule=kijijica-1600-webp"
       ],
       "categoryKey": "auto-parts"
-    },
-    {
-      "id": "apify-5c3caea2439d",
-      "slug": "3-bedroom-modern-house-3caea2439d",
-      "url": "https://6ixo.com/listing/3-bedroom-modern-house-3caea2439d/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/3-bedroom-modern-house-4cy3309-1779185735-0-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/3-bedroom-modern-house-4cy3309-1779185735-1-medium.jpg"
-      ],
-      "categoryKey": "real-estate"
     },
     {
       "id": "kijiji-1737663886",
@@ -34250,9 +34115,6 @@
       "url": "https://6ixo.com/listings/real-estate/page/12/"
     },
     {
-      "url": "https://6ixo.com/listings/real-estate/page/13/"
-    },
-    {
       "url": "https://6ixo.com/listings/services/"
     },
     {
@@ -34493,6 +34355,9 @@
       "url": "https://6ixo.com/listings/country/ghana/services/"
     },
     {
+      "url": "https://6ixo.com/listings/country/ghana/buy-and-sell/"
+    },
+    {
       "url": "https://6ixo.com/listings/country/ghana/"
     },
     {
@@ -34658,9 +34523,6 @@
       "url": "https://6ixo.com/listings/country/united-arab-emirates/real-estate/page/3/"
     },
     {
-      "url": "https://6ixo.com/listings/country/united-arab-emirates/real-estate/page/4/"
-    },
-    {
       "url": "https://6ixo.com/listings/country/united-arab-emirates/buy-and-sell/"
     },
     {
@@ -34802,9 +34664,6 @@
       "url": "https://6ixo.com/apartments-for-rent/united-arab-emirates/page/3/"
     },
     {
-      "url": "https://6ixo.com/apartments-for-rent/united-arab-emirates/page/4/"
-    },
-    {
       "url": "https://6ixo.com/apartments-for-rent/united-arab-emirates/dubai/"
     },
     {
@@ -34812,9 +34671,6 @@
     },
     {
       "url": "https://6ixo.com/apartments-for-rent/united-arab-emirates/dubai/page/3/"
-    },
-    {
-      "url": "https://6ixo.com/apartments-for-rent/united-arab-emirates/dubai/page/4/"
     },
     {
       "url": "https://6ixo.com/apartments-for-rent/united-states/"
@@ -39224,6 +39080,66 @@
       "id": "samtronix-gy-15918517092512",
       "slug": "jbl-headphone-gaming-tune54d-8517092512",
       "url": "https://6ixo.com/listing/jbl-headphone-gaming-tune54d-8517092512/"
+    },
+    {
+      "id": "alba-dubai-2149",
+      "slug": "2025-lamborghini-urus-se-adubai2149",
+      "url": "https://6ixo.com/listing/2025-lamborghini-urus-se-adubai2149/"
+    },
+    {
+      "id": "allsopp-dubai-l-264555",
+      "slug": "studio-apartment-for-rent-sky-gardens-sky-gardens-difc-bail264555",
+      "url": "https://6ixo.com/listing/studio-apartment-for-rent-sky-gardens-sky-gardens-difc-bail264555/"
+    },
+    {
+      "id": "allsopp-dubai-l-310958",
+      "slug": "1-bedroom-apartment-for-rent-the-autograph-jumeirah-villag-bail310958",
+      "url": "https://6ixo.com/listing/1-bedroom-apartment-for-rent-the-autograph-jumeirah-villag-bail310958/"
+    },
+    {
+      "id": "alba-dubai-2031",
+      "slug": "2025-mercedes-benz-c200-amg-premium-plus-adubai2031",
+      "url": "https://6ixo.com/listing/2025-mercedes-benz-c200-amg-premium-plus-adubai2031/"
+    },
+    {
+      "id": "craigslist-vejBHeGd44NMmqnY9zVeA7",
+      "slug": "2023-ford-f600-f-600-xlt-4x4-diesel-193-wb-cab-chassis-ful-mqny9zvea7",
+      "url": "https://6ixo.com/listing/2023-ford-f600-f-600-xlt-4x4-diesel-193-wb-cab-chassis-ful-mqny9zvea7/"
+    },
+    {
+      "id": "craigslist-64ftpd6banWpWNkHyMRgQz",
+      "slug": "2023-ford-f-550-f550-reefer-cold-car-usa-refrigerated-free-wnkhymrgqz",
+      "url": "https://6ixo.com/listing/2023-ford-f-550-f550-reefer-cold-car-usa-refrigerated-free-wnkhymrgqz/"
+    },
+    {
+      "id": "craigslist-nqtMrGriytHHqtSS5StZJ2",
+      "slug": "2017-ford-f550-stetco-crane-storm-drain-catch-basin-cleane-qtss5stzj2",
+      "url": "https://6ixo.com/listing/2017-ford-f550-stetco-crane-storm-drain-catch-basin-cleane-qtss5stzj2/"
+    },
+    {
+      "id": "craigslist-GDFwMjC08RG5oNX5oMzryA",
+      "slug": "2020-lexus-gx-gx-460-premium-suv-onyx-black-onx5omzrya",
+      "url": "https://6ixo.com/listing/2020-lexus-gx-gx-460-premium-suv-onyx-black-onx5omzrya/"
+    },
+    {
+      "id": "apify-81eead5f8cbe",
+      "slug": "brand-new-canon-r50-1845mm-eead5f8cbe",
+      "url": "https://6ixo.com/listing/brand-new-canon-r50-1845mm-eead5f8cbe/"
+    },
+    {
+      "id": "apify-640baf61e81b",
+      "slug": "maxbest-soundbar-mbt125-0baf61e81b",
+      "url": "https://6ixo.com/listing/maxbest-soundbar-mbt125-0baf61e81b/"
+    },
+    {
+      "id": "kijiji-1738656674",
+      "slug": "2023-ram-1500-classic-tradesman-quad-cab-5-7l-hemi-1738656674",
+      "url": "https://6ixo.com/listing/2023-ram-1500-classic-tradesman-quad-cab-5-7l-hemi-1738656674/"
+    },
+    {
+      "id": "apify-5c3caea2439d",
+      "slug": "3-bedroom-modern-house-3caea2439d",
+      "url": "https://6ixo.com/listing/3-bedroom-modern-house-3caea2439d/"
     }
   ]
 }

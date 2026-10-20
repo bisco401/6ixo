@@ -1,5 +1,5 @@
 {
-  "count": 2798,
+  "count": 2795,
   "listings": [
     {
       "id": "apify-b9b18084f762",
@@ -9636,15 +9636,6 @@
       "categoryKey": "electronics"
     },
     {
-      "id": "samtronix-gy-15918481146016",
-      "slug": "saiya-pb-02-power-bank-22-5w-8481146016",
-      "url": "https://6ixo.com/listing/saiya-pb-02-power-bank-22-5w-8481146016/",
-      "images": [
-        "https://samtronixguyana.com/cdn/shop/files/100_BlackPowerBankwithCables_1024x.png?v=1792080611"
-      ],
-      "categoryKey": "electronics"
-    },
-    {
       "id": "samtronix-gy-15918521548960",
       "slug": "saiya-wireless-headphone-aw-28-8521548960",
       "url": "https://6ixo.com/listing/saiya-wireless-headphone-aw-28-8521548960/",
@@ -9659,24 +9650,6 @@
       "url": "https://6ixo.com/listing/saiya-wireless-headphone-aw-27-8520565920/",
       "images": [
         "https://samtronixguyana.com/cdn/shop/files/CIDEACM10017ULTRASIMTABLET_8GBRAM1TBSTORAGE_-2026-10-15T212941.711_1024x.png?v=1792079993"
-      ],
-      "categoryKey": "electronics"
-    },
-    {
-      "id": "samtronix-gy-15918519419040",
-      "slug": "jbl-headphone-gaming-tune49d-8519419040",
-      "url": "https://6ixo.com/listing/jbl-headphone-gaming-tune49d-8519419040/",
-      "images": [
-        "https://samtronixguyana.com/cdn/shop/files/CIDEACM10017ULTRASIMTABLET_8GBRAM1TBSTORAGE_98_1024x.png?v=1792079581"
-      ],
-      "categoryKey": "electronics"
-    },
-    {
-      "id": "samtronix-gy-15918517092512",
-      "slug": "jbl-headphone-gaming-tune54d-8517092512",
-      "url": "https://6ixo.com/listing/jbl-headphone-gaming-tune54d-8517092512/",
-      "images": [
-        "https://samtronixguyana.com/cdn/shop/files/CIDEACM10017ULTRASIMTABLET_8GBRAM1TBSTORAGE_93_1024x.png?v=1792079214"
       ],
       "categoryKey": "electronics"
     },
@@ -39236,6 +39209,21 @@
       "id": "kijiji-1736814633",
       "slug": "2019-ram-1500-classic-tradesman-1736814633",
       "url": "https://6ixo.com/listing/2019-ram-1500-classic-tradesman-1736814633/"
+    },
+    {
+      "id": "samtronix-gy-15918481146016",
+      "slug": "saiya-pb-02-power-bank-22-5w-8481146016",
+      "url": "https://6ixo.com/listing/saiya-pb-02-power-bank-22-5w-8481146016/"
+    },
+    {
+      "id": "samtronix-gy-15918519419040",
+      "slug": "jbl-headphone-gaming-tune49d-8519419040",
+      "url": "https://6ixo.com/listing/jbl-headphone-gaming-tune49d-8519419040/"
+    },
+    {
+      "id": "samtronix-gy-15918517092512",
+      "slug": "jbl-headphone-gaming-tune54d-8517092512",
+      "url": "https://6ixo.com/listing/jbl-headphone-gaming-tune54d-8517092512/"
     }
   ]
 }

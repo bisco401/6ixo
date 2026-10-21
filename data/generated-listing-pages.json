@@ -1,5 +1,5 @@
 {
-  "count": 3252,
+  "count": 3251,
   "listings": [
     {
       "id": "kijiji-1741667011",
@@ -6570,18 +6570,6 @@
         "https://laptopsinkenya.com/wp-content/uploads/sites/2/2024/07/b1f2058ca79ce659ef843a5f6a41430e-hi.jpg"
       ],
       "categoryKey": "electronics"
-    },
-    {
-      "id": "craigslist-3baCojFmvT6w4kxhnqxvFa",
-      "slug": "2010-mercury-milan-low-miles-backup-camera-clean-title-nic-4kxhnqxvfa",
-      "url": "https://6ixo.com/listing/2010-mercury-milan-low-miles-backup-camera-clean-title-nic-4kxhnqxvfa/",
-      "images": [
-        "https://images.craigslist.org/01515_lIZSpr7U8cr_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/01111_4XdF3henxT0_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/00U0U_ipLnANYJLDp_0Cn0t2_600x450.jpg",
-        "https://images.craigslist.org/00c0c_oZKRFR470o_0C40t2_600x450.jpg"
-      ],
-      "categoryKey": "vehicles"
     },
     {
       "id": "craigslist-rNwFBCcqaEhPnLwuaNQjbc",
@@ -45680,6 +45668,11 @@
       "id": "hgc-dubai-5d752f9d2d998011",
       "slug": "hp-omnibook-3-16-bu0305dx-u5-9d2d998011",
       "url": "https://6ixo.com/listing/hp-omnibook-3-16-bu0305dx-u5-9d2d998011/"
+    },
+    {
+      "id": "craigslist-3baCojFmvT6w4kxhnqxvFa",
+      "slug": "2010-mercury-milan-low-miles-backup-camera-clean-title-nic-4kxhnqxvfa",
+      "url": "https://6ixo.com/listing/2010-mercury-milan-low-miles-backup-camera-clean-title-nic-4kxhnqxvfa/"
     }
   ]
 }

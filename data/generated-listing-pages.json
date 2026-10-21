@@ -1,5 +1,5 @@
 {
-  "count": 3289,
+  "count": 3286,
   "listings": [
     {
       "id": "apify-b9b18084f762",
@@ -28833,7 +28833,7 @@
         "https://oxglow.com.gh/uploads/medium/calico-container-shop-Q6ky8h6-1790853959-2-medium.jpg",
         "https://oxglow.com.gh/uploads/medium/calico-container-shop-Q6ky8h6-1790853959-3-medium.jpg"
       ],
-      "categoryKey": "real-estate"
+      "categoryKey": "buy-and-sell"
     },
     {
       "id": "kijiji-1744213043",
@@ -31760,18 +31760,6 @@
       "categoryKey": "vehicles"
     },
     {
-      "id": "apify-7b4fcded558c",
-      "slug": "honda-civic-sport-4fcded558c",
-      "url": "https://6ixo.com/listing/honda-civic-sport-4fcded558c/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/honda-civic-sport-A77g58-1790762307-0-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/honda-civic-sport-A77g58-1790762307-1-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/honda-civic-sport-A77g58-1790762307-2-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/honda-civic-sport-A77g58-1790762307-3-medium.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
       "id": "kijiji-1744152939",
       "slug": "cash-for-phones-iphone-samsung-macbook-google-pixel-ipad-1744152939",
       "url": "https://6ixo.com/listing/cash-for-phones-iphone-samsung-macbook-google-pixel-ipad-1744152939/",
@@ -33064,17 +33052,6 @@
       "categoryKey": "electronics"
     },
     {
-      "id": "apify-dae856af9211",
-      "slug": "hp-envy-x360-e856af9211",
-      "url": "https://6ixo.com/listing/hp-envy-x360-e856af9211/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/hp-envy-x360-0l1h7Fn-1789724745-1-medium.jpeg",
-        "https://oxglow.com.gh/uploads/medium/hp-envy-x360-0l1h7Fn-1789724745-0-medium.jpeg",
-        "https://oxglow.com.gh/uploads/medium/hp-envy-x360-0l1h7Fn-1789724746-2-medium.jpeg"
-      ],
-      "categoryKey": "electronics"
-    },
-    {
       "id": "apify-b908f462c8e1",
       "slug": "4bedroom-selfcompound-house-for-rent-08f462c8e1",
       "url": "https://6ixo.com/listing/4bedroom-selfcompound-house-for-rent-08f462c8e1/",
@@ -33167,18 +33144,6 @@
         "https://opjnizbtppkynxzssijy.supabase.co/storage/v1/object/public/property-images/d53f9c50-8a99-43b6-be43-1f1dc17b386a/1789564898577-by1sd1-1.png"
       ],
       "categoryKey": "real-estate"
-    },
-    {
-      "id": "apify-5ae77e954ea8",
-      "slug": "iphone-13-pro-e77e954ea8",
-      "url": "https://6ixo.com/listing/iphone-13-pro-e77e954ea8/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/iphone-13-pro-256gb-available-for-cool-price-you-can-swap-too-21543-1789562912-0-medium.jpeg",
-        "https://oxglow.com.gh/uploads/medium/iphone-13-pro-256gb-available-for-cool-price-you-can-swap-too-21543-1789562912-2-medium.jpeg",
-        "https://oxglow.com.gh/uploads/medium/iphone-13-pro-256gb-available-for-cool-price-you-can-swap-too-21543-1789562912-1-medium.jpeg",
-        "https://oxglow.com.gh/uploads/medium/iphone-13-pro-256gb-available-for-cool-price-you-can-swap-too-21543-1789562912-3-medium.jpeg"
-      ],
-      "categoryKey": "electronics"
     },
     {
       "id": "kijiji-1743532661",
@@ -41035,6 +41000,9 @@
       "url": "https://6ixo.com/listings/country/ghana/services/"
     },
     {
+      "url": "https://6ixo.com/listings/country/ghana/buy-and-sell/"
+    },
+    {
       "url": "https://6ixo.com/listings/country/ghana/"
     },
     {
@@ -46327,6 +46295,21 @@
       "id": "kijiji-1742945955",
       "slug": "2005-chevrolet-silverado-ss-1742945955",
       "url": "https://6ixo.com/listing/2005-chevrolet-silverado-ss-1742945955/"
+    },
+    {
+      "id": "apify-7b4fcded558c",
+      "slug": "honda-civic-sport-4fcded558c",
+      "url": "https://6ixo.com/listing/honda-civic-sport-4fcded558c/"
+    },
+    {
+      "id": "apify-dae856af9211",
+      "slug": "hp-envy-x360-e856af9211",
+      "url": "https://6ixo.com/listing/hp-envy-x360-e856af9211/"
+    },
+    {
+      "id": "apify-5ae77e954ea8",
+      "slug": "iphone-13-pro-e77e954ea8",
+      "url": "https://6ixo.com/listing/iphone-13-pro-e77e954ea8/"
     }
   ]
 }

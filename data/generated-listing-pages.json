@@ -1,5 +1,5 @@
 {
-  "count": 3251,
+  "count": 3250,
   "listings": [
     {
       "id": "kijiji-1741667011",
@@ -16206,18 +16206,6 @@
         "https://images.craigslist.org/00T0T_cnb0jl3Gyo9_0x20iA_600x450.jpg",
         "https://images.craigslist.org/00808_hfRPiEmP7jG_0x20iA_600x450.jpg",
         "https://images.craigslist.org/00r0r_No6V9qtHkx_0x20iA_600x450.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "craigslist-rR9HZANU5crswj8oDV3WxC",
-      "slug": "2016-nissan-pathfinder-s-115k-wj8odv3wxc",
-      "url": "https://6ixo.com/listing/2016-nissan-pathfinder-s-115k-wj8odv3wxc/",
-      "images": [
-        "https://images.craigslist.org/00h0h_5FVcc0KmPCD_0t20CI_600x450.jpg",
-        "https://images.craigslist.org/00x0x_cmagPYUbYIC_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/00T0T_4I4WtKrlGmg_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/00b0b_67VQptQLSaJ_0CI0t2_600x450.jpg"
       ],
       "categoryKey": "vehicles"
     },
@@ -45673,6 +45661,11 @@
       "id": "craigslist-3baCojFmvT6w4kxhnqxvFa",
       "slug": "2010-mercury-milan-low-miles-backup-camera-clean-title-nic-4kxhnqxvfa",
       "url": "https://6ixo.com/listing/2010-mercury-milan-low-miles-backup-camera-clean-title-nic-4kxhnqxvfa/"
+    },
+    {
+      "id": "craigslist-rR9HZANU5crswj8oDV3WxC",
+      "slug": "2016-nissan-pathfinder-s-115k-wj8odv3wxc",
+      "url": "https://6ixo.com/listing/2016-nissan-pathfinder-s-115k-wj8odv3wxc/"
     }
   ]
 }

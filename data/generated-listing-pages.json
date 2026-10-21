@@ -1,6 +1,32 @@
 {
-  "count": 3275,
+  "count": 3279,
   "listings": [
+    {
+      "id": "kijiji-1745108537",
+      "slug": "lg-33-white-french-door-style-fridge-bottom-slide-out-free-1745108537",
+      "url": "https://6ixo.com/listing/lg-33-white-french-door-style-fridge-bottom-slide-out-free-1745108537/",
+      "images": [
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/ae/ae8c64f7-6138-453b-b6aa-dc60c13dfb7d?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/89/89306d78-ffa4-480b-9221-36ade9446b32?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/27/272573a0-cf34-460e-9982-806a4751e603?rule=kijijica-1600-webp"
+      ],
+      "categoryKey": "buy-and-sell"
+    },
+    {
+      "id": "kijiji-1745107501",
+      "slug": "shed-pads-hot-tub-pads-driveways-walkways-best-price-gta-1745107501",
+      "url": "https://6ixo.com/listing/shed-pads-hot-tub-pads-driveways-walkways-best-price-gta-1745107501/",
+      "images": [
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/de/de71a85a-44e3-4fc1-93a2-b97a4e5fa02c?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/f1/f169e407-ac89-4ae3-847c-fa1838b283ee?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/75/75a7da5b-d62e-485a-beed-0072199aa0a6?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/7b/7bec1862-e03d-48f0-b337-285960d6ab04?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/cb/cbdcfbf5-68c3-48e6-8c51-d80253d0b8da?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/76/769f62fe-a929-4f75-8948-63c3e2efecf2?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/a1/a10dd4d9-35eb-4332-8a75-dcff90890072?rule=kijijica-1600-webp"
+      ],
+      "categoryKey": "jobs"
+    },
     {
       "id": "hgc-dubai-9f0effbe6756af4c",
       "slug": "asus-rog-pg248q-gaming-monitor-be6756af4c",
@@ -1024,6 +1050,26 @@
         "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/85/859aa167-7f10-4fb6-9791-6267e00c17e6?rule=kijijica-1600-webp",
         "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/31/31095825-00ca-48a4-83f3-3e94345fd273?rule=kijijica-1600-webp",
         "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/a4/a42f026e-b9c4-413d-9a1c-c6d078429dd7?rule=kijijica-1600-webp"
+      ],
+      "categoryKey": "vehicles"
+    },
+    {
+      "id": "kijiji-1742847714",
+      "slug": "2025-honda-pilot-black-edition-leather-sunroof-1742847714",
+      "url": "https://6ixo.com/listing/2025-honda-pilot-black-edition-leather-sunroof-1742847714/",
+      "images": [
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/aa/aae35497-4aa8-442c-9cd5-5433b7261d09?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/4b/4b7c0f56-f94f-4864-8517-4df9423d669e?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/c3/c34972e4-7a44-4a27-b295-3bd2de61e438?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/2b/2bfe02db-6070-4aca-9df1-05c3e8936e6a?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/97/97204eff-3e36-4d0a-8b1b-2fcc9abfe453?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/88/8804d5d7-5b68-48a3-9b47-31d53092f5c1?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/c4/c4f48c3b-942f-455d-bb60-7ff9a9c31ab1?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/1d/1d3eb727-ffdf-4ce5-8e24-1bf3340de363?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/a9/a9c36bab-30aa-4ec5-8ec4-5f5e0f8a9a77?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/77/77221e31-fa59-4c29-a646-2211bb372304?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/d6/d670d9a2-17bb-41be-b83e-34d37f9c185b?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/96/9657471b-a638-4814-9906-fc05f6780324?rule=kijijica-1600-webp"
       ],
       "categoryKey": "vehicles"
     },
@@ -5751,6 +5797,46 @@
         "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/81/810fd3b1-f164-4376-a7bc-6786f40595be?rule=kijijica-1600-webp"
       ],
       "categoryKey": "buy-and-sell"
+    },
+    {
+      "id": "kijiji-1743897880",
+      "slug": "2026-kia-sportage-ex-premium-executive-demo-red-leather-1743897880",
+      "url": "https://6ixo.com/listing/2026-kia-sportage-ex-premium-executive-demo-red-leather-1743897880/",
+      "images": [
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/c8/c8a6043d-0ee8-406d-849d-a4b4da4a4673?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/b4/b48eb9ff-5bbd-4a29-9a53-65634f74ac52?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/4f/4fb0624e-e517-4bfb-bcf1-c4bb5d2824a9?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/26/26ad1e50-8bca-4dc3-9538-a657e79f8874?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/5f/5fd3ede2-3f7d-4619-8ad0-67e679bdf465?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/43/438500db-79d7-4964-8422-8982f498a6b1?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/06/06f3439a-7ee0-4396-bb4c-62e424a042c9?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/7a/7ac3969e-7802-4648-a97b-6b80315ec9f1?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/13/13e82bc6-a9d0-46a8-96e3-aac0364679ba?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/85/85908d5a-3c10-4169-91ac-1080f197929b?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/87/8757a10f-6a30-4508-9337-b1888b4b6cbc?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/48/481c431e-5fee-4bbb-8b55-943177bcce23?rule=kijijica-1600-webp"
+      ],
+      "categoryKey": "vehicles"
+    },
+    {
+      "id": "kijiji-1743897879",
+      "slug": "2026-kia-sportage-hybrid-ex-premium-executive-demo-rates-a-1743897879",
+      "url": "https://6ixo.com/listing/2026-kia-sportage-hybrid-ex-premium-executive-demo-rates-a-1743897879/",
+      "images": [
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/66/668f1827-f037-4ea8-bca3-b71f506aaca4?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/dd/dd617f1f-eb38-4552-87d3-c43332818705?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/a3/a3bd3b81-829d-4aa5-8a0b-d6dc7d9b6877?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/d4/d41bc536-8494-4336-8719-4e5eb67d363d?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/31/31e9a846-bf3e-4be4-9444-a4fb0c5330a0?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/c7/c70a42fd-3605-479d-ba13-478a72c69ace?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/b9/b9e6d6f4-4b19-41a6-9be1-9258e96d3cfc?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/31/316f8734-18e6-46c7-b040-6f8ff2ddaad2?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/75/7514bae6-3011-4848-b546-aef422363462?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/3d/3d2ba9bb-0b2d-49cd-aa77-bdb2bc1b414c?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/05/05e9818d-ab3a-440f-b722-7df6da6d357c?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/37/37169dd3-37a6-47c9-9bab-8a6519675cbf?rule=kijijica-1600-webp"
+      ],
+      "categoryKey": "vehicles"
     },
     {
       "id": "kijiji-1745085883",
@@ -16823,26 +16909,6 @@
         "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/6d/6db05193-f1b0-4aaa-b437-5041bf7e1e86?rule=kijijica-1600-webp"
       ],
       "categoryKey": "buy-and-sell"
-    },
-    {
-      "id": "kijiji-1742847714",
-      "slug": "2025-honda-pilot-black-edition-leather-sunroof-1742847714",
-      "url": "https://6ixo.com/listing/2025-honda-pilot-black-edition-leather-sunroof-1742847714/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/aa/aae35497-4aa8-442c-9cd5-5433b7261d09?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/4b/4b7c0f56-f94f-4864-8517-4df9423d669e?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/c3/c34972e4-7a44-4a27-b295-3bd2de61e438?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/2b/2bfe02db-6070-4aca-9df1-05c3e8936e6a?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/97/97204eff-3e36-4d0a-8b1b-2fcc9abfe453?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/88/8804d5d7-5b68-48a3-9b47-31d53092f5c1?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/c4/c4f48c3b-942f-455d-bb60-7ff9a9c31ab1?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/1d/1d3eb727-ffdf-4ce5-8e24-1bf3340de363?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/a9/a9c36bab-30aa-4ec5-8ec4-5f5e0f8a9a77?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/77/77221e31-fa59-4c29-a646-2211bb372304?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/d6/d670d9a2-17bb-41be-b83e-34d37f9c185b?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/96/9657471b-a638-4814-9906-fc05f6780324?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "vehicles"
     },
     {
       "id": "kijiji-1744814518",
@@ -40269,6 +40335,9 @@
     },
     {
       "url": "https://6ixo.com/listings/page/91/"
+    },
+    {
+      "url": "https://6ixo.com/listings/page/92/"
     },
     {
       "url": "https://6ixo.com/listings/electronics/"

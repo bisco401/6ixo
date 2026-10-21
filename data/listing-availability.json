@@ -1,5 +1,5 @@
 {
-  "checkedAt": "2026-10-21T00:03:55.819Z",
+  "checkedAt": "2026-10-21T01:09:28.323Z",
   "listings": {
     "craigslist.org/view/d/bastrop-used-2025-cadillac-xt4-fwd-4d/fuqr_3uo8rgowpq1ctwx-a": {
       "availability": "sold",
@@ -13045,6 +13045,15 @@
       "checkedAt": "2026-10-20T23:04:01.899Z",
       "httpStatus": 200,
       "resolvedUrl": "https://www.kijiji.ca/b-cd-dvd-blu-ray/city-of-toronto/c104l1700273?radius=50.0&ll=43.81%2C-79.17&adRemoved=1745087912",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "craigslist.org/view/d/corona-2016-nissan-pathfinder-115k/rr9hzanu5crswj8odv3wxc": {
+      "id": "craigslist-rR9HZANU5crswj8oDV3WxC",
+      "sourceUrl": "https://www.craigslist.org/view/d/corona-2016-nissan-pathfinder-115k/rR9HZANU5crswj8oDV3WxC",
+      "availability": "gone",
+      "checkedAt": "2026-10-21T01:09:28.323Z",
+      "httpStatus": 410,
+      "resolvedUrl": "https://www.craigslist.org/view/d/corona-2016-nissan-pathfinder-115k/rR9HZANU5crswj8oDV3WxC",
       "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     }
   }

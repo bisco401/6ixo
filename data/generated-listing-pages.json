@@ -1,5 +1,5 @@
 {
-  "count": 3286,
+  "count": 3282,
   "listings": [
     {
       "id": "apify-b9b18084f762",
@@ -16704,18 +16704,6 @@
       "categoryKey": "vehicles"
     },
     {
-      "id": "craigslist-YFr1tQHI8RGMOsaAKkW7fg",
-      "slug": "2014-mercedes-benz-c-class-cash-deal-just-5900-plus-taxes--osaakkw7fg",
-      "url": "https://6ixo.com/listing/2014-mercedes-benz-c-class-cash-deal-just-5900-plus-taxes--osaakkw7fg/",
-      "images": [
-        "https://images.craigslist.org/01111_fgAlHXvgZyp_0gw0co_600x450.jpg",
-        "https://images.craigslist.org/00505_5kDnU9qnvrX_0gw0co_600x450.jpg",
-        "https://images.craigslist.org/00Z0Z_5tL78eO9z7C_0gw0co_600x450.jpg",
-        "https://images.craigslist.org/00909_1tKEex6Wg2n_0gw0co_600x450.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
       "id": "craigslist-Jor-K_vH8RG23tAn2spKeQ",
       "slug": "1997-ford-f-250-xlt-4x4-7-5l-1owner-0-rust-71k-mls-f250-f3-3tan2spkeq",
       "url": "https://6ixo.com/listing/1997-ford-f-250-xlt-4x4-7-5l-1owner-0-rust-71k-mls-f250-f3-3tan2spkeq/",
@@ -16943,6 +16931,15 @@
       "url": "https://6ixo.com/listing/2-bedroom-apartment-for-rent-shoreline-apartments-palm-jum-bail271314/",
       "images": [
         "https://images.allsoppandallsopp.com/public/temp/a0O4S000000VKe3UAG_s_2-bedroom-apartment-in-shoreline-apartments-palm-jumeirah-aed-160k-allsopp-and-allsopp-img4428.jpg"
+      ],
+      "categoryKey": "real-estate"
+    },
+    {
+      "id": "allsopp-dubai-l-312138",
+      "slug": "1-bedroom-apartment-for-rent-the-lofts-downtown-dubai-bail312138",
+      "url": "https://6ixo.com/listing/1-bedroom-apartment-for-rent-the-lofts-downtown-dubai-bail312138/",
+      "images": [
+        "https://images.allsoppandallsopp.com/public/temp/a0OdK000003fuxNUAQ_s_1-bedroom-apartment-in-the-lofts-downtown-dubai-aed-110k-allsopp-and-allsopp-085432ab-23fb-4522-a917-0a559b34a868.jpeg"
       ],
       "categoryKey": "real-estate"
     },
@@ -22985,15 +22982,6 @@
       "categoryKey": "real-estate"
     },
     {
-      "id": "allsopp-dubai-l-311091",
-      "slug": "2-bedroom-apartment-for-rent-marina-views-dubai-marina-bail311091",
-      "url": "https://6ixo.com/listing/2-bedroom-apartment-for-rent-marina-views-dubai-marina-bail311091/",
-      "images": [
-        "https://images.allsoppandallsopp.com/public/temp/a0OdK000003bKyvUAE_s_2-bedroom-apartment-in-marina-views-dubai-marina-aed-140k-allsopp-and-allsopp-45f392de-3de4-4754-87ae-ea3729a53609.jpg"
-      ],
-      "categoryKey": "real-estate"
-    },
-    {
       "id": "allsopp-dubai-l-311119",
       "slug": "3-bedroom-apartment-for-rent-the-mayfair-town-square-bail311119",
       "url": "https://6ixo.com/listing/3-bedroom-apartment-for-rent-the-mayfair-town-square-bail311119/",
@@ -23553,18 +23541,6 @@
       "categoryKey": "vehicles"
     },
     {
-      "id": "craigslist-DrImUDXD8RGi84cW434ZKw",
-      "slug": "2014-mercedes-benz-c-class-5900-cash-what-a-deal-come-and--84cw434zkw",
-      "url": "https://6ixo.com/listing/2014-mercedes-benz-c-class-5900-cash-what-a-deal-come-and--84cw434zkw/",
-      "images": [
-        "https://images.craigslist.org/01111_fgAlHXvgZyp_0gw0co_600x450.jpg",
-        "https://images.craigslist.org/00505_5kDnU9qnvrX_0gw0co_600x450.jpg",
-        "https://images.craigslist.org/00Z0Z_5tL78eO9z7C_0gw0co_600x450.jpg",
-        "https://images.craigslist.org/00909_1tKEex6Wg2n_0gw0co_600x450.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
       "id": "craigslist-tro7fjHFf84jCoUufr93MM",
       "slug": "2015-chevrolet-express-3500-carpet-cleaner-butler-cleaning-couufr93mm",
       "url": "https://6ixo.com/listing/2015-chevrolet-express-3500-carpet-cleaner-butler-cleaning-couufr93mm/",
@@ -23597,18 +23573,6 @@
         "https://images.craigslist.org/00N0N_3Hg1PiK3Zyn_0gw0co_600x450.jpg",
         "https://images.craigslist.org/01515_3jL3bNBPEmv_0gw0co_600x450.jpg",
         "https://images.craigslist.org/00n0n_aKinKaRQ31U_0gw0co_600x450.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "craigslist-TFnTNjDD8RG1mp55pCwmVQ",
-      "slug": "2017-ford-taurus-from-1500-down-buy-here-pay-here-9-apr-mp55pcwmvq",
-      "url": "https://6ixo.com/listing/2017-ford-taurus-from-1500-down-buy-here-pay-here-9-apr-mp55pcwmvq/",
-      "images": [
-        "https://images.craigslist.org/00B0B_ASpzATbJg2_0gw0co_600x450.jpg",
-        "https://images.craigslist.org/00Q0Q_bECwnkqgPqE_0gw0co_600x450.jpg",
-        "https://images.craigslist.org/00N0N_kTNF63V73LY_0gw0co_600x450.jpg",
-        "https://images.craigslist.org/01212_dqN3HV2nAzJ_0gw0co_600x450.jpg"
       ],
       "categoryKey": "vehicles"
     },
@@ -26448,15 +26412,6 @@
       "url": "https://6ixo.com/listing/2-bedroom-apartment-for-rent-sadaf-7-jumeirah-beach-reside-bail309817/",
       "images": [
         "https://images.allsoppandallsopp.com/public/temp/a0O4S000000V08CUAS_s_2-bedroom-apartment-in-sadaf-7-jumeirah-beach-residence-aed-110k-allsopp-and-allsopp-f43b51b1-7bdb-4399-9291-58b2c3057f89.jpeg"
-      ],
-      "categoryKey": "real-estate"
-    },
-    {
-      "id": "allsopp-dubai-l-309739",
-      "slug": "1-bedroom-apartment-for-rent-index-tower-difc-bail309739",
-      "url": "https://6ixo.com/listing/1-bedroom-apartment-for-rent-index-tower-difc-bail309739/",
-      "images": [
-        "https://images.allsoppandallsopp.com/public/temp/a0O4S000000VAB0UAO_s_1-bedroom-apartment-in-index-tower-difc-aed-150k-allsopp-and-allsopp-whatsapp-image-2026-09-09-at-60303-pm-6.jpeg"
       ],
       "categoryKey": "real-estate"
     },
@@ -45332,11 +45287,6 @@
       "url": "https://6ixo.com/listing/2026-toyota-innova-hycross-7-seater-adubai2113/"
     },
     {
-      "id": "allsopp-dubai-l-312138",
-      "slug": "1-bedroom-apartment-for-rent-the-lofts-downtown-dubai-bail312138",
-      "url": "https://6ixo.com/listing/1-bedroom-apartment-for-rent-the-lofts-downtown-dubai-bail312138/"
-    },
-    {
       "id": "allsopp-dubai-l-306917",
       "slug": "1-bedroom-apartment-for-rent-belgravia-2-jumeirah-village--bail306917",
       "url": "https://6ixo.com/listing/1-bedroom-apartment-for-rent-belgravia-2-jumeirah-village--bail306917/"
@@ -46310,6 +46260,31 @@
       "id": "apify-5ae77e954ea8",
       "slug": "iphone-13-pro-e77e954ea8",
       "url": "https://6ixo.com/listing/iphone-13-pro-e77e954ea8/"
+    },
+    {
+      "id": "craigslist-YFr1tQHI8RGMOsaAKkW7fg",
+      "slug": "2014-mercedes-benz-c-class-cash-deal-just-5900-plus-taxes--osaakkw7fg",
+      "url": "https://6ixo.com/listing/2014-mercedes-benz-c-class-cash-deal-just-5900-plus-taxes--osaakkw7fg/"
+    },
+    {
+      "id": "allsopp-dubai-l-311091",
+      "slug": "2-bedroom-apartment-for-rent-marina-views-dubai-marina-bail311091",
+      "url": "https://6ixo.com/listing/2-bedroom-apartment-for-rent-marina-views-dubai-marina-bail311091/"
+    },
+    {
+      "id": "craigslist-DrImUDXD8RGi84cW434ZKw",
+      "slug": "2014-mercedes-benz-c-class-5900-cash-what-a-deal-come-and--84cw434zkw",
+      "url": "https://6ixo.com/listing/2014-mercedes-benz-c-class-5900-cash-what-a-deal-come-and--84cw434zkw/"
+    },
+    {
+      "id": "craigslist-TFnTNjDD8RG1mp55pCwmVQ",
+      "slug": "2017-ford-taurus-from-1500-down-buy-here-pay-here-9-apr-mp55pcwmvq",
+      "url": "https://6ixo.com/listing/2017-ford-taurus-from-1500-down-buy-here-pay-here-9-apr-mp55pcwmvq/"
+    },
+    {
+      "id": "allsopp-dubai-l-309739",
+      "slug": "1-bedroom-apartment-for-rent-index-tower-difc-bail309739",
+      "url": "https://6ixo.com/listing/1-bedroom-apartment-for-rent-index-tower-difc-bail309739/"
     }
   ]
 }

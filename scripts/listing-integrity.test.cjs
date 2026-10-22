@@ -2,6 +2,15 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const vm = require('node:vm');
 const integrity = require('./lib/listing-integrity.cjs');
+const odometerRow = { source_url: 'https://newyork.craigslist.org/cto/d/own-car/123.html', mileage_km: '', attributes: JSON.stringify({ mileageKm: '102,519', sourceSpecifications: [{ label: 'Odometer (source units)', value: '102,519' }, { label: 'Odometer (source units)', value: '102,519 km' }], details: [{ label: 'Odometer (source units)', value: '102,519', key: 'mileageKm' }, { label: 'Mileage', value: '102,519 km', key: 'mileageKm' }, { label: 'VIN', value: 'source-vin' }] }) };
+const literalOdometer = integrity.applyRepair(odometerRow);
+assert.equal(JSON.parse(literalOdometer.attributes).mileageKm, undefined, 'An upstream odometer alias cannot invent kilometre units');
+assert.deepEqual(JSON.parse(literalOdometer.attributes).details, [{ label: 'Odometer (source units)', value: '102,519', key: '' }, { label: 'VIN', value: 'source-vin' }]);
+assert.deepEqual(JSON.parse(literalOdometer.attributes).sourceSpecifications, [{ label: 'Odometer (source units)', value: '102,519' }]);
+assert.deepEqual(integrity.applyRepair(literalOdometer), literalOdometer, 'Odometer repair is idempotent');
+for (const value of ['0', '102519']) assert.equal(integrity.applyRepair({ ...odometerRow, mileage_km: value }).mileage_km, value, 'Explicit kilometre columns remain authoritative');
+const explicitKm = { ...odometerRow, attributes: JSON.stringify({ mileageKm: 69775, sourceSpecifications: [{ label: 'Odometer (source units)', value: '69,775 km' }] }) };
+assert.equal(JSON.parse(integrity.applyRepair(explicitKm).attributes).mileageKm, 69775, 'Literal source kilometres are retained');
 for (const [item, expected] of [
  [{title:'External drive',app_category:'other',app_subcategory:'miscellaneous'}, ['electronics','computers_tablets']],
  [{title:'Samsung a55 5g 256gb',app_category:'electronics',app_subcategory:'computers_tablets'}, ['electronics','phones_accessories']],
@@ -118,6 +127,10 @@ const context={console,Date,Map,Set,URL,URLSearchParams,window:{location:{href:'
 vm.runInNewContext(`${source.slice(0,source.indexOf('// Initialize the app when the page loads'))}\nglobalThis.App=DatingApp;`,context);
 const app=Object.create(context.App.prototype);
 const row={id:'123456',status:'published',source_url:url,title:'Leather Jacket',app_category:'electronics',app_subcategory:'other',phone:'9051234567',image_urls:unrelated};
+const cachedOdometerAttributes = { ...JSON.parse(odometerRow.attributes), mileageKm: 102519 };
+const cachedOdometer = app.normalizeCsvScrapedListingRow({ ...row, ...odometerRow, title: '2015 Subaru XV Crosstrek', app_category: 'vehicles', app_subcategory: 'vehicles', target_surface: 'vehicles', attributes: JSON.stringify(cachedOdometerAttributes) }).item;
+assert.equal(cachedOdometer.mileageKm, null, 'Cached imports cannot expose a unitless reading as kilometres');
+assert.ok(!cachedOdometer.details?.some(fact => fact.key === 'mileageKm'), 'Public/profile facts cannot retain an inferred kilometre label');
 app.scrapedListingIntegrityRepairs={[integrity.key(url)]:{title:row.title,images:[own],checkedAt:'2026-09-06T00:00:00Z'}};
 const normalized=app.normalizeCsvScrapedListingRow(row);
 assert.equal(normalized.item.category,'clothing');

@@ -1,6 +1,6 @@
 // Shared by the browser, repair tool and generated n8n workflows. No DOM/URL globals required.
 function createListingIntegrity() {
-  const VERSION = '2026-10-22.1';
+  const VERSION = '2026-10-22.2';
   const decode = (value = '') => String(value || '').replace(/\\u002f/gi, '/').replace(/\\u0026/gi, '&').replace(/\\\//g, '/').replace(/&amp;/gi, '&').replace(/&quot;|&#34;/gi, '"').replace(/&#39;|&apos;/gi, "'");
   const key = (value = '') => decode(value).trim().replace(/^https?:\/\/(?:www\.)?/i, '').replace(/[?#].*$/, '').replace(/\/$/, '').toLowerCase();
   // Ad IDs survive edits to the human-readable portion of a source URL.
@@ -344,6 +344,29 @@ function createListingIntegrity() {
   const galleryLimit = row => /(?:^|\.)kijiji\.ca\//i.test(key(sourceUrl(row))) ? 12 : 4;
   const limitPublicFields = row => {
     const result = { ...row };
+    const a = attrs(result.attributes);
+    // A source odometer without units is not a kilometre measurement. Some
+    // upstream normalizers alias "odometer" to mileageKm and append a generated
+    // km fact. Keep the first literal source fact and discard that inference.
+    const odometer = (a.sourceSpecifications || []).find(fact => /^odometer \(source units\)$/i.test(String(fact.label || '').trim()));
+    if (odometer && !result.mileage_km && !/\b(?:km|kilometres?|kilometers?)\b/i.test(String(odometer.value || ''))) {
+      const withoutInferredMileage = facts => {
+        let keptOdometer = false;
+        return (facts || []).filter(fact => {
+          const label = String(fact.label || '').trim();
+          if (/^odometer \(source units\)$/i.test(label)) {
+            if (keptOdometer) return false;
+            keptOdometer = true;
+            return true;
+          }
+          return fact.key !== 'mileageKm' && !/^mileage(?:\s*\(km\)|\s+km)?$/i.test(label);
+        }).map(fact => /^odometer \(source units\)$/i.test(String(fact.label || '').trim()) && fact.key === 'mileageKm' ? { ...fact, key: '' } : fact);
+      };
+      const corrected = { ...a };
+      delete corrected.mileageKm;
+      for (const field of ['details', 'sourceSpecifications']) if (Array.isArray(a[field])) corrected[field] = withoutInferredMileage(a[field]);
+      result.attributes = JSON.stringify(corrected);
+    }
     for (const field of ['image_urls', 'image_files']) {
       if (result[field]) result[field] = String(result[field]).split('|').filter(Boolean).slice(0, galleryLimit(row)).join('|');
     }

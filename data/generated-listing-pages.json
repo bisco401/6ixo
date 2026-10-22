@@ -1,5 +1,5 @@
 {
-  "count": 3286,
+  "count": 3285,
   "listings": [
     {
       "id": "apify-b9b18084f762",
@@ -15611,15 +15611,6 @@
       "url": "https://6ixo.com/listing/saiya-pb-02-power-bank-22-5w-8481146016/",
       "images": [
         "https://samtronixguyana.com/cdn/shop/files/100_BlackPowerBankwithCables_1024x.png?v=1792080611"
-      ],
-      "categoryKey": "electronics"
-    },
-    {
-      "id": "samtronix-gy-15918523056288",
-      "slug": "saiya-wireless-headphone-aw-29-8523056288",
-      "url": "https://6ixo.com/listing/saiya-wireless-headphone-aw-29-8523056288/",
-      "images": [
-        "https://samtronixguyana.com/cdn/shop/files/CIDEACM10017ULTRASIMTABLET_8GBRAM1TBSTORAGE_-2026-10-15T213718.596_1024x.png?v=1792080444"
       ],
       "categoryKey": "electronics"
     },
@@ -46483,6 +46474,11 @@
       "id": "kijiji-1744607945",
       "slug": "door-crasher-sale-new-8-seater-spa-56-jets-free-delivery-h-1744607945",
       "url": "https://6ixo.com/listing/door-crasher-sale-new-8-seater-spa-56-jets-free-delivery-h-1744607945/"
+    },
+    {
+      "id": "samtronix-gy-15918523056288",
+      "slug": "saiya-wireless-headphone-aw-29-8523056288",
+      "url": "https://6ixo.com/listing/saiya-wireless-headphone-aw-29-8523056288/"
     }
   ]
 }

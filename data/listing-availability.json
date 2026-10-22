@@ -1,5 +1,5 @@
 {
-  "checkedAt": "2026-10-22T20:52:14Z",
+  "checkedAt": "2026-10-22T21:34:16.041Z",
   "listings": {
     "craigslist.org/view/d/bastrop-used-2025-cadillac-xt4-fwd-4d/fuqr_3uo8rgowpq1ctwx-a": {
       "availability": "sold",
@@ -14605,6 +14605,267 @@
       "httpStatus": 200,
       "sourceUrl": "https://www.kijiji.ca/v-cars-trucks/hamilton/2024-ford-ranger-lariat-sport-supercrew-5-box-4wd-no/1742850999",
       "resolvedUrl": "https://www.kijiji.ca/b-cars-trucks/hamilton/c174l80014?adRemoved=1742850999&ll=42.9325931%2C-79.80726109999999&radius=150.0&rb=50"
+    },
+    "autostore.co.ke/product/denso-ixeh20tt-laser-iridium-spark-plug-in-kenya": {
+      "id": "dealer-66def154d298efe4f3",
+      "sourceUrl": "https://autostore.co.ke/product/denso-ixeh20tt-laser-iridium-spark-plug-in-kenya/",
+      "availability": "gone",
+      "checkedAt": "2026-10-22T21:34:16.041Z",
+      "httpStatus": 404,
+      "resolvedUrl": "https://autostore.co.ke/product/denso-ixeh20tt-laser-iridium-spark-plug-in-kenya/",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "autostore.co.ke/product/ngk-pzker7b8egs-93231-laser-platinum-spark-plug-04e905601": {
+      "id": "dealer-cfb25dc1963aaeebed",
+      "sourceUrl": "https://autostore.co.ke/product/ngk-pzker7b8egs-93231-laser-platinum-spark-plug-04e905601/",
+      "availability": "gone",
+      "checkedAt": "2026-10-22T21:34:16.041Z",
+      "httpStatus": 404,
+      "resolvedUrl": "https://autostore.co.ke/product/ngk-pzker7b8egs-93231-laser-platinum-spark-plug-04e905601/",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "autostore.co.ke/product/denso-ixeh22tt-laser-iridium-spark-plug-4712": {
+      "id": "dealer-6521910c0ca036d0c8",
+      "sourceUrl": "https://autostore.co.ke/product/denso-ixeh22tt-laser-iridium-spark-plug-4712/",
+      "availability": "gone",
+      "checkedAt": "2026-10-22T21:34:16.041Z",
+      "httpStatus": 404,
+      "resolvedUrl": "https://autostore.co.ke/product/denso-ixeh22tt-laser-iridium-spark-plug-4712/",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "autostore.co.ke/product/mann-hu-7020-z-oil-filter-audi-vw": {
+      "id": "dealer-0449626fc0fd6ffed1",
+      "sourceUrl": "https://autostore.co.ke/product/mann-hu-7020-z-oil-filter-audi-vw/",
+      "availability": "gone",
+      "checkedAt": "2026-10-22T21:34:16.041Z",
+      "httpStatus": 404,
+      "resolvedUrl": "https://autostore.co.ke/product/mann-hu-7020-z-oil-filter-audi-vw/",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "autostore.co.ke/product/denso-dcf385k-cabin-air-filter-toyota-lexus-subaru": {
+      "id": "dealer-46cb37cfa3eab8ee0d",
+      "sourceUrl": "https://autostore.co.ke/product/denso-dcf385k-cabin-air-filter-toyota-lexus-subaru/",
+      "availability": "gone",
+      "checkedAt": "2026-10-22T21:34:16.041Z",
+      "httpStatus": 404,
+      "resolvedUrl": "https://autostore.co.ke/product/denso-dcf385k-cabin-air-filter-toyota-lexus-subaru/",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "autostore.co.ke/product/febi-48507-air-filter-for-audi-vw-5q0129620c": {
+      "id": "dealer-2bbdafcc3847b27605",
+      "sourceUrl": "https://autostore.co.ke/product/febi-48507-air-filter-for-audi-vw-5q0129620c/",
+      "availability": "gone",
+      "checkedAt": "2026-10-22T21:34:16.041Z",
+      "httpStatus": 404,
+      "resolvedUrl": "https://autostore.co.ke/product/febi-48507-air-filter-for-audi-vw-5q0129620c/",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "autostore.co.ke/product/delphi-hdf682-fuel-filter-audi-vw": {
+      "id": "dealer-00d80566619e8787e4",
+      "sourceUrl": "https://autostore.co.ke/product/delphi-hdf682-fuel-filter-audi-vw/",
+      "availability": "gone",
+      "checkedAt": "2026-10-22T21:34:16.041Z",
+      "httpStatus": 404,
+      "resolvedUrl": "https://autostore.co.ke/product/delphi-hdf682-fuel-filter-audi-vw/",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "autostore.co.ke/product/ngk-94976-pfr7s8eg-laser-platinum-spark-plug-vw-audi": {
+      "id": "dealer-ab2087469bfb8a96e2",
+      "sourceUrl": "https://autostore.co.ke/product/ngk-94976-pfr7s8eg-laser-platinum-spark-plug-vw-audi/",
+      "availability": "gone",
+      "checkedAt": "2026-10-22T21:34:16.041Z",
+      "httpStatus": 404,
+      "resolvedUrl": "https://autostore.co.ke/product/ngk-94976-pfr7s8eg-laser-platinum-spark-plug-vw-audi/",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "autostore.co.ke/product/valeo-715720-cabin-air-filter-5q0819669-vw-audi": {
+      "id": "dealer-097ef2e7243729fd45",
+      "sourceUrl": "https://autostore.co.ke/product/valeo-715720-cabin-air-filter-5q0819669-vw-audi/",
+      "availability": "gone",
+      "checkedAt": "2026-10-22T21:34:16.041Z",
+      "httpStatus": 404,
+      "resolvedUrl": "https://autostore.co.ke/product/valeo-715720-cabin-air-filter-5q0819669-vw-audi/",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "autostore.co.ke/product/mann-hu-7019-z-oil-filter-lexus-toyota": {
+      "id": "dealer-38daf3e5fe5b4c33ae",
+      "sourceUrl": "https://autostore.co.ke/product/mann-hu-7019-z-oil-filter-lexus-toyota/",
+      "availability": "gone",
+      "checkedAt": "2026-10-22T21:34:16.041Z",
+      "httpStatus": 404,
+      "resolvedUrl": "https://autostore.co.ke/product/mann-hu-7019-z-oil-filter-lexus-toyota/",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "autostore.co.ke/product/%e2%81%a0bosch-0-242-140-565-evo-spark-plug-volvo": {
+      "id": "dealer-ccc8d9d294c46f0755",
+      "sourceUrl": "https://autostore.co.ke/product/%e2%81%a0bosch-0-242-140-565-evo-spark-plug-volvo/",
+      "availability": "gone",
+      "checkedAt": "2026-10-22T21:34:16.041Z",
+      "httpStatus": 404,
+      "resolvedUrl": "https://autostore.co.ke/product/%e2%81%a0bosch-0-242-140-565-evo-spark-plug-volvo/",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "autostore.co.ke/product/ngk-94201-silzkgr8b8s-laser-iridium-spark-plug": {
+      "id": "dealer-ba0f346efa741fac88",
+      "sourceUrl": "https://autostore.co.ke/product/ngk-94201-silzkgr8b8s-laser-iridium-spark-plug/",
+      "availability": "gone",
+      "checkedAt": "2026-10-22T21:34:16.041Z",
+      "httpStatus": 404,
+      "resolvedUrl": "https://autostore.co.ke/product/ngk-94201-silzkgr8b8s-laser-iridium-spark-plug/",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "autostore.co.ke/product/bmw-x1-f48-x2-f39-engine-air-filter-high-flow-filtration-ridex": {
+      "id": "dealer-db81be61cd121a11d8",
+      "sourceUrl": "https://autostore.co.ke/product/bmw-x1-f48-x2-f39-engine-air-filter-high-flow-filtration-ridex/",
+      "availability": "gone",
+      "checkedAt": "2026-10-22T21:34:16.041Z",
+      "httpStatus": 404,
+      "resolvedUrl": "https://autostore.co.ke/product/bmw-x1-f48-x2-f39-engine-air-filter-high-flow-filtration-ridex/",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "autostore.co.ke/product/bmw-x1-f48-engine-air-filter-high-flow-filtration-petrol-engine-ridex": {
+      "id": "dealer-bd70e9045fcb37dca0",
+      "sourceUrl": "https://autostore.co.ke/product/bmw-x1-f48-engine-air-filter-high-flow-filtration-petrol-engine-ridex/",
+      "availability": "gone",
+      "checkedAt": "2026-10-22T21:34:16.041Z",
+      "httpStatus": 404,
+      "resolvedUrl": "https://autostore.co.ke/product/bmw-x1-f48-engine-air-filter-high-flow-filtration-petrol-engine-ridex/",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "autostore.co.ke/product/brake-wear-sensor-land-rover-discovery-3-4-l319-front-set": {
+      "id": "dealer-bc1e9c7a83ecc77db6",
+      "sourceUrl": "https://autostore.co.ke/product/brake-wear-sensor-land-rover-discovery-3-4-l319-front-set/",
+      "availability": "gone",
+      "checkedAt": "2026-10-22T21:34:16.041Z",
+      "httpStatus": 404,
+      "resolvedUrl": "https://autostore.co.ke/product/brake-wear-sensor-land-rover-discovery-3-4-l319-front-set/",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "autostore.co.ke/product/citroen-c4-aircross-rear-brake-pads": {
+      "id": "dealer-91e1faeb6a9b76b130",
+      "sourceUrl": "https://autostore.co.ke/product/citroen-c4-aircross-rear-brake-pads/",
+      "availability": "gone",
+      "checkedAt": "2026-10-22T21:34:16.041Z",
+      "httpStatus": 404,
+      "resolvedUrl": "https://autostore.co.ke/product/citroen-c4-aircross-rear-brake-pads/",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "autostore.co.ke/product/genuine-oil-filter-ford-kuga-mk2-dm2-ridex-plus": {
+      "id": "dealer-9ddda3a96232e7d664",
+      "sourceUrl": "https://autostore.co.ke/product/genuine-oil-filter-ford-kuga-mk2-dm2-ridex-plus/",
+      "availability": "gone",
+      "checkedAt": "2026-10-22T21:34:16.041Z",
+      "httpStatus": 404,
+      "resolvedUrl": "https://autostore.co.ke/product/genuine-oil-filter-ford-kuga-mk2-dm2-ridex-plus/",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "autostore.co.ke/product/front-brake-pads-land-rover-discovery-3-4-l319": {
+      "id": "dealer-62d18504db344fef24",
+      "sourceUrl": "https://autostore.co.ke/product/front-brake-pads-land-rover-discovery-3-4-l319/",
+      "availability": "gone",
+      "checkedAt": "2026-10-22T21:34:16.041Z",
+      "httpStatus": 404,
+      "resolvedUrl": "https://autostore.co.ke/product/front-brake-pads-land-rover-discovery-3-4-l319/",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "autostore.co.ke/product/honda-vezel-front-brake-pad-set-quality-approved-ridex": {
+      "id": "dealer-87120e4aefe363e7f6",
+      "sourceUrl": "https://autostore.co.ke/product/honda-vezel-front-brake-pad-set-quality-approved-ridex/",
+      "availability": "gone",
+      "checkedAt": "2026-10-22T21:34:16.041Z",
+      "httpStatus": 404,
+      "resolvedUrl": "https://autostore.co.ke/product/honda-vezel-front-brake-pad-set-quality-approved-ridex/",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "autostore.co.ke/product/h7-halogen-headlight-bulb-4000k-high-performance-ridex": {
+      "id": "dealer-b41a641e098bd8f934",
+      "sourceUrl": "https://autostore.co.ke/product/h7-halogen-headlight-bulb-4000k-high-performance-ridex/",
+      "availability": "gone",
+      "checkedAt": "2026-10-22T21:34:16.041Z",
+      "httpStatus": 404,
+      "resolvedUrl": "https://autostore.co.ke/product/h7-halogen-headlight-bulb-4000k-high-performance-ridex/",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "autostore.co.ke/product/lexus-ct-es-nx-rx-ux-advanced-oil-filter-ridex-plus-high-filtration-efficiency": {
+      "id": "dealer-587127fdd22ef6acde",
+      "sourceUrl": "https://autostore.co.ke/product/lexus-ct-es-nx-rx-ux-advanced-oil-filter-ridex-plus-high-filtration-efficiency/",
+      "availability": "gone",
+      "checkedAt": "2026-10-22T21:34:16.041Z",
+      "httpStatus": 404,
+      "resolvedUrl": "https://autostore.co.ke/product/lexus-ct-es-nx-rx-ux-advanced-oil-filter-ridex-plus-high-filtration-efficiency/",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "autostore.co.ke/product/lexus-ct-es-nx-rx-ux-quality-oil-filter-high-filtration-efficiency": {
+      "id": "dealer-8ebc29b13f07047fd4",
+      "sourceUrl": "https://autostore.co.ke/product/lexus-ct-es-nx-rx-ux-quality-oil-filter-high-filtration-efficiency/",
+      "availability": "gone",
+      "checkedAt": "2026-10-22T21:34:16.041Z",
+      "httpStatus": 404,
+      "resolvedUrl": "https://autostore.co.ke/product/lexus-ct-es-nx-rx-ux-quality-oil-filter-high-filtration-efficiency/",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "autostore.co.ke/product/honda-accord-civic-cr-v-insight-vezel-premium-oil-filter-ridex-plus-high-filtration-efficiency": {
+      "id": "dealer-16a3ad8a8cec226343",
+      "sourceUrl": "https://autostore.co.ke/product/honda-accord-civic-cr-v-insight-vezel-premium-oil-filter-ridex-plus-high-filtration-efficiency/",
+      "availability": "gone",
+      "checkedAt": "2026-10-22T21:34:16.041Z",
+      "httpStatus": 404,
+      "resolvedUrl": "https://autostore.co.ke/product/honda-accord-civic-cr-v-insight-vezel-premium-oil-filter-ridex-plus-high-filtration-efficiency/",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "autostore.co.ke/product/land-rover-discover-range-rover-sport-engine-air-filter-high-flow-filtration": {
+      "id": "dealer-97de86a3a4307cec8d",
+      "sourceUrl": "https://autostore.co.ke/product/land-rover-discover-range-rover-sport-engine-air-filter-high-flow-filtration/",
+      "availability": "gone",
+      "checkedAt": "2026-10-22T21:34:16.041Z",
+      "httpStatus": 404,
+      "resolvedUrl": "https://autostore.co.ke/product/land-rover-discover-range-rover-sport-engine-air-filter-high-flow-filtration/",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "autostore.co.ke/product/honda-vezel-rear-brake-pad-set-quality-approved-ridex": {
+      "id": "dealer-88e4e810a57bbc42f8",
+      "sourceUrl": "https://autostore.co.ke/product/honda-vezel-rear-brake-pad-set-quality-approved-ridex/",
+      "availability": "gone",
+      "checkedAt": "2026-10-22T21:34:16.041Z",
+      "httpStatus": 404,
+      "resolvedUrl": "https://autostore.co.ke/product/honda-vezel-rear-brake-pad-set-quality-approved-ridex/",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "autostore.co.ke/product/land-rover-jaguar-vw-amarok-oil-filter-ridex-plus-high-filtration-efficiency": {
+      "id": "dealer-5d0f45fdc505a8895f",
+      "sourceUrl": "https://autostore.co.ke/product/land-rover-jaguar-vw-amarok-oil-filter-ridex-plus-high-filtration-efficiency/",
+      "availability": "gone",
+      "checkedAt": "2026-10-22T21:34:16.041Z",
+      "httpStatus": 404,
+      "resolvedUrl": "https://autostore.co.ke/product/land-rover-jaguar-vw-amarok-oil-filter-ridex-plus-high-filtration-efficiency/",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "autostore.co.ke/product/honda-accord-civic-cr-v-insight-vezel-quality-oil-filter-high-efficiency": {
+      "id": "dealer-cbe511f8f1f6813b0f",
+      "sourceUrl": "https://autostore.co.ke/product/honda-accord-civic-cr-v-insight-vezel-quality-oil-filter-high-efficiency/",
+      "availability": "gone",
+      "checkedAt": "2026-10-22T21:34:16.041Z",
+      "httpStatus": 404,
+      "resolvedUrl": "https://autostore.co.ke/product/honda-accord-civic-cr-v-insight-vezel-quality-oil-filter-high-efficiency/",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "autostore.co.ke/product/lexus-lx460-570-mitsubishi-pajero-shogun-front-brake-pads": {
+      "id": "dealer-872ea415d75b709400",
+      "sourceUrl": "https://autostore.co.ke/product/lexus-lx460-570-mitsubishi-pajero-shogun-front-brake-pads/",
+      "availability": "gone",
+      "checkedAt": "2026-10-22T21:34:16.041Z",
+      "httpStatus": 404,
+      "resolvedUrl": "https://autostore.co.ke/product/lexus-lx460-570-mitsubishi-pajero-shogun-front-brake-pads/",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "autostore.co.ke/product/land-rover-discovery-rr-sport-cabin-filter-lr023977": {
+      "id": "dealer-94d4bb4ce1b0bc6540",
+      "sourceUrl": "https://autostore.co.ke/product/land-rover-discovery-rr-sport-cabin-filter-lr023977/",
+      "availability": "gone",
+      "checkedAt": "2026-10-22T21:34:16.041Z",
+      "httpStatus": 404,
+      "resolvedUrl": "https://autostore.co.ke/product/land-rover-discovery-rr-sport-cabin-filter-lr023977/",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     }
   }
 }

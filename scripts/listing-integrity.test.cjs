@@ -17,6 +17,15 @@ for (const [item, expected] of [
 }
 const sourceResponseRemoval = require('./lib/source-response-removal.cjs');
 const url = 'https://www.kijiji.ca/v-clothing-men/hamilton/leather-jacket/123456';
+const movedUrl = url.replace('leather-jacket', 'leather-coat');
+const movedRow = {source_url:url,title:'Leather jacket',status:'published',attributes:'{}'};
+const movedRepair = {sourceUrl:url,supersededBy:movedUrl};
+assert.equal(integrity.applyRepair(movedRow,movedRepair).sync_visibility,'source_url_superseded','Cached copies of an exact retired URL remain hidden');
+assert.equal(integrity.applyRepair({...movedRow,source_url:movedUrl},movedRepair).status,'published','A canonical move does not retire the new exact URL');
+assert.equal(integrity.applyRepair(movedRow,{...movedRepair,supersededBy:movedUrl.replace('123456','987654')}).status,'published','Unrelated source identities cannot retire an ad');
+assert.equal(integrity.applyRepair(movedRow,{...movedRepair,holdReason:'foreign_gallery'}).sync_visibility,'foreign_gallery','Existing review holds retain precedence');
+assert.equal(integrity.resolveRepair({source_url:movedUrl},{[integrity.key(url)]:movedRepair}),undefined,'A retired URL is not a review hold on the ad ID');
+assert.equal(integrity.resolveRepair({source_url:movedUrl},{[integrity.key(url)]:{...movedRepair,holdReason:'foreign_gallery'},[integrity.key(movedUrl)]:{sourceUrl:movedUrl}}).holdReason,'foreign_gallery','A canonical move cannot bypass an existing review hold');
 const oxUrl='https://oxglow.com.gh/listing/own-helmet';
 const oxRow={title:'Own helmet',source_url:oxUrl,phone:'0243768130',seller:'Old seller',city:'Accra',attributes:'{}'};
 const oxSchema='{"@type":"Product","name":"Own helmet","description":"Seller description\nwith a literal newline","location":{"address":{"addressLocality":"Tema","addressRegion":"Greater Accra"}},"offers":{"url":"'+oxUrl+'","price":"55","priceCurrency":"GHS"},"image":"https://oxglow.com.gh/uploads/original/own.jpg"}';
@@ -109,6 +118,15 @@ const normalized=app.normalizeCsvScrapedListingRow(row);
 assert.equal(normalized.item.category,'clothing');
 assert.equal(normalized.item.images[0],own.replace('640','1600'));
 assert.equal(app.buildMarketplaceItemGallery(normalized.item).gallery[0].src,normalized.item.images[0]);
+const savedMoveRepairs=app.scrapedListingIntegrityRepairs;
+app.scrapedListingIntegrityRepairs={
+ [integrity.key(url)]:movedRepair,
+ [integrity.key(movedUrl)]:{sourceUrl:movedUrl,title:row.title,images:[own],checkedAt:'2026-10-22T20:00:00Z'}
+};
+assert.equal(app.normalizeCsvScrapedListingRow(row),null,'Public and profile normalizers exclude the superseded source URL');
+assert.equal(app.normalizeKijijiGtaRow({id:'123456',url,title:row.title,phone_numbers:row.phone,image_urls:own,location:'Hamilton'}),null,'Legacy GTA feed copies also respect the exact URL retirement');
+assert.ok(app.normalizeCsvScrapedListingRow({...row,source_url:movedUrl}),'The current canonical listing remains available');
+app.scrapedListingIntegrityRepairs=savedMoveRepairs;
 const svc=app.normalizeCsvScrapedListingRow({...row,source_url:'https://www.kijiji.ca/v-jewelry-watch/hamilton/buyers/555',title:'GOLD & SILVER BUYERS'});
 assert.equal(svc.item.category,'services');
 assert.equal(app.buildServiceProfileEntryFromMarketplaceItem(svc.item).category,'other');

@@ -1,5 +1,5 @@
 {
-  "count": 3622,
+  "count": 3621,
   "listings": [
     {
       "id": "jacars-2530330",
@@ -22782,18 +22782,6 @@
         "https://images.craigslist.org/00H0H_e378OCIBJ2w_0g80c6_600x450.jpg",
         "https://images.craigslist.org/00W0W_6DjQEXfqUej_0g80c6_600x450.jpg",
         "https://images.craigslist.org/00S0S_gAGsF036Xw9_0g80c6_600x450.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "craigslist-kDzouubE8RGOwP3NDIhP3w",
-      "slug": "2017-honda-pilot-financing-available-wp3ndihp3w",
-      "url": "https://6ixo.com/listing/2017-honda-pilot-financing-available-wp3ndihp3w/",
-      "images": [
-        "https://images.craigslist.org/00A0A_hZGVW8Ijgon_0jm0ew_600x450.jpg",
-        "https://images.craigslist.org/00I0I_2Jfaj3kKLWJ_0jm0ew_600x450.jpg",
-        "https://images.craigslist.org/00I0I_c4oYqbgjlri_0jm0ew_600x450.jpg",
-        "https://images.craigslist.org/00X0X_3crLbDH81IN_0jm0ew_600x450.jpg"
       ],
       "categoryKey": "vehicles"
     },
@@ -51905,6 +51893,11 @@
       "id": "dealer-94d4bb4ce1b0bc6540",
       "slug": "land-rover-discovery-rr-sport-cabin-filter-lr023977-e1b0bc6540",
       "url": "https://6ixo.com/listing/land-rover-discovery-rr-sport-cabin-filter-lr023977-e1b0bc6540/"
+    },
+    {
+      "id": "craigslist-kDzouubE8RGOwP3NDIhP3w",
+      "slug": "2017-honda-pilot-financing-available-wp3ndihp3w",
+      "url": "https://6ixo.com/listing/2017-honda-pilot-financing-available-wp3ndihp3w/"
     }
   ]
 }

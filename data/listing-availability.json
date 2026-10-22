@@ -1,5 +1,5 @@
 {
-  "checkedAt": "2026-10-22T18:34:48Z",
+  "checkedAt": "2026-10-22T18:50:47.874Z",
   "listings": {
     "craigslist.org/view/d/bastrop-used-2025-cadillac-xt4-fwd-4d/fuqr_3uo8rgowpq1ctwx-a": {
       "availability": "sold",
@@ -11739,9 +11739,13 @@
       "reason": "Kijiji redirected the exact ad to a confirmed removal"
     },
     "kijiji.ca/v-room-rental-roommate/city-of-toronto/850-all-inclusive-private-ensuite-basement-room-3gbps-wifi/1745151871": {
-      "availability": "unavailable",
-      "checkedAt": "2026-10-22T18:34:48Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1745151871",
+      "sourceUrl": "https://www.kijiji.ca/v-room-rental-roommate/city-of-toronto/850-all-inclusive-private-ensuite-basement-room-3gbps-wifi/1745151871",
+      "availability": "gone",
+      "checkedAt": "2026-10-22T18:50:47.874Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-room-rental-roommate/city-of-toronto/c36l1700273?radius=50.0&ll=43.78%2C-79.33&adRemoved=1745151871",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-home-outdoor-other/city-of-toronto/reliable-paving-contractors-free-estimates-available/1745132254": {
       "availability": "unavailable",

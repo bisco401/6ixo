@@ -15,6 +15,8 @@ class AvailabilityTest(unittest.TestCase):
         for code in (0, 403, 429, 500):
             self.assertEqual(module.classify(self.row, code, "Sold out")[0], "unknown")
         self.assertEqual(module.classify(self.row, 404, "<title>Just a moment</title>")[0], "unknown")
+        for title in ["Robot Challenge Screen", "Bot Verification", "Verifying your browser"]:
+            self.assertEqual(module.classify(self.row, 404, '<title>'+title+'</title>')[0], 'unknown')
 
     def test_exact_404_hides_without_deleting(self):
         availability, reason = module.classify(self.row, 404, "Missing")
@@ -22,6 +24,11 @@ class AvailabilityTest(unittest.TestCase):
         self.assertEqual(self.row["status"], "rejected")
         self.assertEqual(self.row["source_miss_count"], "1")
         self.assertIn("title", self.row)
+
+    def test_percent_escape_case_is_not_a_different_source_path(self):
+        self.row['source_url']='https://example.com/product/%e2%81%a0own-part/'
+        self.assertEqual(module.classify(self.row,404,'<title>Page Not Found</title>','https://example.com/product/%E2%81%A0own-part/')[0],'gone')
+        self.assertEqual(module.classify(self.row,404,'<title>Page Not Found</title>','https://example.com/product/another-part/')[0],'unknown')
 
     def test_recommendation_sold_does_not_hide_available_item(self):
         body = '<h1>Toyota Corolla 2022</h1><div class="related"><span>Sold out</span></div>'

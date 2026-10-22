@@ -58,7 +58,7 @@ def classify(row, status, body, resolved_url=""):
     heading = " ".join(h.get_text(" ", strip=True) for h in soup.select("h1"))
     page_title = soup.title.get_text(" ", strip=True) if soup.title else ""
     # Inspect challenge documents before their HTTP code: some return a fake 404.
-    if re.search(r"just a moment|access denied|verify you are human|attention required|captcha|too many requests|unusual traffic|security check", page_title + " " + heading, re.I):
+    if re.search(r"just a moment|access denied|verify you are human|attention required|captcha|too many requests|unusual traffic|security check|robot challenge|bot verification|verifying your browser", page_title + " " + heading, re.I):
         return "unknown", "Source returned a verification or access page"
     if status in (401, 403, 429) or status >= 500 or status == 0:
         return "unknown", f"Blocked, limited, or temporary source error: HTTP {status}"
@@ -71,7 +71,8 @@ def classify(row, status, body, resolved_url=""):
     removed = parse_qs(resolved_parts.query).get("adRemoved", [""])[0]
     if host(original_parts) == "kijiji.ca" and (removed == "true" or (own_id and removed == own_id[1])):
         return "unavailable", "Kijiji redirected the exact ad to a confirmed removal"
-    if resolved_url and original and urlsplit(resolved_url).path.rstrip("/") != urlsplit(original).path.rstrip("/"):
+    encoded_path = lambda value: re.sub(r'%[0-9a-f]{2}', lambda match: match[0].upper(), value, flags=re.I).rstrip('/')
+    if resolved_url and original and encoded_path(urlsplit(resolved_url).path) != encoded_path(urlsplit(original).path):
         return "unknown", "Source redirected away from the exact listing"
     if status in (404, 410):
         return "gone", f"Exact source URL returned HTTP {status}"

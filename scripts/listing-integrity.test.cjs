@@ -16,6 +16,11 @@ for (const [item, expected] of [
  assert.deepEqual([route.app_category,route.app_subcategory],expected,item.title);
 }
 const sourceResponseRemoval = require('./lib/source-response-removal.cjs');
+const source404={status:404,resolvedUrl:'https://autostore.co.ke/product/own-part/'};
+assert.equal(sourceResponseRemoval(source404,'<title>Page Not Found</title>',source404.resolvedUrl),true,'Independent exact-source 404 confirmation still removes unavailable products');
+assert.equal(sourceResponseRemoval({...source404,status:410},'<title>Gone</title>',source404.resolvedUrl),true,'Explicit HTTP 410 remains authoritative');
+assert.equal(sourceResponseRemoval({status:404},'<title>Robot Challenge Screen</title>','https://example.test/own-part/'),false,'Challenge documents never confirm removal');
+assert.equal(sourceResponseRemoval({status:404,resolvedUrl:'https://example.test/product/%E2%81%A0own-part/'},'<title>Page Not Found</title>','https://example.test/product/%e2%81%a0own-part/'),true,'Percent escape spelling does not change the exact source URL');
 const url = 'https://www.kijiji.ca/v-clothing-men/hamilton/leather-jacket/123456';
 const movedUrl = url.replace('leather-jacket', 'leather-coat');
 const movedRow = {source_url:url,title:'Leather jacket',status:'published',attributes:'{}'};

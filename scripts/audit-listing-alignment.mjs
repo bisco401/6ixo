@@ -63,7 +63,8 @@ for (const [url, row] of sources) {
     }
     outcome = result.identityIssue || (result.matched && result.title ? 'verified' : 'source_unverified');
   } else if ([403, 429].includes(meta.status)) outcome = 'source_blocked';
-  const decision = { id: row.id, title: row.title, sourceUrl: url, outcome, httpStatus: meta.status, resolvedUrl: meta.resolvedUrl, observedTitle: result?.title, observedSourceUrl: result?.sourceUrl };
+  const responseTitle = html.match(/<title\b[^>]*>([\s\S]*?)<\/title>/i)?.[1]?.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim().slice(0,180);
+  const decision = { id: row.id, title: row.title, sourceUrl: url, outcome, httpStatus: meta.status, resolvedUrl: meta.resolvedUrl, responseTitle, observedTitle: result?.title, observedSourceUrl: result?.sourceUrl };
   report.listings.push(decision);
   report.outcomes[outcome] = (report.outcomes[outcome] || 0) + 1;
   decisions.set(integrity.key(url), { ...decision, verifiedRow });

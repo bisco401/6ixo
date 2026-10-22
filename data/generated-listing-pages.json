@@ -1,5 +1,5 @@
 {
-  "count": 3275,
+  "count": 3265,
   "listings": [
     {
       "id": "apify-b9b18084f762",
@@ -664,30 +664,6 @@
         "https://images.craigslist.org/00B0B_gbJu7LCMYuG_0CI0t2_600x450.jpg",
         "https://images.craigslist.org/00U0U_6pJzdOdtckD_0Cd0t2_600x450.jpg",
         "https://images.craigslist.org/00c0c_gZQvLOsT3ZP_0BX0t2_600x450.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "craigslist-n6Lg4dxuDZUP9cjPULnyMN",
-      "slug": "print-2020-ford-transit-250-cargo-van-high-roof-148-0-wb-9cjpulnymn",
-      "url": "https://6ixo.com/listing/print-2020-ford-transit-250-cargo-van-high-roof-148-0-wb-9cjpulnymn/",
-      "images": [
-        "https://images.craigslist.org/00T0T_3dXdbtAoUiz_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/00v0v_539agsm1FKn_0t20CI_600x450.jpg",
-        "https://images.craigslist.org/00Q0Q_lq8A50D11JY_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/00t0t_78zBP3qF5gS_0t20CI_600x450.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "craigslist-qWbGCYaCnUhRGq6m7ZP2HM",
-      "slug": "2008-toyota-4runner-sport-gq6m7zp2hm",
-      "url": "https://6ixo.com/listing/2008-toyota-4runner-sport-gq6m7zp2hm/",
-      "images": [
-        "https://images.craigslist.org/00r0r_1AwedYSFQtA_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/00K0K_SrZ6OLJ9kY_0t20CI_600x450.jpg",
-        "https://images.craigslist.org/00505_2HhonHoYB6U_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/00505_qifBJjCzWn_0CI0t2_600x450.jpg"
       ],
       "categoryKey": "vehicles"
     },
@@ -2435,15 +2411,6 @@
         "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/d3/d3f853cd-c24d-420a-b9e4-59e8130201d1?rule=kijijica-1600-webp"
       ],
       "categoryKey": "vehicles"
-    },
-    {
-      "id": "kijiji-1745092307",
-      "slug": "online-tests-and-exam-writing-service-for-25-test-1745092307",
-      "url": "https://6ixo.com/listing/online-tests-and-exam-writing-service-for-25-test-1745092307/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/a7/a7e78480-8c07-4861-809b-84abee5a6c6b?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "community"
     },
     {
       "id": "kijiji-1745092278",
@@ -4359,24 +4326,6 @@
       "categoryKey": "community"
     },
     {
-      "id": "kijiji-1745091800",
-      "slug": "commence-ton-permis-aujourd-hui-1745091800",
-      "url": "https://6ixo.com/listing/commence-ton-permis-aujourd-hui-1745091800/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/e7/e7a3c8b9-ab50-4807-8664-d1bd65897d75?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "community"
-    },
-    {
-      "id": "kijiji-1745091775",
-      "slug": "greve-du-metro-prenez-le-volant-1745091775",
-      "url": "https://6ixo.com/listing/greve-du-metro-prenez-le-volant-1745091775/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/db/dbc68b23-7cdd-477e-8562-ccaa8748c9cb?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "community"
-    },
-    {
       "id": "kijiji-1745091769",
       "slug": "urgent-order-picker-needed-1745091769",
       "url": "https://6ixo.com/listing/urgent-order-picker-needed-1745091769/",
@@ -4402,20 +4351,6 @@
         "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/0c/0cac7746-53ce-4675-8fa8-2ea0ed1dabe0?rule=kijijica-1600-webp"
       ],
       "categoryKey": "community"
-    },
-    {
-      "id": "kijiji-1745091726",
-      "slug": "2021-toyota-highlander-l-1745091726",
-      "url": "https://6ixo.com/listing/2021-toyota-highlander-l-1745091726/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/39/39b9ad37-c128-4e9f-a522-c6e1656ec7b2?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/ce/cef5cb1b-086c-494f-9857-7989f792fa39?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/6f/6f5ff896-2a21-4339-9f6d-81bbbb6280b7?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/cc/ccde77c4-2bc5-45d0-810a-f91bdc97b0d4?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/2d/2d5b17bd-431a-468e-b870-e7bdcb1bbca0?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/ba/ba7f0ec5-4bae-486b-aef0-eed9250b7136?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "vehicles"
     },
     {
       "id": "kijiji-1745091698",
@@ -4543,15 +4478,6 @@
         "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/35/358160d9-41fc-408f-b8f0-cc79eddcffc6?rule=kijijica-1600-webp"
       ],
       "categoryKey": "real-estate"
-    },
-    {
-      "id": "kijiji-1745091361",
-      "slug": "urgent-seeking-line-lead-in-bakery-1745091361",
-      "url": "https://6ixo.com/listing/urgent-seeking-line-lead-in-bakery-1745091361/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/2c/2c4b9979-e8b7-4902-b092-0d83f66b1c18?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "jobs"
     },
     {
       "id": "kijiji-1745091322",
@@ -7264,18 +7190,6 @@
       "url": "https://6ixo.com/listing/2024-audi-sq8-e-tron-adubai2150/",
       "images": [
         "https://storage.albacars.ae/vehicles/drafts/2150/1.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "craigslist-rNwFBCcqaEhPnLwuaNQjbc",
-      "slug": "2016-hyundai-elantra-se-sunroof-backup-camera-2-owner-nlwuanqjbc",
-      "url": "https://6ixo.com/listing/2016-hyundai-elantra-se-sunroof-backup-camera-2-owner-nlwuanqjbc/",
-      "images": [
-        "https://images.craigslist.org/01616_3jfiD6b6kC_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/00X0X_2RNtpR3c7dj_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/00N0N_lpTqlp1P19U_0CE0t2_600x450.jpg",
-        "https://images.craigslist.org/00H0H_7KkbRkMuAXH_0C00t2_600x450.jpg"
       ],
       "categoryKey": "vehicles"
     },
@@ -15272,18 +15186,6 @@
         "https://images.craigslist.org/00p0p_bwDwC0Ug7j8_0ew0aT_600x450.jpg"
       ],
       "categoryKey": "vehicles"
-    },
-    {
-      "id": "craigslist-auhHM1NsXKrW8PZ8QCDpBP",
-      "slug": "central-flushing-studio-apt-no-broker-fee-6th-fl-rent-from-8pz8qcdpbp",
-      "url": "https://6ixo.com/listing/central-flushing-studio-apt-no-broker-fee-6th-fl-rent-from-8pz8qcdpbp/",
-      "images": [
-        "https://images.craigslist.org/00q0q_aIBvaMoCD8K_0gw0co_600x450.jpg",
-        "https://images.craigslist.org/01515_fOxr7HBeQ8w_0CI0im_600x450.jpg",
-        "https://images.craigslist.org/00K0K_24JfvmEPRsL_0co0gw_600x450.jpg",
-        "https://images.craigslist.org/00505_i9OTZRCYUQN_0dL0t2_600x450.jpg"
-      ],
-      "categoryKey": "real-estate"
     },
     {
       "id": "craigslist-aoYPakE4wQawvbEXUxdnzc",
@@ -33706,17 +33608,6 @@
       "categoryKey": "buy-and-sell"
     },
     {
-      "id": "kijiji-1740351915",
-      "slug": "fridge-waterline-connection-newline-1740351915",
-      "url": "https://6ixo.com/listing/fridge-waterline-connection-newline-1740351915/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/1d/1d4392e7-182b-4f24-932e-9cd98cbae82d?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/29/295451b0-60f2-41c9-8b5d-50502ebbf709?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/3c/3c6cfc2c-8462-4acb-8ccc-464ddff308d7?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "services"
-    },
-    {
       "id": "kijiji-1743233155",
       "slug": "room-for-rent-1743233155",
       "url": "https://6ixo.com/listing/room-for-rent-1743233155/",
@@ -46241,6 +46132,56 @@
       "id": "craigslist-tLVpJZw3fn1uCBB2RVm4xQ",
       "slug": "newly-renovated-amazing-charming-3broutdoor-deck-near-trai-cbb2rvm4xq",
       "url": "https://6ixo.com/listing/newly-renovated-amazing-charming-3broutdoor-deck-near-trai-cbb2rvm4xq/"
+    },
+    {
+      "id": "craigslist-n6Lg4dxuDZUP9cjPULnyMN",
+      "slug": "print-2020-ford-transit-250-cargo-van-high-roof-148-0-wb-9cjpulnymn",
+      "url": "https://6ixo.com/listing/print-2020-ford-transit-250-cargo-van-high-roof-148-0-wb-9cjpulnymn/"
+    },
+    {
+      "id": "craigslist-qWbGCYaCnUhRGq6m7ZP2HM",
+      "slug": "2008-toyota-4runner-sport-gq6m7zp2hm",
+      "url": "https://6ixo.com/listing/2008-toyota-4runner-sport-gq6m7zp2hm/"
+    },
+    {
+      "id": "kijiji-1745092307",
+      "slug": "online-tests-and-exam-writing-service-for-25-test-1745092307",
+      "url": "https://6ixo.com/listing/online-tests-and-exam-writing-service-for-25-test-1745092307/"
+    },
+    {
+      "id": "kijiji-1745091800",
+      "slug": "commence-ton-permis-aujourd-hui-1745091800",
+      "url": "https://6ixo.com/listing/commence-ton-permis-aujourd-hui-1745091800/"
+    },
+    {
+      "id": "kijiji-1745091775",
+      "slug": "greve-du-metro-prenez-le-volant-1745091775",
+      "url": "https://6ixo.com/listing/greve-du-metro-prenez-le-volant-1745091775/"
+    },
+    {
+      "id": "kijiji-1745091726",
+      "slug": "2021-toyota-highlander-l-1745091726",
+      "url": "https://6ixo.com/listing/2021-toyota-highlander-l-1745091726/"
+    },
+    {
+      "id": "kijiji-1745091361",
+      "slug": "urgent-seeking-line-lead-in-bakery-1745091361",
+      "url": "https://6ixo.com/listing/urgent-seeking-line-lead-in-bakery-1745091361/"
+    },
+    {
+      "id": "craigslist-rNwFBCcqaEhPnLwuaNQjbc",
+      "slug": "2016-hyundai-elantra-se-sunroof-backup-camera-2-owner-nlwuanqjbc",
+      "url": "https://6ixo.com/listing/2016-hyundai-elantra-se-sunroof-backup-camera-2-owner-nlwuanqjbc/"
+    },
+    {
+      "id": "craigslist-auhHM1NsXKrW8PZ8QCDpBP",
+      "slug": "central-flushing-studio-apt-no-broker-fee-6th-fl-rent-from-8pz8qcdpbp",
+      "url": "https://6ixo.com/listing/central-flushing-studio-apt-no-broker-fee-6th-fl-rent-from-8pz8qcdpbp/"
+    },
+    {
+      "id": "kijiji-1740351915",
+      "slug": "fridge-waterline-connection-newline-1740351915",
+      "url": "https://6ixo.com/listing/fridge-waterline-connection-newline-1740351915/"
     }
   ]
 }

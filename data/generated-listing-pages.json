@@ -1,5 +1,5 @@
 {
-  "count": 3269,
+  "count": 3265,
   "listings": [
     {
       "id": "apify-b9b18084f762",
@@ -708,30 +708,6 @@
       "categoryKey": "real-estate"
     },
     {
-      "id": "craigslist-m9h9wmKZWy3rhmuDRXzmSo",
-      "slug": "83street-and-broadway-2-bedrooms-1604-rent-stab-near-7-and-hmudrxzmso",
-      "url": "https://6ixo.com/listing/83street-and-broadway-2-bedrooms-1604-rent-stab-near-7-and-hmudrxzmso/",
-      "images": [
-        "https://images.craigslist.org/00H0H_bdCnDWTnF0c_0t20CI_600x450.jpg",
-        "https://images.craigslist.org/00H0H_cgp9pNxQZKo_0t20CI_600x450.jpg",
-        "https://images.craigslist.org/00j0j_5TMEiGVH3aT_0t20CI_600x450.jpg",
-        "https://images.craigslist.org/00I0I_bjeM03oAWZe_0t20CI_600x450.jpg"
-      ],
-      "categoryKey": "real-estate"
-    },
-    {
-      "id": "craigslist-fAJxd3CzrsUysZYhW8WrWZ",
-      "slug": "94th-street-and-34th-ave-two-bedrooms-1604-00-near-7-train-szyhw8wrwz",
-      "url": "https://6ixo.com/listing/94th-street-and-34th-ave-two-bedrooms-1604-00-near-7-train-szyhw8wrwz/",
-      "images": [
-        "https://images.craigslist.org/00F0F_6W6W68adtYH_0t20CI_600x450.jpg",
-        "https://images.craigslist.org/00r0r_9SV47j8Kp6d_0t20CI_600x450.jpg",
-        "https://images.craigslist.org/00a0a_fK5qZWfAKIz_0t20CI_600x450.jpg",
-        "https://images.craigslist.org/00L0L_hRymf71UGGt_0t20CI_600x450.jpg"
-      ],
-      "categoryKey": "real-estate"
-    },
-    {
       "id": "craigslist-v7XDNysVg6nhaaWgpjMERG",
       "slug": "bushwick-3-bed-3-bath-duplex-private-rooftop-laundry-aawgpjmerg",
       "url": "https://6ixo.com/listing/bushwick-3-bed-3-bath-duplex-private-rooftop-laundry-aawgpjmerg/",
@@ -924,7 +900,7 @@
       "slug": "2-bedroom-apartment-for-rent-golf-residence-by-fortimo-gol-bail312289",
       "url": "https://6ixo.com/listing/2-bedroom-apartment-for-rent-golf-residence-by-fortimo-gol-bail312289/",
       "images": [
-        "https://images.allsoppandallsopp.com/public/temp/a0OdK000003gnSPUAY_s_2-bedroom-apartment-in-golf-residence-by-fortimo-golf-residence-by-fortimo-dubai-hills-estate-aed-260k-allsopp-and-allsopp-001-4.jpg"
+        "https://images.allsoppandallsopp.com/public/temp/a0OdK000003gnSPUAY_s_2-bedroom-apartment-in-golf-residence-by-fortimo-golf-residence-by-fortimo-dubai-hills-estate-aed-245k-allsopp-and-allsopp-001-4.jpg"
       ],
       "categoryKey": "real-estate"
     },
@@ -4560,18 +4536,6 @@
       "categoryKey": "real-estate"
     },
     {
-      "id": "craigslist-dU7VaD8NPdCPpfFC6TJz9H",
-      "slug": "newly-renovated-spacious-two-bedroom-near-prospect-park-pffc6tjz9h",
-      "url": "https://6ixo.com/listing/newly-renovated-spacious-two-bedroom-near-prospect-park-pffc6tjz9h/",
-      "images": [
-        "https://images.craigslist.org/00b0b_55JuJXpLRvP_0t20CI_600x450.jpg",
-        "https://images.craigslist.org/00t0t_jnCirxA6e81_0t20CI_600x450.jpg",
-        "https://images.craigslist.org/00P0P_6la5FAVtRt0_0t20CI_600x450.jpg",
-        "https://images.craigslist.org/00B0B_jFhYveuwDUq_0t20CI_600x450.jpg"
-      ],
-      "categoryKey": "real-estate"
-    },
-    {
       "id": "craigslist-rHba8Gf3GkMr2FgC4azKeq",
       "slug": "w-d-in-the-unit-large-4-bedroom-duplex-with-4-5-bathrooms--2fgc4azkeq",
       "url": "https://6ixo.com/listing/w-d-in-the-unit-large-4-bedroom-duplex-with-4-5-bathrooms--2fgc4azkeq/",
@@ -7401,7 +7365,7 @@
       "slug": "2-bedroom-apartment-for-rent-golfville-golfville-dubai-hil-bail311709",
       "url": "https://6ixo.com/listing/2-bedroom-apartment-for-rent-golfville-golfville-dubai-hil-bail311709/",
       "images": [
-        "https://images.allsoppandallsopp.com/public/temp/a0OdK000003RCg5UAG_s_2-bedroom-apartment-in-golfville-golfville-dubai-hills-aed-120k-allsopp-and-allsopp-002.jpg"
+        "https://images.allsoppandallsopp.com/public/temp/a0OdK000003RCg5UAG_s_2-bedroom-apartment-in-golfville-golfville-dubai-hills-aed-120k-allsopp-and-allsopp-5.png"
       ],
       "categoryKey": "real-estate"
     },
@@ -11327,7 +11291,7 @@
       "slug": "2-bedroom-apartment-for-rent-bay-s-edge-business-bay-bail312025",
       "url": "https://6ixo.com/listing/2-bedroom-apartment-for-rent-bay-s-edge-business-bay-bail312025/",
       "images": [
-        "https://images.allsoppandallsopp.com/public/temp/a0OdK000003f8JFUAY_s_2-bedroom-apartment-in-bays-edge-business-bay-aed-140k-allsopp-and-allsopp-luxury-bedroom-with-city-skyline-view.png"
+        "https://images.allsoppandallsopp.com/public/temp/a0OdK000003f8JFUAY_s_2-bedroom-apartment-in-bays-edge-business-bay-aed-135k-allsopp-and-allsopp-luxury-bedroom-with-city-skyline-view.png"
       ],
       "categoryKey": "real-estate"
     },
@@ -11336,7 +11300,7 @@
       "slug": "1-bedroom-apartment-for-rent-merano-tower-business-bay-bail312026",
       "url": "https://6ixo.com/listing/1-bedroom-apartment-for-rent-merano-tower-business-bay-bail312026/",
       "images": [
-        "https://images.allsoppandallsopp.com/public/temp/a0OdK000003f8KrUAI_s_1-bedroom-apartment-in-merano-tower-business-bay-aed-75k-allsopp-and-allsopp-img3852.png"
+        "https://images.allsoppandallsopp.com/public/temp/a0OdK000003f8KrUAI_s_1-bedroom-apartment-in-merano-tower-business-bay-aed-75k-allsopp-and-allsopp-bright-minimal-bedroom-with-new-mattress.png"
       ],
       "categoryKey": "real-estate"
     },
@@ -16885,7 +16849,7 @@
       "slug": "1-bedroom-apartment-for-rent-the-lofts-downtown-dubai-bail312138",
       "url": "https://6ixo.com/listing/1-bedroom-apartment-for-rent-the-lofts-downtown-dubai-bail312138/",
       "images": [
-        "https://images.allsoppandallsopp.com/public/temp/a0OdK000003fuxNUAQ_s_1-bedroom-apartment-in-the-lofts-downtown-dubai-aed-110k-allsopp-and-allsopp-085432ab-23fb-4522-a917-0a559b34a868.jpeg"
+        "https://images.allsoppandallsopp.com/public/temp/a0OdK000003fuxNUAQ_s_1-bedroom-apartment-in-the-lofts-downtown-dubai-aed-100k-allsopp-and-allsopp-085432ab-23fb-4522-a917-0a559b34a868.jpeg"
       ],
       "categoryKey": "real-estate"
     },
@@ -17274,7 +17238,7 @@
       "slug": "studio-apartment-for-rent-the-sterling-business-bay-bail309162",
       "url": "https://6ixo.com/listing/studio-apartment-for-rent-the-sterling-business-bay-bail309162/",
       "images": [
-        "https://images.allsoppandallsopp.com/public/temp/a0OdK000003UqU5UAK_s_apartment-in-the-sterling-business-bay-aed-80k-allsopp-and-allsopp-whatsapp-image-2026-09-04-at-111559-3.jpeg"
+        "https://images.allsoppandallsopp.com/public/temp/a0OdK000003UqU5UAK_s_apartment-in-the-sterling-business-bay-aed-78k-allsopp-and-allsopp-whatsapp-image-2026-09-04-at-111559-3.jpeg"
       ],
       "categoryKey": "real-estate"
     },
@@ -35997,26 +35961,6 @@
       "categoryKey": "vehicles"
     },
     {
-      "id": "kijiji-1741305796",
-      "slug": "2026-ram-1500-warlock-remote-start-8-4-inch-touchscreen-1741305796",
-      "url": "https://6ixo.com/listing/2026-ram-1500-warlock-remote-start-8-4-inch-touchscreen-1741305796/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/75/756451aa-bc65-4699-b3e9-67bc45a27336?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/64/649d49fe-1e14-4c76-9341-b944cf1697ff?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/68/684ad26a-53da-4806-994d-7043514a1373?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/60/60d078c5-a106-4fc0-9696-043a4ec410a0?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/51/5133532f-2f16-41c8-9104-8c3993a499b1?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/c2/c204a12c-60f2-4649-86fe-8d0acbf6bbda?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/2c/2c620792-4f5c-4197-a849-8ee73390f98f?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/ea/eadaf04a-7f70-4c0c-8423-3302b1e68841?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/6a/6abf380b-ed3e-4f2c-add3-0cc18804c0db?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/e3/e3884cf9-c061-41ce-a1db-1a8c28132029?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/4e/4edfc574-cd3a-4e9a-a7c9-dd41ec261e60?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/d7/d78729f5-f554-4e24-b597-694527c8b39f?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
       "id": "kijiji-1741301567",
       "slug": "2023-ford-bronco-sport-outer-banks-no-accidents-leather-1741301567",
       "url": "https://6ixo.com/listing/2023-ford-bronco-sport-outer-banks-no-accidents-leather-1741301567/",
@@ -41069,9 +41013,6 @@
       "url": "https://6ixo.com/listings/country/united-states/page/21/"
     },
     {
-      "url": "https://6ixo.com/listings/country/united-states/page/22/"
-    },
-    {
       "url": "https://6ixo.com/apartments-for-rent/"
     },
     {
@@ -41184,9 +41125,6 @@
     },
     {
       "url": "https://6ixo.com/cars-for-sale/canada/page/8/"
-    },
-    {
-      "url": "https://6ixo.com/cars-for-sale/canada/page/9/"
     },
     {
       "url": "https://6ixo.com/cars-for-sale/china/"
@@ -46374,6 +46312,26 @@
       "id": "apify-5ae77e954ea8",
       "slug": "iphone-13-pro-e77e954ea8",
       "url": "https://6ixo.com/listing/iphone-13-pro-e77e954ea8/"
+    },
+    {
+      "id": "craigslist-m9h9wmKZWy3rhmuDRXzmSo",
+      "slug": "83street-and-broadway-2-bedrooms-1604-rent-stab-near-7-and-hmudrxzmso",
+      "url": "https://6ixo.com/listing/83street-and-broadway-2-bedrooms-1604-rent-stab-near-7-and-hmudrxzmso/"
+    },
+    {
+      "id": "craigslist-fAJxd3CzrsUysZYhW8WrWZ",
+      "slug": "94th-street-and-34th-ave-two-bedrooms-1604-00-near-7-train-szyhw8wrwz",
+      "url": "https://6ixo.com/listing/94th-street-and-34th-ave-two-bedrooms-1604-00-near-7-train-szyhw8wrwz/"
+    },
+    {
+      "id": "craigslist-dU7VaD8NPdCPpfFC6TJz9H",
+      "slug": "newly-renovated-spacious-two-bedroom-near-prospect-park-pffc6tjz9h",
+      "url": "https://6ixo.com/listing/newly-renovated-spacious-two-bedroom-near-prospect-park-pffc6tjz9h/"
+    },
+    {
+      "id": "kijiji-1741305796",
+      "slug": "2026-ram-1500-warlock-remote-start-8-4-inch-touchscreen-1741305796",
+      "url": "https://6ixo.com/listing/2026-ram-1500-warlock-remote-start-8-4-inch-touchscreen-1741305796/"
     }
   ]
 }

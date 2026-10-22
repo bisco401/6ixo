@@ -2,6 +2,35 @@
   "version": 1,
   "listings": [
     {
+      "id": "353",
+      "url": "https://sebu.co.ke/2-kinds-of-shoe-separately-7bnx7",
+      "lastmod": "2026-10-21",
+      "title": "2 Kinds Of Shoe Separately",
+      "amount": 1200,
+      "negotiable": "yes",
+      "description": "2 kinds of shoe separately sold, price is negotiable",
+      "created_at": "2026-10-21T17:26:14.076Z",
+      "category": "fashion",
+      "category_name": "Fashion",
+      "subcategory": "men-shoes",
+      "subcategory_name": "Men Shoes",
+      "region": "kiambu",
+      "region_name": "Kiambu",
+      "area": "chania",
+      "area_name": "Chania",
+      "images": [
+        "https://pictures.sebu.co.ke/ads/1792603445563-bd775052-a6e6-4122-91a7-1da19d5f8e02.jpg",
+        "https://pictures.sebu.co.ke/ads/1792603450896-c09f75da-4cfd-47dc-8451-1c4815dce8b7.jpg"
+      ],
+      "dynamic": {
+        "brand": "Prada",
+        "shoe_size": "31",
+        "shoe_type": "Sneakers"
+      },
+      "seller": "Tracy Mauno",
+      "seller_phone_verified": true
+    },
+    {
       "id": "312",
       "url": "https://sebu.co.ke/2-piece-gym-wear-xhq84",
       "lastmod": "2026-10-20",
@@ -291,6 +320,66 @@
       "seller_phone_verified": true
     },
     {
+      "id": "355",
+      "url": "https://sebu.co.ke/am-offering-gypsum-ceiling-installation-tv-cabinet-wall-panels-wall-papers-wpc-p-x1crq",
+      "lastmod": "2026-10-21",
+      "title": "Am Offering Gypsum Ceiling Installation,Tv Cabinet, Wall Panels,Wall Papers,Wpc ,Pvc And Acoustic Ceiling",
+      "amount": 50000,
+      "negotiable": "yes",
+      "description": "if you are interested with my services call contact via the original listing",
+      "created_at": "2026-10-22T10:28:04.209Z",
+      "category": "job-looking-for-work",
+      "category_name": "Job - Looking for Work",
+      "subcategory": "looking-for-job-construction-and-engineering",
+      "subcategory_name": "Construction and Engineering",
+      "region": "mombasa",
+      "region_name": "Mombasa",
+      "area": "bamburi",
+      "area_name": "Bamburi",
+      "images": [
+        "https://pictures.sebu.co.ke/ads/1792664611239-137247b5-69f0-4a0a-a720-0f7a01001560.jpg",
+        "https://pictures.sebu.co.ke/ads/1792664620345-a44ac7fd-eb0d-4aab-a690-6b2a99e883de.jpg",
+        "https://pictures.sebu.co.ke/ads/1792664624357-851598f1-340c-4336-86af-e851e5b0d1da.jpg",
+        "https://pictures.sebu.co.ke/ads/1792664628655-06c176a1-8f7d-44a9-bb40-39ab7c7b7537.jpg"
+      ],
+      "dynamic": {
+        "employment_type": "Contract",
+        "education_level": "KCSE",
+        "experience_level": "5+ Years",
+        "salary_frequency": "Per Task",
+        "gender": "Male"
+      },
+      "seller": "Rama gypsum and interior designer",
+      "seller_phone_verified": true
+    },
+    {
+      "id": "381",
+      "url": "https://sebu.co.ke/amaraji-sparkle-cleaners-dx3ae",
+      "lastmod": "2026-10-22",
+      "title": "Amaraji Sparkle Cleaners",
+      "amount": 500,
+      "negotiable": "no",
+      "description": "we sparklingly clean all types of fabrics in all furnitures , car, carpets etc",
+      "created_at": "2026-10-22T16:48:59.324Z",
+      "category": "services",
+      "category_name": "Services",
+      "subcategory": "house-cleaning-services",
+      "subcategory_name": "House Cleaning Services",
+      "region": "nairobi",
+      "region_name": "Nairobi",
+      "area": "imara-daima",
+      "area_name": "Imara Daima",
+      "images": [
+        "https://pictures.sebu.co.ke/ads/1792687604173-0992908f-35b1-4909-ba23-d69e626702fd.jpg"
+      ],
+      "dynamic": {
+        "service_scope": "Both",
+        "cleaning_frequency": "One-time"
+      },
+      "seller": "Tom Mutua",
+      "seller_phone_verified": true
+    },
+    {
       "id": "67",
       "url": "https://sebu.co.ke/android-13-tv-box-smart-carplay-ai-box-wifi-wireless-android-auto-s5gkq",
       "lastmod": "2025-10-25",
@@ -385,6 +474,33 @@
       "seller_phone_verified": true
     },
     {
+      "id": "334",
+      "url": "https://sebu.co.ke/artificial-locks-4qbex",
+      "lastmod": "2026-10-20",
+      "title": "Artificial Locks",
+      "amount": 2000,
+      "negotiable": "yes",
+      "description": "Artificial dreadlocks all types black. Maroon brown......",
+      "created_at": "2026-10-20T23:38:52.832Z",
+      "category": "health-and-beauty",
+      "category_name": "Health and Beauty",
+      "subcategory": "hair-care-products",
+      "subcategory_name": "Hair Care Products",
+      "region": "nairobi",
+      "region_name": "Nairobi",
+      "area": "kawangware",
+      "area_name": "Kawangware",
+      "images": [
+        "https://pictures.sebu.co.ke/ads/1792539436329-7ec53349-652b-4177-a994-507e11cfea61.jpg"
+      ],
+      "dynamic": {
+        "product_type": "Styling Product",
+        "hair_type": "Normal"
+      },
+      "seller": "Musa arts",
+      "seller_phone_verified": true
+    },
+    {
       "id": "304",
       "url": "https://sebu.co.ke/automotive-spare-parts-and-repair-efr4i",
       "lastmod": "2026-10-20",
@@ -443,6 +559,36 @@
         "special_notes": "HOTFIX AUTOMOTIVE GARAGE – NAKURU\nSPECIAL NOTES & TERMS\n\n1. All vehicles are inspected before repair, and any additional faults discovered will be communicated to the customer.\n2. No additional repairs will be carried out without the customer's approval.\n3. Customers are advised to confirm all repair costs before work begins.\n4. Spare parts replaced during repair can be retained by the customer upon request.\n5. Repair warranties, where applicable, will be communicated and agreed upon before work begins.\n6. The garage is not responsible for pre-existing faults or issues unrelated to the agreed repair work.\n7. Customers should remove personal belongings from their vehicles before leaving them at the garage.\n8. All outstanding balances should be cleared upon completion of the agreed work, unless otherwise agreed.\n9. Customers are encouraged to report any concerns related to the completed repair promptly.\n\nThank you for trusting HOTFIX AUTOMOTIVE GARAGE.\nQuality Service. Reliable Repairs. Customer Satisfaction."
       },
       "seller": "HOT FIX MOBILE GARAGE",
+      "seller_phone_verified": true
+    },
+    {
+      "id": "338",
+      "url": "https://sebu.co.ke/bee-venom-654o2",
+      "lastmod": "2026-10-21",
+      "title": "Bee Venom",
+      "amount": 1500,
+      "negotiable": "no",
+      "description": "bee venom is a cream for warts ,skin tags and logs removal",
+      "created_at": "2026-10-21T07:01:03.428Z",
+      "category": "health-and-beauty",
+      "category_name": "Health and Beauty",
+      "subcategory": "skincare-products",
+      "subcategory_name": "Skincare Products",
+      "region": "nairobi",
+      "region_name": "Nairobi",
+      "area": "zimmerman",
+      "area_name": "Zimmerman",
+      "images": [
+        "https://pictures.sebu.co.ke/ads/1792565911538-e64c18e9-4d44-4866-b2c5-2905521cb2eb.jpg",
+        "https://pictures.sebu.co.ke/ads/1792565918296-a2bdfda6-7569-4f06-bf36-fec184cecf59.jpg",
+        "https://pictures.sebu.co.ke/ads/1792565927871-3fc3ff2c-f5ef-4aba-a44c-95f72b2f3986.jpg"
+      ],
+      "dynamic": {
+        "product_type": "Serum",
+        "skin_type": "Dry",
+        "brand": "bee venom"
+      },
+      "seller": "VINCENT BECAM",
       "seller_phone_verified": true
     },
     {
@@ -690,6 +836,55 @@
         "shoe_type": "Casual"
       },
       "seller": "Wamaxi Trendywear and cosmetics",
+      "seller_phone_verified": true
+    },
+    {
+      "id": "376",
+      "url": "https://sebu.co.ke/building-services-engineering-plumbing-sewage-drainage-hvac-r-vts-aitpd",
+      "lastmod": "2026-10-22",
+      "title": "Building Services Engineering (Plumbing, Sewage & Drainage, Hvac & R, Vts)",
+      "amount": 50000,
+      "negotiable": "yes",
+      "description": "Plumbing, Sewage & Drainage, HVAC & R, VTS.\n\nProject Size:\nAll project sizes, ranging from low rise, medium rise to high rise buildings. It can be a villa, bungalow, mansion, residential tower, commercial tower, Hotel, Estate (large or small), etc.\n\nTasks:\n\nDesigning, inspection and problem-solving/trouble-shooting on site, supervision,\npreparing list of materials & equipment with their cost estimates (BoQ), preparing and issuing specifications/ instructions for proper installation of items and equipment for smooth functioning and also as per building standards & regulations so as to safeguard and preserve the overall usability and integrity of the building and infrastructure.\n\nScope of services\n\nWater systems:\n\na) Water Supply:\n\n-Borehole water and fresh/potable water, (hot and cold), water treatment, pumps, pipework, tanks, etc.\n\nb) Entertainment Water Systems\n\n- swimming pools,\n- water parks,\n- spas,\n- saunas,\nj- jacuzzi,\n- water fountains\n- etc.\n\nc) Industrial Water Systems\n-\n cooling systems for factory machines/ equipment, etc.\n\nSewage/Waste/Drainage & Sanitary Systems:\n\n- septic tank & soak away pit, grease trap etc.\n- stormwater drainage\n storm drainage system,\n-rain water harvesting system,\n-sanitaryware selection.\n\n(NB: all above systems with the required plumbing).\n\nFire suppression systems:\n- automatic fire sprinklers,\n- fire hose reels,\n- fire Hydrants,\n-fire suppression\n- water storage tanks,\n- fire pumps, and required plumbing,\n- fire extinguishers,\n- automatic stairwell pressurization systems etc.\n\nHVAC systems (Heating, Ventilation & Air Conditioning):\n\n- VRF/VRV, RTU, MDS, AHU, Chillers (Water Cooled & Air Cooled), Split air conditioning systems, air curtains etc., heat pumps, ventilation systems (both ducted and unducted), in rooms, toilets, bathrooms, etc. air extract hoods for kitchens (both recirculating and non-recirculating cooker hoods), barbeque hoods, industrial hoods, etc.\n\nGas Systems\n\n- Domestic, commercial & industrial\n\nRefrigeration\n\n- Cold-rooms & Freezer-rooms\n\nHydronics,\n\n- both water-only and water plus glycol anti-freeze systems\n\nData Centres,\n\n- CRAC, CRAH, etc.\n\nFuel Stations\n- Petrol, Diesel, Kerosene, etc.\n\nMedical Gas Pipeline Systems (MGPS)\n-\nSurgical Air, Medical Air, Oxygen, Vacuum, Nitrous Oxide, WAGSS, etc\n\nLawn Irrigation\n-\n Tanks pumps and required pipework\n\nVTS -\n- These include Lifts, Escalators, etc.\n\n- And other mehanical building services",
+      "created_at": "2026-10-22T18:14:45.563Z",
+      "category": "real-estate",
+      "category_name": "Real Estate",
+      "subcategory": "real-estate-services",
+      "subcategory_name": "Real Estate Services",
+      "region": "mombasa",
+      "region_name": "Mombasa",
+      "area": "mtopanga",
+      "area_name": "Mtopanga",
+      "images": [
+        "https://pictures.sebu.co.ke/ads/1792682893358-07659fb5-a9bc-4ee1-8bf0-499880dacd98.jpg",
+        "https://pictures.sebu.co.ke/ads/1792682909635-c546c5a1-4fa5-4357-a61f-7fa334940bce.jpg",
+        "https://pictures.sebu.co.ke/ads/1792682916615-087675ee-e49b-4a54-a94b-efc07fd5431e.jpg",
+        "https://pictures.sebu.co.ke/ads/1792682927766-ec093bc7-054d-4963-9070-b2bf5fa61316.jpg"
+      ],
+      "dynamic": {
+        "service_type": "Construction / Renovation",
+        "experience_level": "10+ years",
+        "license_or_registration": "Yes",
+        "services_offered": [
+          "Site Supervision",
+          "Bill of Quantities (BoQ)",
+          "3D Rendering / Floor Plans",
+          "Consultation / Advice"
+        ],
+        "target_clients": [
+          "Individual Landlords",
+          "Real Estate Developers",
+          "Buyers & Investors",
+          "Tenants / Renters",
+          "Institutions & Corporates",
+          "Expatriates / Diaspora Clients"
+        ],
+        "coverage_area": "Contrywide (allover Kenya) and internationally",
+        "availability": "On-Request",
+        "pricing_model": "Project-Based",
+        "extra_info": "Flexible pricing depending on scope and size of the project"
+      },
+      "seller": "Building Services Engineer",
       "seller_phone_verified": true
     },
     {
@@ -1009,6 +1204,73 @@
         "shoe_type": "Casual"
       },
       "seller": "Wamaxi Trendywear and cosmetics",
+      "seller_phone_verified": true
+    },
+    {
+      "id": "330",
+      "url": "https://sebu.co.ke/clothes-erqqg",
+      "lastmod": "2026-10-20",
+      "title": "Clothes",
+      "amount": 450,
+      "negotiable": "yes",
+      "description": "Based online and Isell fashionable clothes and help customers find stylish outfits at affordable prices",
+      "created_at": "2026-10-21T15:59:38.428Z",
+      "category": "baby-and-kids",
+      "category_name": "Baby and Kids",
+      "subcategory": "baby-clothing-and-shoes",
+      "subcategory_name": "Baby Clothing and Shoes",
+      "region": "kajiado",
+      "region_name": "Kajiado",
+      "area": "ngong",
+      "area_name": "Ngong",
+      "images": [
+        "https://pictures.sebu.co.ke/ads/1792596943627-0f8eb2b1-622c-44d5-82dd-b5e6a4188a4a.jpg",
+        "https://pictures.sebu.co.ke/ads/1792596969935-5f4ae707-3a49-437e-8a9d-5a98fa475a4f.jpg",
+        "https://pictures.sebu.co.ke/ads/1792596990079-1c097882-33d5-4a3a-b1f9-a46573658d6e.jpg",
+        "https://pictures.sebu.co.ke/ads/1792597005497-4a1c9bbf-78aa-4646-acb4-23997e1fa4ab.jpg"
+      ],
+      "dynamic": {
+        "size": "4_13years",
+        "gender": "Unisex",
+        "condition": "New"
+      },
+      "seller": "Nancy Atieno",
+      "seller_phone_verified": true
+    },
+    {
+      "id": "347",
+      "url": "https://sebu.co.ke/computer-monitors-pe0yx",
+      "lastmod": "2026-10-21",
+      "title": "Computer Monitors",
+      "amount": 14000,
+      "negotiable": "yes",
+      "description": "imported and it's in good working condition",
+      "created_at": "2026-10-21T13:04:28.972Z",
+      "category": "electronics",
+      "category_name": "Electronics",
+      "subcategory": "computer-monitors",
+      "subcategory_name": "Computer Monitors",
+      "region": "busia",
+      "region_name": "Busia",
+      "area": "bunyala-north",
+      "area_name": "Bunyala North",
+      "images": [
+        "https://pictures.sebu.co.ke/ads/1792586223051-a4e6fbe1-4b73-4614-8934-6534797792e7.jpg"
+      ],
+      "dynamic": {
+        "color": "black",
+        "condition": "Refurbished",
+        "brand": "ViewSonic",
+        "model": "VS16861",
+        "screen_size": "24 inch",
+        "resolution": "2K (2560x1440)",
+        "panel_type": "VA",
+        "refresh_rate": "60Hz",
+        "connectivity": "HDMI",
+        "aspect_ratio": "21:9",
+        "features": "SMHD"
+      },
+      "seller": "xavier bookshop and computer accessories",
       "seller_phone_verified": true
     },
     {
@@ -1670,6 +1932,34 @@
       "seller_phone_verified": true
     },
     {
+      "id": "370",
+      "url": "https://sebu.co.ke/hair-care-products-zky8e",
+      "lastmod": "2026-10-22",
+      "title": "Hair Care Products",
+      "amount": 1000,
+      "negotiable": "no",
+      "description": "suit for your hair controls hair fall and dandruff",
+      "created_at": "2026-10-22T08:45:05.598Z",
+      "category": "health-and-beauty",
+      "category_name": "Health and Beauty",
+      "subcategory": "skincare-products",
+      "subcategory_name": "Skincare Products",
+      "region": "narok",
+      "region_name": "Narok",
+      "area": "ololulunga",
+      "area_name": "Ololulung'a",
+      "images": [
+        "https://pictures.sebu.co.ke/ads/1792658588188-33a0b0f9-2027-4ad7-84ae-e733aeb2101a.jpg"
+      ],
+      "dynamic": {
+        "product_type": "Other",
+        "skin_type": "Normal",
+        "brand": "Dr dess"
+      },
+      "seller": "Nasra Yacqub",
+      "seller_phone_verified": true
+    },
+    {
       "id": "203",
       "url": "https://sebu.co.ke/hermes-leather-sandals-t97qg",
       "lastmod": "2026-05-25",
@@ -1767,6 +2057,70 @@
       "seller_phone_verified": true
     },
     {
+      "id": "357",
+      "url": "https://sebu.co.ke/insurance-policies-investment-plans-education-plans-medical-cover-motor-vehicle--mdq05",
+      "lastmod": "2026-10-21",
+      "title": "Insurance Policies, Investment Plans, Education Plans/ Medical Cover/ Motor Vehicle Insurance",
+      "amount": 50,
+      "negotiable": "no",
+      "description": "we offer insurance solutions to those in need",
+      "created_at": "2026-10-21T18:47:57.869Z",
+      "category": "services",
+      "category_name": "Services",
+      "subcategory": "legal-and-tax-services",
+      "subcategory_name": "Legal and Tax Services",
+      "region": "mombasa",
+      "region_name": "Mombasa",
+      "area": "bamburi",
+      "area_name": "Bamburi",
+      "images": [
+        "https://pictures.sebu.co.ke/ads/1792607830934-673112af-1e7c-4a26-a958-25c1d9efe68d.jpg",
+        "https://pictures.sebu.co.ke/ads/1792607911783-1f7b05d2-17d0-4420-9bcd-1f54b14c5f2a.jpg",
+        "https://pictures.sebu.co.ke/ads/1792607919264-882bb429-afbf-4a01-92a4-c0ff802a2f16.jpg",
+        "https://pictures.sebu.co.ke/ads/1792607927528-646cb18e-4910-4367-86c2-fefcae832184.jpg"
+      ],
+      "dynamic": {
+        "service_area": "Contracts",
+        "licensed": "Yes"
+      },
+      "seller": "Levy Wekesa",
+      "seller_phone_verified": true
+    },
+    {
+      "id": "364",
+      "url": "https://sebu.co.ke/iphone-xsr-n12ba",
+      "lastmod": "2026-10-22",
+      "title": "Iphone Xsr",
+      "amount": 15000,
+      "negotiable": "yes",
+      "description": "iphone xr\n64gb\nface id active\ntrue tone active\nno parts changed.",
+      "created_at": "2026-10-22T04:12:57.889Z",
+      "category": "electronics",
+      "category_name": "Electronics",
+      "subcategory": "mobile-phones",
+      "subcategory_name": "Mobile Phones",
+      "region": "nairobi",
+      "region_name": "Nairobi",
+      "area": "komarock",
+      "area_name": "Komarock",
+      "images": [
+        "https://pictures.sebu.co.ke/ads/1792642142151-c55caae4-d9bf-4168-816e-030a7899563f.jpg",
+        "https://pictures.sebu.co.ke/ads/1792642165379-5ff0e54c-b643-47a3-b298-3a502defa0fc.jpg"
+      ],
+      "dynamic": {
+        "brand": "Apple",
+        "model": "iphone xr",
+        "storage": "64GB",
+        "condition": "Used",
+        "color": "yellow",
+        "battery": "3000",
+        "os": "iOS",
+        "ram": "6GB"
+      },
+      "seller": "Dian Mwangi",
+      "seller_phone_verified": true
+    },
+    {
       "id": "172",
       "url": "https://sebu.co.ke/it-ends-with-us-by-colleen-hoover-7vk14",
       "lastmod": "2026-05-10",
@@ -1792,6 +2146,34 @@
         "condition": "New"
       },
       "seller": "Chly",
+      "seller_phone_verified": true
+    },
+    {
+      "id": "336",
+      "url": "https://sebu.co.ke/jikokoa-pthg0",
+      "lastmod": "2026-10-20",
+      "title": "Jikokoa",
+      "amount": 4100,
+      "negotiable": "yes",
+      "description": "It is very efficient,consumes little charcoal with minimal smoke emissions",
+      "created_at": "2026-10-20T23:46:06.468Z",
+      "category": "home-furniture-and-appliances",
+      "category_name": "Home, Furniture and Appliances",
+      "subcategory": "cookware-and-kitchen",
+      "subcategory_name": "Cookware and Kitchen",
+      "region": "kiambu",
+      "region_name": "Kiambu",
+      "area": "witeithie",
+      "area_name": "Witeithie",
+      "images": [
+        "https://pictures.sebu.co.ke/ads/1792539782785-0b3158fe-0c03-4a62-88c7-fefaf62e00de.jpg"
+      ],
+      "dynamic": {
+        "item_type": "Cookware",
+        "material": "stainless steel",
+        "set_included": "one"
+      },
+      "seller": "Cornelius Kipchirchir",
       "seller_phone_verified": true
     },
     {
@@ -2076,6 +2458,36 @@
         "brand": "Handmade"
       },
       "seller": "Chly",
+      "seller_phone_verified": true
+    },
+    {
+      "id": "379",
+      "url": "https://sebu.co.ke/machine-cut-stones-z8czi",
+      "lastmod": "2026-10-22",
+      "title": "Machine Cut Stones",
+      "amount": 32,
+      "negotiable": "no",
+      "description": "I do sell and supply high quality machine cut stones ideal for walling in your construction project",
+      "created_at": "2026-10-22T16:16:48.915Z",
+      "category": "business-and-industrial",
+      "category_name": "Business and Industrial",
+      "subcategory": "construction-and-tools",
+      "subcategory_name": "Construction and Tools",
+      "region": "machakos",
+      "region_name": "Machakos",
+      "area": "athi-river",
+      "area_name": "Athi River",
+      "images": [
+        "https://pictures.sebu.co.ke/ads/1792685611877-52679c6d-65e4-44c6-b3b0-22dc67259231.jpg",
+        "https://pictures.sebu.co.ke/ads/1792685643194-d8069327-60b2-4c50-897d-e796bcfe06d0.jpg",
+        "https://pictures.sebu.co.ke/ads/1792685647461-eef6f9cc-ca7b-45fb-bbfe-c2f43d2a364c.jpg"
+      ],
+      "dynamic": {
+        "item_type": "Other",
+        "power_source": "Manual",
+        "brand": "Machine cut stones,all gauges"
+      },
+      "seller": "AbdulKhabir Enterprises",
       "seller_phone_verified": true
     },
     {
@@ -3820,6 +4232,37 @@
       "seller_phone_verified": true
     },
     {
+      "id": "374",
+      "url": "https://sebu.co.ke/modern-sofas-chester-beds-dinning-tables-mpolo",
+      "lastmod": "2026-10-22",
+      "title": "Modern Sofas,Chester Beds & Dinning Tables",
+      "amount": 25000,
+      "negotiable": "yes",
+      "description": "inbox for more info /prices",
+      "created_at": "2026-10-22T11:26:07.547Z",
+      "category": "home-furniture-and-appliances",
+      "category_name": "Home, Furniture and Appliances",
+      "subcategory": "furniture",
+      "subcategory_name": "Furniture",
+      "region": "laikipia",
+      "region_name": "Laikipia",
+      "area": "mukogodo-west",
+      "area_name": "Mukogodo West",
+      "images": [
+        "https://pictures.sebu.co.ke/ads/1792668125971-8d850f51-7314-4be0-94f9-d10630519e43.jpg",
+        "https://pictures.sebu.co.ke/ads/1792668131615-a38956ad-8989-46b9-8bca-6adbe9333b8c.jpg",
+        "https://pictures.sebu.co.ke/ads/1792668135676-15cb8e0d-5cb0-4369-9dc1-e55d6ba182b2.jpg",
+        "https://pictures.sebu.co.ke/ads/1792668140944-9954c231-9aef-43d9-b700-6ab53b5b8574.jpg"
+      ],
+      "dynamic": {
+        "furniture_type": "Sofa",
+        "material": "soft leather",
+        "condition": "New"
+      },
+      "seller": "Bluevalley Furnitures",
+      "seller_phone_verified": true
+    },
+    {
       "id": "74",
       "url": "https://sebu.co.ke/mounting-frames-printing-gjzj6",
       "lastmod": "2025-10-27",
@@ -4335,6 +4778,35 @@
       "seller_phone_verified": true
     },
     {
+      "id": "359",
+      "url": "https://sebu.co.ke/paypal-solution-kenya-f35te",
+      "lastmod": "2026-10-21",
+      "title": "Paypal Solution Kenya",
+      "amount": 2000,
+      "negotiable": "yes",
+      "description": "I withdraw funds from permanent limited Paypal and other Paypal issues",
+      "created_at": "2026-10-21T19:03:02.469Z",
+      "category": "gigs-and-freelance",
+      "category_name": "Gigs and Freelance",
+      "subcategory": "data-entry-and-admin-tasks",
+      "subcategory_name": "Data Entry and Admin Tasks",
+      "region": "kisumu",
+      "region_name": "Kisumu",
+      "area": "central-kisumu",
+      "area_name": "Central Kisumu",
+      "images": [
+        "https://pictures.sebu.co.ke/ads/1792608918928-ecacf36e-d9f8-445c-a2e3-cb3b2446c4f9.jpg",
+        "https://pictures.sebu.co.ke/ads/1792608923495-5d010956-f1cf-42bd-af6b-bf07b47c824e.jpg"
+      ],
+      "dynamic": {
+        "duration": "one week",
+        "task_type": "PayPal",
+        "software_used": "phone, laptop"
+      },
+      "seller": "Collen Cee",
+      "seller_phone_verified": true
+    },
+    {
       "id": "99",
       "url": "https://sebu.co.ke/please-paradise-corporate-26tyh",
       "lastmod": "2025-11-15",
@@ -4545,6 +5017,41 @@
       "seller_phone_verified": true
     },
     {
+      "id": "351",
+      "url": "https://sebu.co.ke/printing-tshirts-wp639",
+      "lastmod": "2026-10-21",
+      "title": "Printing Tshirts",
+      "amount": 400,
+      "negotiable": "yes",
+      "description": "Support SenDigitalCyber",
+      "created_at": "2026-10-21T17:06:24.638Z",
+      "category": "services",
+      "category_name": "Services",
+      "subcategory": "printing-services",
+      "subcategory_name": "Printing Services",
+      "region": "kilifi",
+      "region_name": "Kilifi",
+      "area": "shimo-la-tewa",
+      "area_name": "Shimo La Tewa",
+      "images": [
+        "https://pictures.sebu.co.ke/ads/1792602048995-d2e2ea0c-4f80-4bf7-b688-a32e1d583b98.jpg",
+        "https://pictures.sebu.co.ke/ads/1792602090741-7ad70d4b-8974-4939-bf11-8ce7fc631b5e.jpg",
+        "https://pictures.sebu.co.ke/ads/1792602134600-230e2d28-9735-4033-80a6-6272848acf88.jpg",
+        "https://pictures.sebu.co.ke/ads/1792602140004-d71af304-045f-4906-af33-97a2b676e71a.jpg"
+      ],
+      "dynamic": {
+        "service_type": "T-Shirts & Apparel",
+        "paper_size": "Custom Size",
+        "material_type": "Vinyl",
+        "color_option": "Full Color",
+        "minimum_quantity": "1",
+        "printing_side": "Double Side",
+        "urgency": "Flexible"
+      },
+      "seller": "Sen Digital Cyber",
+      "seller_phone_verified": true
+    },
+    {
       "id": "245",
       "url": "https://sebu.co.ke/professional-home-cleaning-services-mama-fua-5auop",
       "lastmod": "2026-08-23",
@@ -4601,6 +5108,36 @@
         "color": ""
       },
       "seller": "Patriciah N.M",
+      "seller_phone_verified": true
+    },
+    {
+      "id": "356",
+      "url": "https://sebu.co.ke/refilling-gas-hhszx",
+      "lastmod": "2026-10-21",
+      "title": "Refilling Gas",
+      "amount": 2300,
+      "negotiable": "no",
+      "description": "REFILLING 13kG GAS @2,300 and 6KG GAS @1050. pay for delivery. come one come all.",
+      "created_at": "2026-10-21T18:45:40.062Z",
+      "category": "home-furniture-and-appliances",
+      "category_name": "Home, Furniture and Appliances",
+      "subcategory": "home-appliances",
+      "subcategory_name": "Home Appliances",
+      "region": "nairobi",
+      "region_name": "Nairobi",
+      "area": "kangemi",
+      "area_name": "Kangemi",
+      "images": [
+        "https://pictures.sebu.co.ke/ads/1792608049291-39cbc060-b6d3-4dcd-9b1b-5f04c20a5eae.jpg",
+        "https://pictures.sebu.co.ke/ads/1792608063700-811c91b8-45c8-40a9-a90a-88d383f665c1.jpg",
+        "https://pictures.sebu.co.ke/ads/1792608071047-21ca3c9b-e829-42a8-9117-0891c5798ae7.jpg",
+        "https://pictures.sebu.co.ke/ads/1792608096715-b8ac8295-683d-4651-a294-7f82821b98a7.jpg"
+      ],
+      "dynamic": {
+        "appliance_type": "Other",
+        "brand": "USED"
+      },
+      "seller": "MK GAS",
       "seller_phone_verified": true
     },
     {
@@ -4662,6 +5199,37 @@
       "seller_phone_verified": true
     },
     {
+      "id": "378",
+      "url": "https://sebu.co.ke/rich-brand-fan-16-inches-wdkel",
+      "lastmod": "2026-10-22",
+      "title": "Rich Brand Fan 16 Inches",
+      "amount": 3500,
+      "negotiable": "yes",
+      "description": "Roch wall fan",
+      "created_at": "2026-10-22T16:17:00.603Z",
+      "category": "home-furniture-and-appliances",
+      "category_name": "Home, Furniture and Appliances",
+      "subcategory": "tools-and-equipment",
+      "subcategory_name": "Tools and Equipment",
+      "region": "mombasa",
+      "region_name": "Mombasa",
+      "area": "shanzu",
+      "area_name": "Shanzu",
+      "images": [
+        "https://pictures.sebu.co.ke/ads/1792685659578-8c7d5f5c-4c80-4172-990d-3a125d4c605b.jpg",
+        "https://pictures.sebu.co.ke/ads/1792685666131-cd7c8e20-0909-4b97-81d1-dc160752dfc5.jpg",
+        "https://pictures.sebu.co.ke/ads/1792685678941-3f007fce-82e5-4466-8f9c-96ffd5ac3aff.jpg",
+        "https://pictures.sebu.co.ke/ads/1792685685074-4d7f1012-39b5-43a1-bf3f-d398ca5e0be4.jpg"
+      ],
+      "dynamic": {
+        "tool_type": "Other",
+        "power_source": "Electric",
+        "brand": "Roch 16 Inch Fan"
+      },
+      "seller": "Quick Serve Solutions",
+      "seller_phone_verified": true
+    },
+    {
       "id": "115",
       "url": "https://sebu.co.ke/ruffle-hat-available-b2wwh",
       "lastmod": "2025-11-19",
@@ -4687,6 +5255,62 @@
         "region": ""
       },
       "seller": "Caroline Mokeira",
+      "seller_phone_verified": true
+    },
+    {
+      "id": "293",
+      "url": "https://sebu.co.ke/shoes-evw4z",
+      "lastmod": "2026-10-20",
+      "title": "Shoes",
+      "amount": 1500,
+      "negotiable": "yes",
+      "description": "Good quality campus shoe",
+      "created_at": "2026-10-21T18:55:20.555Z",
+      "category": "fashion",
+      "category_name": "Fashion",
+      "subcategory": "men-shoes",
+      "subcategory_name": "Men Shoes",
+      "region": "nairobi",
+      "region_name": "Nairobi",
+      "area": "uthiru-ruthimitu",
+      "area_name": "Uthiru/Ruthimitu",
+      "images": [
+        "https://pictures.sebu.co.ke/ads/1792608822745-4d2df693-028d-4037-96d4-650f6dacec3c.jpg"
+      ],
+      "dynamic": {
+        "shoe_size": "41",
+        "brand": "campus",
+        "shoe_type": "Sneakers"
+      },
+      "seller": "Ibin Nyagucha",
+      "seller_phone_verified": true
+    },
+    {
+      "id": "299",
+      "url": "https://sebu.co.ke/shoes-y2t95",
+      "lastmod": "2026-10-20",
+      "title": "Shoes",
+      "amount": 3500,
+      "negotiable": "no",
+      "description": "Air max 97 , white and green original",
+      "created_at": "2026-10-20T21:49:17.028Z",
+      "category": "fashion",
+      "category_name": "Fashion",
+      "subcategory": "men-shoes",
+      "subcategory_name": "Men Shoes",
+      "region": "nairobi",
+      "region_name": "Nairobi",
+      "area": "nairobi-cbd",
+      "area_name": "Nairobi CBD",
+      "images": [
+        "https://pictures.sebu.co.ke/ads/1792532871993-244a6f4a-d620-4313-8ad7-5fac42cacf09.jpg"
+      ],
+      "dynamic": {
+        "shoe_size": "41-45",
+        "brand": "NIKE",
+        "shoe_type": "Sneakers"
+      },
+      "seller": "Jeff Karuga",
       "seller_phone_verified": true
     },
     {
@@ -4745,6 +5369,62 @@
         "brand": "new"
       },
       "seller": "makuti roofing expert",
+      "seller_phone_verified": true
+    },
+    {
+      "id": "369",
+      "url": "https://sebu.co.ke/skin-care-products-2j8an",
+      "lastmod": "2026-10-22",
+      "title": "Skin Care Products",
+      "amount": 400,
+      "negotiable": "no",
+      "description": "suitable for all skin",
+      "created_at": "2026-10-22T08:40:35.048Z",
+      "category": "health-and-beauty",
+      "category_name": "Health and Beauty",
+      "subcategory": "skincare-products",
+      "subcategory_name": "Skincare Products",
+      "region": "narok",
+      "region_name": "Narok",
+      "area": "ololulunga",
+      "area_name": "Ololulung'a",
+      "images": [
+        "https://pictures.sebu.co.ke/ads/1792658119524-0914c8fb-3071-4de6-babc-e729a76fbe0c.jpg"
+      ],
+      "dynamic": {
+        "product_type": "Moisturizer",
+        "skin_type": "Combination",
+        "brand": "unbranded"
+      },
+      "seller": "Nasra Yacqub",
+      "seller_phone_verified": true
+    },
+    {
+      "id": "371",
+      "url": "https://sebu.co.ke/skincare-products-gaen3",
+      "lastmod": "2026-10-22",
+      "title": "Skincare Products",
+      "amount": 500,
+      "negotiable": "no",
+      "description": "for skin brightening for even skin tone",
+      "created_at": "2026-10-22T09:02:38.003Z",
+      "category": "health-and-beauty",
+      "category_name": "Health and Beauty",
+      "subcategory": "skincare-products",
+      "subcategory_name": "Skincare Products",
+      "region": "narok",
+      "region_name": "Narok",
+      "area": "ololulunga",
+      "area_name": "Ololulung'a",
+      "images": [
+        "https://pictures.sebu.co.ke/ads/1792659205094-a7b7d57a-7b80-4051-ab50-86fef1120c9b.jpg"
+      ],
+      "dynamic": {
+        "product_type": "Moisturizer",
+        "skin_type": "Normal",
+        "brand": "tumeric"
+      },
+      "seller": "Nasra Yacqub",
       "seller_phone_verified": true
     },
     {
@@ -4903,6 +5583,35 @@
       "seller_phone_verified": true
     },
     {
+      "id": "349",
+      "url": "https://sebu.co.ke/sofaset-lmgxk",
+      "lastmod": "2026-10-21",
+      "title": "Sofaset",
+      "amount": 120000,
+      "negotiable": "yes",
+      "description": "newly made sofas from Scrach and of good quality",
+      "created_at": "2026-10-22T06:36:44.596Z",
+      "category": "home-furniture-and-appliances",
+      "category_name": "Home, Furniture and Appliances",
+      "subcategory": "furniture",
+      "subcategory_name": "Furniture",
+      "region": "west-pokot",
+      "region_name": "West Pokot",
+      "area": "kapenguria",
+      "area_name": "Kapenguria",
+      "images": [
+        "https://pictures.sebu.co.ke/ads/1792650760242-f14c84a8-64c4-49e0-a1ce-a850a99a512f.jpg",
+        "https://pictures.sebu.co.ke/ads/1792650797131-4d195590-d893-415a-849e-d5c9ab840470.jpg"
+      ],
+      "dynamic": {
+        "furniture_type": "Sofa",
+        "material": "sweed",
+        "condition": "New"
+      },
+      "seller": "Zachary Ombati",
+      "seller_phone_verified": true
+    },
+    {
       "id": "300",
       "url": "https://sebu.co.ke/spare-parts-gkmo7",
       "lastmod": "2026-10-20",
@@ -4997,6 +5706,37 @@
       "seller_phone_verified": true
     },
     {
+      "id": "382",
+      "url": "https://sebu.co.ke/swimming-pool-services-57py6",
+      "lastmod": "2026-10-22",
+      "title": "Swimming Pool Services",
+      "amount": 3500,
+      "negotiable": "yes",
+      "description": "professional swimming pool cleaning in westland nairobi ,we keep your pool sparkle clear ,our services ,greenpool restoration,pool vacumming,tiles scrubbing,chemical balancing (ph and chlorine ,\n\nwhy choose us\naffordable and reliable",
+      "created_at": "2026-10-22T17:32:05.043Z",
+      "category": "services",
+      "category_name": "Services",
+      "subcategory": "other-services",
+      "subcategory_name": "Other Services",
+      "region": "nairobi",
+      "region_name": "Nairobi",
+      "area": "kangemi",
+      "area_name": "Kangemi",
+      "images": [
+        "https://pictures.sebu.co.ke/ads/1792689798214-d2b8ce9f-d522-4d28-83db-7d038aea0b9b.jpg",
+        "https://pictures.sebu.co.ke/ads/1792689802638-6ce84829-c985-4240-92d0-afa42602e488.jpg",
+        "https://pictures.sebu.co.ke/ads/1792689816883-219b9e9a-f056-4e0f-abf7-7f74dd1c23ef.jpg"
+      ],
+      "dynamic": {
+        "availability": "Mon - Sat",
+        "pricing_model": "Hourly Rate",
+        "service_category": "cleaning services",
+        "service_mode": "On-Site / Home Visit"
+      },
+      "seller": "Owen Maloba",
+      "seller_phone_verified": true
+    },
+    {
       "id": "324",
       "url": "https://sebu.co.ke/tecno-camon-50-cnqr1",
       "lastmod": "2026-10-20",
@@ -5027,6 +5767,44 @@
         "battery": "450"
       },
       "seller": "Tracy Mauno",
+      "seller_phone_verified": true
+    },
+    {
+      "id": "344",
+      "url": "https://sebu.co.ke/television-dk75c",
+      "lastmod": "2026-10-21",
+      "title": "Television",
+      "amount": 25000,
+      "negotiable": "yes",
+      "description": "it's in a good condition and it's slightly negotiable",
+      "created_at": "2026-10-21T08:38:26.123Z",
+      "category": "electronics",
+      "category_name": "Electronics",
+      "subcategory": "televisions-and-audio",
+      "subcategory_name": "Televisions and Audio Systems",
+      "region": "kiambu",
+      "region_name": "Kiambu",
+      "area": "kahawa-wendani",
+      "area_name": "Kahawa Wendani",
+      "images": [
+        "https://pictures.sebu.co.ke/ads/1792571660044-44b0cea1-83a2-407e-bda3-41184744e433.jpg",
+        "https://pictures.sebu.co.ke/ads/1792571665817-d9cba47c-dd5b-441f-b6d2-aa254f2fe255.jpg",
+        "https://pictures.sebu.co.ke/ads/1792571682831-8a45c0e6-5228-4506-a89c-ab1ecca6781c.jpg",
+        "https://pictures.sebu.co.ke/ads/1792571688867-416eedb4-9036-47e2-8dc8-d998df7f7b99.jpg"
+      ],
+      "dynamic": {
+        "screen_size": "43\"",
+        "brand": "Skyworth",
+        "type": "Television",
+        "model": "goggle tv",
+        "resolution": "Full HD (1080p)",
+        "smart_tv": "Yes - WebOS",
+        "condition": "Used",
+        "connectivity": "Wi-Fi, Bluetooth, HDMI, USB",
+        "audio_channels": "7.1",
+        "color": "black"
+      },
+      "seller": "Hesborn Nyaundi",
       "seller_phone_verified": true
     },
     {
@@ -5204,6 +5982,37 @@
       "seller_phone_verified": true
     },
     {
+      "id": "333",
+      "url": "https://sebu.co.ke/thermal-rolls-clear-clipboards-casio-calculators-four-figures-exam-pencils-etc-z93as",
+      "lastmod": "2026-10-20",
+      "title": "Thermal Rolls, Clear Clipboards, Casio Calculators, Four Figures,Exam Pencils Etc",
+      "amount": 1400,
+      "negotiable": "yes",
+      "description": "My items are good quality and pocket friendly",
+      "created_at": "2026-10-21T08:12:15.066Z",
+      "category": "business-and-industrial",
+      "category_name": "Business and Industrial",
+      "subcategory": "printing-and-signage",
+      "subcategory_name": "Printing and Signage",
+      "region": "nairobi",
+      "region_name": "Nairobi",
+      "area": "embakasi",
+      "area_name": "Embakasi",
+      "images": [
+        "https://pictures.sebu.co.ke/ads/1792532942266-2f20c16f-4d0e-4081-a023-a9cf0adcf620.jpg",
+        "https://pictures.sebu.co.ke/ads/1792532950967-3d5f98eb-bf62-44d8-aaf9-3535789f4340.jpg",
+        "https://pictures.sebu.co.ke/ads/1792532956942-135204c2-d421-4730-b301-24ad147f4cbc.jpg",
+        "https://pictures.sebu.co.ke/ads/1792570299037-3c08cc4a-c64a-45b0-969a-99bee8f6c084.jpg"
+      ],
+      "dynamic": {
+        "item_type": "Other",
+        "print_size": "1500",
+        "condition": "New"
+      },
+      "seller": "Evans Itapara",
+      "seller_phone_verified": true
+    },
+    {
       "id": "187",
       "url": "https://sebu.co.ke/timberland-casuals-i7f5u",
       "lastmod": "2026-05-23",
@@ -5350,6 +6159,68 @@
         "material": "All fabrics"
       },
       "seller": "Tom Mutua",
+      "seller_phone_verified": true
+    },
+    {
+      "id": "332",
+      "url": "https://sebu.co.ke/tv-stand-anncj",
+      "lastmod": "2026-10-20",
+      "title": "Tv Stand",
+      "amount": 6500,
+      "negotiable": "yes",
+      "description": "3 months used",
+      "created_at": "2026-10-20T20:34:19.962Z",
+      "category": "home-furniture-and-appliances",
+      "category_name": "Home, Furniture and Appliances",
+      "subcategory": "furniture",
+      "subcategory_name": "Furniture",
+      "region": "mombasa",
+      "region_name": "Mombasa",
+      "area": "mtopanga",
+      "area_name": "Mtopanga",
+      "images": [
+        "https://pictures.sebu.co.ke/ads/1792528359736-5bbfe804-343d-4282-8d35-403a80af2bf1.jpg",
+        "https://pictures.sebu.co.ke/ads/1792528363614-58f55cf4-2b98-40f8-9b6c-5958dc60c5d4.jpg",
+        "https://pictures.sebu.co.ke/ads/1792528368229-b5d96ee3-d23d-4dd1-9ab4-47f83564aa49.jpg",
+        "https://pictures.sebu.co.ke/ads/1792528372822-0d6dcccc-9b05-4772-a394-cd629a69ebd9.jpg"
+      ],
+      "dynamic": {
+        "furniture_type": "Other",
+        "material": "hard wood",
+        "condition": "New"
+      },
+      "seller": "Salyne Bushnell",
+      "seller_phone_verified": true
+    },
+    {
+      "id": "345",
+      "url": "https://sebu.co.ke/unisex-cloggs-bm1v2",
+      "lastmod": "2026-10-21",
+      "title": "Unisex Cloggs",
+      "amount": 1700,
+      "negotiable": "yes",
+      "description": "slightly negotiable free delivery around wendani",
+      "created_at": "2026-10-21T12:05:46.106Z",
+      "category": "fashion",
+      "category_name": "Fashion",
+      "subcategory": "men-shoes",
+      "subcategory_name": "Men Shoes",
+      "region": "kiambu",
+      "region_name": "Kiambu",
+      "area": "kahawa-sukari",
+      "area_name": "Kahawa Sukari",
+      "images": [
+        "https://pictures.sebu.co.ke/ads/1792584115080-3b80bfdf-2bc1-4b54-9325-2a11e3316f12.jpg",
+        "https://pictures.sebu.co.ke/ads/1792584122197-645c6e05-529d-4059-a82c-a0ae130868b1.jpg",
+        "https://pictures.sebu.co.ke/ads/1792584129417-5c6f5229-360d-41be-9a3e-06d57e690930.jpg",
+        "https://pictures.sebu.co.ke/ads/1792584143037-9d5333c6-5950-47cf-8004-233126bc7590.jpg"
+      ],
+      "dynamic": {
+        "shoe_size": "38 to 43",
+        "brand": "custom cloggs",
+        "shoe_type": "Other"
+      },
+      "seller": "Hesborn Nyaundi",
       "seller_phone_verified": true
     },
     {
@@ -5531,6 +6402,38 @@
       "seller_phone_verified": true
     },
     {
+      "id": "375",
+      "url": "https://sebu.co.ke/wiring-service-and-repair-fnqtw",
+      "lastmod": "2026-10-22",
+      "title": "Wiring Service And Repair",
+      "amount": 30000,
+      "negotiable": "yes",
+      "description": "I offer professional services that are negotiable.",
+      "created_at": "2026-10-22T12:29:58.357Z",
+      "category": "job-looking-for-work",
+      "category_name": "Job - Looking for Work",
+      "subcategory": "looking-for-job-construction-and-engineering",
+      "subcategory_name": "Construction and Engineering",
+      "region": "nairobi",
+      "region_name": "Nairobi",
+      "area": "nairobi-west",
+      "area_name": "Nairobi West",
+      "images": [
+        "https://pictures.sebu.co.ke/ads/1792671756367-0eb99710-e5bf-4d9b-935a-a34c6fa536fb.jpg",
+        "https://pictures.sebu.co.ke/ads/1792671845763-7ecbb6bc-2b2c-412b-8aff-132216eec41e.jpg",
+        "https://pictures.sebu.co.ke/ads/1792671918663-98ff1aca-7f03-46aa-8e77-51190d57ee8b.jpg"
+      ],
+      "dynamic": {
+        "experience_level": "1-2 Years",
+        "employment_type": "Contract",
+        "education_level": "Diploma",
+        "salary_frequency": "Daily",
+        "gender": "Male"
+      },
+      "seller": "Angel Paul Ndalila",
+      "seller_phone_verified": true
+    },
+    {
       "id": "174",
       "url": "https://sebu.co.ke/wisdom-for-girls-bmscp",
       "lastmod": "2026-05-11",
@@ -5557,6 +6460,36 @@
         "condition": "New"
       },
       "seller": "Chly",
+      "seller_phone_verified": true
+    },
+    {
+      "id": "377",
+      "url": "https://sebu.co.ke/women-clothes-b8q5v",
+      "lastmod": "2026-10-22",
+      "title": "Women Clothes",
+      "amount": 550,
+      "negotiable": "no",
+      "description": "I sell women clothes from 550/= depending with type of clothes",
+      "created_at": "2026-10-22T15:59:58.052Z",
+      "category": "fashion",
+      "category_name": "Fashion",
+      "subcategory": "women-clothing",
+      "subcategory_name": "Women Clothing",
+      "region": "nairobi",
+      "region_name": "Nairobi",
+      "area": "ruai",
+      "area_name": "Ruai",
+      "images": [
+        "https://pictures.sebu.co.ke/ads/1792684515465-6ce69140-85c1-450a-8f7f-a49846c2015b.jpg",
+        "https://pictures.sebu.co.ke/ads/1792684524708-a920e81e-aed9-4bfe-9b48-b51cbb76b741.jpg",
+        "https://pictures.sebu.co.ke/ads/1792684538104-04be10cc-e11d-4c38-b9e2-e5c57e89e4d9.jpg",
+        "https://pictures.sebu.co.ke/ads/1792684545287-fbea451d-4c9b-4393-ae6b-6c3c1685219a.jpg"
+      ],
+      "dynamic": {
+        "size": "all sizes",
+        "material": "cotton"
+      },
+      "seller": "Tom Wa Roberto Official",
       "seller_phone_verified": true
     },
     {

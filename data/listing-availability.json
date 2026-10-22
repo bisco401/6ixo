@@ -1,5 +1,5 @@
 {
-  "checkedAt": "2026-10-22T21:46:08.029030+00:00",
+  "checkedAt": "2026-10-22T21:57:33.399Z",
   "listings": {
     "craigslist.org/view/d/bastrop-used-2025-cadillac-xt4-fwd-4d/fuqr_3uo8rgowpq1ctwx-a": {
       "availability": "sold",
@@ -14837,6 +14837,15 @@
       "resolvedUrl": "https://autostore.co.ke/product/land-rover-discovery-rr-sport-cabin-filter-lr023977/",
       "checkedAt": "2026-10-22T21:46:08.029030+00:00",
       "reason": "Exact source URL returned HTTP 404"
+    },
+    "craigslist.org/view/d/marietta-2017-honda-pilot-financing/kdzouube8rgowp3ndihp3w": {
+      "id": "craigslist-kDzouubE8RGOwP3NDIhP3w",
+      "sourceUrl": "https://www.craigslist.org/view/d/marietta-2017-honda-pilot-financing/kDzouubE8RGOwP3NDIhP3w",
+      "availability": "gone",
+      "checkedAt": "2026-10-22T21:57:33.399Z",
+      "httpStatus": 410,
+      "resolvedUrl": "https://www.craigslist.org/view/d/marietta-2017-honda-pilot-financing/kDzouubE8RGOwP3NDIhP3w",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     }
   }
 }

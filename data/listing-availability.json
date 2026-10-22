@@ -1,5 +1,5 @@
 {
-  "checkedAt": "2026-10-22T12:42:29Z",
+  "checkedAt": "2026-10-22T12:56:20.851Z",
   "listings": {
     "craigslist.org/view/d/bastrop-used-2025-cadillac-xt4-fwd-4d/fuqr_3uo8rgowpq1ctwx-a": {
       "availability": "sold",
@@ -11564,14 +11564,22 @@
       "reason": "Exact source URL returned HTTP 410"
     },
     "kijiji.ca/v-buy-sell-other/city-of-toronto/bosch-800-series-built-in-coffee-machine-bcm8450uc-stainless-ste/1745132262": {
-      "availability": "unavailable",
-      "checkedAt": "2026-10-22T12:42:29Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1745132262",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/bosch-800-series-built-in-coffee-machine-bcm8450uc-stainless-ste/1745132262",
+      "availability": "gone",
+      "checkedAt": "2026-10-22T12:56:20.851Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1745132262",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-tires-rims/mississauga-peel-region/4-new-take-off-bmw-x3-rims-275-40-20-245-45-20-continental-ice-c/1745109888": {
-      "availability": "unavailable",
-      "checkedAt": "2026-10-22T12:42:29Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1745109888",
+      "sourceUrl": "https://www.kijiji.ca/v-tires-rims/mississauga-peel-region/4-new-take-off-bmw-x3-rims-275-40-20-245-45-20-continental-ice-c/1745109888",
+      "availability": "gone",
+      "checkedAt": "2026-10-22T12:56:20.851Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-tires-rims/mississauga-peel-region/c320l1700276?adRemoved=1745109888&ll=43.82%2C-79.55&radius=150.0&rb=50",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "craigslist.org/view/d/lithia-springs-print-2020-ford-transit/n6lg4dxudzup9cjpulnymn": {
       "availability": "gone",
@@ -11694,14 +11702,22 @@
       "reason": "Exact source URL returned HTTP 404"
     },
     "kijiji.ca/v-industrial-shelving-racking/mississauga-peel-region/cantilever-racking/1745114640": {
-      "availability": "unavailable",
-      "checkedAt": "2026-10-22T12:42:29Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1745114640",
+      "sourceUrl": "https://www.kijiji.ca/v-industrial-shelving-racking/mississauga-peel-region/cantilever-racking/1745114640",
+      "availability": "gone",
+      "checkedAt": "2026-10-22T12:56:20.851Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-industrial-shelving-racking/mississauga-peel-region/c29659005l1700276?radius=50.0&ll=43.7%2C-79.75&adRemoved=1745114640",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-buy-sell-other/city-of-toronto/electric-sugarcane-juice-desktop-press-machine-134314/1745117134": {
-      "availability": "unavailable",
-      "checkedAt": "2026-10-22T12:42:29Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1745117134",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/electric-sugarcane-juice-desktop-press-machine-134314/1745117134",
+      "availability": "gone",
+      "checkedAt": "2026-10-22T12:56:20.851Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.77%2C-79.28&adRemoved=1745117134",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-community-other/edmonton/online-tests-and-exam-writing-service-for-25-test/1745092083": {
       "availability": "unavailable",
@@ -11782,6 +11798,24 @@
       "availability": "sold",
       "checkedAt": "2026-10-22T12:42:29Z",
       "reason": "All offers for this exact listing are unavailable"
+    },
+    "craigslist.org/view/d/brooklyn-newly-renovated-spacious-two/du7vad8npdcppffc6tjz9h": {
+      "id": "craigslist-dU7VaD8NPdCPpfFC6TJz9H",
+      "sourceUrl": "https://www.craigslist.org/view/d/brooklyn-newly-renovated-spacious-two/dU7VaD8NPdCPpfFC6TJz9H",
+      "availability": "gone",
+      "checkedAt": "2026-10-22T12:56:20.851Z",
+      "httpStatus": 410,
+      "resolvedUrl": "https://www.craigslist.org/view/d/brooklyn-newly-renovated-spacious-two/dU7VaD8NPdCPpfFC6TJz9H",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "kijiji.ca/v-cars-trucks/edmonton/2026-ram-1500-warlock-remote-start-8-4-inch-touchscreen/1741305796": {
+      "id": "kijiji-1741305796",
+      "sourceUrl": "https://www.kijiji.ca/v-cars-trucks/edmonton/2026-ram-1500-warlock-remote-start-8-4-inch-touchscreen/1741305796",
+      "availability": "gone",
+      "checkedAt": "2026-10-22T12:56:20.851Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-cars-trucks/edmonton/c174l1700203?adRemoved=1741305796&ll=53.5783584%2C-113.5882027&radius=150.0&rb=50",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     }
   }
 }

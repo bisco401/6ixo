@@ -1,5 +1,5 @@
 {
-  "checkedAt": "2026-10-23T01:11:29.119Z",
+  "checkedAt": "2026-10-23T02:09:54.206Z",
   "listings": {
     "craigslist.org/view/d/bastrop-used-2025-cadillac-xt4-fwd-4d/fuqr_3uo8rgowpq1ctwx-a": {
       "availability": "sold",
@@ -14845,6 +14845,24 @@
       "checkedAt": "2026-10-22T21:57:33.399Z",
       "httpStatus": 410,
       "resolvedUrl": "https://www.craigslist.org/view/d/marietta-2017-honda-pilot-financing/kDzouubE8RGOwP3NDIhP3w",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "craigslist.org/view/d/spring-ford-focus-ses-low-100k-miles/3bb4wbmauwbjkn5bgvp56x": {
+      "id": "craigslist-3Bb4wbmauwBjKN5BGvP56X",
+      "sourceUrl": "https://www.craigslist.org/view/d/spring-ford-focus-ses-low-100k-miles/3Bb4wbmauwBjKN5BGvP56X",
+      "availability": "gone",
+      "checkedAt": "2026-10-23T02:09:54.206Z",
+      "httpStatus": 410,
+      "resolvedUrl": "https://www.craigslist.org/view/d/spring-ford-focus-ses-low-100k-miles/3Bb4wbmauwBjKN5BGvP56X",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "kijiji.ca/v-room-rental-roommate/hamilton/room-for-rent/1743233155": {
+      "id": "kijiji-1743233155",
+      "sourceUrl": "https://www.kijiji.ca/v-room-rental-roommate/hamilton/room-for-rent/1743233155",
+      "availability": "gone",
+      "checkedAt": "2026-10-23T02:09:54.206Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-room-rental-roommate/hamilton/c36l80014?radius=50.0&ll=43.21364%2C-79.88592&adRemoved=1743233155",
       "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     }
   }

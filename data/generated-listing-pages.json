@@ -1,5 +1,5 @@
 {
-  "count": 3640,
+  "count": 3623,
   "listings": [
     {
       "id": "apify-b9b18084f762",
@@ -3665,24 +3665,6 @@
       "categoryKey": "real-estate"
     },
     {
-      "id": "kijiji-1745178760",
-      "slug": "chambre-privee-a-montreal-tout-inclus-fille-etudiante-ou-f-1745178760",
-      "url": "https://6ixo.com/listing/chambre-privee-a-montreal-tout-inclus-fille-etudiante-ou-f-1745178760/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/e8/e8473783-f965-4d2f-8ed6-729471eca39d?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/e3/e36d8c10-2e57-477b-b5a7-427c018a3fdf?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/0a/0a0d2743-023e-4254-918a-d835869a51fa?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/b6/b6588f7b-7009-400b-895a-b9d0e9048571?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/65/65761f08-ae9d-4aef-87b4-cb14c8dced72?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/91/91c60105-c215-4f7d-aad3-d8af81794e8f?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/6b/6ba61a74-ba81-40f6-9d83-4e4437f2c130?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/79/7937b3e8-b217-4346-822f-38fa909f7cac?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/b1/b1ff7fc7-757c-46f5-9b9f-925b1667e6de?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/85/85699b96-e6eb-4ff2-93ff-8c4e8bf1d1f3?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "real-estate"
-    },
-    {
       "id": "kijiji-1745178735",
       "slug": "class-1-driver-manual-transmission-1745178735",
       "url": "https://6ixo.com/listing/class-1-driver-manual-transmission-1745178735/",
@@ -3711,15 +3693,6 @@
       "url": "https://6ixo.com/listing/labourer-looking-for-work-1745178588/",
       "images": [
         "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/93/93de1d58-a0fc-4a9f-b8cd-b290fe1aa083?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "jobs"
-    },
-    {
-      "id": "kijiji-1745178542",
-      "slug": "hiring-double-deep-forklift-operator-1745178542",
-      "url": "https://6ixo.com/listing/hiring-double-deep-forklift-operator-1745178542/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/b4/b498268c-3f13-4d52-b8dc-f6412ae1e98b?rule=kijijica-1600-webp"
       ],
       "categoryKey": "jobs"
     },
@@ -3762,18 +3735,6 @@
       "categoryKey": "vehicles"
     },
     {
-      "id": "kijiji-1745178336",
-      "slug": "nest-thermostat-3rd-gen-1745178336",
-      "url": "https://6ixo.com/listing/nest-thermostat-3rd-gen-1745178336/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/45/45679ad4-7a7c-4571-b1f2-db68b7cf895a?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/3e/3ef3f7cf-a4f4-4aed-a554-b5717e58f0ca?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/d8/d8300556-2558-4698-ae42-dd19fdfa19ea?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/68/681010d7-303e-4856-9d90-5bfcb7e8e7ac?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "electronics"
-    },
-    {
       "id": "kijiji-1745178313",
       "slug": "4-beds-modern-two-storey-home-for-rent-1300-42-wilder-lane-1745178313",
       "url": "https://6ixo.com/listing/4-beds-modern-two-storey-home-for-rent-1300-42-wilder-lane-1745178313/",
@@ -3790,15 +3751,6 @@
         "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/e9/e9ea567c-b5bd-4d8e-acf6-d17dbbe84276?rule=kijijica-1600-webp"
       ],
       "categoryKey": "real-estate"
-    },
-    {
-      "id": "kijiji-1745178312",
-      "slug": "genuine-black-decker-fast-charger-brand-new-1745178312",
-      "url": "https://6ixo.com/listing/genuine-black-decker-fast-charger-brand-new-1745178312/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/4d/4d88b14f-0d17-4cdc-8b17-2846978e2c4c?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "buy-and-sell"
     },
     {
       "id": "kijiji-1745178227",
@@ -3915,15 +3867,6 @@
         "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/e5/e5a27e60-b0fb-42d0-8b6a-bc0767f9c7d1?rule=kijijica-1600-webp"
       ],
       "categoryKey": "auto-parts"
-    },
-    {
-      "id": "kijiji-1745177713",
-      "slug": "machine-operator-in-bakery-wanted-1745177713",
-      "url": "https://6ixo.com/listing/machine-operator-in-bakery-wanted-1745177713/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/07/074f5fa6-3aad-48b2-85c2-5219d2013979?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "jobs"
     },
     {
       "id": "kijiji-1745177690",
@@ -4074,25 +4017,6 @@
         "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/b4/b49baa73-9047-452f-baf9-0245750b55e3?rule=kijijica-1600-webp"
       ],
       "categoryKey": "real-estate"
-    },
-    {
-      "id": "kijiji-1745177372",
-      "slug": "dough-dumper-in-bakery-wanted-1745177372",
-      "url": "https://6ixo.com/listing/dough-dumper-in-bakery-wanted-1745177372/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/f3/f36792b2-3bc7-4e3c-a239-55ad0854aa5f?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "jobs"
-    },
-    {
-      "id": "kijiji-1745177240",
-      "slug": "baker-mixer-position-urgent-1745177240",
-      "url": "https://6ixo.com/listing/baker-mixer-position-urgent-1745177240/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/8a/8a4004ae-c922-4beb-89a6-49c47d97a5f4?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/ac/ac8bec18-fc8e-477e-8a89-170d49afda37?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "jobs"
     },
     {
       "id": "kijiji-1745177170",
@@ -6128,18 +6052,6 @@
         "https://images.craigslist.org/00d0d_d4ZD45whAfm_0jm0ew_600x450.jpg",
         "https://images.craigslist.org/00K0K_1lKrb9iXtg_0jm0ew_600x450.jpg",
         "https://images.craigslist.org/01313_jqaxUNtzsQp_0jm0ew_600x450.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "craigslist-3JWKR46ymCaqFYB2CEFQr9",
-      "slug": "honda-pilot-exl-4wd-1-owner-and-no-dealer-fees-serviced-fyb2cefqr9",
-      "url": "https://6ixo.com/listing/honda-pilot-exl-4wd-1-owner-and-no-dealer-fees-serviced-fyb2cefqr9/",
-      "images": [
-        "https://images.craigslist.org/00o0o_aAZ35fYeACV_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/00J0J_6PVaoOo2TGF_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/01010_d02BbMTxXiY_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/00606_itqNQhRl9RJ_0CI0t2_600x450.jpg"
       ],
       "categoryKey": "vehicles"
     },
@@ -12228,18 +12140,6 @@
       "categoryKey": "buy-and-sell"
     },
     {
-      "id": "craigslist-iso2w8jzmSxXrEdnCMzQNM",
-      "slug": "2016-hyundai-veloster-tech-pkg-sunroof-low-56k-miles-1-own-redncmzqnm",
-      "url": "https://6ixo.com/listing/2016-hyundai-veloster-tech-pkg-sunroof-low-56k-miles-1-own-redncmzqnm/",
-      "images": [
-        "https://images.craigslist.org/00u0u_5Rk3HxYgIR0_0C20t2_600x450.jpg",
-        "https://images.craigslist.org/00s0s_lY4W49vzFHW_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/00m0m_isMgWiGs4BN_0Cy0t2_600x450.jpg",
-        "https://images.craigslist.org/00K0K_lkwbOQc72ez_0CI0t2_600x450.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
       "id": "craigslist-okxVUDJAwTZV61Y9W4TjGD",
       "slug": "2014-chevrolet-corvette-convertible-1lt-6sp-auto-clean-tit-61y9w4tjgd",
       "url": "https://6ixo.com/listing/2014-chevrolet-corvette-convertible-1lt-6sp-auto-clean-tit-61y9w4tjgd/",
@@ -13598,18 +13498,6 @@
         "https://images.craigslist.org/00l0l_43HYxddkX9h_0ew0aT_600x450.jpg"
       ],
       "categoryKey": "vehicles"
-    },
-    {
-      "id": "craigslist-3CCoYiWGaqZ7KdckbthTRE",
-      "slug": "2017-grand-design-momentum-3-slide-outs-13ft-garage-kdckbthtre",
-      "url": "https://6ixo.com/listing/2017-grand-design-momentum-3-slide-outs-13ft-garage-kdckbthtre/",
-      "images": [
-        "https://images.craigslist.org/00e0e_5K6XwKHadLX_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/01414_bc6fJXjBClH_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/00u0u_b864nFf4VNE_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/00t0t_5YPmFaP6O9x_0CI0t2_600x450.jpg"
-      ],
-      "categoryKey": "services"
     },
     {
       "id": "craigslist-kopJfAyQAVZDxrFAVfaNb3",
@@ -18626,15 +18514,6 @@
       "categoryKey": "vehicles"
     },
     {
-      "id": "kijiji-1744907351",
-      "slug": "sale-on-new-stationary-sofa-set-in-fabric-upholstery-grey-1744907351",
-      "url": "https://6ixo.com/listing/sale-on-new-stationary-sofa-set-in-fabric-upholstery-grey-1744907351/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/6d/6dc6e436-8ade-42da-b970-9071ee17e02c?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "buy-and-sell"
-    },
-    {
       "id": "kijiji-1744907001",
       "slug": "beautiful-new-house-for-rent-4-bed-2-bath-in-kleefeld-mb-1744907001",
       "url": "https://6ixo.com/listing/beautiful-new-house-for-rent-4-bed-2-bath-in-kleefeld-mb-1744907001/",
@@ -18669,18 +18548,6 @@
         "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/e8/e8acdd87-e33c-4272-85d2-dd5633af08bd?rule=kijijica-1600-webp"
       ],
       "categoryKey": "services"
-    },
-    {
-      "id": "kijiji-1744903273",
-      "slug": "early-drivers-licence-g2-g-road-test-asap-booking-drive-cl-1744903273",
-      "url": "https://6ixo.com/listing/early-drivers-licence-g2-g-road-test-asap-booking-drive-cl-1744903273/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/b5/b56c25ec-c4a6-46e0-9d4b-afbce748ac1d?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/0f/0f009dac-fd68-4b54-8deb-7cd1bca0cccb?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/5e/5e9d962d-6baf-4d8e-b5fa-10b6625e299c?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/b5/b5596cc0-956c-442b-b97b-f842c5c1fead?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "community"
     },
     {
       "id": "kijiji-1744899101",
@@ -19171,26 +19038,6 @@
         "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/71/71190a07-8fb5-47a9-9fb3-2f434e109721?rule=kijijica-1600-webp"
       ],
       "categoryKey": "community"
-    },
-    {
-      "id": "kijiji-1744864241",
-      "slug": "2025-toyota-tacoma-hybrid-limited-4x4-toit-cuir-gps-rack-1744864241",
-      "url": "https://6ixo.com/listing/2025-toyota-tacoma-hybrid-limited-4x4-toit-cuir-gps-rack-1744864241/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/c9/c9f25c41-5066-46e7-9727-ed5205cb1493?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/c0/c0924374-5c01-46dc-8406-755df8af8d8c?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/c6/c674dfbd-1925-41ce-a51d-5192ae00addf?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/07/07081cc0-5ee5-4c40-866c-6adf84a830aa?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/a4/a462d81a-ac20-423e-a4af-02c9f8b8dd3e?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/cd/cdb4938b-a8c3-4dc9-822c-4157e2273e1f?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/c0/c003c18d-7453-40e1-bce5-945f0d800bfa?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/84/84857597-5b97-4153-989b-a02ce393a357?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/56/56d6bedc-c8a8-4132-a9df-9a18c7016b71?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/26/266814e3-6870-4f30-a8d8-ee8ca5c30879?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/c7/c76daaf4-f6bc-4a91-ba3c-2d1db6b4def4?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/24/24f0bd8e-2c47-4523-b6b0-6ad690a3d19c?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "vehicles"
     },
     {
       "id": "kijiji-1744863960",
@@ -24879,19 +24726,6 @@
       "categoryKey": "buy-and-sell"
     },
     {
-      "id": "kijiji-1744644294",
-      "slug": "hvac-conversions-oil-to-gas-prices-28-1744644294",
-      "url": "https://6ixo.com/listing/hvac-conversions-oil-to-gas-prices-28-1744644294/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/72/721fcff9-7e32-40ec-a7f8-b6012160d36f?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/37/37ec6e8e-0e39-4b8f-a874-8721d414f0e7?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/b4/b4ce2722-f503-4275-84da-80bc6284ed20?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/51/5138b5ff-8995-469e-bc95-1453424b384b?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/93/93aa7de3-e656-474d-ab4b-6225ef38bc80?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "buy-and-sell"
-    },
-    {
       "id": "kijiji-1744644279",
       "slug": "milwaukee-m18-quik-lok-pole-saw-attachment-like-new-1744644279",
       "url": "https://6ixo.com/listing/milwaukee-m18-quik-lok-pole-saw-attachment-like-new-1744644279/",
@@ -25042,19 +24876,6 @@
         "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/82/8256465c-11d9-4ca7-85e8-eb06c867781a?rule=kijijica-1600-webp",
         "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/cb/cb39a48a-e1d1-4d40-a594-9b193bacd036?rule=kijijica-1600-webp",
         "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/18/18323516-a3f3-45a5-9e45-336f0d7480b5?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "buy-and-sell"
-    },
-    {
-      "id": "kijiji-1744641668",
-      "slug": "n4a342-55-1744641668",
-      "url": "https://6ixo.com/listing/n4a342-55-1744641668/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/10/10fac592-02c5-4297-9a92-6d6ff3f87c93?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/e1/e1729fa8-12c0-40ba-a1a9-b93f04a2275f?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/7c/7c3c8097-1d82-48d4-b8a7-601027a17de2?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/f5/f5532fc2-5ad1-4c9b-b6e2-fd5ce6c469ab?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/6d/6d1899c0-d010-4617-b5d1-ebf7370201b4?rule=kijijica-1600-webp"
       ],
       "categoryKey": "buy-and-sell"
     },
@@ -34228,18 +34049,6 @@
       "categoryKey": "vehicles"
     },
     {
-      "id": "craigslist-oEbyFKwjNyfpTofzphuRha",
-      "slug": "polaroid-26-tv-tofzphurha",
-      "url": "https://6ixo.com/listing/polaroid-26-tv-tofzphurha/",
-      "images": [
-        "https://images.craigslist.org/00C0C_3QTcxevYdBn_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/00b0b_aVmyW29AdbC_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/01717_dVcl5StjSOi_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/00i0i_TXdrScd0YX_0CI0t2_600x450.jpg"
-      ],
-      "categoryKey": "electronics"
-    },
-    {
       "id": "craigslist-pyA5pVxRkWjYzeToHGHNMp",
       "slug": "we-finance-gas-saver-1-495-down-no-credit-check-zetohghnmp",
       "url": "https://6ixo.com/listing/we-finance-gas-saver-1-495-down-no-credit-check-zetohghnmp/",
@@ -34405,24 +34214,6 @@
         "https://cdn2.jacars.net/media/cache/e6/8c/e68cb95c95b8149a0969db973e0ac87c.webp"
       ],
       "categoryKey": "electronics"
-    },
-    {
-      "id": "kijiji-1744195796",
-      "slug": "204-birchcliffe-crescent-hamilton-1744195796",
-      "url": "https://6ixo.com/listing/204-birchcliffe-crescent-hamilton-1744195796/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/00/00248514-2f23-4158-9153-6c89d1e02233?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/f6/f6e59d61-bab2-41f7-bf1e-856e7b49b84b?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/eb/eb11a2e0-3b5b-4ed5-8726-703af9a71756?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/6d/6d69e799-d972-4945-b0b6-670f65a75bd9?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/13/131f775c-4f77-4df9-a5c5-a8d9c7aa48a7?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/a6/a60869f5-7401-4ca0-95f9-179ca885f9fb?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/91/917b5901-a88c-4d65-adc4-fa06bbe78045?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/6c/6cb25122-3393-44a8-b9f3-2e6dfa99722f?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/5b/5b4a7da3-78c6-4f5e-979d-387128fbd344?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/eb/ebaa81de-5144-4850-8b27-8547fb65fa95?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "real-estate"
     },
     {
       "id": "kijiji-1744195730",
@@ -45158,9 +44949,6 @@
       "url": "https://6ixo.com/listings/page/101/"
     },
     {
-      "url": "https://6ixo.com/listings/page/102/"
-    },
-    {
       "url": "https://6ixo.com/listings/electronics/"
     },
     {
@@ -45717,9 +45505,6 @@
     },
     {
       "url": "https://6ixo.com/listings/country/canada/page/42/"
-    },
-    {
-      "url": "https://6ixo.com/listings/country/canada/page/43/"
     },
     {
       "url": "https://6ixo.com/listings/country/china/electronics/"
@@ -52278,6 +52063,91 @@
       "id": "craigslist-qvVacjHD8RGC8PhW-tXwPQ",
       "slug": "2017-toyota-tacoma-from-2200-down-come-take-it-for-test-dr-c8phwtxwpq",
       "url": "https://6ixo.com/listing/2017-toyota-tacoma-from-2200-down-come-take-it-for-test-dr-c8phwtxwpq/"
+    },
+    {
+      "id": "kijiji-1745178760",
+      "slug": "chambre-privee-a-montreal-tout-inclus-fille-etudiante-ou-f-1745178760",
+      "url": "https://6ixo.com/listing/chambre-privee-a-montreal-tout-inclus-fille-etudiante-ou-f-1745178760/"
+    },
+    {
+      "id": "kijiji-1745178542",
+      "slug": "hiring-double-deep-forklift-operator-1745178542",
+      "url": "https://6ixo.com/listing/hiring-double-deep-forklift-operator-1745178542/"
+    },
+    {
+      "id": "kijiji-1745178336",
+      "slug": "nest-thermostat-3rd-gen-1745178336",
+      "url": "https://6ixo.com/listing/nest-thermostat-3rd-gen-1745178336/"
+    },
+    {
+      "id": "kijiji-1745178312",
+      "slug": "genuine-black-decker-fast-charger-brand-new-1745178312",
+      "url": "https://6ixo.com/listing/genuine-black-decker-fast-charger-brand-new-1745178312/"
+    },
+    {
+      "id": "kijiji-1745177713",
+      "slug": "machine-operator-in-bakery-wanted-1745177713",
+      "url": "https://6ixo.com/listing/machine-operator-in-bakery-wanted-1745177713/"
+    },
+    {
+      "id": "kijiji-1745177372",
+      "slug": "dough-dumper-in-bakery-wanted-1745177372",
+      "url": "https://6ixo.com/listing/dough-dumper-in-bakery-wanted-1745177372/"
+    },
+    {
+      "id": "kijiji-1745177240",
+      "slug": "baker-mixer-position-urgent-1745177240",
+      "url": "https://6ixo.com/listing/baker-mixer-position-urgent-1745177240/"
+    },
+    {
+      "id": "craigslist-3JWKR46ymCaqFYB2CEFQr9",
+      "slug": "honda-pilot-exl-4wd-1-owner-and-no-dealer-fees-serviced-fyb2cefqr9",
+      "url": "https://6ixo.com/listing/honda-pilot-exl-4wd-1-owner-and-no-dealer-fees-serviced-fyb2cefqr9/"
+    },
+    {
+      "id": "craigslist-iso2w8jzmSxXrEdnCMzQNM",
+      "slug": "2016-hyundai-veloster-tech-pkg-sunroof-low-56k-miles-1-own-redncmzqnm",
+      "url": "https://6ixo.com/listing/2016-hyundai-veloster-tech-pkg-sunroof-low-56k-miles-1-own-redncmzqnm/"
+    },
+    {
+      "id": "craigslist-3CCoYiWGaqZ7KdckbthTRE",
+      "slug": "2017-grand-design-momentum-3-slide-outs-13ft-garage-kdckbthtre",
+      "url": "https://6ixo.com/listing/2017-grand-design-momentum-3-slide-outs-13ft-garage-kdckbthtre/"
+    },
+    {
+      "id": "kijiji-1744907351",
+      "slug": "sale-on-new-stationary-sofa-set-in-fabric-upholstery-grey-1744907351",
+      "url": "https://6ixo.com/listing/sale-on-new-stationary-sofa-set-in-fabric-upholstery-grey-1744907351/"
+    },
+    {
+      "id": "kijiji-1744903273",
+      "slug": "early-drivers-licence-g2-g-road-test-asap-booking-drive-cl-1744903273",
+      "url": "https://6ixo.com/listing/early-drivers-licence-g2-g-road-test-asap-booking-drive-cl-1744903273/"
+    },
+    {
+      "id": "kijiji-1744864241",
+      "slug": "2025-toyota-tacoma-hybrid-limited-4x4-toit-cuir-gps-rack-1744864241",
+      "url": "https://6ixo.com/listing/2025-toyota-tacoma-hybrid-limited-4x4-toit-cuir-gps-rack-1744864241/"
+    },
+    {
+      "id": "kijiji-1744644294",
+      "slug": "hvac-conversions-oil-to-gas-prices-28-1744644294",
+      "url": "https://6ixo.com/listing/hvac-conversions-oil-to-gas-prices-28-1744644294/"
+    },
+    {
+      "id": "kijiji-1744641668",
+      "slug": "n4a342-55-1744641668",
+      "url": "https://6ixo.com/listing/n4a342-55-1744641668/"
+    },
+    {
+      "id": "craigslist-oEbyFKwjNyfpTofzphuRha",
+      "slug": "polaroid-26-tv-tofzphurha",
+      "url": "https://6ixo.com/listing/polaroid-26-tv-tofzphurha/"
+    },
+    {
+      "id": "kijiji-1744195796",
+      "slug": "204-birchcliffe-crescent-hamilton-1744195796",
+      "url": "https://6ixo.com/listing/204-birchcliffe-crescent-hamilton-1744195796/"
     }
   ]
 }

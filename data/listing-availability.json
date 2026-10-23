@@ -1,5 +1,5 @@
 {
-  "checkedAt": "2026-10-23T06:59:34.738Z",
+  "checkedAt": "2026-10-23T08:05:42.049Z",
   "listings": {
     "craigslist.org/view/d/bastrop-used-2025-cadillac-xt4-fwd-4d/fuqr_3uo8rgowpq1ctwx-a": {
       "availability": "sold",
@@ -13029,6 +13029,105 @@
       "availability": "gone",
       "checkedAt": "2026-10-23T06:46:14Z",
       "reason": "Exact source URL returned HTTP 410"
+    },
+    "craigslist.org/view/d/bastrop-used-2023-ford-transit-connect/bn8gkp-28rgh98ecyi4ofa": {
+      "id": "craigslist-Bn8gKp-28RGh98ECYI4OfA",
+      "sourceUrl": "https://www.craigslist.org/view/d/bastrop-used-2023-ford-transit-connect/Bn8gKp-28RGh98ECYI4OfA",
+      "availability": "gone",
+      "checkedAt": "2026-10-23T08:05:42.049Z",
+      "httpStatus": 410,
+      "resolvedUrl": "https://www.craigslist.org/view/d/bastrop-used-2023-ford-transit-connect/Bn8gKp-28RGh98ECYI4OfA",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "craigslist.org/view/d/odessa-2018-nissan-rogue-parting-out/ec1lfywt9eka52yxw35c79": {
+      "id": "craigslist-ec1Lfywt9eka52yXw35C79",
+      "sourceUrl": "https://www.craigslist.org/view/d/odessa-2018-nissan-rogue-parting-out/ec1Lfywt9eka52yXw35C79",
+      "availability": "gone",
+      "checkedAt": "2026-10-23T08:05:42.049Z",
+      "httpStatus": 410,
+      "resolvedUrl": "https://www.craigslist.org/view/d/odessa-2018-nissan-rogue-parting-out/ec1Lfywt9eka52yXw35C79",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "craigslist.org/view/d/odessa-2013-nissan-quest-parting-out/6accbvhqjbdgscwd6ssshb": {
+      "id": "craigslist-6ACCBVHqjBdGsCwD6SsshB",
+      "sourceUrl": "https://www.craigslist.org/view/d/odessa-2013-nissan-quest-parting-out/6ACCBVHqjBdGsCwD6SsshB",
+      "availability": "gone",
+      "checkedAt": "2026-10-23T08:05:42.049Z",
+      "httpStatus": 410,
+      "resolvedUrl": "https://www.craigslist.org/view/d/odessa-2013-nissan-quest-parting-out/6ACCBVHqjBdGsCwD6SsshB",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "craigslist.org/view/d/odessa-2004-cadillac-srx-parting-out/4uviacfqhsuh5p46jvcahk": {
+      "id": "craigslist-4uViaCfQHSuH5p46jVCAHK",
+      "sourceUrl": "https://www.craigslist.org/view/d/odessa-2004-cadillac-srx-parting-out/4uViaCfQHSuH5p46jVCAHK",
+      "availability": "gone",
+      "checkedAt": "2026-10-23T08:05:42.049Z",
+      "httpStatus": 410,
+      "resolvedUrl": "https://www.craigslist.org/view/d/odessa-2004-cadillac-srx-parting-out/4uViaCfQHSuH5p46jVCAHK",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "craigslist.org/view/d/odessa-2010-ford-flex-parting-out/b9rzwrwnysi6gkw4c1qvd4": {
+      "id": "craigslist-b9RzwRWnySi6gkw4c1qvd4",
+      "sourceUrl": "https://www.craigslist.org/view/d/odessa-2010-ford-flex-parting-out/b9RzwRWnySi6gkw4c1qvd4",
+      "availability": "gone",
+      "checkedAt": "2026-10-23T08:05:42.049Z",
+      "httpStatus": 410,
+      "resolvedUrl": "https://www.craigslist.org/view/d/odessa-2010-ford-flex-parting-out/b9RzwRWnySi6gkw4c1qvd4",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "craigslist.org/view/d/odessa-2020-ford-edge-titanium-awd/hp2zfuw6fjzzxxap8obaff": {
+      "id": "craigslist-hp2zfUw6fjZZXXAP8obAff",
+      "sourceUrl": "https://www.craigslist.org/view/d/odessa-2020-ford-edge-titanium-awd/hp2zfUw6fjZZXXAP8obAff",
+      "availability": "gone",
+      "checkedAt": "2026-10-23T08:05:42.049Z",
+      "httpStatus": 410,
+      "resolvedUrl": "https://www.craigslist.org/view/d/odessa-2020-ford-edge-titanium-awd/hp2zfUw6fjZZXXAP8obAff",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "craigslist.org/view/d/odessa-2014-hyundai-sonata-parting-out/ovvbzazeiyp1xvgw73ryvy": {
+      "id": "craigslist-ovVBZaZeiyP1xVGW73RyVy",
+      "sourceUrl": "https://www.craigslist.org/view/d/odessa-2014-hyundai-sonata-parting-out/ovVBZaZeiyP1xVGW73RyVy",
+      "availability": "gone",
+      "checkedAt": "2026-10-23T08:05:42.049Z",
+      "httpStatus": 410,
+      "resolvedUrl": "https://www.craigslist.org/view/d/odessa-2014-hyundai-sonata-parting-out/ovVBZaZeiyP1xVGW73RyVy",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "craigslist.org/view/d/killeen-2012-150-oem-dash-parts-radio/4zdrbfnohqbhgzhnisojns": {
+      "id": "craigslist-4ZDrbFnoHQbhGzhnisojNS",
+      "sourceUrl": "https://www.craigslist.org/view/d/killeen-2012-150-oem-dash-parts-radio/4ZDrbFnoHQbhGzhnisojNS",
+      "availability": "gone",
+      "checkedAt": "2026-10-23T08:05:42.049Z",
+      "httpStatus": 410,
+      "resolvedUrl": "https://www.craigslist.org/view/d/killeen-2012-150-oem-dash-parts-radio/4ZDrbFnoHQbhGzhnisojNS",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "craigslist.org/view/d/laredo-ford-escape-st-line-gas-saver/3e3jphctspjg6zvyvnjvta": {
+      "id": "craigslist-3E3JPHctSpjG6zVYVnjVTA",
+      "sourceUrl": "https://www.craigslist.org/view/d/laredo-ford-escape-st-line-gas-saver/3E3JPHctSpjG6zVYVnjVTA",
+      "availability": "gone",
+      "checkedAt": "2026-10-23T08:05:42.049Z",
+      "httpStatus": 410,
+      "resolvedUrl": "https://www.craigslist.org/view/d/laredo-ford-escape-st-line-gas-saver/3E3JPHctSpjG6zVYVnjVTA",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "craigslist.org/view/d/san-antonio-2023-chevy-chevrolet/mbgm24q28rg9w_n82zorbw": {
+      "id": "craigslist-mBGM24q28RG9w_n82Zorbw",
+      "sourceUrl": "https://www.craigslist.org/view/d/san-antonio-2023-chevy-chevrolet/mBGM24q28RG9w_n82Zorbw",
+      "availability": "gone",
+      "checkedAt": "2026-10-23T08:05:42.049Z",
+      "httpStatus": 410,
+      "resolvedUrl": "https://www.craigslist.org/view/d/san-antonio-2023-chevy-chevrolet/mBGM24q28RG9w_n82Zorbw",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "craigslist.org/view/d/san-antonio-2023-mercedes-benz-cla-amg/2spxbia28rgatpgklpk0la": {
+      "id": "craigslist-2sPxbIa28RGatpGKLPk0lA",
+      "sourceUrl": "https://www.craigslist.org/view/d/san-antonio-2023-mercedes-benz-cla-amg/2sPxbIa28RGatpGKLPk0lA",
+      "availability": "gone",
+      "checkedAt": "2026-10-23T08:05:42.049Z",
+      "httpStatus": 410,
+      "resolvedUrl": "https://www.craigslist.org/view/d/san-antonio-2023-mercedes-benz-cla-amg/2sPxbIa28RGatpGKLPk0lA",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     }
   }
 }

@@ -1,5 +1,5 @@
 {
-  "count": 3644,
+  "count": 3640,
   "listings": [
     {
       "id": "apify-b9b18084f762",
@@ -3863,21 +3863,6 @@
       "categoryKey": "real-estate"
     },
     {
-      "id": "kijiji-1745178030",
-      "slug": "one-bedroom-apartment-in-south-etobicoke-1745178030",
-      "url": "https://6ixo.com/listing/one-bedroom-apartment-in-south-etobicoke-1745178030/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/89/895a234a-4e48-4da3-a8be-b0327bdeea78?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/c0/c0b58fbe-4b73-4529-b74c-00bdc04e24eb?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/8d/8ddb7c2b-69d8-4611-a4aa-216776718f18?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/c8/c89a9b2c-91dc-455f-bdc5-47d4081d1b4a?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/1e/1e7322e8-e692-4851-bdc7-922979d7c4b3?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/8e/8e65a4b8-6a45-4670-8805-8c6c2a92579b?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/70/7077e88b-d291-4809-af11-2c1dd5ffd67c?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "real-estate"
-    },
-    {
       "id": "kijiji-1745177932",
       "slug": "new-saint-laurent-opyum-patent-leather-heeled-sandals-size-1745177932",
       "url": "https://6ixo.com/listing/new-saint-laurent-opyum-patent-leather-heeled-sandals-size-1745177932/",
@@ -6029,6 +6014,15 @@
       "url": "https://6ixo.com/listing/2025-mini-countryman-s-jcw-kit-adubai2177/",
       "images": [
         "https://storage.albacars.ae/vehicles/drafts/2177/1.jpg"
+      ],
+      "categoryKey": "vehicles"
+    },
+    {
+      "id": "alba-dubai-2178",
+      "slug": "2023-ford-f-150-tremor-adubai2178",
+      "url": "https://6ixo.com/listing/2023-ford-f-150-tremor-adubai2178/",
+      "images": [
+        "https://storage.albacars.ae/vehicles/2359fd46-c1ed-4b86-a456-1abe6d749a65/6f0a2e3e-3160-4abc-a363-32f664406973.jpeg"
       ],
       "categoryKey": "vehicles"
     },
@@ -10026,21 +10020,6 @@
         "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/68/68ed0b5c-bdcf-4478-a79e-73fdbaae9f03?rule=kijijica-1600-webp"
       ],
       "categoryKey": "vehicles"
-    },
-    {
-      "id": "kijiji-1745087719",
-      "slug": "female-only-2-rooms-now-mohawk-college-st-jos-hospital-1745087719",
-      "url": "https://6ixo.com/listing/female-only-2-rooms-now-mohawk-college-st-jos-hospital-1745087719/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/e1/e17242b4-2e90-4d84-8e6c-305b611804c3?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/48/4888f61c-79ba-4170-98a7-aaf002b4bcd9?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/39/390326cc-f60f-4fc4-8632-22cb028091b4?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/5f/5f1c9b34-a65e-4d27-8491-c71bd647b7cb?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/d4/d4c9b2ef-9ae0-46f1-98d3-bbbc5ae4e7ca?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/3f/3fc5808c-7de1-498f-a1d1-356da95d44ee?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/b9/b9d13373-4273-4668-b62f-1f7bf1490321?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "real-estate"
     },
     {
       "id": "kijiji-1745087690",
@@ -20477,18 +20456,6 @@
       "categoryKey": "real-estate"
     },
     {
-      "id": "craigslist-Ygy_pQLI8RGjTsyEOWFjgg",
-      "slug": "2009-mazda-mx-5-miata-cash-deal-just-8900-plus-taxes-come--tsyeowfjgg",
-      "url": "https://6ixo.com/listing/2009-mazda-mx-5-miata-cash-deal-just-8900-plus-taxes-come--tsyeowfjgg/",
-      "images": [
-        "https://images.craigslist.org/00B0B_eXXMf0syZc9_0gw0co_600x450.jpg",
-        "https://images.craigslist.org/00B0B_gF0MNmMf0aH_0gw0co_600x450.jpg",
-        "https://images.craigslist.org/00X0X_2qx7K1kL0u_0gw0co_600x450.jpg",
-        "https://images.craigslist.org/00S0S_5DwdGDEv5NO_0gw0co_600x450.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
       "id": "craigslist-Rj_-DgLI8RGSEOfXgpEzYg",
       "slug": "2014-mercedes-benz-s-class-buy-here-pay-here-available-eofxgpezyg",
       "url": "https://6ixo.com/listing/2014-mercedes-benz-s-class-buy-here-pay-here-available-eofxgpezyg/",
@@ -21067,15 +21034,6 @@
       "url": "https://6ixo.com/listing/2024-mitsubishi-outlander-glx-adubai2098/",
       "images": [
         "https://storage.albacars.ae/vehicles/drafts/2098/1.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "alba-dubai-2096",
-      "slug": "2024-tesla-model-3-adubai2096",
-      "url": "https://6ixo.com/listing/2024-tesla-model-3-adubai2096/",
-      "images": [
-        "https://storage.albacars.ae/vehicles/drafts/2096/1.jpg"
       ],
       "categoryKey": "vehicles"
     },
@@ -27172,30 +27130,6 @@
       "categoryKey": "vehicles"
     },
     {
-      "id": "craigslist-xlrPwjHD8RGqo_Q0S54YAw",
-      "slug": "2009-mazda-mx-5-miata-8900-cash-what-a-deal-come-and-take--qoq0s54yaw",
-      "url": "https://6ixo.com/listing/2009-mazda-mx-5-miata-8900-cash-what-a-deal-come-and-take--qoq0s54yaw/",
-      "images": [
-        "https://images.craigslist.org/00B0B_eXXMf0syZc9_0gw0co_600x450.jpg",
-        "https://images.craigslist.org/00B0B_gF0MNmMf0aH_0gw0co_600x450.jpg",
-        "https://images.craigslist.org/00X0X_2qx7K1kL0u_0gw0co_600x450.jpg",
-        "https://images.craigslist.org/00S0S_5DwdGDEv5NO_0gw0co_600x450.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "craigslist-qvVacjHD8RGC8PhW-tXwPQ",
-      "slug": "2017-toyota-tacoma-from-2200-down-come-take-it-for-test-dr-c8phwtxwpq",
-      "url": "https://6ixo.com/listing/2017-toyota-tacoma-from-2200-down-come-take-it-for-test-dr-c8phwtxwpq/",
-      "images": [
-        "https://images.craigslist.org/00O0O_iqz1dN163g3_0gw0co_600x450.jpg",
-        "https://images.craigslist.org/00N0N_3Hg1PiK3Zyn_0gw0co_600x450.jpg",
-        "https://images.craigslist.org/01515_3jL3bNBPEmv_0gw0co_600x450.jpg",
-        "https://images.craigslist.org/00n0n_aKinKaRQ31U_0gw0co_600x450.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
       "id": "craigslist-rBj1EzrD8RGE1dVwjPW-vg",
       "slug": "2014-jeep-wrangler-4wd-suv-no-gimmicks-real-price-e1dvwjpwvg",
       "url": "https://6ixo.com/listing/2014-jeep-wrangler-4wd-suv-no-gimmicks-real-price-e1dvwjpwvg/",
@@ -30001,6 +29935,15 @@
       "url": "https://6ixo.com/listing/1-bedroom-apartment-for-rent-creek-gate-tower-2-dubai-cree-bail308866/",
       "images": [
         "https://images.allsoppandallsopp.com/public/temp/a0O4S000000WeEjUAK_s_1-bedroom-apartment-in-creek-gate-tower-2-dubai-creek-harbour-the-lagoons-aed-90k-allsopp-and-allsopp-img7779.jpeg"
+      ],
+      "categoryKey": "real-estate"
+    },
+    {
+      "id": "allsopp-dubai-l-308444",
+      "slug": "2-bedroom-apartment-for-rent-marina-wharf-dubai-marina-bail308444",
+      "url": "https://6ixo.com/listing/2-bedroom-apartment-for-rent-marina-wharf-dubai-marina-bail308444/",
+      "images": [
+        "https://images.allsoppandallsopp.com/public/temp/a0O4V00000MhJFHUA3_s_2-bedroom-apartment-in-marina-wharf-dubai-marina-aed-100k-allsopp-and-allsopp-adb21de8-b26f-4627-b88f-b8145b31db62.jpg"
       ],
       "categoryKey": "real-estate"
     },
@@ -51187,11 +51130,6 @@
       "url": "https://6ixo.com/listing/door-crasher-sale-new-8-seater-spa-56-jets-free-delivery-h-1744607945/"
     },
     {
-      "id": "alba-dubai-2178",
-      "slug": "2023-ford-f-150-tremor-adubai2178",
-      "url": "https://6ixo.com/listing/2023-ford-f-150-tremor-adubai2178/"
-    },
-    {
       "id": "kijiji-1745092083",
       "slug": "online-tests-and-exam-writing-service-for-25-test-1745092083",
       "url": "https://6ixo.com/listing/online-tests-and-exam-writing-service-for-25-test-1745092083/"
@@ -51370,11 +51308,6 @@
       "id": "kijiji-1744870770",
       "slug": "stable-4k-sports-channels-for-all-devices-1744870770",
       "url": "https://6ixo.com/listing/stable-4k-sports-channels-for-all-devices-1744870770/"
-    },
-    {
-      "id": "allsopp-dubai-l-308444",
-      "slug": "2-bedroom-apartment-for-rent-marina-wharf-dubai-marina-bail308444",
-      "url": "https://6ixo.com/listing/2-bedroom-apartment-for-rent-marina-wharf-dubai-marina-bail308444/"
     },
     {
       "id": "alba-dubai-1997",
@@ -52315,6 +52248,36 @@
       "id": "apify-9d51a50ddd45",
       "slug": "canon-eos-r-51a50ddd45",
       "url": "https://6ixo.com/listing/canon-eos-r-51a50ddd45/"
+    },
+    {
+      "id": "kijiji-1745178030",
+      "slug": "one-bedroom-apartment-in-south-etobicoke-1745178030",
+      "url": "https://6ixo.com/listing/one-bedroom-apartment-in-south-etobicoke-1745178030/"
+    },
+    {
+      "id": "kijiji-1745087719",
+      "slug": "female-only-2-rooms-now-mohawk-college-st-jos-hospital-1745087719",
+      "url": "https://6ixo.com/listing/female-only-2-rooms-now-mohawk-college-st-jos-hospital-1745087719/"
+    },
+    {
+      "id": "craigslist-Ygy_pQLI8RGjTsyEOWFjgg",
+      "slug": "2009-mazda-mx-5-miata-cash-deal-just-8900-plus-taxes-come--tsyeowfjgg",
+      "url": "https://6ixo.com/listing/2009-mazda-mx-5-miata-cash-deal-just-8900-plus-taxes-come--tsyeowfjgg/"
+    },
+    {
+      "id": "alba-dubai-2096",
+      "slug": "2024-tesla-model-3-adubai2096",
+      "url": "https://6ixo.com/listing/2024-tesla-model-3-adubai2096/"
+    },
+    {
+      "id": "craigslist-xlrPwjHD8RGqo_Q0S54YAw",
+      "slug": "2009-mazda-mx-5-miata-8900-cash-what-a-deal-come-and-take--qoq0s54yaw",
+      "url": "https://6ixo.com/listing/2009-mazda-mx-5-miata-8900-cash-what-a-deal-come-and-take--qoq0s54yaw/"
+    },
+    {
+      "id": "craigslist-qvVacjHD8RGC8PhW-tXwPQ",
+      "slug": "2017-toyota-tacoma-from-2200-down-come-take-it-for-test-dr-c8phwtxwpq",
+      "url": "https://6ixo.com/listing/2017-toyota-tacoma-from-2200-down-come-take-it-for-test-dr-c8phwtxwpq/"
     }
   ]
 }

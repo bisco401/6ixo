@@ -1,5 +1,5 @@
 {
-  "count": 3658,
+  "count": 3659,
   "listings": [
     {
       "id": "apify-b9b18084f762",
@@ -126,6 +126,22 @@
         "https://oxglow.com.gh/uploads/medium/1-car-multimedia-players-571249764531945.jpg"
       ],
       "categoryKey": "auto-parts"
+    },
+    {
+      "id": "kijiji-1745194482",
+      "slug": "air-conditioner-air-conditioner-air-conditioner-air-condit-1745194482",
+      "url": "https://6ixo.com/listing/air-conditioner-air-conditioner-air-conditioner-air-condit-1745194482/",
+      "images": [
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/49/49f5fac3-0ce3-4a0d-bcb4-ca245559c96c?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/48/487ff035-d461-4be2-ac89-cbf6e6a31b03?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/05/05cf7ca2-3f4a-4a2b-9415-72d9ea418314?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/96/9685f593-c082-4d0a-b415-890ed19adb98?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/ff/ff8e89cd-e897-4960-8dfe-0b389ba27a5d?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/87/87937376-fa51-4f82-bb1f-d4faaca68eb0?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/87/8782529a-2974-4d3a-965c-76c8eeef2519?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/6c/6c430857-f6b9-4bb2-8cb4-b4645f5ae9fd?rule=kijijica-1600-webp"
+      ],
+      "categoryKey": "buy-and-sell"
     },
     {
       "id": "hgc-dubai-5d752f9d2d998011",
@@ -6714,6 +6730,26 @@
         "https://samtronixguyana.com/cdn/shop/files/IPAD_SAMTRONIX_1024x.jpg?v=1763814203"
       ],
       "categoryKey": "electronics"
+    },
+    {
+      "id": "kijiji-1737875592",
+      "slug": "2026-honda-cr-v-lx-1737875592",
+      "url": "https://6ixo.com/listing/2026-honda-cr-v-lx-1737875592/",
+      "images": [
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/23/23289569-acf4-46f5-94ee-26eb060be05f?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/64/642d2b52-83a2-4dc9-a634-e4f81617c65c?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/7b/7be84df9-c371-439f-b565-8c4d08393aa9?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/47/4784ee06-a0f5-485f-bc9d-fe1d17318fd8?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/50/50eb0684-9d75-497a-a1cd-f16dddc597a2?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/0f/0f1430cb-a10a-4b36-bfa2-a3657a7f2a8f?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/d9/d9462567-fc9e-45ba-865a-3af47d2882ee?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/65/6538e584-60fc-4d1e-a220-f44564d43e92?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/c5/c596f9bb-47e9-4924-8301-ba4582695fb2?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/9b/9b161121-23cc-4975-86d9-91f8f2266fd7?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/20/20f6f7a4-d337-4ab8-ba35-68724a7aba37?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/e9/e9d012e7-98e8-4b8d-abe3-09b0d402540b?rule=kijijica-1600-webp"
+      ],
+      "categoryKey": "vehicles"
     },
     {
       "id": "kijiji-1745111481",
@@ -42745,26 +42781,6 @@
         "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/70/7041e649-c677-4a9e-adae-c620c85a1ae8?rule=kijijica-1600-webp"
       ],
       "categoryKey": "auto-parts"
-    },
-    {
-      "id": "kijiji-1737875592",
-      "slug": "2026-honda-cr-v-lx-1737875592",
-      "url": "https://6ixo.com/listing/2026-honda-cr-v-lx-1737875592/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/23/23289569-acf4-46f5-94ee-26eb060be05f?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/64/642d2b52-83a2-4dc9-a634-e4f81617c65c?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/7b/7be84df9-c371-439f-b565-8c4d08393aa9?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/47/4784ee06-a0f5-485f-bc9d-fe1d17318fd8?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/50/50eb0684-9d75-497a-a1cd-f16dddc597a2?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/0f/0f1430cb-a10a-4b36-bfa2-a3657a7f2a8f?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/d9/d9462567-fc9e-45ba-865a-3af47d2882ee?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/65/6538e584-60fc-4d1e-a220-f44564d43e92?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/c5/c596f9bb-47e9-4924-8301-ba4582695fb2?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/9b/9b161121-23cc-4975-86d9-91f8f2266fd7?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/20/20f6f7a4-d337-4ab8-ba35-68724a7aba37?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/e9/e9d012e7-98e8-4b8d-abe3-09b0d402540b?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "vehicles"
     },
     {
       "id": "kijiji-1737663886",

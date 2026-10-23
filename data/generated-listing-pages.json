@@ -1,5 +1,5 @@
 {
-  "count": 3659,
+  "count": 3644,
   "listings": [
     {
       "id": "apify-b9b18084f762",
@@ -126,22 +126,6 @@
         "https://oxglow.com.gh/uploads/medium/1-car-multimedia-players-571249764531945.jpg"
       ],
       "categoryKey": "auto-parts"
-    },
-    {
-      "id": "kijiji-1745194482",
-      "slug": "air-conditioner-air-conditioner-air-conditioner-air-condit-1745194482",
-      "url": "https://6ixo.com/listing/air-conditioner-air-conditioner-air-conditioner-air-condit-1745194482/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/49/49f5fac3-0ce3-4a0d-bcb4-ca245559c96c?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/48/487ff035-d461-4be2-ac89-cbf6e6a31b03?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/05/05cf7ca2-3f4a-4a2b-9415-72d9ea418314?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/96/9685f593-c082-4d0a-b415-890ed19adb98?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/ff/ff8e89cd-e897-4960-8dfe-0b389ba27a5d?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/87/87937376-fa51-4f82-bb1f-d4faaca68eb0?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/87/8782529a-2974-4d3a-965c-76c8eeef2519?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/6c/6c430857-f6b9-4bb2-8cb4-b4645f5ae9fd?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "buy-and-sell"
     },
     {
       "id": "hgc-dubai-5d752f9d2d998011",
@@ -8691,7 +8675,7 @@
       "slug": "2-bedroom-apartment-for-rent-shemara-tower-marina-promenad-isup177007",
       "url": "https://6ixo.com/listing/2-bedroom-apartment-for-rent-shemara-tower-marina-promenad-isup177007/",
       "images": [
-        "https://images.allsoppandallsopp.com/public/temp/a0O4S000000VJJZUA4_s_2-bedroom-apartment-in-shemara-tower-marina-promenade-dubai-marina-aed-160k-allsopp-and-allsopp-6.jpeg"
+        "https://images.allsoppandallsopp.com/public/temp/a0O4S000000VJJZUA4_s_2-bedroom-apartment-in-shemara-tower-marina-promenade-dubai-marina-aed-155k-allsopp-and-allsopp-6.jpeg"
       ],
       "categoryKey": "real-estate"
     },
@@ -32509,7 +32493,7 @@
         "https://oxglow.com.gh/uploads/medium/calico-container-shop-Q6ky8h6-1790853959-2-medium.jpg",
         "https://oxglow.com.gh/uploads/medium/calico-container-shop-Q6ky8h6-1790853959-3-medium.jpg"
       ],
-      "categoryKey": "real-estate"
+      "categoryKey": "buy-and-sell"
     },
     {
       "id": "kijiji-1744213051",
@@ -33448,18 +33432,6 @@
       "categoryKey": "vehicles"
     },
     {
-      "id": "craigslist-Bn8gKp-28RGh98ECYI4OfA",
-      "slug": "used-2023-ford-transit-connect-fwd-4d-wagon-wagon-xlt-98ecyi4ofa",
-      "url": "https://6ixo.com/listing/used-2023-ford-transit-connect-fwd-4d-wagon-wagon-xlt-98ecyi4ofa/",
-      "images": [
-        "https://images.craigslist.org/00o0o_lxJyAOXyQub_0hk0co_600x450.jpg",
-        "https://images.craigslist.org/00202_5H2IUKtbPy4_0hk0co_600x450.jpg",
-        "https://images.craigslist.org/00606_lcwFCEctSMc_0hk0co_600x450.jpg",
-        "https://images.craigslist.org/00V0V_9zmlooogBNg_0gw0co_600x450.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
       "id": "craigslist-feDpmQcjXjD8Q1zEGSVzhT",
       "slug": "98-silverado-pickup-truck-extended-cab-q1zegsvzht",
       "url": "https://6ixo.com/listing/98-silverado-pickup-truck-extended-cab-q1zegsvzht/",
@@ -33537,75 +33509,6 @@
         "https://images.craigslist.org/00C0C_lEpAjiXvNUF_0CI0t2_600x450.jpg"
       ],
       "categoryKey": "vehicles"
-    },
-    {
-      "id": "craigslist-ec1Lfywt9eka52yXw35C79",
-      "slug": "2018-nissan-rogue-parting-out-52yxw35c79",
-      "url": "https://6ixo.com/listing/2018-nissan-rogue-parting-out-52yxw35c79/",
-      "images": [
-        "https://images.craigslist.org/00606_e5LcXSlYypD_0dD0ad_600x450.jpg",
-        "https://images.craigslist.org/00H0H_l4iFxBOAXMT_0dD0ad_600x450.jpg",
-        "https://images.craigslist.org/00E0E_kTmciyHHORO_0dD0ad_600x450.jpg"
-      ],
-      "categoryKey": "auto-parts"
-    },
-    {
-      "id": "craigslist-6ACCBVHqjBdGsCwD6SsshB",
-      "slug": "2013-nissan-quest-parting-out-scwd6ssshb",
-      "url": "https://6ixo.com/listing/2013-nissan-quest-parting-out-scwd6ssshb/",
-      "images": [
-        "https://images.craigslist.org/00g0g_aotKeoXktyJ_0dD0ad_600x450.jpg",
-        "https://images.craigslist.org/00z0z_bG29S194Ayn_0dD0ad_600x450.jpg",
-        "https://images.craigslist.org/00G0G_6dJVp0UGa6Q_0dD0ad_600x450.jpg",
-        "https://images.craigslist.org/00e0e_7jJnqAbUR3B_0dD0ad_600x450.jpg"
-      ],
-      "categoryKey": "auto-parts"
-    },
-    {
-      "id": "craigslist-4uViaCfQHSuH5p46jVCAHK",
-      "slug": "2004-cadillac-srx-parting-out-5p46jvcahk",
-      "url": "https://6ixo.com/listing/2004-cadillac-srx-parting-out-5p46jvcahk/",
-      "images": [
-        "https://images.craigslist.org/00k0k_9HDOqiFJxxr_0fu0bC_600x450.jpg",
-        "https://images.craigslist.org/00D0D_aDulzOh0tFE_0fu0bC_600x450.jpg",
-        "https://images.craigslist.org/00Z0Z_3aw68XZ9TU4_0fu0bC_600x450.jpg",
-        "https://images.craigslist.org/00w0w_2qRmswcKVtr_0fu0bC_600x450.jpg"
-      ],
-      "categoryKey": "auto-parts"
-    },
-    {
-      "id": "craigslist-b9RzwRWnySi6gkw4c1qvd4",
-      "slug": "2010-ford-flex-parting-out-gkw4c1qvd4",
-      "url": "https://6ixo.com/listing/2010-ford-flex-parting-out-gkw4c1qvd4/",
-      "images": [
-        "https://images.craigslist.org/00n0n_eChzwyrr0zY_0dD0ad_600x450.jpg",
-        "https://images.craigslist.org/00n0n_h90xW8veYxb_0dD0ad_600x450.jpg",
-        "https://images.craigslist.org/01414_4aFQsa3lBxB_0dD0ad_600x450.jpg",
-        "https://images.craigslist.org/00v0v_8CtL4AwC1tn_0dD0ad_600x450.jpg"
-      ],
-      "categoryKey": "auto-parts"
-    },
-    {
-      "id": "craigslist-hp2zfUw6fjZZXXAP8obAff",
-      "slug": "2020-ford-edge-titanium-awd-parting-out-xxap8obaff",
-      "url": "https://6ixo.com/listing/2020-ford-edge-titanium-awd-parting-out-xxap8obaff/",
-      "images": [
-        "https://images.craigslist.org/00c0c_aoZUioNraxh_0fu0bC_600x450.jpg",
-        "https://images.craigslist.org/00G0G_lJlMMfAMRVR_0fu0bC_600x450.jpg",
-        "https://images.craigslist.org/00707_4LMw3ZSBKrW_0fu0bC_600x450.jpg",
-        "https://images.craigslist.org/00j0j_cSDYqvKAEby_0fu0bC_600x450.jpg"
-      ],
-      "categoryKey": "auto-parts"
-    },
-    {
-      "id": "craigslist-ovVBZaZeiyP1xVGW73RyVy",
-      "slug": "2014-hyundai-sonata-parting-out-xvgw73ryvy",
-      "url": "https://6ixo.com/listing/2014-hyundai-sonata-parting-out-xvgw73ryvy/",
-      "images": [
-        "https://images.craigslist.org/00h0h_bz3ZPknCh98_0dD0ad_600x450.jpg",
-        "https://images.craigslist.org/00K0K_eVY8tA4TwrL_0dD0ad_600x450.jpg"
-      ],
-      "categoryKey": "auto-parts"
     },
     {
       "id": "craigslist-m2cSnwQ6XfGncx8rTDhBXb",
@@ -33984,18 +33887,6 @@
       "categoryKey": "vehicles"
     },
     {
-      "id": "craigslist-4ZDrbFnoHQbhGzhnisojNS",
-      "slug": "2012-f-150-oem-dash-parts-radio-jump-seat-and-upholstery-gzhnisojns",
-      "url": "https://6ixo.com/listing/2012-f-150-oem-dash-parts-radio-jump-seat-and-upholstery-gzhnisojns/",
-      "images": [
-        "https://images.craigslist.org/00202_cJVSEzdr4bJ_0ew0aT_600x450.jpg",
-        "https://images.craigslist.org/00z0z_dCWWyscS37E_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/00R0R_7mLo8cefGz3_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/01313_3MZ8YUWcqi2_0CI0t2_600x450.jpg"
-      ],
-      "categoryKey": "auto-parts"
-    },
-    {
       "id": "craigslist-pJjBZMPBm2641tkSXCovq2",
       "slug": "2002-chevy-silverado-z71-4x4-for-sale-1tksxcovq2",
       "url": "https://6ixo.com/listing/2002-chevy-silverado-z71-4x4-for-sale-1tksxcovq2/",
@@ -34004,42 +33895,6 @@
         "https://images.craigslist.org/00E0E_fgD87f1TVQm_0CI0t2_600x450.jpg",
         "https://images.craigslist.org/00M0M_8qvh5GYXY9v_0CI0t2_600x450.jpg",
         "https://images.craigslist.org/00x0x_1rCkxqoOC0e_0CI0t2_600x450.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "craigslist-3E3JPHctSpjG6zVYVnjVTA",
-      "slug": "2023-ford-escape-st-line-gas-saver-6zvyvnjvta",
-      "url": "https://6ixo.com/listing/2023-ford-escape-st-line-gas-saver-6zvyvnjvta/",
-      "images": [
-        "https://images.craigslist.org/00W0W_6g55wDhbZvJ_0i90au_600x450.jpg",
-        "https://images.craigslist.org/00N0N_1UdaZVIosQC_0t20CI_600x450.jpg",
-        "https://images.craigslist.org/00e0e_cOifoIkpmvb_0t20CI_600x450.jpg",
-        "https://images.craigslist.org/01212_jnLGuKXKISm_0t20CI_600x450.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "craigslist-mBGM24q28RG9w_n82Zorbw",
-      "slug": "2023-chevy-chevrolet-silverado-1500-high-country-pickup-ra-9wn82zorbw",
-      "url": "https://6ixo.com/listing/2023-chevy-chevrolet-silverado-1500-high-country-pickup-ra-9wn82zorbw/",
-      "images": [
-        "https://images.craigslist.org/00s0s_8eUBOA8ClL_0ak07K_600x450.jpg",
-        "https://images.craigslist.org/00W0W_l6HbT0aqwUA_0ak07K_600x450.jpg",
-        "https://images.craigslist.org/00g0g_1l8TQOt9rlW_0ak07K_600x450.jpg",
-        "https://images.craigslist.org/00v0v_3Gdr82gs8xA_0ak07K_600x450.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "craigslist-2sPxbIa28RGatpGKLPk0lA",
-      "slug": "2023-mercedes-benz-cla-amg-cla-45-4dr-car-black-tpgklpk0la",
-      "url": "https://6ixo.com/listing/2023-mercedes-benz-cla-amg-cla-45-4dr-car-black-tpgklpk0la/",
-      "images": [
-        "https://images.craigslist.org/00707_4ZrtPeGcYfJ_0ak07K_600x450.jpg",
-        "https://images.craigslist.org/00808_7FYs5InmTSm_0ak07K_600x450.jpg",
-        "https://images.craigslist.org/00f0f_jGA7dJx0Wxe_0ak07K_600x450.jpg",
-        "https://images.craigslist.org/00u0u_dfujhK9Qt7i_0ak07K_600x450.jpg"
       ],
       "categoryKey": "vehicles"
     },
@@ -35311,16 +35166,6 @@
       "categoryKey": "vehicles"
     },
     {
-      "id": "apify-505250e9e85d",
-      "slug": "honda-cl500-5250e9e85d",
-      "url": "https://6ixo.com/listing/honda-cl500-5250e9e85d/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/honda-cl500-Z708xJ4-1790767952-1-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/honda-cl500-Z708xJ4-1790767952-0-medium.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
       "id": "apify-dbca7ec54027",
       "slug": "sony-play-station-5-ca7ec54027",
       "url": "https://6ixo.com/listing/sony-play-station-5-ca7ec54027/",
@@ -35350,18 +35195,6 @@
         "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/02/02530999-2919-4c99-abba-e7943ce0cfaf?rule=kijijica-1600-webp"
       ],
       "categoryKey": "real-estate"
-    },
-    {
-      "id": "apify-6d67e36b6582",
-      "slug": "hyundai-veloster-67e36b6582",
-      "url": "https://6ixo.com/listing/hyundai-veloster-67e36b6582/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/hyundai-veloster-MQ390Q-1790763998-0-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/hyundai-veloster-MQ390Q-1790763999-1-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/hyundai-veloster-MQ390Q-1790763999-2-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/hyundai-veloster-MQ390Q-1790763999-3-medium.jpg"
-      ],
-      "categoryKey": "vehicles"
     },
     {
       "id": "kijiji-1744166753",
@@ -36862,17 +36695,6 @@
       "images": [
         "https://oxglow.com.gh/uploads/medium/portable-solar-panel-charger-8D6APF6-1789725455-0-medium.jpg",
         "https://oxglow.com.gh/uploads/medium/portable-solar-panel-charger-8D6APF6-1789725455-1-medium.jpg"
-      ],
-      "categoryKey": "electronics"
-    },
-    {
-      "id": "apify-9d51a50ddd45",
-      "slug": "canon-eos-r-51a50ddd45",
-      "url": "https://6ixo.com/listing/canon-eos-r-51a50ddd45/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/canon-eos-r-F297b5-1789725044-1-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/canon-eos-r-F297b5-1789725044-0-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/canon-eos-r-F297b5-1789725044-2-medium.jpg"
       ],
       "categoryKey": "electronics"
     },
@@ -45990,6 +45812,9 @@
       "url": "https://6ixo.com/listings/country/ghana/services/"
     },
     {
+      "url": "https://6ixo.com/listings/country/ghana/buy-and-sell/"
+    },
+    {
       "url": "https://6ixo.com/listings/country/ghana/"
     },
     {
@@ -46297,9 +46122,6 @@
     },
     {
       "url": "https://6ixo.com/listings/country/united-states/page/22/"
-    },
-    {
-      "url": "https://6ixo.com/listings/country/united-states/page/23/"
     },
     {
       "url": "https://6ixo.com/apartments-for-rent/"
@@ -52418,6 +52240,81 @@
       "id": "kijiji-1745052398",
       "slug": "30-minute-free-non-rmt-relaxation-massage-50-h-thereafter-1745052398",
       "url": "https://6ixo.com/listing/30-minute-free-non-rmt-relaxation-massage-50-h-thereafter-1745052398/"
+    },
+    {
+      "id": "kijiji-1745194482",
+      "slug": "air-conditioner-air-conditioner-air-conditioner-air-condit-1745194482",
+      "url": "https://6ixo.com/listing/air-conditioner-air-conditioner-air-conditioner-air-condit-1745194482/"
+    },
+    {
+      "id": "craigslist-Bn8gKp-28RGh98ECYI4OfA",
+      "slug": "used-2023-ford-transit-connect-fwd-4d-wagon-wagon-xlt-98ecyi4ofa",
+      "url": "https://6ixo.com/listing/used-2023-ford-transit-connect-fwd-4d-wagon-wagon-xlt-98ecyi4ofa/"
+    },
+    {
+      "id": "craigslist-ec1Lfywt9eka52yXw35C79",
+      "slug": "2018-nissan-rogue-parting-out-52yxw35c79",
+      "url": "https://6ixo.com/listing/2018-nissan-rogue-parting-out-52yxw35c79/"
+    },
+    {
+      "id": "craigslist-6ACCBVHqjBdGsCwD6SsshB",
+      "slug": "2013-nissan-quest-parting-out-scwd6ssshb",
+      "url": "https://6ixo.com/listing/2013-nissan-quest-parting-out-scwd6ssshb/"
+    },
+    {
+      "id": "craigslist-4uViaCfQHSuH5p46jVCAHK",
+      "slug": "2004-cadillac-srx-parting-out-5p46jvcahk",
+      "url": "https://6ixo.com/listing/2004-cadillac-srx-parting-out-5p46jvcahk/"
+    },
+    {
+      "id": "craigslist-b9RzwRWnySi6gkw4c1qvd4",
+      "slug": "2010-ford-flex-parting-out-gkw4c1qvd4",
+      "url": "https://6ixo.com/listing/2010-ford-flex-parting-out-gkw4c1qvd4/"
+    },
+    {
+      "id": "craigslist-hp2zfUw6fjZZXXAP8obAff",
+      "slug": "2020-ford-edge-titanium-awd-parting-out-xxap8obaff",
+      "url": "https://6ixo.com/listing/2020-ford-edge-titanium-awd-parting-out-xxap8obaff/"
+    },
+    {
+      "id": "craigslist-ovVBZaZeiyP1xVGW73RyVy",
+      "slug": "2014-hyundai-sonata-parting-out-xvgw73ryvy",
+      "url": "https://6ixo.com/listing/2014-hyundai-sonata-parting-out-xvgw73ryvy/"
+    },
+    {
+      "id": "craigslist-4ZDrbFnoHQbhGzhnisojNS",
+      "slug": "2012-f-150-oem-dash-parts-radio-jump-seat-and-upholstery-gzhnisojns",
+      "url": "https://6ixo.com/listing/2012-f-150-oem-dash-parts-radio-jump-seat-and-upholstery-gzhnisojns/"
+    },
+    {
+      "id": "craigslist-3E3JPHctSpjG6zVYVnjVTA",
+      "slug": "2023-ford-escape-st-line-gas-saver-6zvyvnjvta",
+      "url": "https://6ixo.com/listing/2023-ford-escape-st-line-gas-saver-6zvyvnjvta/"
+    },
+    {
+      "id": "craigslist-mBGM24q28RG9w_n82Zorbw",
+      "slug": "2023-chevy-chevrolet-silverado-1500-high-country-pickup-ra-9wn82zorbw",
+      "url": "https://6ixo.com/listing/2023-chevy-chevrolet-silverado-1500-high-country-pickup-ra-9wn82zorbw/"
+    },
+    {
+      "id": "craigslist-2sPxbIa28RGatpGKLPk0lA",
+      "slug": "2023-mercedes-benz-cla-amg-cla-45-4dr-car-black-tpgklpk0la",
+      "url": "https://6ixo.com/listing/2023-mercedes-benz-cla-amg-cla-45-4dr-car-black-tpgklpk0la/"
+    },
+    {
+      "id": "apify-505250e9e85d",
+      "slug": "honda-cl500-5250e9e85d",
+      "url": "https://6ixo.com/listing/honda-cl500-5250e9e85d/"
+    },
+    {
+      "id": "apify-6d67e36b6582",
+      "slug": "hyundai-veloster-67e36b6582",
+      "url": "https://6ixo.com/listing/hyundai-veloster-67e36b6582/"
+    },
+    {
+      "id": "apify-9d51a50ddd45",
+      "slug": "canon-eos-r-51a50ddd45",
+      "url": "https://6ixo.com/listing/canon-eos-r-51a50ddd45/"
     }
   ]
 }

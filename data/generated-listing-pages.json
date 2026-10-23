@@ -1,5 +1,5 @@
 {
-  "count": 3659,
+  "count": 3658,
   "listings": [
     {
       "id": "hgc-dubai-5d752f9d2d998011",
@@ -11895,15 +11895,6 @@
         "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/aa/aa4c8c42-62d0-40f9-972a-fc88567923f2?rule=kijijica-1600-webp"
       ],
       "categoryKey": "jobs"
-    },
-    {
-      "id": "kijiji-1745052398",
-      "slug": "30-minute-free-non-rmt-relaxation-massage-50-h-thereafter-1745052398",
-      "url": "https://6ixo.com/listing/30-minute-free-non-rmt-relaxation-massage-50-h-thereafter-1745052398/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/7c/7c4271f8-bf75-4c38-b632-4c04554f5bd4?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "community"
     },
     {
       "id": "kijiji-1745052159",
@@ -52409,6 +52400,11 @@
       "id": "craigslist-x6doC71gZcck8tniYXbhXT",
       "slug": "2016-ram-3500-longhorn-mega-4x4-cummins-nav-sunroof-goosen-8tniyxbhxt",
       "url": "https://6ixo.com/listing/2016-ram-3500-longhorn-mega-4x4-cummins-nav-sunroof-goosen-8tniyxbhxt/"
+    },
+    {
+      "id": "kijiji-1745052398",
+      "slug": "30-minute-free-non-rmt-relaxation-massage-50-h-thereafter-1745052398",
+      "url": "https://6ixo.com/listing/30-minute-free-non-rmt-relaxation-massage-50-h-thereafter-1745052398/"
     }
   ]
 }

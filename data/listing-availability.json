@@ -1,5 +1,5 @@
 {
-  "checkedAt": "2026-10-23T12:40:04Z",
+  "checkedAt": "2026-10-23T12:53:41.382Z",
   "listings": {
     "craigslist.org/view/d/bastrop-used-2025-cadillac-xt4-fwd-4d/fuqr_3uo8rgowpq1ctwx-a": {
       "availability": "sold",
@@ -13033,19 +13033,31 @@
       "reason": "Kijiji redirected the exact ad to a confirmed removal"
     },
     "kijiji.ca/v-pet-services/city-of-toronto/bird-boarding-toronto-text-647-490-7156/1745194254": {
-      "availability": "unavailable",
-      "checkedAt": "2026-10-23T12:40:04Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1745194254",
+      "sourceUrl": "https://www.kijiji.ca/v-pet-services/city-of-toronto/bird-boarding-toronto-text-647-490-7156/1745194254",
+      "availability": "gone",
+      "checkedAt": "2026-10-23T12:53:41.382Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-pet-services/city-of-toronto/c143l1700273?radius=50.0&ll=43.64%2C-79.39&adRemoved=1745194254",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-buy-sell-other/city-of-toronto/demolition-service/1745194188": {
-      "availability": "unavailable",
-      "checkedAt": "2026-10-23T12:40:04Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1745194188",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/demolition-service/1745194188",
+      "availability": "gone",
+      "checkedAt": "2026-10-23T12:53:41.382Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.77%2C-79.41&adRemoved=1745194188",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-other-business-industrial/mississauga-peel-region/wholesale-machine-stretch-wrap-20-x-6500-51-ga/1745153214": {
-      "availability": "unavailable",
-      "checkedAt": "2026-10-23T12:40:04Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1745153214",
+      "sourceUrl": "https://www.kijiji.ca/v-other-business-industrial/mississauga-peel-region/wholesale-machine-stretch-wrap-20-x-6500-51-ga/1745153214",
+      "availability": "gone",
+      "checkedAt": "2026-10-23T12:53:41.382Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-other-business-industrial/mississauga-peel-region/c145l1700276?radius=50.0&ll=43.7%2C-79.74&adRemoved=1745153214",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-other-business-industrial/mississauga-peel-region/wholesale-machine-stretch-wrap-pallet-wrap-20-x-6500-65-ga/1745153198": {
       "availability": "unavailable",
@@ -13053,9 +13065,13 @@
       "reason": "Kijiji redirected the exact ad to a confirmed removal"
     },
     "kijiji.ca/v-pet-services/city-of-toronto/nail-and-wing-clipping-for-your-bird-text-647-490-7156/1745194238": {
-      "availability": "unavailable",
-      "checkedAt": "2026-10-23T12:40:04Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1745194238",
+      "sourceUrl": "https://www.kijiji.ca/v-pet-services/city-of-toronto/nail-and-wing-clipping-for-your-bird-text-647-490-7156/1745194238",
+      "availability": "gone",
+      "checkedAt": "2026-10-23T12:53:41.382Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-pet-services/city-of-toronto/c143l1700273?radius=50.0&ll=43.64%2C-79.39&adRemoved=1745194238",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-apartments-condos/mississauga-peel-region/one-bedroom-apartment-in-south-etobicoke/1745178030": {
       "availability": "unavailable",

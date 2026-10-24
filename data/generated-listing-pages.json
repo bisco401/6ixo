@@ -1,5 +1,5 @@
 {
-  "count": 3619,
+  "count": 3606,
   "listings": [
     {
       "id": "apify-b9b18084f762",
@@ -575,18 +575,6 @@
         "https://images.craigslist.org/00z0z_1OxJwVz9vlb_0CI0t2_600x450.jpg",
         "https://images.craigslist.org/00D0D_lt2ZaVwkqc8_0CI0t2_600x450.jpg",
         "https://images.craigslist.org/00T0T_19PLdkgWovJ_0CI0t2_600x450.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "craigslist-uQosD92RpN4XAyUJCfJBVK",
-      "slug": "print-2004-toyota-tacoma-prerunner-crew-cab-medium-bed-ayujcfjbvk",
-      "url": "https://6ixo.com/listing/print-2004-toyota-tacoma-prerunner-crew-cab-medium-bed-ayujcfjbvk/",
-      "images": [
-        "https://images.craigslist.org/00u0u_aHDzvx27QAa_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/00p0p_4Kgm5QBQySd_0t20CI_600x450.jpg",
-        "https://images.craigslist.org/00404_acKmHsZCZdQ_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/00808_kOyYRPSCMzl_0CI0t2_600x450.jpg"
       ],
       "categoryKey": "vehicles"
     },
@@ -4424,15 +4412,6 @@
       "categoryKey": "buy-and-sell"
     },
     {
-      "id": "kijiji-1745177060",
-      "slug": "driving-lessons-certificate-fast-test-700-five-star-review-1745177060",
-      "url": "https://6ixo.com/listing/driving-lessons-certificate-fast-test-700-five-star-review-1745177060/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/70/704ffeb0-4170-4f4e-8778-89d6b80cb055?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "community"
-    },
-    {
       "id": "kijiji-1745177026",
       "slug": "2020-ford-escape-hybrid-titanium-1745177026",
       "url": "https://6ixo.com/listing/2020-ford-escape-hybrid-titanium-1745177026/",
@@ -4449,24 +4428,6 @@
         "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/38/382d7aee-e3ce-40d1-8240-fffadeda3af1?rule=kijijica-1600-webp"
       ],
       "categoryKey": "vehicles"
-    },
-    {
-      "id": "kijiji-1745176975",
-      "slug": "two-bedroom-apartment-1745176975",
-      "url": "https://6ixo.com/listing/two-bedroom-apartment-1745176975/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/dd/ddf2ad52-7145-453e-8361-9bc2c480e35a?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/4b/4bf0d1f7-a9ea-42df-a7df-0ee933c958fa?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/ad/adfefc79-7491-4c87-a747-249dc3bcd962?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/22/220e6666-5f96-48f2-a213-843f9ae5db60?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/e6/e6a5de0f-c82c-440b-8c57-338bf288455d?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/70/705edc16-61e5-46c8-b6ce-11e0fc4a0611?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/82/82d7df39-b658-4308-9bb1-ebd32855229f?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/ee/ee4b2320-7549-40c0-bf11-9bef9c7c97eb?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/79/79d0e311-debf-480e-9952-3217f7cf3a0a?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/3e/3e12c2eb-42c5-48a3-8096-7456880a1c9f?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "real-estate"
     },
     {
       "id": "kijiji-1745176912",
@@ -4556,24 +4517,6 @@
         "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/7c/7c2c21e8-aa8c-4dc5-9e16-f2f4c7790033?rule=kijijica-1600-webp"
       ],
       "categoryKey": "buy-and-sell"
-    },
-    {
-      "id": "kijiji-1745176637",
-      "slug": "beautiful-1-bedroom-apt-steps-to-keelesdale-subway-station-1745176637",
-      "url": "https://6ixo.com/listing/beautiful-1-bedroom-apt-steps-to-keelesdale-subway-station-1745176637/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/a8/a8232be3-3439-4beb-aa7b-4029c7ea2495?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/1d/1dd77195-dd46-415f-b343-ea249e129371?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/cf/cfc91f69-13bc-4d9b-ba37-9ee0ab48ec4d?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/30/3007f0ef-1c26-4d0d-aa1a-3f2f8d9aa62d?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/0d/0d990cdc-9df6-4630-97bb-6f62e260e908?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/9c/9c1ba3a1-0409-45c5-9d0e-754199e83729?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/ca/cafae66b-2809-496f-bfea-c928cfd2a168?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/6b/6b5886b8-7006-4405-9c9c-e802c067e6cc?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/96/96e8f0e3-dd10-4fc7-bd24-5c13d002574d?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/c3/c30910cb-82e4-4133-abf3-69cd93980cc9?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "real-estate"
     },
     {
       "id": "kijiji-1745176636",
@@ -11167,26 +11110,6 @@
       "categoryKey": "auto-parts"
     },
     {
-      "id": "kijiji-1745075885",
-      "slug": "satellite-dish-s-24-with-lnb-s-bell-service-1745075885",
-      "url": "https://6ixo.com/listing/satellite-dish-s-24-with-lnb-s-bell-service-1745075885/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/79/79233e3a-27bc-42b5-9f04-90e1ab179689?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/87/8720ecd9-a1af-4c5b-a5cb-0be818689c91?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "electronics"
-    },
-    {
-      "id": "kijiji-1745075798",
-      "slug": "apc-xs1300-ups-battery-back-up-1745075798",
-      "url": "https://6ixo.com/listing/apc-xs1300-ups-battery-back-up-1745075798/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/14/146bcd8b-cf83-48e4-a04a-760fddac544a?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/74/742c6d9f-7cb1-46f6-a2e6-4b1b7b3f9bb2?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "electronics"
-    },
-    {
       "id": "kijiji-1745075760",
       "slug": "oct-deals-clean-comfort-hrv-clean-comfort-hrv-clean-comfor-1745075760",
       "url": "https://6ixo.com/listing/oct-deals-clean-comfort-hrv-clean-comfort-hrv-clean-comfor-1745075760/",
@@ -11195,16 +11118,6 @@
         "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/2f/2f03961e-6b97-4d71-94a0-7c93aab163b7?rule=kijijica-1600-webp"
       ],
       "categoryKey": "buy-and-sell"
-    },
-    {
-      "id": "kijiji-1745074946",
-      "slug": "classical-guitar-mcgill-grad-20-yrs-exp-seneca-professor-1745074946",
-      "url": "https://6ixo.com/listing/classical-guitar-mcgill-grad-20-yrs-exp-seneca-professor-1745074946/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/ef/ef064b5d-0da3-4fd1-9da3-babd3e611905?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/3d/3d9f707c-a1f5-40f9-815e-688f8b0b00b6?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "community"
     },
     {
       "id": "kijiji-1745074765",
@@ -11609,18 +11522,6 @@
         "https://images.craigslist.org/00j0j_dqI5mC0qryS_0hk0co_600x450.jpg",
         "https://images.craigslist.org/00p0p_1gBTINAiQes_0hk0co_600x450.jpg",
         "https://images.craigslist.org/00303_k0GUJrutnsT_0hk0co_600x450.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "craigslist-kpSDdTTM8RG6E4tCCy79rg",
-      "slug": "2020-honda-cr-v-fwd-suv-ex-l-e4tccy79rg",
-      "url": "https://6ixo.com/listing/2020-honda-cr-v-fwd-suv-ex-l-e4tccy79rg/",
-      "images": [
-        "https://images.craigslist.org/00a0a_sdc1vriFm2_0hk0co_600x450.jpg",
-        "https://images.craigslist.org/00j0j_dqI5mC0qryS_0hk0co_600x450.jpg",
-        "https://images.craigslist.org/00m0m_l29L1brsmOz_0hk0co_600x450.jpg",
-        "https://images.craigslist.org/01212_lXFxijNATnX_0hk0co_600x450.jpg"
       ],
       "categoryKey": "vehicles"
     },
@@ -18818,15 +18719,6 @@
       "categoryKey": "electronics"
     },
     {
-      "id": "samtronix-gy-12130988130464",
-      "slug": "samsung-galaxy-tab-a9-wi-fi-4gb-ram-64gb-storage-0988130464",
-      "url": "https://6ixo.com/listing/samsung-galaxy-tab-a9-wi-fi-4gb-ram-64gb-storage-0988130464/",
-      "images": [
-        "https://samtronixguyana.com/cdn/shop/files/61MTXDqdidL._SL1500_1024x.jpg?v=1754044703"
-      ],
-      "categoryKey": "electronics"
-    },
-    {
       "id": "samtronix-gy-15920730603680",
       "slug": "apple-watch-series-12-42mm-0730603680",
       "url": "https://6ixo.com/listing/apple-watch-series-12-42mm-0730603680/",
@@ -23253,30 +23145,6 @@
         "https://images.craigslist.org/01010_9ZKu4gGLMdR_0jh0ew_600x450.jpg",
         "https://images.craigslist.org/00d0d_9PUcDnaegzC_0jh0ew_600x450.jpg",
         "https://images.craigslist.org/00G0G_8OFLWKsW7Uh_0jh0ew_600x450.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "craigslist-twUBwRk3HZQR4EZqCndJtQ",
-      "slug": "2022-gmc-savanna-2500-cargo-van-4ezqcndjtq",
-      "url": "https://6ixo.com/listing/2022-gmc-savanna-2500-cargo-van-4ezqcndjtq/",
-      "images": [
-        "https://images.craigslist.org/00d0d_1ndcgk2PRXd_0pO0jm_600x450.jpg",
-        "https://images.craigslist.org/00J0J_bacVQ7Nz2OK_0pO0jm_600x450.jpg",
-        "https://images.craigslist.org/00505_dgsMEj2C3g_0pO0jm_600x450.jpg",
-        "https://images.craigslist.org/00A0A_5MZYR5QZAQ5_0pO0jm_600x450.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "craigslist-1vArkPao7jWT9v8VEZz4KE",
-      "slug": "2012-hyundai-sonata-gls-9v8vezz4ke",
-      "url": "https://6ixo.com/listing/2012-hyundai-sonata-gls-9v8vezz4ke/",
-      "images": [
-        "https://images.craigslist.org/00y0y_6N4iCykYN5V_0pO0jm_600x450.jpg",
-        "https://images.craigslist.org/00Z0Z_8fPEbUf3gRG_0pO0jm_600x450.jpg",
-        "https://images.craigslist.org/00O0O_bOU4Kcvq9Yl_0pO0jm_600x450.jpg",
-        "https://images.craigslist.org/00k0k_8E795mnwCGn_0pO0jm_600x450.jpg"
       ],
       "categoryKey": "vehicles"
     },
@@ -35417,15 +35285,6 @@
       "categoryKey": "jobs"
     },
     {
-      "id": "samtronix-gy-15886608990368",
-      "slug": "redmi-17-4gb-ram-256gb-storage-6608990368",
-      "url": "https://6ixo.com/listing/redmi-17-4gb-ram-256gb-storage-6608990368/",
-      "images": [
-        "https://samtronixguyana.com/cdn/shop/files/REDMI17_11_1024x.png?v=1790255226"
-      ],
-      "categoryKey": "electronics"
-    },
-    {
       "id": "samtronix-gy-15886580482208",
       "slug": "redmi-17-4gb-ram-128gb-storage-6580482208",
       "url": "https://6ixo.com/listing/redmi-17-4gb-ram-128gb-storage-6580482208/",
@@ -37773,21 +37632,6 @@
       "images": [
         "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/7b/7bddb0b6-ac6a-4e7c-b3aa-bf41ef565c3a?rule=kijijica-1600-webp",
         "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/4a/4a74679f-a03b-4305-bacc-c87c30e895e8?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "buy-and-sell"
-    },
-    {
-      "id": "kijiji-1722349713",
-      "slug": "hot-wheels-matchbox-cars-1722349713",
-      "url": "https://6ixo.com/listing/hot-wheels-matchbox-cars-1722349713/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/06/061c3b0d-43b9-4483-bc20-15e903155234?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/7d/7dcc0cf6-6297-4590-9421-ef0e4cdb473d?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/28/28ba8b47-fbcb-4828-a275-6df545770aff?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/0a/0a527f67-0a79-4ba4-b690-b3cfa39c093e?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/5f/5f7189c5-4203-466f-af39-6feb09996919?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/16/162384e0-48d5-4f94-b2c0-456226ba3c32?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/20/2098f9e9-9763-4fcd-af6a-7025c65a010f?rule=kijijica-1600-webp"
       ],
       "categoryKey": "buy-and-sell"
     },
@@ -45232,9 +45076,6 @@
       "url": "https://6ixo.com/listings/country/canada/real-estate/page/5/"
     },
     {
-      "url": "https://6ixo.com/listings/country/canada/real-estate/page/6/"
-    },
-    {
       "url": "https://6ixo.com/listings/country/canada/services/"
     },
     {
@@ -45302,9 +45143,6 @@
     },
     {
       "url": "https://6ixo.com/listings/country/canada/buy-and-sell/page/9/"
-    },
-    {
-      "url": "https://6ixo.com/listings/country/canada/buy-and-sell/page/10/"
     },
     {
       "url": "https://6ixo.com/listings/country/canada/"
@@ -52254,6 +52092,71 @@
       "id": "apify-9d51a50ddd45",
       "slug": "canon-eos-r-51a50ddd45",
       "url": "https://6ixo.com/listing/canon-eos-r-51a50ddd45/"
+    },
+    {
+      "id": "craigslist-uQosD92RpN4XAyUJCfJBVK",
+      "slug": "print-2004-toyota-tacoma-prerunner-crew-cab-medium-bed-ayujcfjbvk",
+      "url": "https://6ixo.com/listing/print-2004-toyota-tacoma-prerunner-crew-cab-medium-bed-ayujcfjbvk/"
+    },
+    {
+      "id": "kijiji-1745177060",
+      "slug": "driving-lessons-certificate-fast-test-700-five-star-review-1745177060",
+      "url": "https://6ixo.com/listing/driving-lessons-certificate-fast-test-700-five-star-review-1745177060/"
+    },
+    {
+      "id": "kijiji-1745176975",
+      "slug": "two-bedroom-apartment-1745176975",
+      "url": "https://6ixo.com/listing/two-bedroom-apartment-1745176975/"
+    },
+    {
+      "id": "kijiji-1745176637",
+      "slug": "beautiful-1-bedroom-apt-steps-to-keelesdale-subway-station-1745176637",
+      "url": "https://6ixo.com/listing/beautiful-1-bedroom-apt-steps-to-keelesdale-subway-station-1745176637/"
+    },
+    {
+      "id": "kijiji-1745075885",
+      "slug": "satellite-dish-s-24-with-lnb-s-bell-service-1745075885",
+      "url": "https://6ixo.com/listing/satellite-dish-s-24-with-lnb-s-bell-service-1745075885/"
+    },
+    {
+      "id": "kijiji-1745075798",
+      "slug": "apc-xs1300-ups-battery-back-up-1745075798",
+      "url": "https://6ixo.com/listing/apc-xs1300-ups-battery-back-up-1745075798/"
+    },
+    {
+      "id": "kijiji-1745074946",
+      "slug": "classical-guitar-mcgill-grad-20-yrs-exp-seneca-professor-1745074946",
+      "url": "https://6ixo.com/listing/classical-guitar-mcgill-grad-20-yrs-exp-seneca-professor-1745074946/"
+    },
+    {
+      "id": "craigslist-kpSDdTTM8RG6E4tCCy79rg",
+      "slug": "2020-honda-cr-v-fwd-suv-ex-l-e4tccy79rg",
+      "url": "https://6ixo.com/listing/2020-honda-cr-v-fwd-suv-ex-l-e4tccy79rg/"
+    },
+    {
+      "id": "samtronix-gy-12130988130464",
+      "slug": "samsung-galaxy-tab-a9-wi-fi-4gb-ram-64gb-storage-0988130464",
+      "url": "https://6ixo.com/listing/samsung-galaxy-tab-a9-wi-fi-4gb-ram-64gb-storage-0988130464/"
+    },
+    {
+      "id": "craigslist-twUBwRk3HZQR4EZqCndJtQ",
+      "slug": "2022-gmc-savanna-2500-cargo-van-4ezqcndjtq",
+      "url": "https://6ixo.com/listing/2022-gmc-savanna-2500-cargo-van-4ezqcndjtq/"
+    },
+    {
+      "id": "craigslist-1vArkPao7jWT9v8VEZz4KE",
+      "slug": "2012-hyundai-sonata-gls-9v8vezz4ke",
+      "url": "https://6ixo.com/listing/2012-hyundai-sonata-gls-9v8vezz4ke/"
+    },
+    {
+      "id": "samtronix-gy-15886608990368",
+      "slug": "redmi-17-4gb-ram-256gb-storage-6608990368",
+      "url": "https://6ixo.com/listing/redmi-17-4gb-ram-256gb-storage-6608990368/"
+    },
+    {
+      "id": "kijiji-1722349713",
+      "slug": "hot-wheels-matchbox-cars-1722349713",
+      "url": "https://6ixo.com/listing/hot-wheels-matchbox-cars-1722349713/"
     }
   ]
 }

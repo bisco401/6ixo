@@ -200,6 +200,8 @@ def main():
             try:
                 response = requests.get(url, headers={"User-Agent": USER_AGENT}, timeout=22)
                 status, body, resolved = response.status_code, response.text, response.url
+                if cache:
+                    cache.with_suffix(".html").write_text(body)
                 availability, reason = classify(by_url[url][0], status, body, resolved)
             except requests.RequestException as error:
                 status, availability, reason, resolved = 0, "unknown", type(error).__name__, url

@@ -72,8 +72,8 @@ test('topic pages are crawlable and retired location pages stop allowing indexin
   t.after(() => fs.rm(root, { recursive: true, force: true }));
   await fs.mkdir(path.join(root, 'data'), { recursive: true });
   await fs.writeFile(path.join(root, 'sitemap.xml'), '<urlset></urlset>');
-  const columns = ['id', 'status', 'app_category', 'title', 'description', 'image_urls', 'city', 'country', 'source_url'];
-  const rows = Array.from({ length: 80 }, (_, i) => ({ id: `phone-${i}`, status: 'published', app_category: 'electronics', title: `iPhone ${i + 11}`, description: 'A mobile phone offered for sale with its original box and charging cable.', image_urls: 'https://example.com/phone.jpg', city: 'Dubai', country: 'United Arab Emirates', source_url: `https://example.com/phone/${i}` }));
+  const columns = ['id', 'status', 'app_category', 'title', 'description', 'image_urls', 'phone', 'city', 'country', 'source_url'];
+  const rows = Array.from({ length: 80 }, (_, i) => ({ id: `phone-${i}`, status: 'published', phone: '+14165551234', app_category: 'electronics', title: `iPhone ${i + 11}`, description: 'A mobile phone offered for sale with its original box and charging cable.', image_urls: 'https://example.com/phone.jpg', city: 'Dubai', country: 'United Arab Emirates', source_url: `https://example.com/phone/${i}` }));
   rows.push({ ...rows[0], id: 'laptop', title: 'Laptop for sale', source_url: 'https://example.com/laptop' });
   const writeFeed = async () => fs.writeFile(path.join(root, 'data/scraped-listings.csv'), columns.join(',') + '\n' + rows.map(r => columns.map(c => `"${String(r[c] || '').replaceAll('"', '""')}"`).join(',')).join('\n'));
   await writeFeed();
@@ -127,8 +127,8 @@ test('inventory builds paginate, deduplicate, preserve URLs, retire sold pages, 
   const home = '<!DOCTYPE html><html lang="en"><head><link rel="canonical" href="https://6ixo.com/"><meta name="robots" content="index, follow"></head><body><a href="/listings/">Listings</a></body></html>';
   await fs.writeFile(path.join(root, 'index.html'), home);
   await fs.writeFile(path.join(root, 'sitemap.xml'), '<urlset><url><loc>https://6ixo.com/</loc><lastmod>2026-09-01</lastmod></url></urlset>');
-  const headers = ['id', 'status', 'app_category', 'app_subcategory', 'title', 'description', 'image_urls', 'city', 'country', 'source_url', 'price_value', 'price_text', 'currency', 'source_availability', 'scraped_at'];
-  const rows = Array.from({ length: 40 }, (_, i) => ({ id: `id-${i}`, status: 'published', app_category: 'electronics', title: `Laptop ${i}`, description: 'A complete description of this laptop and its useful features.', image_urls: 'https://example.com/photo.jpg', city: 'Toronto', country: 'Canada', source_url: `https://example.com/ad/${i}`, price_value: '2500', price_text: '$25', currency: 'CAD', source_availability: 'unknown', scraped_at: '2026-10-01' }));
+  const headers = ['id', 'status', 'app_category', 'app_subcategory', 'title', 'description', 'image_urls', 'phone', 'city', 'country', 'source_url', 'price_value', 'price_text', 'currency', 'source_availability', 'scraped_at'];
+  const rows = Array.from({ length: 40 }, (_, i) => ({ id: `id-${i}`, status: 'published', phone: '+14165551234', app_category: 'electronics', title: `Laptop ${i}`, description: 'A complete description of this laptop and its useful features.', image_urls: 'https://example.com/photo.jpg', city: 'Toronto', country: 'Canada', source_url: `https://example.com/ad/${i}`, price_value: '2500', price_text: '$25', currency: 'CAD', source_availability: 'unknown', scraped_at: '2026-10-01' }));
   rows[2].price_text = 'Contact seller'; rows[2].price_value = '';
   rows[3].price_text = 'Contact seller for price'; rows[3].price_value = '';
   const writeFeed = async records => fs.writeFile(path.join(root, 'data/scraped-listings.csv'), headers.join(',') + '\n' + records.map(row => headers.map(h => `"${String(row[h] || '').replaceAll('"', '""')}"`).join(',')).join('\n'));
@@ -171,4 +171,37 @@ test('inventory builds paginate, deduplicate, preserve URLs, retire sold pages, 
   assert.equal(state[`${ORIGIN}/apartments-for-rent/`].lastmod, firstState[`${ORIGIN}/apartments-for-rent/`].lastmod);
   await writeFeed([]);
   await assert.rejects(generate(root), /Refusing to retire every listing/);
+});
+
+
+test('static pages enforce feed publication guards and retire held imports', async t => {
+  const root = await fs.mkdtemp(path.join(os.tmpdir(), '6ixo-publication-'));
+  t.after(() => fs.rm(root, { recursive: true, force: true }));
+  await fs.mkdir(path.join(root, 'data'), { recursive: true });
+  await fs.writeFile(path.join(root, 'sitemap.xml'), '<urlset></urlset>');
+  const base = { status: 'published', app_category: 'electronics', title: 'Source laptop', description: 'A complete source description with the advertised laptop specifications.', image_urls: 'https://example.com/source-photo.jpg', phone: '+14165551234', city: 'Toronto', country: 'Canada' };
+  const rows = ['valid', 'no-phone', 'review-held', 'superseded'].map(id => ({ ...base, id, title: `Source laptop ${id}`, source_url: `https://example.com/ad/${id}` }));
+  rows[3].source_url = 'https://www.kijiji.ca/v-laptops/city-of-toronto/old-laptop/1745000001';
+  const writeFeed = async () => {
+    const headers = Object.keys(rows[0]);
+    await fs.writeFile(path.join(root, 'data/scraped-listings.csv'), headers.join(',') + '\n' + rows.map(row => headers.map(h => `"${String(row[h] ?? '').replaceAll('"', '""')}"`).join(',')).join('\n'));
+  };
+  await writeFeed();
+  const first = await generate(root);
+  assert.equal(first.count, 4);
+  rows[1].phone = '';
+  await writeFeed();
+  await fs.writeFile(path.join(root, 'data/listing-integrity-repairs.json'), JSON.stringify({ listings: {
+    'example.com/ad/review-held': { sourceUrl: rows[2].source_url, title: rows[2].title, holdReason: 'foreign_gallery' },
+    'kijiji.ca/v-laptops/city-of-toronto/old-laptop/1745000001': { sourceUrl: rows[3].source_url, title: rows[3].title, supersededBy: 'https://www.kijiji.ca/v-laptops/city-of-toronto/current-laptop/1745000001' }
+  } }));
+  const next = await generate(root);
+  assert.deepEqual(next.listings.map(row => row.id), ['valid']);
+  for (const id of ['no-phone', 'review-held', 'superseded']) {
+    const previous = first.listings.find(row => row.id === id);
+    const html = await fs.readFile(path.join(root, 'listing', previous.slug, 'index.html'), 'utf8');
+    assert.match(html, /noindex, follow/);
+    assert.doesNotMatch(html, /"@type":"Product"/);
+    assert.ok(!next.indexes.some(index => index.ids?.includes(id)));
+  }
 });

@@ -1,5 +1,8 @@
 import json
+import csv
+import tempfile
 import unittest
+from pathlib import Path
 
 import sebu_scrape
 
@@ -59,8 +62,26 @@ class SebuScrapeTests(unittest.TestCase):
         row = sebu_scrape.candidate_to_csv(candidate, "2026-08-28T07:00:00Z")
         self.assertEqual(row["app_category"], "clothing")
         self.assertEqual(row["phone"], "")
+        self.assertEqual(row["status"], "pending")
+        self.assertEqual(row["sync_visibility"], "no_phone")
+        self.assertEqual(row["condition"], "")
         self.assertEqual(row["source_url"], candidate["url"])
         self.assertEqual(row["image_urls"], candidate["images"][0])
+
+    def test_sync_preserves_review_hold_for_same_source(self):
+        with tempfile.TemporaryDirectory() as folder:
+            path = Path(folder) / "feed.csv"
+            held = {"id": "sebu-251", "source_site": "Sebu", "source_url": "https://sebu.co.ke/watch", "status": "rejected", "sync_visibility": "foreign_gallery", "sync_visibility_reason": "Reviewed source photo mismatch"}
+            with path.open("w", newline="") as handle:
+                writer = csv.DictWriter(handle, fieldnames=list(held))
+                writer.writeheader(); writer.writerow(held)
+            incoming = {**held, "status": "pending", "sync_visibility": "no_phone", "sync_visibility_reason": "Public seller phone required"}
+            sebu_scrape.merge_csv(path, [incoming], False)
+            with path.open() as handle:
+                saved = next(csv.DictReader(handle))
+            self.assertEqual(saved["status"], "rejected")
+            self.assertEqual(saved["sync_visibility"], "foreign_gallery")
+            self.assertEqual(saved["sync_visibility_reason"], held["sync_visibility_reason"])
 
     def test_redacts_contact_details_from_cached_description(self):
         cleaned = sebu_scrape.redact_contact_details(

@@ -65,6 +65,7 @@ CSV_FIELDS = [
     "source_availability", "source_availability_checked_at",
     "source_http_status", "source_unavailable_reason", "source_last_seen_at",
     "source_resolved_url",
+    "sync_visibility", "sync_visibility_reason",
 ]
 SITEMAP_NS = {
     "sm": "http://www.sitemaps.org/schemas/sitemap/0.9",
@@ -310,7 +311,7 @@ def candidate_to_csv(candidate: dict[str, Any], checked_at: str) -> dict[str, st
     row = {field: "" for field in CSV_FIELDS}
     row.update({
         "id": f"sebu-{stable_id}",
-        "status": "published",
+        "status": "pending",
         "target_surface": target_surface,
         "app_category": app_category,
         "app_subcategory": infer_subcategory(candidate, app_category),
@@ -331,13 +332,15 @@ def candidate_to_csv(candidate: dict[str, Any], checked_at: str) -> dict[str, st
         "model": clean_text(attributes.get("model")),
         "trim": clean_text(attributes.get("trim")),
         "year": clean_text(attributes.get("year")),
-        "condition": clean_text(attributes.get("condition")) or "used",
+        "condition": clean_text(attributes.get("condition")),
         "transmission": clean_text(attributes.get("transmission")),
         "color": clean_text(attributes.get("color")),
         "attributes": json.dumps(attributes, ensure_ascii=False, separators=(",", ":")),
         "source_availability": "active",
         "source_availability_checked_at": checked_at,
         "source_http_status": "200",
+        "sync_visibility": "no_phone",
+        "sync_visibility_reason": "A complete publicly visible seller phone is required before publication.",
         "source_last_seen_at": checked_at,
         "source_resolved_url": candidate["url"],
     })
@@ -406,6 +409,14 @@ def merge_csv(csv_path: Path, new_rows: list[dict[str, str]], dry_run: bool) -> 
             reader = csv.DictReader(handle)
             fields = list(reader.fieldnames or CSV_FIELDS)
             existing_rows = list(reader)
+    fields = list(dict.fromkeys(fields + CSV_FIELDS))
+    by_url = {str(row.get("source_url") or "").rstrip("/"): row for row in existing_rows}
+    hard_holds = {"reviewed_image_mismatch", "foreign_gallery", "source_identity_mismatch", "foreign_contact", "foreign_seller", "foreign_location"}
+    for row in new_rows:
+        previous = by_url.get(str(row.get("source_url") or "").rstrip("/"), {})
+        if previous.get("sync_visibility") in hard_holds:
+            row.update(status="rejected", sync_visibility=previous["sync_visibility"],
+                       sync_visibility_reason=previous.get("sync_visibility_reason") or "Preserved source review hold")
     preserved = [
         {key: "\n".join(line.rstrip() for line in str(value or "").splitlines()).strip() for key, value in row.items()}
         for row in existing_rows

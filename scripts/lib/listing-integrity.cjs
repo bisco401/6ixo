@@ -1,6 +1,6 @@
 // Shared by the browser, repair tool and generated n8n workflows. No DOM/URL globals required.
 function createListingIntegrity() {
-  const VERSION = '2026-10-22.2';
+  const VERSION = '2026-10-24.1';
   const decode = (value = '') => String(value || '').replace(/\\u002f/gi, '/').replace(/\\u0026/gi, '&').replace(/\\\//g, '/').replace(/&amp;/gi, '&').replace(/&quot;|&#34;/gi, '"').replace(/&#39;|&apos;/gi, "'");
   const key = (value = '') => decode(value).trim().replace(/^https?:\/\/(?:www\.)?/i, '').replace(/[?#].*$/, '').replace(/\/$/, '').toLowerCase();
   // Ad IDs survive edits to the human-readable portion of a source URL.
@@ -86,6 +86,7 @@ function createListingIntegrity() {
   const route = (category, subcategory = 'other', reason = 'source_category') => ({ target_surface: category === 'vehicles' ? 'vehicles' : 'marketplace', app_category: category, app_subcategory: subcategory, reason });
   const titleRoute = (value = '') => {
     const t = decode(value).toLowerCase();
+    if (/\b(?:looking\s+to\s+sell\s+(?:a|your)\s+car|sell\s+your\s+car)\b/.test(t) && /\b(?:cash|towing)\b/.test(t)) return route('services', 'other', 'title_intent');
     // Intent in the title outranks a provider's broad product category.
     // Buying physical goods is a buying service, not financial/legal advice.
     if (/\b(?:cash (?:for|4) (?:gold|silver|platinum|diamonds?|jewell?ery)|(?:gold|silver|platinum|gift cards?).{0,50}buyers?)\b/.test(t)) return route('services', 'other', 'title_intent');

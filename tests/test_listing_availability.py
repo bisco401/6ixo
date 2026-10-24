@@ -1,5 +1,10 @@
 import importlib.util
 import pathlib
+import csv
+import hashlib
+import tempfile
+from types import SimpleNamespace
+from unittest.mock import patch
 import unittest
 
 spec = importlib.util.spec_from_file_location("availability", pathlib.Path(__file__).resolve().parents[1] / "scripts/check-listing-availability.py")
@@ -10,6 +15,23 @@ spec.loader.exec_module(module)
 class AvailabilityTest(unittest.TestCase):
     def setUp(self):
         self.row = {"title": "Toyota Corolla 2022", "source_url": "https://example.com/car/1", "status": "published"}
+
+    def test_cache_retains_exact_response_for_detail_comparison(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root = pathlib.Path(folder)
+            feed = root / "feed.csv"
+            with feed.open("w", newline="") as handle:
+                writer = csv.DictWriter(handle, fieldnames=list(self.row))
+                writer.writeheader(); writer.writerow(self.row)
+            body = '<title>Toyota Corolla 2022</title><h1>Toyota Corolla 2022</h1>\n<p>Source specifications</p>'
+            args = ["check", "--files", str(feed), "--cache-dir", str(root / "cache"), "--report", str(root / "report.json"), "--dry-run"]
+            with patch("sys.argv", args), patch.object(module.requests, "get", return_value=SimpleNamespace(status_code=200, text=body, url=self.row["source_url"])):
+                module.main()
+            cached = root / "cache" / (hashlib.sha256(self.row["source_url"].encode()).hexdigest() + ".html")
+            self.assertEqual(cached.read_text(), body)
+            with patch("sys.argv", args), patch.object(module.requests, "get", side_effect=AssertionError("Cached status must not refetch")):
+                module.main()
+            self.assertEqual(cached.read_text(), body)
 
     def test_errors_are_not_removals(self):
         for code in (0, 403, 429, 500):

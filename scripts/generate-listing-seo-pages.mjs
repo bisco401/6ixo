@@ -100,12 +100,11 @@ export async function generate(root = ROOT) {
   rows.sort((a, b) => (Date.parse(b.scraped_at) || 0) - (Date.parse(a.scraped_at) || 0));
   const seen = new Set(), usedSlugs = new Set(), titles = new Set(), descriptions = new Set(), listings = [];
   for (const original of rows) {
-    if (clean(original.status).toLowerCase() !== 'published') continue;
-    if (/^(hidden|suppressed|removed|no_source_photo)$/.test(clean(original.sync_visibility).toLowerCase()) || /^(unavailable|removed|sold|expired|gone)$/.test(clean(original.source_availability).toLowerCase())) continue;
-    const sourceKey = integrity.key(original.source_url || '');
+    const corrected = integrity.applyRepair(original, integrity.resolveRepair(original, repairs));
+    if (clean(corrected.status).toLowerCase() !== 'published' || integrity.publicationIssue(corrected)) continue;
+    if (/^(hidden|suppressed|removed|no_source_photo)$/.test(clean(corrected.sync_visibility).toLowerCase()) || /^(unavailable|removed|sold|expired|gone)$/.test(clean(corrected.source_availability).toLowerCase())) continue;
+    const sourceKey = integrity.key(integrity.sourceUrl(corrected));
     if (/^(sold|unavailable|removed|expired|gone)$/.test(clean(availability[sourceKey]?.availability))) continue;
-    const repair = repairs[sourceKey] || {};
-    const corrected = { ...original, ...(repair.replacementCity ? { city: repair.replacementCity } : {}), ...(repair.images?.length ? { image_files: '', image_urls: repair.images.join('|') } : {}) };
     const row = { ...corrected, ...integrity.classify(corrected) };
     row.id = clean(row.id); row.title = clean(text(row.title)); row.description = text(row.description);
     if (!row.id || !row.title || clean(row.description).length < 30) continue;

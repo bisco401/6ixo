@@ -2,6 +2,8 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const vm = require('node:vm');
 const integrity = require('./lib/listing-integrity.cjs');
+assert.equal(integrity.classify({ title: 'Looking To Sell A Car? Get Cash And Towing FREE!', source_url: 'https://www.kijiji.ca/v-other-auto-parts-and-accessories/hamilton/cash/1745000000', app_category: 'vehicles', app_subcategory: 'auto_parts' }).app_category, 'services', 'Vehicle buying and towing ads do not enter parts inventory');
+assert.equal(integrity.classify({ title: '2015 Toyota Corolla - cash offers only', app_category: 'vehicles', app_subcategory: 'vehicles' }).app_category, 'vehicles', 'A vehicle asking for cash offers remains inventory');
 const odometerRow = { source_url: 'https://newyork.craigslist.org/cto/d/own-car/123.html', mileage_km: '', attributes: JSON.stringify({ mileageKm: '102,519', sourceSpecifications: [{ label: 'Odometer (source units)', value: '102,519' }, { label: 'Odometer (source units)', value: '102,519 km' }], details: [{ label: 'Odometer (source units)', value: '102,519', key: 'mileageKm' }, { label: 'Mileage', value: '102,519 km', key: 'mileageKm' }, { label: 'VIN', value: 'source-vin' }] }) };
 const literalOdometer = integrity.applyRepair(odometerRow);
 assert.equal(JSON.parse(literalOdometer.attributes).mileageKm, undefined, 'An upstream odometer alias cannot invent kilometre units');

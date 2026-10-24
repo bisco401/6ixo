@@ -1,5 +1,5 @@
 {
-  "count": 3643,
+  "count": 3619,
   "listings": [
     {
       "id": "apify-b9b18084f762",
@@ -4935,46 +4935,6 @@
       "categoryKey": "real-estate"
     },
     {
-      "id": "kijiji-1745173605",
-      "slug": "3-piece-furniture-for-sale-1745173605",
-      "url": "https://6ixo.com/listing/3-piece-furniture-for-sale-1745173605/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/c2/c22f65f2-6725-4558-8180-fdbd115063ae?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/b5/b5fc4dbb-9795-4d90-afdd-4e287c22ea4a?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/37/3732cba7-b11f-4c4e-b02f-8b336316a670?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/05/05f8ca06-4d64-4abc-8632-3a71f254e8df?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/c7/c7d42f8a-bdcf-4fa8-a648-a20ff0e897ee?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "buy-and-sell"
-    },
-    {
-      "id": "kijiji-1745173538",
-      "slug": "men-s-leather-jacket-for-sale-1745173538",
-      "url": "https://6ixo.com/listing/men-s-leather-jacket-for-sale-1745173538/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/8c/8c935412-a6dd-44b4-b573-be1166d0ae93?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/df/dfb2372c-4551-4dd2-9703-902076678e96?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/8e/8e44b300-35be-4bb8-9c35-9ed288c6eeab?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "fashion"
-    },
-    {
-      "id": "kijiji-1745173452",
-      "slug": "men-s-jeans-and-shorts-for-sale-1745173452",
-      "url": "https://6ixo.com/listing/men-s-jeans-and-shorts-for-sale-1745173452/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/c9/c9901a3d-9b4e-4412-a9b8-3fab0088bf9c?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/a1/a1879cf5-bddd-48d9-8e29-c1f59ae71f4a?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/71/711dc820-e56c-454b-8caf-5a9a43721569?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/3f/3f4bf97e-4735-43df-8bcb-7e8a487ac43e?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/89/8951a875-736f-419a-9805-1e91912272ad?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/47/477230db-3532-4211-af38-b7acae7704ab?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/12/128f97f4-c08f-42b7-bacb-509a96a67529?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/6d/6d486eea-0912-4e09-bb78-4c099a0537d0?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "fashion"
-    },
-    {
       "id": "kijiji-1745173325",
       "slug": "property-management-needed-asap-1745173325",
       "url": "https://6ixo.com/listing/property-management-needed-asap-1745173325/",
@@ -5047,22 +5007,6 @@
         "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/b1/b1597b30-723d-4421-a587-9a01f7d826c6?rule=kijijica-1600-webp",
         "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/d1/d19df961-96a6-485d-ae3a-b8e2800bc5e8?rule=kijijica-1600-webp",
         "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/1b/1b7066a3-433b-4864-9c35-7184754d5988?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "buy-and-sell"
-    },
-    {
-      "id": "kijiji-1745173192",
-      "slug": "amana-washer-can-deliver-1745173192",
-      "url": "https://6ixo.com/listing/amana-washer-can-deliver-1745173192/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/ac/ac04c6ae-47fa-490e-99ac-87ac1538b9f1?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/1e/1e102664-0fa0-4a0e-9ff3-6fc1e5ae202b?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/81/817f2de9-ab31-4e30-9e70-65237e903dd9?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/97/974b6319-0686-41bf-9e13-89b2481b05ee?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/6c/6cbd05ba-1126-4aa2-9949-7b03296afc98?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/e6/e60aa937-cc5b-419d-bc9f-8469ac8b7a65?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/50/50f630db-ecb1-49ca-a582-cd806689423d?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/a5/a57504e5-3e5a-4473-8713-709a6396dbef?rule=kijijica-1600-webp"
       ],
       "categoryKey": "buy-and-sell"
     },
@@ -5240,18 +5184,6 @@
       "categoryKey": "jobs"
     },
     {
-      "id": "kijiji-1745171388",
-      "slug": "start-your-own-business-with-government-funded-training-1745171388",
-      "url": "https://6ixo.com/listing/start-your-own-business-with-government-funded-training-1745171388/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/1f/1f9669d9-15ba-4983-89a3-17b44155de7d?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/54/5478b03e-cd77-47b1-b844-d57d7ae9c758?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/4e/4eda35fe-7b62-4872-9ceb-8356c3693824?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/d1/d125f7ab-e3b2-4246-80d1-df7464a25668?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "community"
-    },
-    {
       "id": "kijiji-1745171133",
       "slug": "virtual-office-private-office-co-working-space-meeting-roo-1745171133",
       "url": "https://6ixo.com/listing/virtual-office-private-office-co-working-space-meeting-roo-1745171133/",
@@ -5265,15 +5197,6 @@
         "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/1d/1ded778d-bd9d-4819-8d64-1a8375c33661?rule=kijijica-1600-webp",
         "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/08/082f2805-bd4b-4501-ad90-03b4bc47a8bf?rule=kijijica-1600-webp",
         "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/87/87b919a2-f25f-41cf-bfd4-563185d0e96e?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "community"
-    },
-    {
-      "id": "kijiji-1745171060",
-      "slug": "commence-ton-permis-aujourd-hui-1745171060",
-      "url": "https://6ixo.com/listing/commence-ton-permis-aujourd-hui-1745171060/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/55/55020bf2-3e13-428d-a5eb-2adced4bb12c?rule=kijijica-1600-webp"
       ],
       "categoryKey": "community"
     },
@@ -14276,15 +14199,6 @@
       "categoryKey": "real-estate"
     },
     {
-      "id": "kijiji-1745007723",
-      "slug": "momo-alloys-brand-new-1745007723",
-      "url": "https://6ixo.com/listing/momo-alloys-brand-new-1745007723/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/54/5471d4c2-744e-4602-8954-f5566a405328?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "auto-parts"
-    },
-    {
       "id": "kijiji-1745007690",
       "slug": "oct-deals-get-an-a-c-quote-that-includes-rebates-options-2-1745007690",
       "url": "https://6ixo.com/listing/oct-deals-get-an-a-c-quote-that-includes-rebates-options-2-1745007690/",
@@ -19739,30 +19653,6 @@
       "categoryKey": "vehicles"
     },
     {
-      "id": "craigslist-87oQiMJyknSmAbdHbDwDcG",
-      "slug": "2015-nissan-nv200s-abdhbdwdcg",
-      "url": "https://6ixo.com/listing/2015-nissan-nv200s-abdhbdwdcg/",
-      "images": [
-        "https://images.craigslist.org/00404_3UQsd9BsUbZ_0kE0fu_600x450.jpg",
-        "https://images.craigslist.org/00101_js0mEskqdno_0kE0fu_600x450.jpg",
-        "https://images.craigslist.org/00S0S_l0Uv59eDf8L_0kE0fu_600x450.jpg",
-        "https://images.craigslist.org/00i0i_aG17wY2GIOT_0kE0fu_600x450.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "craigslist-jYQMzsC8tbwzqsCSRzw6A9",
-      "slug": "2017-gmc-acadia-limited-qscsrzw6a9",
-      "url": "https://6ixo.com/listing/2017-gmc-acadia-limited-qscsrzw6a9/",
-      "images": [
-        "https://images.craigslist.org/00p0p_eDgyUqjxNRi_0kE0fu_600x450.jpg",
-        "https://images.craigslist.org/01717_3TmgIgRQdlc_0kE0fu_600x450.jpg",
-        "https://images.craigslist.org/00U0U_6XIsyQ5aBVP_0kE0fu_600x450.jpg",
-        "https://images.craigslist.org/01515_csVAqCivXeW_0kE0fu_600x450.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
       "id": "craigslist-Iv0jiCPI8RG6tcsvKUC7Iw",
       "slug": "2015-acura-mdx-financing-available-tcsvkuc7iw",
       "url": "https://6ixo.com/listing/2015-acura-mdx-financing-available-tcsvkuc7iw/",
@@ -19771,18 +19661,6 @@
         "https://images.craigslist.org/00O0O_1UFfrFmRPJe_0jh0ew_600x450.jpg",
         "https://images.craigslist.org/00N0N_dBjktUiK331_0gP0dr_600x450.jpg",
         "https://images.craigslist.org/00606_3zXf3M6890s_0jh0ew_600x450.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "craigslist-5BxoTTNV8txneU9gaMWyCp",
-      "slug": "2016-ram-1500-slt-eu9gamwycp",
-      "url": "https://6ixo.com/listing/2016-ram-1500-slt-eu9gamwycp/",
-      "images": [
-        "https://images.craigslist.org/00G0G_2YnYUXT35yC_0kE0fu_600x450.jpg",
-        "https://images.craigslist.org/00G0G_3uLFcTYmeiF_0kE0fu_600x450.jpg",
-        "https://images.craigslist.org/01111_1gAXSwU0e4e_0kE0fu_600x450.jpg",
-        "https://images.craigslist.org/00u0u_jAYbWFPpdbr_0kE0fu_600x450.jpg"
       ],
       "categoryKey": "vehicles"
     },
@@ -25405,15 +25283,6 @@
       "url": "https://6ixo.com/listing/2025-forthing-u-tour-adubai2064/",
       "images": [
         "https://storage.albacars.ae/vehicles/35a4efeb-818a-4fa4-a820-d4bc9a87c279/c47edd4e-2b9d-4b66-a3a9-d9e2b198cd4f.jpeg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "alba-dubai-2062",
-      "slug": "2026-used-jetour-t1-flagship-adubai2062",
-      "url": "https://6ixo.com/listing/2026-used-jetour-t1-flagship-adubai2062/",
-      "images": [
-        "https://storage.albacars.ae/vehicles/drafts/2062/1.jpg"
       ],
       "categoryKey": "vehicles"
     },
@@ -32423,16 +32292,6 @@
       "categoryKey": "services"
     },
     {
-      "id": "apify-b6c59079b853",
-      "slug": "2018-accord-sports-c59079b853",
-      "url": "https://6ixo.com/listing/2018-accord-sports-c59079b853/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/2018-accord-sports-99M69o4-1790854704-0-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/2018-accord-sports-99M69o4-1790854704-1-medium.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
       "id": "apify-59951a845d29",
       "slug": "calico-container-shop-951a845d29",
       "url": "https://6ixo.com/listing/calico-container-shop-951a845d29/",
@@ -32442,7 +32301,7 @@
         "https://oxglow.com.gh/uploads/medium/calico-container-shop-Q6ky8h6-1790853959-2-medium.jpg",
         "https://oxglow.com.gh/uploads/medium/calico-container-shop-Q6ky8h6-1790853959-3-medium.jpg"
       ],
-      "categoryKey": "real-estate"
+      "categoryKey": "buy-and-sell"
     },
     {
       "id": "kijiji-1744213051",
@@ -33345,30 +33204,6 @@
       "categoryKey": "electronics"
     },
     {
-      "id": "craigslist-DgZk2mu38RGX7eqRUjN5HQ",
-      "slug": "used-2021-jeep-gladiator-4wd-4d-crew-cab-truck-mojave-7eqrujn5hq",
-      "url": "https://6ixo.com/listing/used-2021-jeep-gladiator-4wd-4d-crew-cab-truck-mojave-7eqrujn5hq/",
-      "images": [
-        "https://images.craigslist.org/01212_dfLM9OJa8Tl_0hk0co_600x450.jpg",
-        "https://images.craigslist.org/01313_d9p7FaQFrVD_0hk0co_600x450.jpg",
-        "https://images.craigslist.org/00606_lcwFCEctSMc_0hk0co_600x450.jpg",
-        "https://images.craigslist.org/01313_3wv4I8y3bMe_0gw0co_600x450.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "craigslist-Ll1EFmq38RGw5LYVSAMV_g",
-      "slug": "used-2024-mitsubishi-mirage-fwd-4d-hatchback-hatchback-es-w5lyvsamvg",
-      "url": "https://6ixo.com/listing/used-2024-mitsubishi-mirage-fwd-4d-hatchback-hatchback-es-w5lyvsamvg/",
-      "images": [
-        "https://images.craigslist.org/00X0X_ccVxXfr8PrD_0hk0co_600x450.jpg",
-        "https://images.craigslist.org/00K0K_bEAWonPpwcY_0hk0co_600x450.jpg",
-        "https://images.craigslist.org/00606_lcwFCEctSMc_0hk0co_600x450.jpg",
-        "https://images.craigslist.org/00X0X_9Fm9VyF8NPC_0gw0co_600x450.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
       "id": "craigslist-feDpmQcjXjD8Q1zEGSVzhT",
       "slug": "98-silverado-pickup-truck-extended-cab-q1zegsvzht",
       "url": "https://6ixo.com/listing/98-silverado-pickup-truck-extended-cab-q1zegsvzht/",
@@ -33504,18 +33339,6 @@
         "https://images.craigslist.org/00h0h_bgvVkMxP8dn_0t20CI_600x450.jpg",
         "https://images.craigslist.org/00k0k_l0DvnCPUyYn_0t20CI_600x450.jpg",
         "https://images.craigslist.org/00808_imqwEkrol57_0t20CI_600x450.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "craigslist-bzManW6LMsmGGKcATob1jq",
-      "slug": "2017-gmc-yukon-denali-gkcatob1jq",
-      "url": "https://6ixo.com/listing/2017-gmc-yukon-denali-gkcatob1jq/",
-      "images": [
-        "https://images.craigslist.org/00l0l_71JrxK9vBDg_0x20oM_600x450.jpg",
-        "https://images.craigslist.org/00C0C_4ovvlXo2qRA_0x20oM_600x450.jpg",
-        "https://images.craigslist.org/00202_cgNRF7FJ49q_0x20oM_600x450.jpg",
-        "https://images.craigslist.org/00O0O_aiU6sMwLxVx_0x20oM_600x450.jpg"
       ],
       "categoryKey": "vehicles"
     },
@@ -33680,30 +33503,6 @@
       "categoryKey": "services"
     },
     {
-      "id": "craigslist-vj0kQ1a38RGMwbm4biwgXg",
-      "slug": "2024-mercedes-benz-gls-gls-450-suv-white-wbm4biwgxg",
-      "url": "https://6ixo.com/listing/2024-mercedes-benz-gls-gls-450-suv-white-wbm4biwgxg/",
-      "images": [
-        "https://images.craigslist.org/00Q0Q_53aRIg4uGQB_0ak07K_600x450.jpg",
-        "https://images.craigslist.org/00a0a_cDxTEQcATMe_0ak07K_600x450.jpg",
-        "https://images.craigslist.org/00b0b_5K1wDd9Bg9w_0ak07K_600x450.jpg",
-        "https://images.craigslist.org/00O0O_7h6Uhevri3e_0ak07K_600x450.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "craigslist-ZMT2T0-38RGcZfbkf0V1aw",
-      "slug": "2023-chevy-chevrolet-suburban-high-country-suv-black-zfbkf0v1aw",
-      "url": "https://6ixo.com/listing/2023-chevy-chevrolet-suburban-high-country-suv-black-zfbkf0v1aw/",
-      "images": [
-        "https://images.craigslist.org/00r0r_6rxfBYgINvt_0ak07K_600x450.jpg",
-        "https://images.craigslist.org/00X0X_el1jDBkGQ8v_0ak07K_600x450.jpg",
-        "https://images.craigslist.org/00S0S_a2HRKvWMENn_0ak07K_600x450.jpg",
-        "https://images.craigslist.org/00y0y_2nV4jiFQLm9_0ak07K_600x450.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
       "id": "craigslist-iS9SDrfEGmshQRLyHqN5L5",
       "slug": "chevy-bed-cover-qrlyhqn5l5",
       "url": "https://6ixo.com/listing/chevy-bed-cover-qrlyhqn5l5/",
@@ -33808,18 +33607,6 @@
         "https://images.craigslist.org/00H0H_aB6Mx1up390_0jm0ew_600x450.jpg",
         "https://images.craigslist.org/00q0q_cWClno7P8dc_0jm0ew_600x450.jpg",
         "https://images.craigslist.org/00C0C_ptVulvbxmK_0jm0ew_600x450.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "craigslist-LD8f_3C38RGw5LYVSAMV_g",
-      "slug": "chevrolet-cruze-cash-w5lyvsamvg",
-      "url": "https://6ixo.com/listing/chevrolet-cruze-cash-w5lyvsamvg/",
-      "images": [
-        "https://images.craigslist.org/00v0v_8sQCg3cPNcv_0jm0ew_600x450.jpg",
-        "https://images.craigslist.org/01717_fq5tklJ0iOG_0jm0ew_600x450.jpg",
-        "https://images.craigslist.org/00f0f_hdipCtirLUw_0jm0ew_600x450.jpg",
-        "https://images.craigslist.org/00P0P_2br06AhKkGZ_0jm0ew_600x450.jpg"
       ],
       "categoryKey": "vehicles"
     },
@@ -33975,18 +33762,6 @@
         "https://images.craigslist.org/00F0F_5eTvp9mDa0Cz_0pO0jm_600x450.jpg"
       ],
       "categoryKey": "electronics"
-    },
-    {
-      "id": "craigslist-kRye4FDXveTQQKSV1ZkHAc",
-      "slug": "rv-van-camper-overland-lithium-battery-upgrade-sale-going--qksv1zkhac",
-      "url": "https://6ixo.com/listing/rv-van-camper-overland-lithium-battery-upgrade-sale-going--qksv1zkhac/",
-      "images": [
-        "https://images.craigslist.org/01111_jLxpgz7QF0A_0jm0iA_600x450.jpg",
-        "https://images.craigslist.org/00M0M_3rxxza0Rotx_0jm0j4_600x450.jpg",
-        "https://images.craigslist.org/01515_cIxWflIUT8T_0jm0jn_600x450.jpg",
-        "https://images.craigslist.org/00o0o_7qD9e5U8J9G_0jm0jm_600x450.jpg"
-      ],
-      "categoryKey": "auto-parts"
     },
     {
       "id": "craigslist-3pPa4YLnq9nxiCky5Bp3ti",
@@ -34521,16 +34296,6 @@
         "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/60/60d2f682-b79b-41be-b2d9-b94f8f95ebce?rule=kijijica-1600-webp",
         "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/e8/e863b575-4a16-4d54-a104-4453e7dc3ca7?rule=kijijica-1600-webp",
         "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/1b/1b3d2137-a506-4295-9839-e4bc41905d65?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "real-estate"
-    },
-    {
-      "id": "kijiji-1744192556",
-      "slug": "basement-room-rental-1-room-1-full-washroom-brampton-1744192556",
-      "url": "https://6ixo.com/listing/basement-room-rental-1-room-1-full-washroom-brampton-1744192556/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/5d/5d4649d6-5ecf-4e5f-913f-3336fe06a821?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/06/06b077d8-a5e5-4af4-9c3f-757a800f2716?rule=kijijica-1600-webp"
       ],
       "categoryKey": "real-estate"
     },
@@ -35073,16 +34838,6 @@
       "categoryKey": "vehicles"
     },
     {
-      "id": "apify-505250e9e85d",
-      "slug": "honda-cl500-5250e9e85d",
-      "url": "https://6ixo.com/listing/honda-cl500-5250e9e85d/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/honda-cl500-Z708xJ4-1790767952-1-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/honda-cl500-Z708xJ4-1790767952-0-medium.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
       "id": "apify-dbca7ec54027",
       "slug": "sony-play-station-5-ca7ec54027",
       "url": "https://6ixo.com/listing/sony-play-station-5-ca7ec54027/",
@@ -35112,18 +34867,6 @@
         "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/02/02530999-2919-4c99-abba-e7943ce0cfaf?rule=kijijica-1600-webp"
       ],
       "categoryKey": "real-estate"
-    },
-    {
-      "id": "apify-6d67e36b6582",
-      "slug": "hyundai-veloster-67e36b6582",
-      "url": "https://6ixo.com/listing/hyundai-veloster-67e36b6582/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/hyundai-veloster-MQ390Q-1790763998-0-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/hyundai-veloster-MQ390Q-1790763999-1-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/hyundai-veloster-MQ390Q-1790763999-2-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/hyundai-veloster-MQ390Q-1790763999-3-medium.jpg"
-      ],
-      "categoryKey": "vehicles"
     },
     {
       "id": "kijiji-1744166753",
@@ -36625,27 +36368,6 @@
         "https://oxglow.com.gh/uploads/medium/fully-furnished-room-self-contained-apartment-to-let-5h4y8nV-1789725893-2-medium.jpg"
       ],
       "categoryKey": "real-estate"
-    },
-    {
-      "id": "apify-8cbd8f534c2a",
-      "slug": "portable-solar-panel-charger-bd8f534c2a",
-      "url": "https://6ixo.com/listing/portable-solar-panel-charger-bd8f534c2a/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/portable-solar-panel-charger-8D6APF6-1789725455-0-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/portable-solar-panel-charger-8D6APF6-1789725455-1-medium.jpg"
-      ],
-      "categoryKey": "electronics"
-    },
-    {
-      "id": "apify-9d51a50ddd45",
-      "slug": "canon-eos-r-51a50ddd45",
-      "url": "https://6ixo.com/listing/canon-eos-r-51a50ddd45/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/canon-eos-r-F297b5-1789725044-1-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/canon-eos-r-F297b5-1789725044-0-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/canon-eos-r-F297b5-1789725044-2-medium.jpg"
-      ],
-      "categoryKey": "electronics"
     },
     {
       "id": "apify-b908f462c8e1",
@@ -45153,9 +44875,6 @@
       "url": "https://6ixo.com/listings/page/101/"
     },
     {
-      "url": "https://6ixo.com/listings/page/102/"
-    },
-    {
       "url": "https://6ixo.com/listings/electronics/"
     },
     {
@@ -45747,6 +45466,9 @@
       "url": "https://6ixo.com/listings/country/ghana/services/"
     },
     {
+      "url": "https://6ixo.com/listings/country/ghana/buy-and-sell/"
+    },
+    {
       "url": "https://6ixo.com/listings/country/ghana/"
     },
     {
@@ -46054,9 +45776,6 @@
     },
     {
       "url": "https://6ixo.com/listings/country/united-states/page/22/"
-    },
-    {
-      "url": "https://6ixo.com/listings/country/united-states/page/23/"
     },
     {
       "url": "https://6ixo.com/apartments-for-rent/"
@@ -52415,6 +52134,126 @@
       "id": "jacars-2510939",
       "slug": "15-inch-rims-and-5-lugs-ars2510939",
       "url": "https://6ixo.com/listing/15-inch-rims-and-5-lugs-ars2510939/"
+    },
+    {
+      "id": "kijiji-1745173605",
+      "slug": "3-piece-furniture-for-sale-1745173605",
+      "url": "https://6ixo.com/listing/3-piece-furniture-for-sale-1745173605/"
+    },
+    {
+      "id": "kijiji-1745173538",
+      "slug": "men-s-leather-jacket-for-sale-1745173538",
+      "url": "https://6ixo.com/listing/men-s-leather-jacket-for-sale-1745173538/"
+    },
+    {
+      "id": "kijiji-1745173452",
+      "slug": "men-s-jeans-and-shorts-for-sale-1745173452",
+      "url": "https://6ixo.com/listing/men-s-jeans-and-shorts-for-sale-1745173452/"
+    },
+    {
+      "id": "kijiji-1745173192",
+      "slug": "amana-washer-can-deliver-1745173192",
+      "url": "https://6ixo.com/listing/amana-washer-can-deliver-1745173192/"
+    },
+    {
+      "id": "kijiji-1745171388",
+      "slug": "start-your-own-business-with-government-funded-training-1745171388",
+      "url": "https://6ixo.com/listing/start-your-own-business-with-government-funded-training-1745171388/"
+    },
+    {
+      "id": "kijiji-1745171060",
+      "slug": "commence-ton-permis-aujourd-hui-1745171060",
+      "url": "https://6ixo.com/listing/commence-ton-permis-aujourd-hui-1745171060/"
+    },
+    {
+      "id": "kijiji-1745007723",
+      "slug": "momo-alloys-brand-new-1745007723",
+      "url": "https://6ixo.com/listing/momo-alloys-brand-new-1745007723/"
+    },
+    {
+      "id": "craigslist-87oQiMJyknSmAbdHbDwDcG",
+      "slug": "2015-nissan-nv200s-abdhbdwdcg",
+      "url": "https://6ixo.com/listing/2015-nissan-nv200s-abdhbdwdcg/"
+    },
+    {
+      "id": "craigslist-jYQMzsC8tbwzqsCSRzw6A9",
+      "slug": "2017-gmc-acadia-limited-qscsrzw6a9",
+      "url": "https://6ixo.com/listing/2017-gmc-acadia-limited-qscsrzw6a9/"
+    },
+    {
+      "id": "craigslist-5BxoTTNV8txneU9gaMWyCp",
+      "slug": "2016-ram-1500-slt-eu9gamwycp",
+      "url": "https://6ixo.com/listing/2016-ram-1500-slt-eu9gamwycp/"
+    },
+    {
+      "id": "alba-dubai-2062",
+      "slug": "2026-used-jetour-t1-flagship-adubai2062",
+      "url": "https://6ixo.com/listing/2026-used-jetour-t1-flagship-adubai2062/"
+    },
+    {
+      "id": "apify-b6c59079b853",
+      "slug": "2018-accord-sports-c59079b853",
+      "url": "https://6ixo.com/listing/2018-accord-sports-c59079b853/"
+    },
+    {
+      "id": "craigslist-DgZk2mu38RGX7eqRUjN5HQ",
+      "slug": "used-2021-jeep-gladiator-4wd-4d-crew-cab-truck-mojave-7eqrujn5hq",
+      "url": "https://6ixo.com/listing/used-2021-jeep-gladiator-4wd-4d-crew-cab-truck-mojave-7eqrujn5hq/"
+    },
+    {
+      "id": "craigslist-Ll1EFmq38RGw5LYVSAMV_g",
+      "slug": "used-2024-mitsubishi-mirage-fwd-4d-hatchback-hatchback-es-w5lyvsamvg",
+      "url": "https://6ixo.com/listing/used-2024-mitsubishi-mirage-fwd-4d-hatchback-hatchback-es-w5lyvsamvg/"
+    },
+    {
+      "id": "craigslist-bzManW6LMsmGGKcATob1jq",
+      "slug": "2017-gmc-yukon-denali-gkcatob1jq",
+      "url": "https://6ixo.com/listing/2017-gmc-yukon-denali-gkcatob1jq/"
+    },
+    {
+      "id": "craigslist-vj0kQ1a38RGMwbm4biwgXg",
+      "slug": "2024-mercedes-benz-gls-gls-450-suv-white-wbm4biwgxg",
+      "url": "https://6ixo.com/listing/2024-mercedes-benz-gls-gls-450-suv-white-wbm4biwgxg/"
+    },
+    {
+      "id": "craigslist-ZMT2T0-38RGcZfbkf0V1aw",
+      "slug": "2023-chevy-chevrolet-suburban-high-country-suv-black-zfbkf0v1aw",
+      "url": "https://6ixo.com/listing/2023-chevy-chevrolet-suburban-high-country-suv-black-zfbkf0v1aw/"
+    },
+    {
+      "id": "craigslist-LD8f_3C38RGw5LYVSAMV_g",
+      "slug": "chevrolet-cruze-cash-w5lyvsamvg",
+      "url": "https://6ixo.com/listing/chevrolet-cruze-cash-w5lyvsamvg/"
+    },
+    {
+      "id": "craigslist-kRye4FDXveTQQKSV1ZkHAc",
+      "slug": "rv-van-camper-overland-lithium-battery-upgrade-sale-going--qksv1zkhac",
+      "url": "https://6ixo.com/listing/rv-van-camper-overland-lithium-battery-upgrade-sale-going--qksv1zkhac/"
+    },
+    {
+      "id": "kijiji-1744192556",
+      "slug": "basement-room-rental-1-room-1-full-washroom-brampton-1744192556",
+      "url": "https://6ixo.com/listing/basement-room-rental-1-room-1-full-washroom-brampton-1744192556/"
+    },
+    {
+      "id": "apify-505250e9e85d",
+      "slug": "honda-cl500-5250e9e85d",
+      "url": "https://6ixo.com/listing/honda-cl500-5250e9e85d/"
+    },
+    {
+      "id": "apify-6d67e36b6582",
+      "slug": "hyundai-veloster-67e36b6582",
+      "url": "https://6ixo.com/listing/hyundai-veloster-67e36b6582/"
+    },
+    {
+      "id": "apify-8cbd8f534c2a",
+      "slug": "portable-solar-panel-charger-bd8f534c2a",
+      "url": "https://6ixo.com/listing/portable-solar-panel-charger-bd8f534c2a/"
+    },
+    {
+      "id": "apify-9d51a50ddd45",
+      "slug": "canon-eos-r-51a50ddd45",
+      "url": "https://6ixo.com/listing/canon-eos-r-51a50ddd45/"
     }
   ]
 }

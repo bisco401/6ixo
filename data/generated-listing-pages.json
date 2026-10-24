@@ -1,5 +1,5 @@
 {
-  "count": 3623,
+  "count": 3616,
   "listings": [
     {
       "id": "apify-b9b18084f762",
@@ -668,18 +668,6 @@
         "https://images.craigslist.org/00V0V_1HZuZ33hL69_0cg09c_600x450.jpg",
         "https://images.craigslist.org/00b0b_joTRpenABtP_0cg09c_600x450.jpg",
         "https://images.craigslist.org/01111_4to4TPZTb6I_0cg09c_600x450.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "craigslist-wm3HfAXPX2Sk8z3hEXidpJ",
-      "slug": "2007-subaru-forester-premium-awd-only-110k-mi-srvcd-h-gask-8z3hexidpj",
-      "url": "https://6ixo.com/listing/2007-subaru-forester-premium-awd-only-110k-mi-srvcd-h-gask-8z3hexidpj/",
-      "images": [
-        "https://images.craigslist.org/00P0P_49P857YTnX6_0ew0aT_600x450.jpg",
-        "https://images.craigslist.org/00c0c_4vTIjZuvhLt_0eu0aS_600x450.jpg",
-        "https://images.craigslist.org/01515_5PfbYhiFXma_0ew0aT_600x450.jpg",
-        "https://images.craigslist.org/00L0L_jHzWhVZ5Zve_0ew0aT_600x450.jpg"
       ],
       "categoryKey": "vehicles"
     },
@@ -4019,26 +4007,6 @@
       "categoryKey": "real-estate"
     },
     {
-      "id": "kijiji-1745177170",
-      "slug": "view-spacious-private-room-for-rent-in-brampton-near-willi-1745177170",
-      "url": "https://6ixo.com/listing/view-spacious-private-room-for-rent-in-brampton-near-willi-1745177170/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/1f/1f462b34-96f6-434e-8026-ae32b03f0b2a?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/67/67fceaae-460e-415a-9f9c-4e5145053a23?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/24/2458a757-6277-483e-bc59-ede7e43582c9?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/2c/2cab34e1-ffd3-4346-be2a-8b382af8590f?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/29/29222a2f-65a8-4d8f-abaf-91099e34f8fe?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/e3/e307156a-fbbf-43c8-99d3-4f54fc7be05f?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/37/3737f49e-af7d-4cb0-8c40-61bd2561022b?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/8d/8da2ceb7-e50c-4da7-bea6-987d33453b4e?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/33/33756092-63a9-46d4-8462-3bd7a72f32af?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/d8/d82d5c85-ffdb-48e6-9880-3e89201427ba?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/73/73f1b7b9-15a8-4c48-871c-c5b2ce8e384b?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/bd/bd620bdb-945b-474f-a1b7-8f96382e5d75?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "real-estate"
-    },
-    {
       "id": "kijiji-1745177161",
       "slug": "dodge-grand-caravan-2008-cargo-van-1745177161",
       "url": "https://6ixo.com/listing/dodge-grand-caravan-2008-cargo-van-1745177161/",
@@ -6670,17 +6638,6 @@
       "categoryKey": "real-estate"
     },
     {
-      "id": "kijiji-1745108537",
-      "slug": "lg-33-white-french-door-style-fridge-bottom-slide-out-free-1745108537",
-      "url": "https://6ixo.com/listing/lg-33-white-french-door-style-fridge-bottom-slide-out-free-1745108537/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/ae/ae8c64f7-6138-453b-b6aa-dc60c13dfb7d?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/89/89306d78-ffa4-480b-9221-36ade9446b32?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/27/272573a0-cf34-460e-9982-806a4751e603?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "buy-and-sell"
-    },
-    {
       "id": "kijiji-1745107501",
       "slug": "shed-pads-hot-tub-pads-driveways-walkways-best-price-gta-1745107501",
       "url": "https://6ixo.com/listing/shed-pads-hot-tub-pads-driveways-walkways-best-price-gta-1745107501/",
@@ -6789,18 +6746,6 @@
         "https://images.craigslist.org/01212_hXYu7VirqSk_0Cr0t2_600x450.jpg",
         "https://images.craigslist.org/00T0T_i74mmMgxpCS_0Cn0t2_600x450.jpg",
         "https://images.craigslist.org/00t0t_1D0ZEq6xA3c_0Cz0t2_600x450.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "craigslist-3xozekZwgPdM6TyU5rQ97A",
-      "slug": "2017-nissan-sentra-sv-backup-camera-clean-title-nice-6tyu5rq97a",
-      "url": "https://6ixo.com/listing/2017-nissan-sentra-sv-backup-camera-clean-title-nice-6tyu5rq97a/",
-      "images": [
-        "https://images.craigslist.org/00K0K_2D44JNneY8T_0C60t2_600x450.jpg",
-        "https://images.craigslist.org/00D0D_lW58x1xCcp5_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/00P0P_3dRWvB8FOzK_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/00j0j_fwvYxSYh8pF_0CI0t2_600x450.jpg"
       ],
       "categoryKey": "vehicles"
     },
@@ -12196,18 +12141,6 @@
         "https://images.craigslist.org/00K0K_f1E6pOsHOK5_0CI0pO_600x450.jpg",
         "https://images.craigslist.org/00I0I_j9mH2T6ldqZ_0CI0pO_600x450.jpg",
         "https://images.craigslist.org/00J0J_hGa122BNiD9_0CI0pO_600x450.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "craigslist-aKmeaerNourtPZuq1wCYvt",
-      "slug": "2020-kia-soul-lx-wagon-4d-1000-down-pzuq1wcyvt",
-      "url": "https://6ixo.com/listing/2020-kia-soul-lx-wagon-4d-1000-down-pzuq1wcyvt/",
-      "images": [
-        "https://images.craigslist.org/00z0z_dthZZQlzngL_0CI0lM_600x450.jpg",
-        "https://images.craigslist.org/00202_2LjT5sFLmj5_0CI0lM_600x450.jpg",
-        "https://images.craigslist.org/00t0t_dyZ6c3BhRyZ_0CI0lM_600x450.jpg",
-        "https://images.craigslist.org/00X0X_c96fFywsiHn_0CI0lM_600x450.jpg"
       ],
       "categoryKey": "vehicles"
     },
@@ -19557,18 +19490,6 @@
         "https://images.craigslist.org/00G0G_3uLFcTYmeiF_0kE0fu_600x450.jpg",
         "https://images.craigslist.org/01111_1gAXSwU0e4e_0kE0fu_600x450.jpg",
         "https://images.craigslist.org/00u0u_jAYbWFPpdbr_0kE0fu_600x450.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "craigslist-78UEQee2RJrNMuN5A8iexA",
-      "slug": "2018-chevrolet-spark-mun5a8iexa",
-      "url": "https://6ixo.com/listing/2018-chevrolet-spark-mun5a8iexa/",
-      "images": [
-        "https://images.craigslist.org/00P0P_kTXitQPMdKY_0kE0fu_600x450.jpg",
-        "https://images.craigslist.org/00l0l_hTK22fC0ber_0kE0fu_600x450.jpg",
-        "https://images.craigslist.org/00A0A_11EOkMRArR_0kE0fu_600x450.jpg",
-        "https://images.craigslist.org/00L0L_aCWSU11bGEb_0kE0fu_600x450.jpg"
       ],
       "categoryKey": "vehicles"
     },
@@ -32943,18 +32864,6 @@
         "https://images.craigslist.org/00o0o_lmDl5grnaWh_0gw0co_600x450.jpg",
         "https://images.craigslist.org/00T0T_heYbV5eKo7B_0gw0cn_600x450.jpg",
         "https://images.craigslist.org/00O0O_6l4qpvMjtVI_0gw0cn_600x450.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "craigslist-bViatUEgT3aGkWmhgXBcA8",
-      "slug": "2015-cadie-escalade-4x4-kwmhgxbca8",
-      "url": "https://6ixo.com/listing/2015-cadie-escalade-4x4-kwmhgxbca8/",
-      "images": [
-        "https://images.craigslist.org/00u0u_cYAcULIVRAv_0ak07K_600x450.jpg",
-        "https://images.craigslist.org/00B0B_gvUWnQkU7Q_0ak0ik_600x450.jpg",
-        "https://images.craigslist.org/00b0b_156hxy3KEC9_07K0ak_600x450.jpg",
-        "https://images.craigslist.org/00c0c_5fwh5dMIUXZ_0ak0ik_600x450.jpg"
       ],
       "categoryKey": "vehicles"
     },
@@ -52148,6 +52057,41 @@
       "id": "kijiji-1744195796",
       "slug": "204-birchcliffe-crescent-hamilton-1744195796",
       "url": "https://6ixo.com/listing/204-birchcliffe-crescent-hamilton-1744195796/"
+    },
+    {
+      "id": "craigslist-wm3HfAXPX2Sk8z3hEXidpJ",
+      "slug": "2007-subaru-forester-premium-awd-only-110k-mi-srvcd-h-gask-8z3hexidpj",
+      "url": "https://6ixo.com/listing/2007-subaru-forester-premium-awd-only-110k-mi-srvcd-h-gask-8z3hexidpj/"
+    },
+    {
+      "id": "kijiji-1745177170",
+      "slug": "view-spacious-private-room-for-rent-in-brampton-near-willi-1745177170",
+      "url": "https://6ixo.com/listing/view-spacious-private-room-for-rent-in-brampton-near-willi-1745177170/"
+    },
+    {
+      "id": "kijiji-1745108537",
+      "slug": "lg-33-white-french-door-style-fridge-bottom-slide-out-free-1745108537",
+      "url": "https://6ixo.com/listing/lg-33-white-french-door-style-fridge-bottom-slide-out-free-1745108537/"
+    },
+    {
+      "id": "craigslist-3xozekZwgPdM6TyU5rQ97A",
+      "slug": "2017-nissan-sentra-sv-backup-camera-clean-title-nice-6tyu5rq97a",
+      "url": "https://6ixo.com/listing/2017-nissan-sentra-sv-backup-camera-clean-title-nice-6tyu5rq97a/"
+    },
+    {
+      "id": "craigslist-aKmeaerNourtPZuq1wCYvt",
+      "slug": "2020-kia-soul-lx-wagon-4d-1000-down-pzuq1wcyvt",
+      "url": "https://6ixo.com/listing/2020-kia-soul-lx-wagon-4d-1000-down-pzuq1wcyvt/"
+    },
+    {
+      "id": "craigslist-78UEQee2RJrNMuN5A8iexA",
+      "slug": "2018-chevrolet-spark-mun5a8iexa",
+      "url": "https://6ixo.com/listing/2018-chevrolet-spark-mun5a8iexa/"
+    },
+    {
+      "id": "craigslist-bViatUEgT3aGkWmhgXBcA8",
+      "slug": "2015-cadie-escalade-4x4-kwmhgxbca8",
+      "url": "https://6ixo.com/listing/2015-cadie-escalade-4x4-kwmhgxbca8/"
     }
   ]
 }

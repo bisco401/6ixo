@@ -1,5 +1,5 @@
 {
-  "checkedAt": "2026-10-24T18:31:50Z",
+  "checkedAt": "2026-10-24T18:46:09.430Z",
   "listings": {
     "craigslist.org/view/d/bastrop-used-2025-cadillac-xt4-fwd-4d/fuqr_3uo8rgowpq1ctwx-a": {
       "availability": "sold",
@@ -12674,9 +12674,13 @@
       "reason": "All offers for this exact listing are unavailable"
     },
     "kijiji.ca/v-pet-services/city-of-toronto/nail-and-wing-clipping-for-your-bird-text-647-490-7156/1745203218": {
-      "availability": "unavailable",
-      "checkedAt": "2026-10-24T03:58:12Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1745203218",
+      "sourceUrl": "https://www.kijiji.ca/v-pet-services/city-of-toronto/nail-and-wing-clipping-for-your-bird-text-647-490-7156/1745203218",
+      "availability": "gone",
+      "checkedAt": "2026-10-24T18:46:09.430Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-pet-services/city-of-toronto/c143l1700273?radius=50.0&ll=43.64%2C-79.39&adRemoved=1745203218",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-room-rental-roommate/ville-de-montreal/chambre-privee-a-montreal-tout-inclus-fille-etudiante-ou-femme/1745178760": {
       "availability": "unavailable",
@@ -12769,9 +12773,13 @@
       "reason": "Kijiji redirected the exact ad to a confirmed removal"
     },
     "kijiji.ca/v-renovation-window-door-trim/city-of-toronto/get-a-real-price-in-5-minutes-for-windows-and-doors/1745218503": {
-      "availability": "unavailable",
-      "checkedAt": "2026-10-24T03:58:12Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1745218503",
+      "sourceUrl": "https://www.kijiji.ca/v-renovation-window-door-trim/city-of-toronto/get-a-real-price-in-5-minutes-for-windows-and-doors/1745218503",
+      "availability": "gone",
+      "checkedAt": "2026-10-24T18:46:09.430Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-renovation-window-door-trim/city-of-toronto/c736l1700273?radius=50.0&ll=43.71%2C-79.29&adRemoved=1745218503",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "craigslist.org/view/d/meriden-2007-subaru-forester-premium/wm3hfaxpx2sk8z3hexidpj": {
       "availability": "gone",
@@ -12929,9 +12937,13 @@
       "reason": "Kijiji redirected the exact ad to a confirmed removal"
     },
     "kijiji.ca/v-plumbing-sink-toilet-shower/mississauga-peel-region/cooling-heating-expert-all-gta-gas-fitter-416-871-7673/1745232471": {
-      "availability": "unavailable",
-      "checkedAt": "2026-10-24T18:31:50Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1745232471",
+      "sourceUrl": "https://www.kijiji.ca/v-plumbing-sink-toilet-shower/mississauga-peel-region/cooling-heating-expert-all-gta-gas-fitter-416-871-7673/1745232471",
+      "availability": "gone",
+      "checkedAt": "2026-10-24T18:46:09.430Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-plumbing-sink-toilet-shower/mississauga-peel-region/c734l1700276?radius=50.0&ll=43.6%2C-79.6&adRemoved=1745232471",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "craigslist.org/view/d/lithia-springs-print-2004-toyota-tacoma/uqosd92rpn4xayujcfjbvk": {
       "availability": "gone",

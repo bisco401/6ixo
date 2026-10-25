@@ -475,7 +475,7 @@ test('failed photo upload removes partial files and records and keeps the select
 test('compact stay cards show a nightly rate in the listing currency without dropping cents',()=>{
   const {app}=fixture();
   const html=app.buildShortTermCardMarkup({id:'stay',title:'Downtown suite',location:'Private street address',city:'Toronto',country:'Canada',price:123.45,priceTerm:'per_night',currency:'CAD',images:['suite.jpg']},{compact:true});
-  assert.match(html,/CA\$123\.45 \/ night/);
+  assert.match(html,/CAD 123\.45 \/ night/);
   assert.match(html,/Toronto, Canada/);
   assert.match(html,/src="suite.jpg"/);
 });
@@ -514,7 +514,7 @@ test('feed entries preserve map coordinates, currency and nested review scores',
   assert.equal(entry.rating,4.92);assert.equal(entry.reviews,27);
   assert.match(app.buildShortTermCardMarkup(entry,{compact:true}),/4.92/);
   assert.match(app.buildShortTermCardMarkup(entry,{compact:true}),/\(27\)/);
-  assert.match(app.buildShortTermCardMarkup(entry,{compact:true}),/CA\$185.25 \/ night/);
+  assert.match(app.buildShortTermCardMarkup(entry,{compact:true}),/CAD 185\.25 \/ night/);
   assert.match(app.buildShortTermCardMarkup(entry,{compact:true}),/data-shortstay-location-id="st_1"/);
 });
 
@@ -561,7 +561,7 @@ test('Signature profile, form preview and persisted listing agree on currency, f
  const preview=f.app.buildShortTermCardPreviewMarkup();
  const listing=f.app.buildRealestateFeedEntryFromMarketplaceItem({id:'st_signature',category:'real_estate',title:'Signature sample',price:185.25,currency:draft.currency,city:'Toronto',country:'Canada',description:'Quiet <script>stay</script>',realestate:JSON.parse(JSON.stringify(draft))});
  const profile=f.app.buildShortTermSignatureSectionsMarkup(listing);const card=f.app.buildShortTermCardMarkup(listing);
- for(const html of [preview,profile,card]) {assert.match(html,/CA\$185\.25/);assert.doesNotMatch(html,/123 Private Street|A1A 1A1|43\.66241|<script>/);}
+ for(const html of [preview,profile,card]) {assert.match(html,/CAD 185\.25/);assert.doesNotMatch(html,/123 Private Street|A1A 1A1|43\.66241|<script>/);}
  assert.equal(listing.cleaningFee,35.25);assert.match(preview,/35\.25/);
  for(const html of [preview,profile]) {assert.match(html,/No parties/);assert.match(html,/New stay/);assert.match(html,/Approximate area/);}
  assert.equal((profile.match(/id="realestate-short-term-booking-checkin"/g)||[]).length,1);

@@ -1,3 +1,4 @@
+import './build-listing-currency.mjs';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import CleanCSS from 'clean-css';

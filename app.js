@@ -1,3 +1,90 @@
+// BEGIN GENERATED LISTING CURRENCY
+function createListingCurrency(catalog) {
+    const key = value => String(value ?? '').trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[\s._’'()-]+/g, '');
+    const countryKey = value => key(String(value ?? '').replace(/&/g, ' and ').replace(/\bst\.?\s+/gi, 'Saint ').replace(/\bthe\b/gi, ''));
+    const countries = new Map();
+    const aliases = new Map();
+    const addAlias = (name, code) => {
+        const normalized = key(name);
+        if (!normalized) return;
+        if (!aliases.has(normalized)) aliases.set(normalized, new Set());
+        aliases.get(normalized).add(code);
+    };
+    for (const [code, entry] of Object.entries(catalog.countries)) {
+        for (const name of [code, entry.name, ...entry.aliases]) countries.set(countryKey(name), entry.currencies);
+    }
+    for (const [name, country] of Object.entries({
+        'United States of America': 'US', America: 'US', UK: 'GB', 'UAE': 'AE',
+        'Ivory Coast': 'CI', 'Cape Verde': 'CV', 'Swaziland': 'SZ', 'Czech Republic': 'CZ',
+        'South Korea': 'KR', 'North Korea': 'KP', 'East Timor': 'TL', 'Vatican City': 'VA',
+        'Palestine': 'PS', 'The Bahamas': 'BS', 'The Gambia': 'GM', 'Russia': 'RU',
+        'Democratic Republic of the Congo': 'CD', 'DR Congo': 'CD', 'Republic of the Congo': 'CG'
+    })) countries.set(countryKey(name), catalog.countries[country].currencies);
+    for (const [code, entry] of Object.entries(catalog.currencies)) {
+        for (const name of [code, entry.name, ...entry.aliases]) addAlias(name, code);
+    }
+    for (const [code, names] of Object.entries({
+        CAD: ['C$', 'CA$'], USD: ['US$', 'U.S. dollars'], JMD: ['J$', 'JA$', 'JM$'],
+        GHS: ['GH¢', 'GH₵', '₵', 'cedi', 'cedis', 'Ghana cedi', 'Ghana cedis'],
+        KES: ['KSh', 'KShs', 'Ksh/=', 'Kenya shilling', 'Kenya shillings'],
+        UGX: ['USh'], TZS: ['TSh'], GYD: ['G$', 'GY$'], TTD: ['TT$'],
+        AUD: ['A$', 'AU$'], NZD: ['NZ$'], SGD: ['S$', 'SG$'], HKD: ['HK$'],
+        CNY: ['RMB', 'CN¥'], JPY: ['JP¥'], NGN: ['₦'], ZAR: ['R'], INR: ['₹']
+    })) for (const name of names) addAlias(name, code);
+
+    const countryCurrencies = options => countries.get(countryKey(options.countryCode)) || countries.get(countryKey(options.country || options.location?.country)) || [];
+    const aliasCodes = token => {
+        const code = String(token || '').trim().toUpperCase();
+        if (Object.hasOwn(catalog.currencies, code)) return [code];
+        return [...(aliases.get(key(token)) || [])];
+    };
+    const resolve = (token = '', options = {}) => {
+        const explicit = aliasCodes(token);
+        if (explicit.length === 1) return explicit[0];
+        const metadata = aliasCodes(options.currency || options.price?.currency || options.vehicle?.currency || options.realestate?.currency || '');
+        if (metadata.length === 1) return metadata[0];
+        const local = countryCurrencies(options);
+        if (!token) return local[0] || '';
+        return local.find(code => explicit.includes(code)) || '';
+    };
+    const parse = value => {
+        const raw = String(value ?? '').trim();
+        const match = raw.match(/^(?:(From|Starting at)\s+)?([^\d]*?)(\d{1,3}(?:,\d{3})+|\d+)(?:\.(\d{1,4}))?(.*)$/i);
+        if (!match) return null;
+        const [, qualifier = '', prefix, whole, fraction = '', rest] = match;
+        if (/[-+()]/.test(prefix)) return null;
+        const suffixMatch = rest.match(/^(.*?)(\s*(?:\/\s*[a-z][a-z\s-]*|per\s+[a-z][a-z\s-]*|\+\s*tax))?$/i);
+        if (!suffixMatch) return null;
+        const trailingCurrency = suffixMatch[1].trim();
+        const leadingCurrency = prefix.trim();
+        if (leadingCurrency && !aliasCodes(leadingCurrency).length) return null;
+        if (trailingCurrency && !aliasCodes(trailingCurrency).length) return null;
+        if (leadingCurrency && trailingCurrency) {
+            const trailingCodes = aliasCodes(trailingCurrency);
+            if (!aliasCodes(leadingCurrency).some(code => trailingCodes.includes(code))) return null;
+        }
+        return { qualifier, token: trailingCurrency || leadingCurrency, whole: whole.replace(/,/g, ''), fraction, suffix: suffixMatch[2] || '' };
+    };
+    const currency = (value, options = {}) => {
+        const parsed = parse(value);
+        return resolve(parsed?.token || '', options);
+    };
+    const format = (value, options = {}) => {
+        const raw = String(value ?? '').trim();
+        if (!raw) return '';
+        const parsed = parse(raw);
+        if (!parsed) return raw;
+        const code = resolve(parsed.token, options);
+        const prefix = code ? `${code} ` : parsed.token ? `${parsed.token} ` : '';
+        const grouped = parsed.whole.replace(/^0+(?=\d)/, '').replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+        // At least two decimals, preserving real third/fourth decimal units.
+        return `${parsed.qualifier ? `${parsed.qualifier} ` : ''}${prefix}${grouped}.${parsed.fraction.padEnd(2, '0')}${parsed.suffix}`;
+    };
+    return { format, currency, parse, countryCurrencies };
+}
+const ListingCurrency = createListingCurrency({"asOf":"2026-10-25","cldrVersion":"48","source":"https://github.com/unicode-org/cldr-json","license":"https://www.unicode.org/license.txt","countries":{"AC":{"name":"Ascension Island","currencies":["SHP"],"aliases":["ASC"]},"AD":{"name":"Andorra","currencies":["EUR"],"aliases":["AND"]},"AE":{"name":"United Arab Emirates","currencies":["AED"],"aliases":["ARE"]},"AF":{"name":"Afghanistan","currencies":["AFN"],"aliases":["AFG"]},"AG":{"name":"Antigua & Barbuda","currencies":["XCD"],"aliases":["ATG"]},"AI":{"name":"Anguilla","currencies":["XCD"],"aliases":["AIA"]},"AL":{"name":"Albania","currencies":["ALL"],"aliases":["ALB"]},"AM":{"name":"Armenia","currencies":["AMD"],"aliases":["ARM"]},"AO":{"name":"Angola","currencies":["AOA"],"aliases":["AGO"]},"AR":{"name":"Argentina","currencies":["ARS"],"aliases":["ARG"]},"AS":{"name":"American Samoa","currencies":["USD"],"aliases":["ASM"]},"AT":{"name":"Austria","currencies":["EUR"],"aliases":["AUT"]},"AU":{"name":"Australia","currencies":["AUD"],"aliases":["AUS"]},"AW":{"name":"Aruba","currencies":["AWG"],"aliases":["ABW"]},"AX":{"name":"Åland Islands","currencies":["EUR"],"aliases":["ALA"]},"AZ":{"name":"Azerbaijan","currencies":["AZN"],"aliases":["AZE"]},"BA":{"name":"Bosnia & Herzegovina","currencies":["BAM"],"aliases":["BIH","Bosnia"]},"BB":{"name":"Barbados","currencies":["BBD"],"aliases":["BRB"]},"BD":{"name":"Bangladesh","currencies":["BDT"],"aliases":["BGD"]},"BE":{"name":"Belgium","currencies":["EUR"],"aliases":["BEL"]},"BF":{"name":"Burkina Faso","currencies":["XOF"],"aliases":["BFA"]},"BG":{"name":"Bulgaria","currencies":["EUR"],"aliases":["BGR"]},"BH":{"name":"Bahrain","currencies":["BHD"],"aliases":["BHR"]},"BI":{"name":"Burundi","currencies":["BIF"],"aliases":["BDI"]},"BJ":{"name":"Benin","currencies":["XOF"],"aliases":["BEN"]},"BL":{"name":"St. Barthélemy","currencies":["EUR"],"aliases":["BLM"]},"BM":{"name":"Bermuda","currencies":["BMD"],"aliases":["BMU"]},"BN":{"name":"Brunei","currencies":["BND"],"aliases":["BRN"]},"BO":{"name":"Bolivia","currencies":["BOB"],"aliases":["BOL"]},"BQ":{"name":"Caribbean Netherlands","currencies":["USD"],"aliases":["BES"]},"BR":{"name":"Brazil","currencies":["BRL"],"aliases":["BRA"]},"BS":{"name":"Bahamas","currencies":["BSD"],"aliases":["BHS"]},"BT":{"name":"Bhutan","currencies":["BTN","INR"],"aliases":["BTN"]},"BV":{"name":"Bouvet Island","currencies":["NOK"],"aliases":["BVT"]},"BW":{"name":"Botswana","currencies":["BWP"],"aliases":["BWA"]},"BY":{"name":"Belarus","currencies":["BYN"],"aliases":["BLR"]},"BZ":{"name":"Belize","currencies":["BZD"],"aliases":["BLZ"]},"CA":{"name":"Canada","currencies":["CAD"],"aliases":["CAN"]},"CC":{"name":"Cocos (Keeling) Islands","currencies":["AUD"],"aliases":["CCK","Cocos Islands"]},"CD":{"name":"Congo - Kinshasa","currencies":["CDF"],"aliases":["COD","Congo (DRC)"]},"CF":{"name":"Central African Republic","currencies":["XAF"],"aliases":["CAF"]},"CG":{"name":"Congo - Brazzaville","currencies":["XAF"],"aliases":["COG","Congo (Republic)"]},"CH":{"name":"Switzerland","currencies":["CHF"],"aliases":["CHE"]},"CI":{"name":"Côte d’Ivoire","currencies":["XOF"],"aliases":["CIV","Ivory Coast"]},"CK":{"name":"Cook Islands","currencies":["NZD"],"aliases":["COK"]},"CL":{"name":"Chile","currencies":["CLP"],"aliases":["CHL"]},"CM":{"name":"Cameroon","currencies":["XAF"],"aliases":["CMR"]},"CN":{"name":"China","currencies":["CNY"],"aliases":["CHN"]},"CO":{"name":"Colombia","currencies":["COP"],"aliases":["COL"]},"CR":{"name":"Costa Rica","currencies":["CRC"],"aliases":["CRI"]},"CU":{"name":"Cuba","currencies":["CUP"],"aliases":["CUB"]},"CV":{"name":"Cape Verde","currencies":["CVE"],"aliases":["CPV","Cabo Verde"]},"CW":{"name":"Curaçao","currencies":["XCG"],"aliases":["CUW"]},"CX":{"name":"Christmas Island","currencies":["AUD"],"aliases":["CXR"]},"CY":{"name":"Cyprus","currencies":["EUR"],"aliases":["CYP"]},"CZ":{"name":"Czechia","currencies":["CZK"],"aliases":["CZE","Czech Republic"]},"DE":{"name":"Germany","currencies":["EUR"],"aliases":["DEU"]},"DG":{"name":"Diego Garcia","currencies":["USD"],"aliases":["DGA"]},"DJ":{"name":"Djibouti","currencies":["DJF"],"aliases":["DJI"]},"DK":{"name":"Denmark","currencies":["DKK"],"aliases":["DNK"]},"DM":{"name":"Dominica","currencies":["XCD"],"aliases":["DMA"]},"DO":{"name":"Dominican Republic","currencies":["DOP"],"aliases":["DOM"]},"DZ":{"name":"Algeria","currencies":["DZD"],"aliases":["DZA"]},"EA":{"name":"Ceuta & Melilla","currencies":["EUR"],"aliases":[]},"EC":{"name":"Ecuador","currencies":["USD"],"aliases":["ECU"]},"EE":{"name":"Estonia","currencies":["EUR"],"aliases":["EST"]},"EG":{"name":"Egypt","currencies":["EGP"],"aliases":["EGY"]},"EH":{"name":"Western Sahara","currencies":["MAD"],"aliases":["ESH"]},"ER":{"name":"Eritrea","currencies":["ERN"],"aliases":["ERI"]},"ES":{"name":"Spain","currencies":["EUR"],"aliases":["ESP"]},"ET":{"name":"Ethiopia","currencies":["ETB"],"aliases":["ETH"]},"EU":{"name":"European Union","currencies":["EUR"],"aliases":["QUU"]},"FI":{"name":"Finland","currencies":["EUR"],"aliases":["FIN"]},"FJ":{"name":"Fiji","currencies":["FJD"],"aliases":["FJI"]},"FK":{"name":"Falkland Islands","currencies":["FKP"],"aliases":["FLK","Falkland Islands (Islas Malvinas)"]},"FM":{"name":"Micronesia","currencies":["USD"],"aliases":["FSM"]},"FO":{"name":"Faroe Islands","currencies":["DKK"],"aliases":["FRO"]},"FR":{"name":"France","currencies":["EUR"],"aliases":["FRA"]},"GA":{"name":"Gabon","currencies":["XAF"],"aliases":["GAB"]},"GB":{"name":"United Kingdom","currencies":["GBP"],"aliases":["GBR","UK"]},"GD":{"name":"Grenada","currencies":["XCD"],"aliases":["GRD"]},"GE":{"name":"Georgia","currencies":["GEL"],"aliases":["GEO"]},"GF":{"name":"French Guiana","currencies":["EUR"],"aliases":["GUF"]},"GG":{"name":"Guernsey","currencies":["GBP"],"aliases":["GGY"]},"GH":{"name":"Ghana","currencies":["GHS"],"aliases":["GHA"]},"GI":{"name":"Gibraltar","currencies":["GIP"],"aliases":["GIB"]},"GL":{"name":"Greenland","currencies":["DKK"],"aliases":["GRL"]},"GM":{"name":"Gambia","currencies":["GMD"],"aliases":["GMB"]},"GN":{"name":"Guinea","currencies":["GNF"],"aliases":["GIN"]},"GP":{"name":"Guadeloupe","currencies":["EUR"],"aliases":["GLP"]},"GQ":{"name":"Equatorial Guinea","currencies":["XAF"],"aliases":["GNQ"]},"GR":{"name":"Greece","currencies":["EUR"],"aliases":["GRC"]},"GS":{"name":"South Georgia & South Sandwich Islands","currencies":["GBP"],"aliases":["SGS"]},"GT":{"name":"Guatemala","currencies":["GTQ"],"aliases":["GTM"]},"GU":{"name":"Guam","currencies":["USD"],"aliases":["GUM"]},"GW":{"name":"Guinea-Bissau","currencies":["XOF"],"aliases":["GNB"]},"GY":{"name":"Guyana","currencies":["GYD"],"aliases":["GUY"]},"HK":{"name":"Hong Kong SAR China","currencies":["HKD"],"aliases":["HKG","Hong Kong"]},"HM":{"name":"Heard & McDonald Islands","currencies":["AUD"],"aliases":["HMD"]},"HN":{"name":"Honduras","currencies":["HNL"],"aliases":["HND"]},"HR":{"name":"Croatia","currencies":["EUR"],"aliases":["HRV"]},"HT":{"name":"Haiti","currencies":["HTG","USD"],"aliases":["HTI"]},"HU":{"name":"Hungary","currencies":["HUF"],"aliases":["HUN"]},"IC":{"name":"Canary Islands","currencies":["EUR"],"aliases":[]},"ID":{"name":"Indonesia","currencies":["IDR"],"aliases":["IDN"]},"IE":{"name":"Ireland","currencies":["EUR"],"aliases":["IRL"]},"IL":{"name":"Israel","currencies":["ILS"],"aliases":["ISR"]},"IM":{"name":"Isle of Man","currencies":["GBP"],"aliases":["IMN"]},"IN":{"name":"India","currencies":["INR"],"aliases":["IND"]},"IO":{"name":"British Indian Ocean Territory","currencies":["USD"],"aliases":["IOT","Chagos Archipelago"]},"IQ":{"name":"Iraq","currencies":["IQD"],"aliases":["IRQ"]},"IR":{"name":"Iran","currencies":["IRR"],"aliases":["IRN"]},"IS":{"name":"Iceland","currencies":["ISK"],"aliases":["ISL"]},"IT":{"name":"Italy","currencies":["EUR"],"aliases":["ITA"]},"JE":{"name":"Jersey","currencies":["GBP"],"aliases":["JEY"]},"JM":{"name":"Jamaica","currencies":["JMD"],"aliases":["JAM"]},"JO":{"name":"Jordan","currencies":["JOD"],"aliases":["JOR"]},"JP":{"name":"Japan","currencies":["JPY"],"aliases":["JPN"]},"KE":{"name":"Kenya","currencies":["KES"],"aliases":["KEN"]},"KG":{"name":"Kyrgyzstan","currencies":["KGS"],"aliases":["KGZ"]},"KH":{"name":"Cambodia","currencies":["KHR"],"aliases":["KHM"]},"KI":{"name":"Kiribati","currencies":["AUD"],"aliases":["KIR"]},"KM":{"name":"Comoros","currencies":["KMF"],"aliases":["COM"]},"KN":{"name":"St. Kitts & Nevis","currencies":["XCD"],"aliases":["KNA"]},"KP":{"name":"North Korea","currencies":["KPW"],"aliases":["PRK"]},"KR":{"name":"South Korea","currencies":["KRW"],"aliases":["KOR"]},"KW":{"name":"Kuwait","currencies":["KWD"],"aliases":["KWT"]},"KY":{"name":"Cayman Islands","currencies":["KYD"],"aliases":["CYM"]},"KZ":{"name":"Kazakhstan","currencies":["KZT"],"aliases":["KAZ"]},"LA":{"name":"Laos","currencies":["LAK"],"aliases":["LAO"]},"LB":{"name":"Lebanon","currencies":["LBP"],"aliases":["LBN"]},"LC":{"name":"St. Lucia","currencies":["XCD"],"aliases":["LCA"]},"LI":{"name":"Liechtenstein","currencies":["CHF"],"aliases":["LIE"]},"LK":{"name":"Sri Lanka","currencies":["LKR"],"aliases":["LKA"]},"LR":{"name":"Liberia","currencies":["LRD"],"aliases":["LBR"]},"LS":{"name":"Lesotho","currencies":["ZAR","LSL"],"aliases":["LSO"]},"LT":{"name":"Lithuania","currencies":["EUR"],"aliases":["LTU"]},"LU":{"name":"Luxembourg","currencies":["EUR"],"aliases":["LUX"]},"LV":{"name":"Latvia","currencies":["EUR"],"aliases":["LVA"]},"LY":{"name":"Libya","currencies":["LYD"],"aliases":["LBY"]},"MA":{"name":"Morocco","currencies":["MAD"],"aliases":["MAR"]},"MC":{"name":"Monaco","currencies":["EUR"],"aliases":["MCO"]},"MD":{"name":"Moldova","currencies":["MDL"],"aliases":["MDA"]},"ME":{"name":"Montenegro","currencies":["EUR"],"aliases":["MNE"]},"MF":{"name":"St. Martin","currencies":["EUR"],"aliases":["MAF"]},"MG":{"name":"Madagascar","currencies":["MGA"],"aliases":["MDG"]},"MH":{"name":"Marshall Islands","currencies":["USD"],"aliases":["MHL"]},"MK":{"name":"North Macedonia","currencies":["MKD"],"aliases":["MKD"]},"ML":{"name":"Mali","currencies":["XOF"],"aliases":["MLI"]},"MM":{"name":"Myanmar (Burma)","currencies":["MMK"],"aliases":["MMR","Myanmar"]},"MN":{"name":"Mongolia","currencies":["MNT"],"aliases":["MNG"]},"MO":{"name":"Macao SAR China","currencies":["MOP"],"aliases":["MAC","Macao"]},"MP":{"name":"Northern Mariana Islands","currencies":["USD"],"aliases":["MNP"]},"MQ":{"name":"Martinique","currencies":["EUR"],"aliases":["MTQ"]},"MR":{"name":"Mauritania","currencies":["MRU"],"aliases":["MRT"]},"MS":{"name":"Montserrat","currencies":["XCD"],"aliases":["MSR"]},"MT":{"name":"Malta","currencies":["EUR"],"aliases":["MLT"]},"MU":{"name":"Mauritius","currencies":["MUR"],"aliases":["MUS"]},"MV":{"name":"Maldives","currencies":["MVR"],"aliases":["MDV"]},"MW":{"name":"Malawi","currencies":["MWK"],"aliases":["MWI"]},"MX":{"name":"Mexico","currencies":["MXN"],"aliases":["MEX"]},"MY":{"name":"Malaysia","currencies":["MYR"],"aliases":["MYS"]},"MZ":{"name":"Mozambique","currencies":["MZN"],"aliases":["MOZ"]},"NA":{"name":"Namibia","currencies":["NAD","ZAR"],"aliases":["NAM"]},"NC":{"name":"New Caledonia","currencies":["XPF"],"aliases":["NCL"]},"NE":{"name":"Niger","currencies":["XOF"],"aliases":["NER"]},"NF":{"name":"Norfolk Island","currencies":["AUD"],"aliases":["NFK"]},"NG":{"name":"Nigeria","currencies":["NGN"],"aliases":["NGA"]},"NI":{"name":"Nicaragua","currencies":["NIO"],"aliases":["NIC"]},"NL":{"name":"Netherlands","currencies":["EUR"],"aliases":["NLD"]},"NO":{"name":"Norway","currencies":["NOK"],"aliases":["NOR"]},"NP":{"name":"Nepal","currencies":["NPR"],"aliases":["NPL"]},"NR":{"name":"Nauru","currencies":["AUD"],"aliases":["NRU"]},"NU":{"name":"Niue","currencies":["NZD"],"aliases":["NIU"]},"NZ":{"name":"New Zealand","currencies":["NZD"],"aliases":["NZL","Aotearoa New Zealand"]},"OM":{"name":"Oman","currencies":["OMR"],"aliases":["OMN"]},"PA":{"name":"Panama","currencies":["PAB","USD"],"aliases":["PAN"]},"PE":{"name":"Peru","currencies":["PEN"],"aliases":["PER"]},"PF":{"name":"French Polynesia","currencies":["XPF"],"aliases":["PYF"]},"PG":{"name":"Papua New Guinea","currencies":["PGK"],"aliases":["PNG"]},"PH":{"name":"Philippines","currencies":["PHP"],"aliases":["PHL"]},"PK":{"name":"Pakistan","currencies":["PKR"],"aliases":["PAK"]},"PL":{"name":"Poland","currencies":["PLN"],"aliases":["POL"]},"PM":{"name":"St. Pierre & Miquelon","currencies":["EUR"],"aliases":["SPM"]},"PN":{"name":"Pitcairn Islands","currencies":["NZD"],"aliases":["PCN","Pitcairn"]},"PR":{"name":"Puerto Rico","currencies":["USD"],"aliases":["PRI"]},"PS":{"name":"Palestinian Territories","currencies":["ILS","JOD"],"aliases":["PSE","Palestine"]},"PT":{"name":"Portugal","currencies":["EUR"],"aliases":["PRT"]},"PW":{"name":"Palau","currencies":["USD"],"aliases":["PLW"]},"PY":{"name":"Paraguay","currencies":["PYG"],"aliases":["PRY"]},"QA":{"name":"Qatar","currencies":["QAR"],"aliases":["QAT"]},"RE":{"name":"Réunion","currencies":["EUR"],"aliases":["REU"]},"RO":{"name":"Romania","currencies":["RON"],"aliases":["ROU"]},"RS":{"name":"Serbia","currencies":["RSD"],"aliases":["SRB"]},"RU":{"name":"Russia","currencies":["RUB"],"aliases":["RUS"]},"RW":{"name":"Rwanda","currencies":["RWF"],"aliases":["RWA"]},"SA":{"name":"Saudi Arabia","currencies":["SAR"],"aliases":["SAU"]},"SB":{"name":"Solomon Islands","currencies":["SBD"],"aliases":["SLB"]},"SC":{"name":"Seychelles","currencies":["SCR"],"aliases":["SYC"]},"SD":{"name":"Sudan","currencies":["SDG"],"aliases":["SDN"]},"SE":{"name":"Sweden","currencies":["SEK"],"aliases":["SWE"]},"SG":{"name":"Singapore","currencies":["SGD"],"aliases":["SGP"]},"SH":{"name":"St. Helena","currencies":["SHP"],"aliases":["SHN"]},"SI":{"name":"Slovenia","currencies":["EUR"],"aliases":["SVN"]},"SJ":{"name":"Svalbard & Jan Mayen","currencies":["NOK"],"aliases":["SJM"]},"SK":{"name":"Slovakia","currencies":["EUR"],"aliases":["SVK"]},"SL":{"name":"Sierra Leone","currencies":["SLE"],"aliases":["SLE"]},"SM":{"name":"San Marino","currencies":["EUR"],"aliases":["SMR"]},"SN":{"name":"Senegal","currencies":["XOF"],"aliases":["SEN"]},"SO":{"name":"Somalia","currencies":["SOS"],"aliases":["SOM"]},"SR":{"name":"Suriname","currencies":["SRD"],"aliases":["SUR"]},"SS":{"name":"South Sudan","currencies":["SSP"],"aliases":["SSD"]},"ST":{"name":"São Tomé & Príncipe","currencies":["STN"],"aliases":["STP"]},"SV":{"name":"El Salvador","currencies":["USD"],"aliases":["SLV"]},"SX":{"name":"Sint Maarten","currencies":["XCG"],"aliases":["SXM"]},"SY":{"name":"Syria","currencies":["SYP"],"aliases":["SYR"]},"SZ":{"name":"Eswatini","currencies":["SZL"],"aliases":["SWZ","Swaziland"]},"TA":{"name":"Tristan da Cunha","currencies":["GBP"],"aliases":["TAA"]},"TC":{"name":"Turks & Caicos Islands","currencies":["USD"],"aliases":["TCA"]},"TD":{"name":"Chad","currencies":["XAF"],"aliases":["TCD"]},"TF":{"name":"French Southern Territories","currencies":["EUR"],"aliases":["ATF"]},"TG":{"name":"Togo","currencies":["XOF"],"aliases":["TGO"]},"TH":{"name":"Thailand","currencies":["THB"],"aliases":["THA"]},"TJ":{"name":"Tajikistan","currencies":["TJS"],"aliases":["TJK"]},"TK":{"name":"Tokelau","currencies":["NZD"],"aliases":["TKL"]},"TL":{"name":"Timor-Leste","currencies":["USD"],"aliases":["TLS","East Timor"]},"TM":{"name":"Turkmenistan","currencies":["TMT"],"aliases":["TKM"]},"TN":{"name":"Tunisia","currencies":["TND"],"aliases":["TUN"]},"TO":{"name":"Tonga","currencies":["TOP"],"aliases":["TON"]},"TR":{"name":"Türkiye","currencies":["TRY"],"aliases":["TUR","Turkey"]},"TT":{"name":"Trinidad & Tobago","currencies":["TTD"],"aliases":["TTO"]},"TV":{"name":"Tuvalu","currencies":["AUD"],"aliases":["TUV"]},"TW":{"name":"Taiwan","currencies":["TWD"],"aliases":["TWN"]},"TZ":{"name":"Tanzania","currencies":["TZS"],"aliases":["TZA"]},"UA":{"name":"Ukraine","currencies":["UAH"],"aliases":["UKR"]},"UG":{"name":"Uganda","currencies":["UGX"],"aliases":["UGA"]},"UM":{"name":"U.S. Outlying Islands","currencies":["USD"],"aliases":["UMI"]},"US":{"name":"United States","currencies":["USD"],"aliases":["USA","US"]},"UY":{"name":"Uruguay","currencies":["UYU"],"aliases":["URY"]},"UZ":{"name":"Uzbekistan","currencies":["UZS"],"aliases":["UZB"]},"VA":{"name":"Vatican City","currencies":["EUR"],"aliases":["VAT"]},"VC":{"name":"St. Vincent & Grenadines","currencies":["XCD"],"aliases":["VCT"]},"VE":{"name":"Venezuela","currencies":["VES"],"aliases":["VEN"]},"VG":{"name":"British Virgin Islands","currencies":["USD"],"aliases":["VGB"]},"VI":{"name":"U.S. Virgin Islands","currencies":["USD"],"aliases":["VIR"]},"VN":{"name":"Vietnam","currencies":["VND"],"aliases":["VNM"]},"VU":{"name":"Vanuatu","currencies":["VUV"],"aliases":["VUT"]},"WF":{"name":"Wallis & Futuna","currencies":["XPF"],"aliases":["WLF"]},"WS":{"name":"Samoa","currencies":["WST"],"aliases":["WSM"]},"XK":{"name":"Kosovo","currencies":["EUR"],"aliases":["XKK"]},"YE":{"name":"Yemen","currencies":["YER"],"aliases":["YEM"]},"YT":{"name":"Mayotte","currencies":["EUR"],"aliases":["MYT"]},"ZA":{"name":"South Africa","currencies":["ZAR"],"aliases":["ZAF"]},"ZM":{"name":"Zambia","currencies":["ZMW"],"aliases":["ZMB"]},"ZW":{"name":"Zimbabwe","currencies":["ZWG","USD"],"aliases":["ZWE"]}},"currencies":{"ADP":{"name":"Andorran Peseta","aliases":["Andorran peseta","Andorran pesetas"]},"AED":{"name":"United Arab Emirates Dirham","aliases":["UAE dirham","UAE dirhams","AED"]},"AFA":{"name":"Afghan Afghani (1927–2002)","aliases":["Afghan afghani (1927–2002)","Afghan afghanis (1927–2002)"]},"AFN":{"name":"Afghan Afghani","aliases":["Afghan Afghani","Afghan Afghanis","AFN","؋"]},"ALK":{"name":"Albanian Lek (1946–1965)","aliases":["Albanian lek (1946–1965)","Albanian lekë (1946–1965)"]},"ALL":{"name":"Albanian Lek","aliases":["Albanian lek","Albanian lekë","ALL"]},"AMD":{"name":"Armenian Dram","aliases":["Armenian dram","Armenian drams","AMD","֏"]},"ANG":{"name":"Netherlands Antillean Guilder","aliases":["Netherlands Antillean guilder","Netherlands Antillean guilders","ANG"]},"AOA":{"name":"Angolan Kwanza","aliases":["Angolan kwanza","Angolan kwanzas","AOA","Kz"]},"AOK":{"name":"Angolan Kwanza (1977–1991)","aliases":["Angolan kwanza (1977–1991)","Angolan kwanzas (1977–1991)"]},"AON":{"name":"Angolan New Kwanza (1990–2000)","aliases":["Angolan new kwanza (1990–2000)","Angolan new kwanzas (1990–2000)"]},"AOR":{"name":"Angolan Readjusted Kwanza (1995–1999)","aliases":["Angolan readjusted kwanza (1995–1999)","Angolan readjusted kwanzas (1995–1999)"]},"ARA":{"name":"Argentine Austral","aliases":["Argentine austral","Argentine australs"]},"ARL":{"name":"Argentine Peso Ley (1970–1983)","aliases":["Argentine peso ley (1970–1983)","Argentine pesos ley (1970–1983)"]},"ARM":{"name":"Argentine Peso (1881–1970)","aliases":["Argentine peso (1881–1970)","Argentine pesos (1881–1970)"]},"ARP":{"name":"Argentine Peso (1983–1985)","aliases":["Argentine peso (1983–1985)","Argentine pesos (1983–1985)"]},"ARS":{"name":"Argentine Peso","aliases":["Argentine peso","Argentine pesos","ARS","$"]},"ATS":{"name":"Austrian Schilling","aliases":["Austrian schilling","Austrian schillings"]},"AUD":{"name":"Australian Dollar","aliases":["Australian dollar","Australian dollars","A$","$"]},"AWG":{"name":"Aruban Florin","aliases":["Aruban florin","AWG"]},"AZM":{"name":"Azerbaijani Manat (1993–2006)","aliases":["Azerbaijani manat (1993–2006)","Azerbaijani manats (1993–2006)"]},"AZN":{"name":"Azerbaijani Manat","aliases":["Azerbaijani manat","Azerbaijani manats","AZN","₼"]},"BAD":{"name":"Bosnia-Herzegovina Dinar (1992–1994)","aliases":["Bosnia-Herzegovina dinar (1992–1994)","Bosnia-Herzegovina dinars (1992–1994)"]},"BAM":{"name":"Bosnia-Herzegovina Convertible Mark","aliases":["Bosnia-Herzegovina convertible mark","Bosnia-Herzegovina convertible marks","BAM","KM"]},"BAN":{"name":"Bosnia-Herzegovina New Dinar (1994–1997)","aliases":["Bosnia-Herzegovina new dinar (1994–1997)","Bosnia-Herzegovina new dinars (1994–1997)"]},"BBD":{"name":"Barbadian Dollar","aliases":["Barbadian dollar","Barbadian dollars","BBD","$"]},"BDT":{"name":"Bangladeshi Taka","aliases":["Bangladeshi taka","Bangladeshi takas","BDT","৳"]},"BEC":{"name":"Belgian Franc (convertible)","aliases":["Belgian franc (convertible)","Belgian francs (convertible)"]},"BEF":{"name":"Belgian Franc","aliases":["Belgian franc","Belgian francs"]},"BEL":{"name":"Belgian Franc (financial)","aliases":["Belgian franc (financial)","Belgian francs (financial)"]},"BGL":{"name":"Bulgarian Hard Lev","aliases":["Bulgarian hard lev","Bulgarian hard leva"]},"BGM":{"name":"Bulgarian Socialist Lev","aliases":["Bulgarian socialist lev","Bulgarian socialist leva"]},"BGN":{"name":"Bulgarian Lev","aliases":["Bulgarian lev","Bulgarian leva","BGN"]},"BGO":{"name":"Bulgarian Lev (1879–1952)","aliases":["Bulgarian lev (1879–1952)","Bulgarian leva (1879–1952)"]},"BHD":{"name":"Bahraini Dinar","aliases":["Bahraini dinar","Bahraini dinars","BHD"]},"BIF":{"name":"Burundian Franc","aliases":["Burundian franc","Burundian francs","BIF"]},"BMD":{"name":"Bermudan Dollar","aliases":["Bermudan dollar","Bermudan dollars","BMD","$"]},"BND":{"name":"Brunei Dollar","aliases":["Brunei dollar","Brunei dollars","BND","$"]},"BOB":{"name":"Bolivian Boliviano","aliases":["Bolivian boliviano","Bolivian bolivianos","BOB","Bs"]},"BOL":{"name":"Bolivian Boliviano (1863–1963)","aliases":["Bolivian boliviano (1863–1963)","Bolivian bolivianos (1863–1963)"]},"BOP":{"name":"Bolivian Peso","aliases":["Bolivian peso","Bolivian pesos"]},"BOV":{"name":"Bolivian Mvdol","aliases":["Bolivian mvdol","Bolivian mvdols"]},"BRB":{"name":"Brazilian New Cruzeiro (1967–1986)","aliases":["Brazilian new cruzeiro (1967–1986)","Brazilian new cruzeiros (1967–1986)"]},"BRC":{"name":"Brazilian Cruzado (1986–1989)","aliases":["Brazilian cruzado (1986–1989)","Brazilian cruzados (1986–1989)"]},"BRE":{"name":"Brazilian Cruzeiro (1990–1993)","aliases":["Brazilian cruzeiro (1990–1993)","Brazilian cruzeiros (1990–1993)"]},"BRL":{"name":"Brazilian Real","aliases":["Brazilian real","Brazilian reals","R$"]},"BRN":{"name":"Brazilian New Cruzado (1989–1990)","aliases":["Brazilian new cruzado (1989–1990)","Brazilian new cruzados (1989–1990)"]},"BRR":{"name":"Brazilian Cruzeiro (1993–1994)","aliases":["Brazilian cruzeiro (1993–1994)","Brazilian cruzeiros (1993–1994)"]},"BRZ":{"name":"Brazilian Cruzeiro (1942–1967)","aliases":["Brazilian cruzeiro (1942–1967)","Brazilian cruzeiros (1942–1967)"]},"BSD":{"name":"Bahamian Dollar","aliases":["Bahamian dollar","Bahamian dollars","BSD","$"]},"BTN":{"name":"Bhutanese Ngultrum","aliases":["Bhutanese ngultrum","Bhutanese ngultrums","BTN"]},"BUK":{"name":"Burmese Kyat","aliases":["Burmese kyat","Burmese kyats"]},"BWP":{"name":"Botswanan Pula","aliases":["Botswanan pula","Botswanan pulas","BWP","P"]},"BYB":{"name":"Belarusian Ruble (1994–1999)","aliases":["Belarusian ruble (1994–1999)","Belarusian rubles (1994–1999)"]},"BYN":{"name":"Belarusian Ruble","aliases":["Belarusian ruble","Belarusian rubles","BYN"]},"BYR":{"name":"Belarusian Ruble (2000–2016)","aliases":["Belarusian ruble (2000–2016)","Belarusian rubles (2000–2016)"]},"BZD":{"name":"Belize Dollar","aliases":["Belize dollar","Belize dollars","BZD","$"]},"CAD":{"name":"Canadian Dollar","aliases":["Canadian dollar","Canadian dollars","CA$","$"]},"CDF":{"name":"Congolese Franc","aliases":["Congolese franc","Congolese francs","CDF"]},"CHE":{"name":"WIR Euro","aliases":["WIR euro","WIR euros"]},"CHF":{"name":"Swiss Franc","aliases":["Swiss franc","Swiss francs","CHF"]},"CHW":{"name":"WIR Franc","aliases":["WIR franc","WIR francs"]},"CLE":{"name":"Chilean Escudo","aliases":["Chilean escudo","Chilean escudos"]},"CLF":{"name":"Chilean Unit of Account (UF)","aliases":["Chilean unit of account (UF)","Chilean units of account (UF)"]},"CLP":{"name":"Chilean Peso","aliases":["Chilean peso","Chilean pesos","CLP","$"]},"CNH":{"name":"Chinese Yuan (offshore)","aliases":["Chinese yuan (offshore)","CNH"]},"CNX":{"name":"Chinese People’s Bank Dollar","aliases":["Chinese People’s Bank dollar","Chinese People’s Bank dollars"]},"CNY":{"name":"Chinese Yuan","aliases":["Chinese yuan","CN¥","¥"]},"COP":{"name":"Colombian Peso","aliases":["Colombian peso","Colombian pesos","COP","$"]},"COU":{"name":"Colombian Real Value Unit","aliases":["Colombian real value unit","Colombian real value units"]},"CRC":{"name":"Costa Rican Colón","aliases":["Costa Rican colón","Costa Rican colóns","CRC","₡"]},"CSD":{"name":"Serbian Dinar (2002–2006)","aliases":["Serbian dinar (2002–2006)","Serbian dinars (2002–2006)"]},"CSK":{"name":"Czechoslovak Hard Koruna","aliases":["Czechoslovak hard koruna","Czechoslovak hard korunas"]},"CUC":{"name":"Cuban Convertible Peso","aliases":["Cuban convertible peso","Cuban convertible pesos","CUC","$"]},"CUP":{"name":"Cuban Peso","aliases":["Cuban peso","Cuban pesos","CUP","$"]},"CVE":{"name":"Cape Verdean Escudo","aliases":["Cape Verdean escudo","Cape Verdean escudos","CVE"]},"CYP":{"name":"Cypriot Pound","aliases":["Cypriot pound","Cypriot pounds"]},"CZK":{"name":"Czech Koruna","aliases":["Czech koruna","Czech korunas","CZK","Kč"]},"DDM":{"name":"East German Mark","aliases":["East German mark","East German marks"]},"DEM":{"name":"German Mark","aliases":["German mark","German marks"]},"DJF":{"name":"Djiboutian Franc","aliases":["Djiboutian franc","Djiboutian francs","DJF"]},"DKK":{"name":"Danish Krone","aliases":["Danish krone","Danish kroner","DKK","kr"]},"DOP":{"name":"Dominican Peso","aliases":["Dominican peso","Dominican pesos","DOP","$"]},"DZD":{"name":"Algerian Dinar","aliases":["Algerian dinar","Algerian dinars","DZD"]},"ECS":{"name":"Ecuadorian Sucre","aliases":["Ecuadorian sucre","Ecuadorian sucres"]},"ECV":{"name":"Ecuadorian Unit of Constant Value","aliases":["Ecuadorian unit of constant value","Ecuadorian units of constant value"]},"EEK":{"name":"Estonian Kroon","aliases":["Estonian kroon","Estonian kroons"]},"EGP":{"name":"Egyptian Pound","aliases":["Egyptian pound","Egyptian pounds","EGP","E£"]},"ERN":{"name":"Eritrean Nakfa","aliases":["Eritrean nakfa","Eritrean nakfas","ERN"]},"ESA":{"name":"Spanish Peseta (A account)","aliases":["Spanish peseta (A account)","Spanish pesetas (A account)"]},"ESB":{"name":"Spanish Peseta (convertible account)","aliases":["Spanish peseta (convertible account)","Spanish pesetas (convertible account)"]},"ESP":{"name":"Spanish Peseta","aliases":["Spanish peseta","Spanish pesetas","₧"]},"ETB":{"name":"Ethiopian Birr","aliases":["Ethiopian birr","Ethiopian birrs","ETB"]},"EUR":{"name":"Euro","aliases":["euro","euros","€"]},"FIM":{"name":"Finnish Markka","aliases":["Finnish markka","Finnish markkas"]},"FJD":{"name":"Fijian Dollar","aliases":["Fijian dollar","Fijian dollars","FJD","$"]},"FKP":{"name":"Falkland Islands Pound","aliases":["Falkland Islands pound","Falkland Islands pounds","FKP","£"]},"FRF":{"name":"French Franc","aliases":["French franc","French francs"]},"GBP":{"name":"British Pound","aliases":["British pound","British pounds","£"]},"GEK":{"name":"Georgian Kupon Larit","aliases":["Georgian kupon larit","Georgian kupon larits"]},"GEL":{"name":"Georgian Lari","aliases":["Georgian lari","Georgian laris","GEL","₾"]},"GHC":{"name":"Ghanaian Cedi (1979–2007)","aliases":["Ghanaian cedi (1979–2007)","Ghanaian cedis (1979–2007)"]},"GHS":{"name":"Ghanaian Cedi","aliases":["Ghanaian cedi","Ghanaian cedis","GHS","GH₵"]},"GIP":{"name":"Gibraltar Pound","aliases":["Gibraltar pound","Gibraltar pounds","GIP","£"]},"GMD":{"name":"Gambian Dalasi","aliases":["Gambian dalasi","Gambian dalasis","GMD"]},"GNF":{"name":"Guinean Franc","aliases":["Guinean franc","Guinean francs","GNF","FG"]},"GNS":{"name":"Guinean Syli","aliases":["Guinean syli","Guinean sylis"]},"GQE":{"name":"Equatorial Guinean Ekwele","aliases":["Equatorial Guinean ekwele"]},"GRD":{"name":"Greek Drachma","aliases":["Greek drachma","Greek drachmas"]},"GTQ":{"name":"Guatemalan Quetzal","aliases":["Guatemalan quetzal","Guatemalan quetzals","GTQ","Q"]},"GWE":{"name":"Portuguese Guinea Escudo","aliases":["Portuguese Guinea escudo","Portuguese Guinea escudos"]},"GWP":{"name":"Guinea-Bissau Peso","aliases":["Guinea-Bissau peso","Guinea-Bissau pesos"]},"GYD":{"name":"Guyanaese Dollar","aliases":["Guyanaese dollar","Guyanaese dollars","GYD","$"]},"HKD":{"name":"Hong Kong Dollar","aliases":["Hong Kong dollar","Hong Kong dollars","HK$","$"]},"HNL":{"name":"Honduran Lempira","aliases":["Honduran lempira","Honduran lempiras","HNL","L"]},"HRD":{"name":"Croatian Dinar","aliases":["Croatian dinar","Croatian dinars"]},"HRK":{"name":"Croatian Kuna","aliases":["Croatian kuna","Croatian kunas","HRK","kn"]},"HTG":{"name":"Haitian Gourde","aliases":["Haitian gourde","Haitian gourdes","HTG"]},"HUF":{"name":"Hungarian Forint","aliases":["Hungarian forint","Hungarian forints","HUF","Ft"]},"IDR":{"name":"Indonesian Rupiah","aliases":["Indonesian rupiah","Indonesian rupiahs","IDR","Rp"]},"IEP":{"name":"Irish Pound","aliases":["Irish pound","Irish pounds"]},"ILP":{"name":"Israeli Pound","aliases":["Israeli pound","Israeli pounds"]},"ILR":{"name":"Israeli Shekel (1980–1985)","aliases":["Israeli shekel (1980–1985)","Israeli shekels (1980–1985)"]},"ILS":{"name":"Israeli New Shekel","aliases":["Israeli new shekel","Israeli new shekels","₪"]},"INR":{"name":"Indian Rupee","aliases":["Indian rupee","Indian rupees","₹"]},"IQD":{"name":"Iraqi Dinar","aliases":["Iraqi dinar","Iraqi dinars","IQD"]},"IRR":{"name":"Iranian Rial","aliases":["Iranian rial","Iranian rials","IRR"]},"ISJ":{"name":"Icelandic Króna (1918–1981)","aliases":["Icelandic króna (1918–1981)","Icelandic krónur (1918–1981)"]},"ISK":{"name":"Icelandic Króna","aliases":["Icelandic króna","Icelandic krónur","ISK","kr"]},"ITL":{"name":"Italian Lira","aliases":["Italian lira","Italian liras"]},"JMD":{"name":"Jamaican Dollar","aliases":["Jamaican dollar","Jamaican dollars","JMD","$"]},"JOD":{"name":"Jordanian Dinar","aliases":["Jordanian dinar","Jordanian dinars","JOD"]},"JPY":{"name":"Japanese Yen","aliases":["Japanese yen","¥"]},"KES":{"name":"Kenyan Shilling","aliases":["Kenyan shilling","Kenyan shillings","KES"]},"KGS":{"name":"Kyrgyz Som","aliases":["Kyrgyz som","Kyrgyz soms","KGS","⃀"]},"KHR":{"name":"Cambodian Riel","aliases":["Cambodian riel","Cambodian riels","KHR","៛"]},"KMF":{"name":"Comorian Franc","aliases":["Comorian franc","Comorian francs","KMF","CF"]},"KPW":{"name":"North Korean Won","aliases":["North Korean won","KPW","₩"]},"KRH":{"name":"South Korean Hwan (1953–1962)","aliases":["South Korean hwan (1953–1962)"]},"KRO":{"name":"South Korean Won (1945–1953)","aliases":["South Korean won (1945–1953)"]},"KRW":{"name":"South Korean Won","aliases":["South Korean won","₩"]},"KWD":{"name":"Kuwaiti Dinar","aliases":["Kuwaiti dinar","Kuwaiti dinars","KWD"]},"KYD":{"name":"Cayman Islands Dollar","aliases":["Cayman Islands dollar","Cayman Islands dollars","KYD","$"]},"KZT":{"name":"Kazakhstani Tenge","aliases":["Kazakhstani tenge","Kazakhstani tenges","KZT","₸"]},"LAK":{"name":"Laotian Kip","aliases":["Laotian kip","Laotian kips","LAK","₭"]},"LBP":{"name":"Lebanese Pound","aliases":["Lebanese pound","Lebanese pounds","LBP","L£"]},"LKR":{"name":"Sri Lankan Rupee","aliases":["Sri Lankan rupee","Sri Lankan rupees","LKR","Rs"]},"LRD":{"name":"Liberian Dollar","aliases":["Liberian dollar","Liberian dollars","LRD","$"]},"LSL":{"name":"Lesotho Loti","aliases":["Lesotho loti","Lesotho lotis","LSL"]},"LTL":{"name":"Lithuanian Litas","aliases":["Lithuanian litas","Lithuanian litai","Lt"]},"LTT":{"name":"Lithuanian Talonas","aliases":["Lithuanian talonas","Lithuanian talonases"]},"LUC":{"name":"Luxembourgian Convertible Franc","aliases":["Luxembourgian convertible franc","Luxembourgian convertible francs"]},"LUF":{"name":"Luxembourgian Franc","aliases":["Luxembourgian franc","Luxembourgian francs"]},"LUL":{"name":"Luxembourg Financial Franc","aliases":["Luxembourg financial franc","Luxembourg financial francs"]},"LVL":{"name":"Latvian Lats","aliases":["Latvian lats","Latvian lati","Ls"]},"LVR":{"name":"Latvian Ruble","aliases":["Latvian ruble","Latvian rubles"]},"LYD":{"name":"Libyan Dinar","aliases":["Libyan dinar","Libyan dinars","LYD"]},"MAD":{"name":"Moroccan Dirham","aliases":["Moroccan dirham","Moroccan dirhams","MAD"]},"MAF":{"name":"Moroccan Franc","aliases":["Moroccan franc","Moroccan francs"]},"MCF":{"name":"Monegasque Franc","aliases":["Monegasque franc","Monegasque francs"]},"MDC":{"name":"Moldovan Cupon","aliases":["Moldovan cupon"]},"MDL":{"name":"Moldovan Leu","aliases":["Moldovan leu","Moldovan lei","MDL"]},"MGA":{"name":"Malagasy Ariary","aliases":["Malagasy ariary","Malagasy ariaries","MGA","Ar"]},"MGF":{"name":"Malagasy Franc","aliases":["Malagasy franc","Malagasy francs"]},"MKD":{"name":"Macedonian Denar","aliases":["Macedonian denar","Macedonian denari","MKD"]},"MKN":{"name":"Macedonian Denar (1992–1993)","aliases":["Macedonian denar (1992–1993)","Macedonian denari (1992–1993)"]},"MLF":{"name":"Malian Franc","aliases":["Malian franc","Malian francs"]},"MMK":{"name":"Myanmar Kyat","aliases":["Myanmar kyat","Myanmar kyats","MMK","K"]},"MNT":{"name":"Mongolian Tugrik","aliases":["Mongolian tugrik","Mongolian tugriks","MNT","₮"]},"MOP":{"name":"Macanese Pataca","aliases":["Macanese pataca","Macanese patacas","MOP"]},"MRO":{"name":"Mauritanian Ouguiya (1973–2017)","aliases":["Mauritanian ouguiya (1973–2017)","Mauritanian ouguiyas (1973–2017)"]},"MRU":{"name":"Mauritanian Ouguiya","aliases":["Mauritanian ouguiya","Mauritanian ouguiyas","MRU"]},"MTL":{"name":"Maltese Lira","aliases":["Maltese lira"]},"MTP":{"name":"Maltese Pound","aliases":["Maltese pound","Maltese pounds"]},"MUR":{"name":"Mauritian Rupee","aliases":["Mauritian rupee","Mauritian rupees","MUR","Rs"]},"MVP":{"name":"Maldivian Rupee (1947–1981)","aliases":["Maldivian rupee (1947–1981)","Maldivian rupees (1947–1981)"]},"MVR":{"name":"Maldivian Rufiyaa","aliases":["Maldivian rufiyaa","Maldivian rufiyaas","MVR"]},"MWK":{"name":"Malawian Kwacha","aliases":["Malawian kwacha","Malawian kwachas","MWK"]},"MXN":{"name":"Mexican Peso","aliases":["Mexican peso","Mexican pesos","MX$","$"]},"MXP":{"name":"Mexican Silver Peso (1861–1992)","aliases":["Mexican silver peso (1861–1992)","Mexican silver pesos (1861–1992)"]},"MXV":{"name":"Mexican Investment Unit","aliases":["Mexican investment unit","Mexican investment units"]},"MYR":{"name":"Malaysian Ringgit","aliases":["Malaysian ringgit","Malaysian ringgits","MYR","RM"]},"MZE":{"name":"Mozambican Escudo","aliases":["Mozambican escudo","Mozambican escudos"]},"MZM":{"name":"Mozambican Metical (1980–2006)","aliases":["Mozambican metical (1980–2006)","Mozambican meticals (1980–2006)"]},"MZN":{"name":"Mozambican Metical","aliases":["Mozambican metical","Mozambican meticals","MZN"]},"NAD":{"name":"Namibian Dollar","aliases":["Namibian dollar","Namibian dollars","NAD","$"]},"NGN":{"name":"Nigerian Naira","aliases":["Nigerian naira","Nigerian nairas","NGN","₦"]},"NIC":{"name":"Nicaraguan Córdoba (1988–1991)","aliases":["Nicaraguan córdoba (1988–1991)","Nicaraguan córdobas (1988–1991)"]},"NIO":{"name":"Nicaraguan Córdoba","aliases":["Nicaraguan córdoba","Nicaraguan córdobas","NIO","C$"]},"NLG":{"name":"Dutch Guilder","aliases":["Dutch guilder","Dutch guilders"]},"NOK":{"name":"Norwegian Krone","aliases":["Norwegian krone","Norwegian kroner","NOK","kr"]},"NPR":{"name":"Nepalese Rupee","aliases":["Nepalese rupee","Nepalese rupees","NPR","Rs"]},"NZD":{"name":"New Zealand Dollar","aliases":["New Zealand dollar","New Zealand dollars","NZ$","$"]},"OMR":{"name":"Omani Rial","aliases":["Omani rial","Omani rials","OMR"]},"PAB":{"name":"Panamanian Balboa","aliases":["Panamanian balboa","Panamanian balboas","PAB"]},"PEI":{"name":"Peruvian Inti","aliases":["Peruvian inti","Peruvian intis"]},"PEN":{"name":"Peruvian Sol","aliases":["Peruvian sol","Peruvian soles","PEN"]},"PES":{"name":"Peruvian Sol (1863–1965)","aliases":["Peruvian sol (1863–1965)","Peruvian soles (1863–1965)"]},"PGK":{"name":"Papua New Guinean Kina","aliases":["Papua New Guinean kina","PGK"]},"PHP":{"name":"Philippine Peso","aliases":["Philippine peso","Philippine pesos","₱"]},"PKR":{"name":"Pakistani Rupee","aliases":["Pakistani rupee","Pakistani rupees","PKR","Rs"]},"PLN":{"name":"Polish Zloty","aliases":["Polish zloty","Polish zlotys","PLN","zł"]},"PLZ":{"name":"Polish Zloty (1950–1995)","aliases":["Polish zloty (PLZ)","Polish zlotys (PLZ)"]},"PTE":{"name":"Portuguese Escudo","aliases":["Portuguese escudo","Portuguese escudos"]},"PYG":{"name":"Paraguayan Guarani","aliases":["Paraguayan guarani","Paraguayan guaranis","PYG","₲"]},"QAR":{"name":"Qatari Riyal","aliases":["Qatari riyal","Qatari riyals","QAR"]},"RHD":{"name":"Rhodesian Dollar","aliases":["Rhodesian dollar","Rhodesian dollars"]},"ROL":{"name":"Romanian Leu (1952–2006)","aliases":["Romanian leu (1952–2006)","Romanian Lei (1952–2006)"]},"RON":{"name":"Romanian Leu","aliases":["Romanian leu","Romanian lei","RON","lei"]},"RSD":{"name":"Serbian Dinar","aliases":["Serbian dinar","Serbian dinars","RSD"]},"RUB":{"name":"Russian Ruble","aliases":["Russian ruble","Russian rubles","RUB","₽"]},"RUR":{"name":"Russian Ruble (1991–1998)","aliases":["Russian ruble (1991–1998)","Russian rubles (1991–1998)"]},"RWF":{"name":"Rwandan Franc","aliases":["Rwandan franc","Rwandan francs","RWF","RF"]},"SAR":{"name":"Saudi Riyal","aliases":["Saudi riyal","Saudi riyals","SAR","⃁"]},"SBD":{"name":"Solomon Islands Dollar","aliases":["Solomon Islands dollar","Solomon Islands dollars","SBD","$"]},"SCR":{"name":"Seychellois Rupee","aliases":["Seychellois rupee","Seychellois rupees","SCR"]},"SDD":{"name":"Sudanese Dinar (1992–2007)","aliases":["Sudanese dinar (1992–2007)","Sudanese dinars (1992–2007)"]},"SDG":{"name":"Sudanese Pound","aliases":["Sudanese pound","Sudanese pounds","SDG"]},"SDP":{"name":"Sudanese Pound (1957–1998)","aliases":["Sudanese pound (1957–1998)","Sudanese pounds (1957–1998)"]},"SEK":{"name":"Swedish Krona","aliases":["Swedish krona","Swedish kronor","SEK","kr"]},"SGD":{"name":"Singapore Dollar","aliases":["Singapore dollar","Singapore dollars","SGD","$"]},"SHP":{"name":"St. Helena Pound","aliases":["St. Helena pound","St. Helena pounds","SHP","£"]},"SIT":{"name":"Slovenian Tolar","aliases":["Slovenian tolar","Slovenian tolars"]},"SKK":{"name":"Slovak Koruna","aliases":["Slovak koruna","Slovak korunas"]},"SLE":{"name":"Sierra Leonean Leone","aliases":["Sierra Leonean leone","Sierra Leonean leones","SLE"]},"SLL":{"name":"Sierra Leonean Leone (1964—2022)","aliases":["Sierra Leonean leone (1964—2022)","Sierra Leonean leones (1964—2022)","SLL"]},"SOS":{"name":"Somali Shilling","aliases":["Somali shilling","Somali shillings","SOS"]},"SRD":{"name":"Surinamese Dollar","aliases":["Surinamese dollar","Surinamese dollars","SRD","$"]},"SRG":{"name":"Surinamese Guilder","aliases":["Surinamese guilder","Surinamese guilders"]},"SSP":{"name":"South Sudanese Pound","aliases":["South Sudanese pound","South Sudanese pounds","SSP","£"]},"STD":{"name":"São Tomé & Príncipe Dobra (1977–2017)","aliases":["São Tomé & Príncipe dobra (1977–2017)","São Tomé & Príncipe dobras (1977–2017)"]},"STN":{"name":"São Tomé & Príncipe Dobra","aliases":["São Tomé & Príncipe dobra","São Tomé & Príncipe dobras","STN","Db"]},"SUR":{"name":"Soviet Rouble","aliases":["Soviet rouble","Soviet roubles"]},"SVC":{"name":"Salvadoran Colón","aliases":["Salvadoran colón","Salvadoran colones"]},"SYP":{"name":"Syrian Pound","aliases":["Syrian pound","Syrian pounds","SYP","£"]},"SZL":{"name":"Swazi Lilangeni","aliases":["Swazi lilangeni","Swazi emalangeni","SZL"]},"THB":{"name":"Thai Baht","aliases":["Thai baht","THB","฿"]},"TJR":{"name":"Tajikistani Ruble","aliases":["Tajikistani ruble","Tajikistani rubles"]},"TJS":{"name":"Tajikistani Somoni","aliases":["Tajikistani somoni","Tajikistani somonis","TJS"]},"TMM":{"name":"Turkmenistani Manat (1993–2009)","aliases":["Turkmenistani manat (1993–2009)"]},"TMT":{"name":"Turkmenistani Manat","aliases":["Turkmenistani manat","TMT"]},"TND":{"name":"Tunisian Dinar","aliases":["Tunisian dinar","Tunisian dinars","TND"]},"TOP":{"name":"Tongan Paʻanga","aliases":["Tongan paʻanga","TOP","T$"]},"TPE":{"name":"Timorese Escudo","aliases":["Timorese escudo","Timorese escudos"]},"TRL":{"name":"Turkish Lira (1922–2005)","aliases":["Turkish lira (1922–2005)","Turkish Lira (1922–2005)"]},"TRY":{"name":"Turkish Lira","aliases":["Turkish lira","Turkish Lira","TRY","₺","TL"]},"TTD":{"name":"Trinidad & Tobago Dollar","aliases":["Trinidad & Tobago dollar","Trinidad & Tobago dollars","TTD","$"]},"TWD":{"name":"New Taiwan Dollar","aliases":["New Taiwan dollar","New Taiwan dollars","NT$","$"]},"TZS":{"name":"Tanzanian Shilling","aliases":["Tanzanian shilling","Tanzanian shillings","TZS"]},"UAH":{"name":"Ukrainian Hryvnia","aliases":["Ukrainian hryvnia","Ukrainian hryvnias","UAH","₴"]},"UAK":{"name":"Ukrainian Karbovanets","aliases":["Ukrainian karbovanets","Ukrainian karbovantsiv"]},"UGS":{"name":"Ugandan Shilling (1966–1987)","aliases":["Ugandan shilling (1966–1987)","Ugandan shillings (1966–1987)"]},"UGX":{"name":"Ugandan Shilling","aliases":["Ugandan shilling","Ugandan shillings","UGX"]},"USD":{"name":"US Dollar","aliases":["US dollar","US dollars","$"]},"USN":{"name":"US Dollar (Next day)","aliases":["US dollar (next day)","US dollars (next day)"]},"USS":{"name":"US Dollar (Same day)","aliases":["US dollar (same day)","US dollars (same day)"]},"UYI":{"name":"Uruguayan Peso (Indexed Units)","aliases":["Uruguayan peso (indexed units)","Uruguayan pesos (indexed units)"]},"UYP":{"name":"Uruguayan Peso (1975–1993)","aliases":["Uruguayan peso (1975–1993)","Uruguayan pesos (1975–1993)"]},"UYU":{"name":"Uruguayan Peso","aliases":["Uruguayan peso","Uruguayan pesos","UYU","$"]},"UYW":{"name":"Uruguayan Nominal Wage Index Unit","aliases":["Uruguayan nominal wage index unit","Uruguayan nominal wage index units"]},"UZS":{"name":"Uzbekistani Som","aliases":["Uzbekistani som","UZS"]},"VEB":{"name":"Venezuelan Bolívar (1871–2008)","aliases":["Venezuelan bolívar (1871–2008)","Venezuelan bolívars (1871–2008)"]},"VED":{"name":"Bolívar Soberano","aliases":["Bolívar Soberano","Bolívar Soberanos"]},"VEF":{"name":"Venezuelan Bolívar (2008–2018)","aliases":["Venezuelan bolívar (2008–2018)","Venezuelan bolívars (2008–2018)","Bs"]},"VES":{"name":"Venezuelan Bolívar","aliases":["Venezuelan bolívar","Venezuelan bolívars","VES"]},"VND":{"name":"Vietnamese Dong","aliases":["Vietnamese dong","₫"]},"VNN":{"name":"Vietnamese Dong (1978–1985)","aliases":["Vietnamese dong (1978–1985)"]},"VUV":{"name":"Vanuatu Vatu","aliases":["Vanuatu vatu","Vanuatu vatus","VUV"]},"WST":{"name":"Samoan Tala","aliases":["Samoan tala","WST"]},"XAF":{"name":"Central African CFA Franc","aliases":["Central African CFA franc","Central African CFA francs","FCFA"]},"XAG":{"name":"Silver","aliases":["troy ounce of silver","troy ounces of silver"]},"XAU":{"name":"Gold","aliases":["troy ounce of gold","troy ounces of gold"]},"XBA":{"name":"European Composite Unit","aliases":["European composite unit","European composite units"]},"XBB":{"name":"European Monetary Unit","aliases":["European monetary unit","European monetary units"]},"XBC":{"name":"European Unit of Account (XBC)","aliases":["European unit of account (XBC)","European units of account (XBC)"]},"XBD":{"name":"European Unit of Account (XBD)","aliases":["European unit of account (XBD)","European units of account (XBD)"]},"XCD":{"name":"East Caribbean Dollar","aliases":["East Caribbean dollar","East Caribbean dollars","EC$","$"]},"XCG":{"name":"Caribbean guilder","aliases":["Caribbean guilder","Caribbean guilders","Cg."]},"XDR":{"name":"Special Drawing Rights","aliases":["special drawing rights"]},"XEU":{"name":"European Currency Unit","aliases":["European currency unit","European currency units"]},"XFO":{"name":"French Gold Franc","aliases":["French gold franc","French gold francs"]},"XFU":{"name":"French UIC-Franc","aliases":["French UIC-franc","French UIC-francs"]},"XOF":{"name":"West African CFA Franc","aliases":["West African CFA franc","West African CFA francs","F CFA"]},"XPD":{"name":"Palladium","aliases":["troy ounce of palladium","troy ounces of palladium"]},"XPF":{"name":"CFP Franc","aliases":["CFP franc","CFP francs","CFPF"]},"XPT":{"name":"Platinum","aliases":["troy ounce of platinum","troy ounces of platinum"]},"XRE":{"name":"RINET Funds","aliases":["RINET Funds unit","RINET Funds units"]},"XSU":{"name":"Sucre","aliases":["Sucre","Sucres"]},"XUA":{"name":"ADB Unit of Account","aliases":["ADB unit of account","ADB units of account"]},"YDD":{"name":"Yemeni Dinar","aliases":["Yemeni dinar","Yemeni dinars"]},"YER":{"name":"Yemeni Rial","aliases":["Yemeni rial","Yemeni rials","YER"]},"YUD":{"name":"Yugoslavian Hard Dinar (1966–1990)","aliases":["Yugoslavian hard dinar (1966–1990)","Yugoslavian hard dinars (1966–1990)"]},"YUM":{"name":"Yugoslavian New Dinar (1994–2002)","aliases":["Yugoslavian new dinar (1994–2002)","Yugoslavian new dinars (1994–2002)"]},"YUN":{"name":"Yugoslavian Convertible Dinar (1990–1992)","aliases":["Yugoslavian convertible dinar (1990–1992)","Yugoslavian convertible dinars (1990–1992)"]},"YUR":{"name":"Yugoslavian Reformed Dinar (1992–1993)","aliases":["Yugoslavian reformed dinar (1992–1993)","Yugoslavian reformed dinars (1992–1993)"]},"ZAL":{"name":"South African Rand (financial)","aliases":["South African rand (financial)","South African rands (financial)"]},"ZAR":{"name":"South African Rand","aliases":["South African rand","ZAR","R"]},"ZMK":{"name":"Zambian Kwacha (1968–2012)","aliases":["Zambian kwacha (1968–2012)","Zambian kwachas (1968–2012)"]},"ZMW":{"name":"Zambian Kwacha","aliases":["Zambian kwacha","Zambian kwachas","ZMW","ZK"]},"ZRN":{"name":"Zairean New Zaire (1993–1998)","aliases":["Zairean new zaire (1993–1998)","Zairean new zaires (1993–1998)"]},"ZRZ":{"name":"Zairean Zaire (1971–1993)","aliases":["Zairean zaire (1971–1993)","Zairean zaires (1971–1993)"]},"ZWD":{"name":"Zimbabwean Dollar (1980–2008)","aliases":["Zimbabwean dollar (1980–2008)","Zimbabwean dollars (1980–2008)"]},"ZWG":{"name":"Zimbabwean Gold","aliases":["Zimbabwean gold","ZWG"]},"ZWL":{"name":"Zimbabwean Dollar (2009–2024)","aliases":["Zimbabwean dollar (2009–2024)","Zimbabwean dollars (2009–2024)"]},"ZWR":{"name":"Zimbabwean Dollar (2008)","aliases":["Zimbabwean dollar (2008)","Zimbabwean dollars (2008)"]}}});
+// END GENERATED LISTING CURRENCY
+
 // BEGIN GENERATED LISTING INTEGRITY
 // Shared by the browser, repair tool and generated n8n workflows. No DOM/URL globals required.
 function createListingIntegrity() {
@@ -3977,7 +4064,7 @@ class DatingApp {
                 ))
                 .forEach((entry) => this.insertFeaturedAdCard(entry, {
                     priceText: String(entry?.featuredAd?.priceLine || '').trim()
-                        || this.formatMarketplaceMoney(Number(entry?.price), { fallback: '' }),
+                        || this.formatMarketplaceMoney(Number(entry?.price), { ...entry, fallback: '' }),
                     sellerName: String(entry?.seller || '').trim(),
                     sellerPhoto: String(entry?.sellerPhoto || '').trim()
                 }));
@@ -4308,11 +4395,7 @@ class DatingApp {
     }
 
     parseOxglowPriceLabel(value = '') {
-        const raw = String(value || '').trim();
-        if (!raw) return '';
-        const numeric = Number.parseFloat(raw.replace(/[^0-9.]/g, ''));
-        if (!Number.isFinite(numeric)) return raw;
-        return `GH¢ ${Math.round(numeric).toLocaleString()}`;
+        return this.formatListingPriceText(value, { country: 'Ghana' });
     }
 
     formatOxglowPropertyTypeLabel(value = '') {
@@ -5003,7 +5086,7 @@ class DatingApp {
 
         const phone = this.parseDelimitedList(row.phone_numbers || '').join(' | ');
         if (!phone) return null;
-        const priceText = String(row.price || '').trim();
+        const priceText = this.formatListingPriceText(row.price, { currency: 'CAD' });
         const priceValue = Number.parseFloat(priceText.replace(/[^0-9.]/g, ''));
         const city = String(row.city || row.location_name || '').trim();
         const category = this.inferKijijiGtaCategory(row);
@@ -5015,6 +5098,7 @@ class DatingApp {
             city,
             country: 'Canada',
             fullDescription: String(row.description || '').trim(),
+            currency: this.getListingCurrency(row.price, { currency: row.currency, country: 'Canada' }),
             description: String(row.description || '').trim(),
             seller: String(row.seller || this.parseCsvJsonField(row.attributes, {}).sellerName || 'Unknown').trim(),
             sourceTable: 'kijiji_gta_recent_csv',
@@ -5060,7 +5144,7 @@ class DatingApp {
             price: Number.isFinite(priceValue) ? priceValue : 0,
             priceText,
             priceLabel: priceText,
-            currency: 'CAD',
+            currency: common.currency,
             phone,
             contact: phone ? { method: 'phone', phone } : null,
             postedDate: row.sorting_date || row.posted_at || new Date().toISOString(),
@@ -5140,7 +5224,7 @@ class DatingApp {
             price: Number.isFinite(priceValue) ? priceValue : 0,
             priceText: this.parseOxglowPriceLabel(priceRaw) || priceRaw,
             priceLabel: this.parseOxglowPriceLabel(priceRaw) || priceRaw,
-            currency: 'GHS',
+            currency: this.getListingCurrency(priceRaw, { country: 'Ghana' }),
             city,
             country: 'Ghana',
             fullDescription: String(row.description || '').trim(),
@@ -5322,7 +5406,9 @@ class DatingApp {
         }, normalizedSeller);
         const priceValue = Number(row.price_value);
         const suppliedPrice = String(row.price_text || '').trim();
-        const rawPriceText = /^contact(?: the)? seller(?: for price)?$/i.test(suppliedPrice) ? 'Price not provided' : suppliedPrice;
+        const rawPriceText = /^contact(?: the)? seller(?: for price)?$/i.test(suppliedPrice)
+            ? 'Price not provided'
+            : this.formatListingPriceText(suppliedPrice, { currency: row.currency, country: row.country });
         const priceTextValue = Number(rawPriceText.replace(/[^0-9.]/g, ''));
         let normalizedPriceValue = Number.isFinite(priceValue) ? priceValue : null;
         if (Number.isFinite(priceValue) && Number.isFinite(priceTextValue) && priceTextValue > 0) {
@@ -5347,6 +5433,7 @@ class DatingApp {
             province: region,
             country: String(row.country || '').trim(),
             fullDescription: String(row.description || '').trim(),
+            currency: this.getListingCurrency(suppliedPrice, { currency: row.currency, country: row.country }),
             description: String(row.description || '').trim(),
             seller: sellerIsMarketplaceName ? 'Unknown' : normalizedSeller,
             sourceTable: 'csv_scraped_listings',
@@ -5397,7 +5484,7 @@ class DatingApp {
             price: Number.isFinite(normalizedPriceValue) ? normalizedPriceValue : 0,
             priceText: rawPriceText,
             priceLabel: rawPriceText,
-            currency: String(row.currency || '').trim(),
+            currency: common.currency,
             phone,
             postedDate: row.scraped_at || new Date().toISOString(),
             images: imageList,
@@ -5579,7 +5666,7 @@ class DatingApp {
         if (!quality) return null;
         const category = isVehicle ? 'vehicles' : String(item.category || '').trim().toLowerCase();
         const rawPrice = item.priceText || item.priceLabel || item.price || '';
-        const priceLine = Number(rawPrice) === 0 ? '' : String(rawPrice).trim();
+        const priceLine = Number(rawPrice) === 0 ? '' : this.formatListingPriceText(rawPrice, item);
         const location = [item.city, item.region, item.country].filter(Boolean).join(', ');
         const seller = this.getImportedListingSellerName(item);
         const condition = String(item.condition || item.vehicle?.condition || '').trim();
@@ -7881,17 +7968,8 @@ class DatingApp {
 
     formatHostBookingMoney(value, currency = 'USD') {
         const amount = Number(value);
-        if (!Number.isFinite(amount) || amount <= 0) return '$0';
-        const currencyCode = String(currency || 'USD').trim().toUpperCase() || 'USD';
-        try {
-            return new Intl.NumberFormat('en-US', {
-                style: 'currency',
-                currency: currencyCode,
-                maximumFractionDigits: amount % 1 === 0 ? 0 : 2
-            }).format(amount);
-        } catch {
-            return `${currencyCode} ${Math.round(amount).toLocaleString()}`;
-        }
+        if (!Number.isFinite(amount) || amount < 0) return '—';
+        return this.formatListingPriceText(amount.toFixed(2), { currency });
     }
 
     getFilteredHostBookings() {
@@ -21324,11 +21402,9 @@ class DatingApp {
         row.innerHTML = displayDeals.map(({ item, reasons, isPromotedDeal, campaign }, index) => {
             const title = this.escapeHtml(String(item?.title || 'Listing'));
             const price = Number(item?.price);
-            const listedPriceText = String(item?.priceText || item?.priceLabel || '').trim();
-            const rawPriceText = listedPriceText || (Number.isFinite(price)
-                ? (price <= 0 ? 'Free' : `$${price.toLocaleString()}`)
-                : String(item?.price || 'Open to offers'));
-            const priceText = this.escapeHtml(rawPriceText);
+            const rawPriceText = item.priceText || item.priceLabel
+                || (Number.isFinite(price) ? (price <= 0 ? 'Free' : price) : item.price || 'Open to offers');
+            const priceText = this.escapeHtml(this.formatListingPriceText(rawPriceText, item));
             const location = this.escapeHtml([item?.city, item?.country].filter(Boolean).join(', ') || 'Worldwide');
             const dealImages = this.getMarketplaceImageSources(item);
             const img = this.escapeHtml(String(dealImages[0] || 'https://via.placeholder.com/600x420/ebeef5/111827?text=Deal'));
@@ -26756,7 +26832,7 @@ class DatingApp {
 	                    const rentalPriceLine = isRental
 	                        ? `
 	                            <div class="vehicle-rental-price-line">
-	                                <strong>${this.escapeHtml(item.price || '')}</strong>
+	                                <strong>${this.escapeHtml(this.formatListingPriceText(item.price, item))}</strong>
 	                                <span>${this.escapeHtml([item.make, item.model, item.year].filter(Boolean).join(' · '))}</span>
 	                            </div>
 	                        `
@@ -26776,7 +26852,7 @@ class DatingApp {
                                 marketplace: 'Used listing'
                             };
                             const kindLabel = kindLabelMap[item.searchResultKind] || 'Vehicle listing';
-                            const priceLine = item.price || '';
+                            const priceLine = this.formatListingPriceText(item.price, item);
                             const vehicleLocationLabel = this.getFeedLocationLabel(item);
                             const subLine = item.searchResultKind === 'parts'
                                 ? [item.brandName || item.seller, item.partType ? this.titleCase(item.partType) : '', item.inStock ? 'In stock' : 'Check availability'].filter(Boolean).join(' · ')
@@ -26827,7 +26903,7 @@ class DatingApp {
 		                        <div class="dating-feed-meta">
 		                            ${postedDateMarkup}
 		                            <div class="dating-feed-name">${title}</div>
-	                                ${rentalPriceLine || `<div class="dating-feed-location">${this.escapeHtml(item.city)} · ${this.escapeHtml(item.price)}</div>`}
+	                                ${rentalPriceLine || `<div class="dating-feed-location">${this.escapeHtml(item.city)} · ${this.escapeHtml(this.formatListingPriceText(item.price, item))}</div>`}
 	                                ${rentalBadges ? `<div class="vehicle-rental-badges">${rentalBadges}</div>` : ''}
                                     ${rentalDescription ? `<p class="vehicle-rental-card-description">${this.escapeHtml(rentalDescription)}</p>` : ''}
                                             <div class="dating-feed-status ${this.vehicleFavorites.has(item.id) || (hasTripDates && !hasTripConflict) ? 'online' : 'offline'}">${this.vehicleFavorites.has(item.id) ? 'Saved' : (hasTripDates ? (hasTripConflict ? 'Unavailable' : 'Available') : 'Check dates')}</div>
@@ -27262,7 +27338,7 @@ class DatingApp {
             descEl.setAttribute('aria-expanded', 'false');
             descEl.setAttribute('aria-label', desc ? `Read full description for ${displayTitle}` : 'Full description unavailable');
         }
-	        if (priceEl) priceEl.textContent = item.price || '';
+	        if (priceEl) priceEl.textContent = this.formatListingPriceText(item.price, item);
 	        if (imgEl) this.applyContainedModalImage(imgEl, safePhotos[0], {
                 fallback: fallbackPhoto,
                 alt: `${item.title || 'Vehicle'} photo 1`,
@@ -29457,7 +29533,7 @@ class DatingApp {
 
         if (titleEl) titleEl.textContent = data.title || 'Featured listing';
         if (priceEl) {
-            priceEl.textContent = data.price || '';
+            priceEl.textContent = this.formatListingPriceText(data.price, data);
             priceEl.classList.toggle('hidden', !data.price);
         }
         if (metaEl) {
@@ -31681,7 +31757,7 @@ class DatingApp {
         const fallbackBid = isBidIntent ? this.getClothingBidMarket(item).topBid : null;
         const bidValueRaw = Number(suggestedBid);
         const resolvedBid = Number.isFinite(bidValueRaw) && bidValueRaw > 0 ? bidValueRaw : fallbackBid;
-        const bidLabel = isBidIntent ? this.formatMarketplaceMoney(resolvedBid, { fallback: '' }) : '';
+        const bidLabel = isBidIntent ? this.formatMarketplaceMoney(resolvedBid, { ...item, fallback: '' }) : '';
         const isServerBacked = item?.serverBacked === true
             && ['marketplace_listings', 'short_term_listings'].includes(String(item?.sourceTable || '').trim());
         const prefillText = isBidIntent
@@ -35788,10 +35864,12 @@ class DatingApp {
         };
         const priceAmount = Number.isFinite(item.price) ? item.price : Number.parseFloat(String(item.price || '').replace(/[^0-9.]/g, ''));
         const importedPriceText = item.source?.type === 'scraped_csv' ? String(item.priceText || item.priceLabel || '').trim() : '';
-        const currencyPrefix = item.currency ? `${item.currency} ` : '$';
-        const priceText = importedPriceText || (Number.isFinite(priceAmount)
-            ? `${currencyPrefix}${priceAmount.toLocaleString()}${priceSuffixMap[priceTerm] || ''}`
-            : String(item.priceLabel || item.price || '').trim());
+        const displayCurrency = this.getListingCurrency(item.priceText || item.priceLabel || item.price, item);
+        const priceText = importedPriceText
+            ? this.formatListingPriceText(importedPriceText, item)
+            : (Number.isFinite(priceAmount)
+                ? `${this.formatListingPriceText(priceAmount, { currency: displayCurrency })}${priceSuffixMap[priceTerm] || ''}`
+                : this.formatListingPriceText(item.priceLabel || item.price, item));
         const bedrooms = Number.isFinite(realestate.bedrooms) ? realestate.bedrooms : Number.parseInt(String(realestate.bedrooms || ''), 10);
         const bathrooms = Number.isFinite(realestate.bathrooms) ? realestate.bathrooms : Number.parseFloat(String(realestate.bathrooms || ''));
         const sqft = Number.isFinite(realestate.sqft) ? realestate.sqft : Number.parseInt(String(realestate.sqft || ''), 10);
@@ -39216,7 +39294,7 @@ class DatingApp {
                 const service = item.service || {};
                 const photo = service.photos?.[0] || service.avatar || fallbackPhoto;
                 const locationLabel = this.getServiceLocationLabel(service) || 'Location not listed';
-                const priceLine = String(service.price || service.priceNote || '').trim();
+                const priceLine = this.formatListingPriceText(service.price || service.priceNote, service);
                 const reviewMeta = this.getServiceCardReviewMeta(service);
                 const tripLine = hasPreviewDestination
                     ? `Destination: ${previewDestination}`
@@ -39246,7 +39324,7 @@ class DatingApp {
                 const service = item.service || {};
                 const photo = service.photos?.[0] || service.avatar || fallbackPhoto;
                 const locationLabel = this.getServiceLocationLabel(service) || 'Location not listed';
-                const priceLine = String(service.price || service.priceNote || '').trim();
+                const priceLine = this.formatListingPriceText(service.price || service.priceNote, service);
                 const reviewMeta = this.getServiceCardReviewMeta(service);
                 const tripLine = hasPreviewDestination
                     ? `Destination: ${previewDestination}`
@@ -40155,7 +40233,7 @@ class DatingApp {
         if (titleEl) titleEl.textContent = isStandardProperty ? profileSummary.title : (listing.title || 'Property');
         if (priceEl) priceEl.textContent = this.isRealestateShortTermListing(listing)
             ? `${this.formatShortTermMoney(this.getShortTermNightlyRate(listing), listing.currency || 'USD')} / night`
-            : (listing.price || '');
+            : this.formatListingPriceText(listing.price, listing);
 
         const location = isStandardProperty ? (listing.location || [listing.city, listing.country].filter(Boolean).join(', ')) : this.getShortTermPublicAreaLabel(listing);
         if (locationEl) {
@@ -42034,7 +42112,7 @@ class DatingApp {
 	                return this.marketplaceCategoryLabel(category);
 	            })();
 	            const cardTitle = this.escapeHtml(String(it.title || 'Listing'));
-	            const priceText = this.escapeHtml(String(it.priceText || ''));
+	            const priceText = this.escapeHtml(this.formatListingPriceText(it.priceText, it.raw || it));
 	            const locationTextRaw = [typeLabel, it.locationLabel || [it.city, it.country].filter(Boolean).join(', ')].filter(Boolean).join(' • ');
 	            const locationText = this.escapeHtml(locationTextRaw);
 	            const homeCardImages = this.getSwipeImageSources(it);
@@ -44146,14 +44224,22 @@ class DatingApp {
         return 'sale';
     }
 
+    getListingCurrency(value, options = {}) {
+        return ListingCurrency.currency(value, options);
+    }
+
+    formatListingPriceText(value, options = {}) {
+        return ListingCurrency.format(value, options);
+    }
+
     formatListingPrice(listing, listingType) {
         if (!listing) return '';
-        if (listing.priceText) return listing.priceText;
+        if (listing.priceText) return this.formatListingPriceText(listing.priceText, listing);
         if (listing.price && typeof listing.price.amount === 'number') {
-            const currency = listing.price.currency || 'USD';
-            const amount = listing.price.amount.toLocaleString(undefined, { maximumFractionDigits: 0 });
+            const currency = listing.price.currency || this.getListingCurrency('', listing);
+            const amount = this.formatListingPriceText(listing.price.amount, { currency });
             const freq = listing.price.frequency ? ` / ${listing.price.frequency}` : '';
-            return `${currency} ${amount}${freq}`;
+            return `${amount}${freq}`;
         }
         switch (listingType) {
             case 'free':
@@ -44749,7 +44835,7 @@ class DatingApp {
             const auctionTimesHtml = this.buildAuctionTimeRowsHtml(auction, { wrapperClass: 'my-auction-times' });
             const winnerAmount = Number(auction?.winner?.amount);
             const wonLine = entry.isWinner && Number.isFinite(winnerAmount)
-                ? `Won at ${this.formatMarketplaceMoney(winnerAmount)}`
+                ? `Won at ${this.formatMarketplaceMoney(winnerAmount, item)}`
                 : '';
             const metaText = [meta, wonLine].filter(Boolean).join(' · ');
             const safeMetaText = this.escapeHtml(metaText || category || 'Marketplace');
@@ -46667,9 +46753,9 @@ class DatingApp {
         }
         if (titleEl) titleEl.textContent = String(item.title || 'Place bid').trim() || 'Place bid';
         if (subtitleEl) subtitleEl.textContent = `${String(item.seller || 'Seller').trim() || 'Seller'} · ${liveAuction?.enabled ? 'Live auction' : 'Bidding listing'}`;
-        if (topEl) topEl.textContent = this.formatMarketplaceMoney(currentTop);
-        if (askEl) askEl.textContent = this.formatMarketplaceMoney(market.lowestAsk);
-        if (minEl) minEl.textContent = this.formatMarketplaceMoney(minBid);
+        if (topEl) topEl.textContent = this.formatMarketplaceMoney(currentTop, item);
+        if (askEl) askEl.textContent = this.formatMarketplaceMoney(market.lowestAsk, item);
+        if (minEl) minEl.textContent = this.formatMarketplaceMoney(minBid, item);
         if (countdownEl) countdownEl.textContent = countdownText;
         if (fulfillmentEl) fulfillmentEl.textContent = fulfillmentText;
         if (amountEl) {
@@ -46682,7 +46768,7 @@ class DatingApp {
                 ? 'This bid window is closed.'
                 : (!hasStarted
                     ? `Bidding opens ${this.formatAuctionDeadline(timing?.startsAtMs || '')}.`
-                    : `Enter at least ${this.formatMarketplaceMoney(minBid)}. If your bid reaches the ask, the seller can accept immediately.`);
+                    : `Enter at least ${this.formatMarketplaceMoney(minBid, item)}. If your bid reaches the ask, the seller can accept immediately.`);
         }
         if (submitBtn) {
             submitBtn.textContent = isClosed ? 'Auction closed' : (!hasStarted ? 'Starts soon' : 'Place bid');
@@ -46712,7 +46798,7 @@ class DatingApp {
         const minBid = Math.max(Number(market.topBid || 0) + 1, 1);
         const bidAmount = Number(amount);
         if (!Number.isFinite(bidAmount) || bidAmount < minBid) {
-            return { ok: false, error: `Bid must be at least ${this.formatMarketplaceMoney(minBid)}.` };
+            return { ok: false, error: `Bid must be at least ${this.formatMarketplaceMoney(minBid, item)}.` };
         }
         item.topBid = bidAmount;
         item.lastSale = bidAmount;
@@ -46739,10 +46825,10 @@ class DatingApp {
             return;
         }
         this.closeMarketplaceBidModal();
-        this.showNotification(`Bid placed: ${this.formatMarketplaceMoney(result.bidAmount)}.`, { force: true, type: 'success' });
+        this.showNotification(`Bid placed: ${this.formatMarketplaceMoney(result.bidAmount, item)}.`, { force: true, type: 'success' });
         this.addNotification({
             title: 'Bid placed',
-            message: `You bid ${this.formatMarketplaceMoney(result.bidAmount)} on ${String(item.title || 'listing')}.`,
+            message: `You bid ${this.formatMarketplaceMoney(result.bidAmount, item)} on ${String(item.title || 'listing')}.`,
             type: 'marketplace'
         });
         this.refreshActiveMarketplaceView();
@@ -55326,7 +55412,7 @@ class DatingApp {
         if (notify && !auction.notifiedClosed) {
             const title = String(item.title || 'listing');
             const winnerLabel = auction.winner
-                ? `${auction.winner.bidder} won with ${this.formatMarketplaceMoney(auction.winner.amount)}`
+                ? `${auction.winner.bidder} won with ${this.formatMarketplaceMoney(auction.winner.amount, item)}`
                 : 'No bids were placed';
             this.showNotification(`Auction ended for ${title}. ${winnerLabel}.`, { force: true, type: 'success' });
         }
@@ -55493,7 +55579,7 @@ class DatingApp {
         if (!auction) return '';
         if (auction.status === 'closed') {
             if (auction.winner?.bidder && Number.isFinite(Number(auction.winner.amount))) {
-                return `Closed · Winner: ${auction.winner.bidder} (${this.formatMarketplaceMoney(auction.winner.amount)})`;
+                return `Closed · Winner: ${auction.winner.bidder} (${this.formatMarketplaceMoney(auction.winner.amount, item)})`;
             }
             return 'Closed · No winning bids';
         }
@@ -55664,7 +55750,7 @@ class DatingApp {
         const minBid = Math.max(currentTop + 1, 1);
         const bidAmount = Number(amount);
         if (!Number.isFinite(bidAmount) || bidAmount < minBid) {
-            return { ok: false, error: `Bid must be at least ${this.formatMarketplaceMoney(minBid)}.`, minBid };
+            return { ok: false, error: `Bid must be at least ${this.formatMarketplaceMoney(minBid, item)}.`, minBid };
         }
 
         const bidder = String(this.getMarketplaceUsername() || 'Guest bidder').trim() || 'Guest bidder';
@@ -55687,7 +55773,7 @@ class DatingApp {
         if (!auction) return false;
         if (auction.status === 'closed') {
             const winnerMsg = auction.winner?.bidder
-                ? `Winner: ${auction.winner.bidder} (${this.formatMarketplaceMoney(auction.winner.amount)})`
+                ? `Winner: ${auction.winner.bidder} (${this.formatMarketplaceMoney(auction.winner.amount, item)})`
                 : 'No winning bids.';
             this.showNotification(`Auction closed. ${winnerMsg}`, { force: true, type: 'warn' });
             return true;
@@ -55703,7 +55789,7 @@ class DatingApp {
         const minBid = Math.max(currentTop + 1, 1);
         const deadline = this.formatAuctionDeadline(auction.endsAt);
         const raw = window.prompt(
-            `Live auction bid\nCurrent top: ${this.formatMarketplaceMoney(currentTop)}\nMinimum next bid: ${this.formatMarketplaceMoney(minBid)}\nCloses: ${deadline}`,
+            `Live auction bid\nCurrent top: ${this.formatMarketplaceMoney(currentTop, item)}\nMinimum next bid: ${this.formatMarketplaceMoney(minBid, item)}\nCloses: ${deadline}`,
             String(minBid)
         );
         if (raw == null) return true;
@@ -55713,10 +55799,10 @@ class DatingApp {
             this.showNotification(result.error || 'Could not place bid.', { force: true, type: 'error' });
             return true;
         }
-        this.showNotification(`Bid placed: ${this.formatMarketplaceMoney(result.bidAmount)}.`, { force: true, type: 'success' });
+        this.showNotification(`Bid placed: ${this.formatMarketplaceMoney(result.bidAmount, item)}.`, { force: true, type: 'success' });
         this.addNotification({
             title: 'Bid placed',
-            message: `You bid ${this.formatMarketplaceMoney(result.bidAmount)} on ${String(item.title || 'listing')}.`,
+            message: `You bid ${this.formatMarketplaceMoney(result.bidAmount, item)} on ${String(item.title || 'listing')}.`,
             type: 'marketplace'
         });
         this.refreshActiveMarketplaceView();
@@ -55786,7 +55872,7 @@ class DatingApp {
         container.replaceChildren();
         sponsoredItems.slice().reverse().forEach((item) => {
             const priceText = String(item?.featuredAd?.priceLine || '').trim()
-                || this.formatMarketplaceMoney(Number(item?.price), { fallback: '' });
+                || this.formatMarketplaceMoney(Number(item?.price), { ...item, fallback: '' });
             const metaLine = String(item?.featuredAd?.metaLine || item?.availability || '').trim()
                 || this.truncateText(String(item?.description || '').trim(), 88);
             const featuredAd = item?.featuredAd && typeof item.featuredAd === 'object'
@@ -57367,7 +57453,7 @@ class DatingApp {
             : '';
         return {
             adTitle: featuredAd?.title || item?.title || 'Featured listing',
-            adPrice: featuredAd?.priceLine || priceText || '',
+            adPrice: this.formatListingPriceText(featuredAd?.priceLine || priceText, item),
             adSummary: featuredAd?.metaLine || metaLine || '',
             adDesc: featuredAd?.summary || item?.description || '',
             adCategory: this.isScrapedMarketplaceItem(item)
@@ -57781,7 +57867,7 @@ class DatingApp {
             if (!this.isSponsoredListingVisibleToAudience(item)) return;
 	        const featuredAd = item.featuredAd || {};
 	        const title = featuredAd.title || item.title || 'Featured listing';
-	        const priceLine = featuredAd.priceLine || priceText || '';
+	        const priceLine = this.formatListingPriceText(featuredAd.priceLine || priceText, item);
 	        const metaLine = featuredAd.metaLine || item.availability || '';
         const auctionWindowHtml = this.buildAuctionTimeRowsHtml(item.liveAuction || null, {
             wrapperClass: 'featured-ad-auction-times'
@@ -58342,11 +58428,9 @@ class DatingApp {
         const market = isBidListing ? this.getClothingBidMarket(item) : null;
         const shipping = this.getCrossBorderShipping(item);
         const isCrossBorderListing = this.isCrossBorderSponsoredListing(item);
-        const displayPrice = String(item.priceText || item.priceLabel || '').trim()
-            || this.formatMarketplaceMoney(Number(item.price), { fallback: '' })
-            || `$${String(item.price ?? '')}`;
+        const displayPrice = this.formatListingPriceText(item.priceText || item.priceLabel || item.price, item);
         const priceLabel = isBidListing
-            ? `Lowest ask ${this.formatMarketplaceMoney(market.lowestAsk)}`
+            ? `Lowest ask ${this.formatMarketplaceMoney(market.lowestAsk, item)}`
             : displayPrice;
         const actionLabel = isSold ? 'Sold' : (isBidListing ? 'Place bid' : (isCrossBorderListing ? 'Make offer' : 'Send a message'));
         const actionIcon = isSold ? 'fa-check-circle' : (isBidListing ? 'fa-gavel' : 'fa-handshake');
@@ -58386,9 +58470,9 @@ class DatingApp {
             : '';
         const bidSnapshotHtml = isBidListing ? `
             <div class="marketplace-bid-snapshot" aria-hidden="true">
-                <span class="marketplace-bid-pill"><strong>${this.escapeHtml(this.formatMarketplaceMoney(market.topBid))}</strong><span>Top bid</span></span>
-                <span class="marketplace-bid-pill"><strong>${this.escapeHtml(this.formatMarketplaceMoney(market.lowestAsk))}</strong><span>Lowest ask</span></span>
-                <span class="marketplace-bid-pill"><strong>${this.escapeHtml(this.formatMarketplaceMoney(market.lastSale))}</strong><span>Last sale</span></span>
+                <span class="marketplace-bid-pill"><strong>${this.escapeHtml(this.formatMarketplaceMoney(market.topBid, item))}</strong><span>Top bid</span></span>
+                <span class="marketplace-bid-pill"><strong>${this.escapeHtml(this.formatMarketplaceMoney(market.lowestAsk, item))}</strong><span>Lowest ask</span></span>
+                <span class="marketplace-bid-pill"><strong>${this.escapeHtml(this.formatMarketplaceMoney(market.lastSale, item))}</strong><span>Last sale</span></span>
             </div>
         ` : '';
         const bidFulfillmentHtml = isBidListing
@@ -58488,11 +58572,9 @@ class DatingApp {
         const market = isBidListing ? this.getClothingBidMarket(item) : null;
         const shipping = this.getCrossBorderShipping(item);
         const isCrossBorderListing = this.isCrossBorderSponsoredListing(item);
-        const displayPrice = String(item.priceText || item.priceLabel || '').trim()
-            || this.formatMarketplaceMoney(Number(item.price), { fallback: '' })
-            || `$${String(item.price ?? '')}`;
+        const displayPrice = this.formatListingPriceText(item.priceText || item.priceLabel || item.price, item);
         const priceLine = isBidListing
-            ? `${this.formatMarketplaceMoney(market.topBid)} bid · ${this.formatMarketplaceMoney(market.lowestAsk)} ask`
+            ? `${this.formatMarketplaceMoney(market.topBid, item)} bid · ${this.formatMarketplaceMoney(market.lowestAsk, item)} ask`
             : displayPrice;
         const marketLineHtml = this.buildMarketplacePriceCityLineHtml(
             priceLine,
@@ -58501,9 +58583,9 @@ class DatingApp {
         );
         const bidSnapshotHtml = isBidListing ? `
             <div class="marketplace-bid-snapshot compact" aria-hidden="true">
-                <span class="marketplace-bid-pill"><strong>${this.escapeHtml(this.formatMarketplaceMoney(market.topBid))}</strong><span>Top bid</span></span>
-                <span class="marketplace-bid-pill"><strong>${this.escapeHtml(this.formatMarketplaceMoney(market.lowestAsk))}</strong><span>Lowest ask</span></span>
-                <span class="marketplace-bid-pill"><strong>${this.escapeHtml(this.formatMarketplaceMoney(market.lastSale))}</strong><span>Last sale</span></span>
+                <span class="marketplace-bid-pill"><strong>${this.escapeHtml(this.formatMarketplaceMoney(market.topBid, item))}</strong><span>Top bid</span></span>
+                <span class="marketplace-bid-pill"><strong>${this.escapeHtml(this.formatMarketplaceMoney(market.lowestAsk, item))}</strong><span>Lowest ask</span></span>
+                <span class="marketplace-bid-pill"><strong>${this.escapeHtml(this.formatMarketplaceMoney(market.lastSale, item))}</strong><span>Last sale</span></span>
             </div>
         ` : '';
         const bidFulfillmentHtml = isBidListing
@@ -60990,7 +61072,7 @@ class DatingApp {
 
             const price = body.querySelector('.item-price')?.textContent?.trim()
                 || String(item.priceText || item.priceLabel || '').trim()
-                || this.formatMarketplaceMoney(Number(item.price), { fallback: 'Contact for price' });
+                || this.formatMarketplaceMoney(Number(item.price), { ...item, fallback: 'Contact for price' });
             const location = [item.city, item.country].filter(Boolean).join(', ') || 'Location on request';
             const seller = this.getImportedListingSellerName(item, 'Verified electronics seller');
             const reviewMeta = this.getMarketplaceSellerReviewMeta(item);
@@ -63138,11 +63220,11 @@ class DatingApp {
         return hasTerm(terms);
     }
 
-    formatMarketplaceMoney(value, { fallback = '--' } = {}) {
+    formatMarketplaceMoney(value, { fallback = '--', currency = '', country = '' } = {}) {
         const numeric = Number(value);
         if (!Number.isFinite(numeric) || numeric < 0) return fallback;
-        const rounded = Math.round(numeric);
-        return `$${rounded.toLocaleString()}`;
+        const resolvedCurrency = this.getListingCurrency('', { currency, country }) || 'USD';
+        return this.formatListingPriceText(numeric.toFixed(2), { currency: resolvedCurrency });
     }
 
     isClothingBiddingListing(item, { stockxMode = false } = {}) {
@@ -64064,11 +64146,10 @@ class DatingApp {
             if (isBidListing && market) {
                 priceEl.innerHTML = `
                     <span class="marketplace-price-eyebrow">Lowest Ask</span>
-                    ${this.escapeHtml(this.formatMarketplaceMoney(market.lowestAsk))}
+                    ${this.escapeHtml(this.formatMarketplaceMoney(market.lowestAsk, item))}
                 `;
             } else {
-                const priceText = String(item.priceText || item.priceLabel || '').trim()
-                    || (typeof item.price === 'number' ? `$${item.price}` : String(item.price || ''));
+                const priceText = this.formatListingPriceText(item.priceText || item.priceLabel || item.price, item);
                 priceEl.textContent = priceText;
             }
         }
@@ -64299,9 +64380,9 @@ class DatingApp {
                         : []),
                     ...(isBidListing && market
                         ? [
-                            { label: 'Top Bid', value: this.formatMarketplaceMoney(market.topBid) },
-                            { label: 'Lowest Ask', value: this.formatMarketplaceMoney(market.lowestAsk) },
-                            { label: 'Last Sale', value: this.formatMarketplaceMoney(market.lastSale) },
+                            { label: 'Top Bid', value: this.formatMarketplaceMoney(market.topBid, item) },
+                            { label: 'Lowest Ask', value: this.formatMarketplaceMoney(market.lowestAsk, item) },
+                            { label: 'Last Sale', value: this.formatMarketplaceMoney(market.lastSale, item) },
                             { label: 'Shipping', value: meta.delivery },
                             { label: 'Auction opens', value: this.formatAuctionDeadline(market.startsAt || '') },
                             { label: 'Auction closes', value: this.formatAuctionDeadline(market.endsAt || '') }
@@ -64805,7 +64886,7 @@ class DatingApp {
             if (auction?.enabled) {
                 if (auction.status === 'closed') {
                     const winnerMsg = auction.winner?.bidder
-                        ? `Winner: ${auction.winner.bidder} (${this.formatMarketplaceMoney(auction.winner.amount)})`
+                        ? `Winner: ${auction.winner.bidder} (${this.formatMarketplaceMoney(auction.winner.amount, item)})`
                         : 'No winning bids.';
                     this.showNotification(`Auction closed. ${winnerMsg}`, { force: true, type: 'warn' });
                     return;

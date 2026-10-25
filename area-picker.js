@@ -13,6 +13,9 @@
         field.dataset.boundInput = '1'; field.dataset.boundEnter = '1';
         let matches = [], active = -1, generation = 0, timer, restoringFocus = false;
         let baseline, baselineValue = '', baselineAuto, applying = null, scrollPending = false, submitting = null;
+        const search = query => window.SIXO_LOCATION_AUTOCOMPLETE.search(query, {
+            regions: Array.from(new Set(app.getRegionAliasMap?.().values() || []))
+        });
         const remember = () => {
             baseline = app.getHomeSearchLocationSelection();
             baselineValue = field.value; baselineAuto = field.dataset.autoLocationDefault;
@@ -56,7 +59,8 @@
             status.textContent = 'Loading listings…'; retry.hidden = true;
             applying = (async () => {
                 try {
-                    await app.applyManualDiscoveryLocation({ city: result.city, country: result.country });
+                    await app.applyManualDiscoveryLocation({ city: result.city, country: result.country,
+                        region: result.type === 'region' ? result.region : '' });
                     remember(); close({ focus: document.activeElement === field || panel.contains(document.activeElement) });
                     return true;
                 } catch {
@@ -76,7 +80,7 @@
                 option.type = 'button'; option.id = `area-result-${index}`; option.tabIndex = -1;
                 option.setAttribute('role', 'option'); option.setAttribute('aria-selected', 'false');
                 const title = document.createElement('span'); title.textContent = result.label;
-                const detail = document.createElement('small'); detail.textContent = result.type === 'country' ? 'Country' : result.region;
+                const detail = document.createElement('small'); detail.textContent = result.type === 'country' ? 'Country' : result.type === 'region' ? 'State / Province' : result.region;
                 option.append(title, detail);
                 option.addEventListener('mousedown', event => event.preventDefault());
                 option.addEventListener('click', () => void choose(result));
@@ -88,7 +92,7 @@
         };
         const refresh = async (query, token) => {
             try {
-                const results = await window.SIXO_LOCATION_AUTOCOMPLETE.search(query);
+                const results = await search(query);
                 if (token !== generation || panel.hidden) return;
                 render(results, query); retry.hidden = true;
             } catch {
@@ -123,7 +127,7 @@
             submitting = token;
             status.textContent = 'Finding locations…';
             try {
-                const results = await window.SIXO_LOCATION_AUTOCOMPLETE.search(query);
+                const results = await search(query);
                 if (token !== generation || field.value !== query || !app.homeLocationDraft) return false;
                 if (results.length) return choose(results[0]);
                 render([], query); return false;

@@ -35,7 +35,15 @@ jobs:
         run: |
           python -m unittest discover -s tests -p test_listing_availability.py
           python -m unittest discover -s tests -p test_marketplace_refresh.py
+          python -m unittest discover -s tests -p test_regional_listing_refresh.py
+          node scripts/regional-listing-location.test.cjs
           node scripts/listing-integrity.test.cjs
+      - name: Import New York, Florida, Atlanta, Texas and Ethiopia sources
+        if: github.event_name == 'workflow_dispatch' || github.event.schedule == '47 3 * * *'
+        continue-on-error: true
+        run: >-
+          python scripts/refresh-regional-listings.py
+          --limit-per-source 12 --candidate-limit 36 --workers 3
       - name: Import current Canada, US, Jamaica and Kenya ads
         if: github.event_name == 'workflow_dispatch' || github.event.schedule == '47 3 * * *'
         continue-on-error: true
@@ -43,6 +51,12 @@ jobs:
           python scripts/refresh-marketplace-listings.py
           --limit-per-region-category 6 --candidate-limit 24 --workers 8
           --crawl4ai-url "$CRAWL4AI_URL"
+      - name: Restore missing US states from exact source addresses
+        if: github.event_name == 'workflow_dispatch' || github.event.schedule == '47 3 * * *'
+        continue-on-error: true
+        run: |
+          python scripts/backfill-listing-regions.py --workers 4
+          python scripts/backfill-listing-regions.py --apply-report
       - name: Refresh Ghana vehicles, parts, property and electronics
         if: github.event_name == 'workflow_dispatch' || github.event.schedule == '47 3 * * *'
         continue-on-error: true

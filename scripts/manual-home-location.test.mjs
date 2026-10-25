@@ -116,3 +116,18 @@ finishLookup([{ city: 'Toronto', country: 'Canada', label: 'Toronto, Canada', ty
 await searching;
 assert.deepEqual(safariBlur.app.renders.at(-1), ['toronto'], 'A Safari blur without a related target cannot cancel an explicit Search');
 console.log('Manual Home search passed: denied GPS, direct typed values, edited areas, countries, immediate Search, Safari blur and invalid qualifiers.');
+
+const state = fixture();
+state.window.SIXO_LOCATION_AUTOCOMPLETE.search = async (query, options) => {
+    assert.ok(options.regions.some(row => row.name === 'Florida'));
+    return [{ city: '', region: 'Florida', country: 'United States', label: 'Florida, United States', type: 'region' }];
+};
+state.field.value = 'Florida';
+await state.app.submitHomeSearch();
+assert.equal(state.app.getCurrentLocationDisplayText(), 'Florida, United States');
+assert.equal(state.app.manualDiscoveryLocation.city, '');
+assert.equal(state.app.manualDiscoveryLocation.region, 'Florida');
+const floridaScope = state.app.getDeviceListingLocationScope();
+assert.ok(state.app.matchesListingLocationScope({ city: 'Pompano Beach', region: 'Florida', country: 'United States' }, floridaScope));
+assert.equal(state.app.matchesListingLocationScope({ city: 'Houston', region: 'Texas', country: 'United States' }, floridaScope), false);
+console.log('Manual state search passed: Florida selection preserves its region without inventing a city or requesting GPS.');

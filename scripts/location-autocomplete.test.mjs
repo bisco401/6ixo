@@ -39,6 +39,14 @@ assert.equal((await search('East Legon'))[0].label, 'East Legon, Ghana');
 assert.equal((await search('east legon, ghana'))[0].region, 'Greater Accra');
 assert.equal((await search('East Legon, Canada')).length, 0);
 assert.equal((await search('Atlanta, Kenya')).length, 0, 'Qualifiers cannot silently switch countries');
+const regions = [{ name: 'Florida', abbr: 'FL', country: 'United States' }, { name: 'Texas', abbr: 'TX', country: 'United States' }, { name: 'New York', abbr: 'NY', country: 'United States' }];
+for (const query of ['Florida', 'Florida, United States', 'FL, USA', 'Texas', 'New York']) {
+    const match = (await search(query, { regions }))[0];
+    assert.equal(match.type, 'region', `${query} must not silently select a similarly named city`);
+    assert.equal(match.city, '');
+}
+assert.equal((await search('Florida, Canada', { regions })).length, 0);
+assert.ok((await search('Florida')).every(row => row.type !== 'region'), 'City-only controls retain their existing scope');
 assert.equal((await search('zzzzzzzzzz')).length, 0);
 assert.ok((await search('')).length > 240, 'An empty field offers the country dropdown');
 assert.ok((await search('a')).every(row => row.type === 'country'), 'Cities need two letters');

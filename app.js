@@ -4648,6 +4648,7 @@ class DatingApp {
             'offerup'
         ]);
         if (knownMarketplaceKeys.has(sellerKey)) return true;
+        if (item.source?.kind === 'dealer') return false;
         return this.getImportedListingMarketplaceKeys(item).has(sellerKey);
     }
 
@@ -5399,6 +5400,7 @@ class DatingApp {
             seller: normalizedSeller,
             source: {
                 type: 'scraped_csv',
+                kind: String(attributes.sourceKind || ''),
                 site: sourceSite,
                 url: sourceUrl
             }
@@ -5430,6 +5432,7 @@ class DatingApp {
             region,
             state: region,
             province: region,
+            metro: String(attributes.searchMetro || '').trim(),
             country: String(row.country || '').trim(),
             fullDescription: String(row.description || '').trim(),
             currency: this.getListingCurrency(suppliedPrice, { currency: row.currency, country: row.country }),
@@ -5439,6 +5442,7 @@ class DatingApp {
             sourceRowId: rowId,
             source: {
                 type: 'scraped_csv',
+                kind: String(attributes.sourceKind || ''),
                 site: sourceSite,
                 url: sourceUrl,
                 catalogItemId: String(attributes.catalogItemId || '').trim()
@@ -5731,6 +5735,7 @@ class DatingApp {
 
         const locationEligible = localScope.active
             ? eligible.filter(({ item }) => this.matchesListingLocationScope({
+                metro: item.metro || '',
                 city: item.city || '',
                 region: item.region || '',
                 country: item.country || '',
@@ -15743,6 +15748,7 @@ class DatingApp {
             active: true,
             pending: !ready,
             city: this.manualDiscoveryLocation ? this.normalizeLocationText(location.city || '') : '',
+            region: this.manualDiscoveryLocation ? this.normalizeLocationText(location.region || '') : '',
             country: this.normalizeLocationText(location.country || ''),
             text: '',
             source: this.manualDiscoveryLocation ? 'manual' : 'device'
@@ -15786,7 +15792,7 @@ class DatingApp {
 
     getCurrentLocationDisplayText() {
         if (this.manualDiscoveryLocation?.country) {
-            return [this.manualDiscoveryLocation.city, this.manualDiscoveryLocation.country].filter(Boolean).join(', ');
+            return [this.manualDiscoveryLocation.city || this.manualDiscoveryLocation.region, this.manualDiscoveryLocation.country].filter(Boolean).join(', ');
         }
         if (!this.hasUsableCurrentLocation()) return '';
         const resolved = this.resolvedDeviceLocation;
@@ -16221,7 +16227,7 @@ class DatingApp {
         window.SIXO_LOCATION_ENTRY?.dismiss?.();
         const selected = {
             city: String(location.city || '').trim().slice(0, 100),
-            region: '', country, source: 'manual', approximate: false
+            region: String(location.region || '').trim().slice(0, 100), country, source: 'manual', approximate: false
         };
         this.manualDiscoveryLocation = selected;
         this.locationLifecycleGeneration = Number(this.locationLifecycleGeneration || 0) + 1;
@@ -16657,7 +16663,7 @@ class DatingApp {
         return this.getEffectiveListingLocationScope({ text: rawText });
     }
 
-    matchesListingLocationScope({ city = '', region = '', state = '', province = '', country = '', label = '' } = {}, scope = null) {
+    matchesListingLocationScope({ city = '', region = '', state = '', province = '', country = '', label = '', metro = '' } = {}, scope = null) {
         if (this.strictDeviceLocation && !this.getCurrentLocationDisplayText()) return false;
         const resolved = scope && typeof scope === 'object'
             ? scope
@@ -16669,7 +16675,8 @@ class DatingApp {
         const regionValue = this.normalizeLocationText(region || state || province);
         const countryValue = this.normalizeLocationText(country);
         const labelValue = this.normalizeLocationText(label || [city, region || state || province, country].filter(Boolean).join(', '));
-        const combined = [labelValue, cityValue, regionValue, countryValue].filter(Boolean).join(' ').trim();
+        const metroValue = this.normalizeLocationText(metro);
+        const combined = [labelValue, cityValue, regionValue, countryValue, metroValue].filter(Boolean).join(' ').trim();
 
         if (this.strictDeviceLocation && resolved.source === 'device') {
             const parts = String(label || '').split(/[,·•|]/).map(part => this.normalizeLocationText(part)).filter(Boolean);
@@ -16694,7 +16701,8 @@ class DatingApp {
         if (resolved.city) {
             const cityNeedle = this.normalizeLocationText(resolved.city);
             const cityMatches = this.isLooseLocationMatch(cityValue, cityNeedle)
-                || this.isLooseLocationMatch(labelValue, cityNeedle);
+                || this.isLooseLocationMatch(labelValue, cityNeedle)
+                || (metroValue && this.isLooseLocationMatch(metroValue, cityNeedle));
             if (!cityMatches) return false;
         }
         if (resolved.region) {
@@ -18363,7 +18371,7 @@ class DatingApp {
             || currentHomeLocation === displayLocation
         );
         if (canRefreshHomeLocation) {
-            this.setHomeLocationControls({ city, country, text: displayLocation, auto: true });
+            this.setHomeLocationControls({ city, region, country, text: displayLocation, auto: true });
             this.applyHomeFilters();
         }
         this.updateHomeCurrentLocationDisplay(displayLocation || 'Location detected');
@@ -21585,12 +21593,16 @@ class DatingApp {
 	        });
 	        const isNotHomeFeatured = (entry) => !this.isScrapedHomeFeaturedListing(entry);
 	        const allItems = (this.marketplaceItems || []).filter((entry) => isNotHomeFeatured(entry) && this.matchesListingLocationScope({
+	            region: entry.region || entry.state || entry.province || '',
+	            metro: entry.metro || entry.raw?.metro || '',
 	            city: entry.city || '',
 	            country: entry.country || '',
 	            label: [entry.city, entry.country].filter(Boolean).join(', ')
 	        }, effectiveLocationScope));
 	        const sourceRaw = Array.isArray(pool) ? pool : allItems;
             const source = sourceRaw.filter((entry) => isNotHomeFeatured(entry) && this.matchesListingLocationScope({
+                region: entry.region || entry.state || entry.province || '',
+                metro: entry.metro || entry.raw?.metro || '',
                 city: entry.city || '',
                 country: entry.country || '',
                 label: [entry.city, entry.country].filter(Boolean).join(', ')
@@ -23512,6 +23524,8 @@ class DatingApp {
         }
         if (effectiveLocationScope.active) {
             list = list.filter((service) => this.matchesListingLocationScope({
+                region: service.region || service.state || service.province || '',
+                metro: service.metro || '',
                 city: service.city || '',
                 country: service.country || '',
                 label: this.getServiceLocationLabel(service)
@@ -26628,6 +26642,8 @@ class DatingApp {
             } = this.vehicleFilters;
 
             if (!this.matchesListingLocationScope({
+                region: item.region || item.state || item.province || '',
+                metro: item.metro || '',
                 city: item.city || '',
                 country: item.country || '',
                 label: [item.city, item.country].filter(Boolean).join(', ')
@@ -39914,6 +39930,8 @@ class DatingApp {
                     this.renderRealestateFeatured(featuredCandidates, uiFilters);
                     const uiMatched = categoryMatched.filter((item) => this.matchesRealestateUiFilters(item, uiFilters, { isAirbnb }));
                     const scopedListings = uiMatched.filter((item) => this.matchesListingLocationScope({
+                        region: item.region || item.state || item.province || '',
+                        metro: item.metro || '',
                         city: item?.city || '',
                         country: item?.country || '',
                         label: item?.location || [item?.city, item?.country].filter(Boolean).join(', ')
@@ -41858,6 +41876,7 @@ class DatingApp {
 
 	            const locationText = entry.locationLabel || [entry.city, entry.country].filter(Boolean).join(', ');
                 if (!this.matchesListingLocationScope({
+                    metro: entry.metro || entry.raw?.metro || '',
                     city: entry.city,
                     region: entry.region,
                     country: entry.country,
@@ -58969,12 +58988,16 @@ class DatingApp {
             useDefaultCountry: false
         });
         const allItems = (this.marketplaceItems || []).filter((entry) => this.matchesListingLocationScope({
+            region: entry.region || entry.state || entry.province || '',
+            metro: entry.metro || entry.raw?.metro || '',
             city: entry.city || '',
             country: entry.country || '',
             label: [entry.city, entry.country].filter(Boolean).join(', ')
         }, effectiveLocationScope));
         const sourceRaw = Array.isArray(pool) ? pool : allItems;
         const source = sourceRaw.filter((entry) => this.matchesListingLocationScope({
+            region: entry.region || entry.state || entry.province || '',
+            metro: entry.metro || entry.raw?.metro || '',
             city: entry.city || '',
             country: entry.country || '',
             label: [entry.city, entry.country].filter(Boolean).join(', ')
@@ -59344,6 +59367,8 @@ class DatingApp {
             const itemCountry = (item.country || '').toLowerCase();
             const itemCity = (item.city || '').toLowerCase();
             const locationMatches = this.matchesListingLocationScope({
+                region: item.region || item.state || item.province || '',
+                metro: item.metro || '',
                 city: itemCity,
                 country: itemCountry,
                 label: [item.city, item.country].filter(Boolean).join(', ')
@@ -61035,6 +61060,8 @@ class DatingApp {
             if (minPrice !== null && (typeof item.price !== 'number' || item.price < minPrice)) return false;
             if (maxPrice !== null && (typeof item.price !== 'number' || item.price > maxPrice)) return false;
             if (!this.matchesListingLocationScope({
+                region: item.region || item.state || item.province || '',
+                metro: item.metro || '',
                 city: item.city || '',
                 country: item.country || '',
                 label: [item.city, item.country].filter(Boolean).join(', ')
@@ -61345,6 +61372,8 @@ class DatingApp {
             if (!this.matchesClothingAudience(item, audience)) return false;
             if (!this.matchesClothingSearch(item, search)) return false;
             if (!this.matchesListingLocationScope({
+                region: item.region || item.state || item.province || '',
+                metro: item.metro || '',
                 city: item.city || '',
                 country: item.country || '',
                 label: [
@@ -61556,6 +61585,8 @@ class DatingApp {
         const filtered = items.filter((item) => {
             if (!this.isJobsCategoryMatch(item, filter)) return false;
             if (!this.matchesListingLocationScope({
+                region: item.region || item.state || item.province || '',
+                metro: item.metro || '',
                 city: item.city || '',
                 country: item.country || '',
                 label: item.location || [item.city, item.country].filter(Boolean).join(', ')
@@ -63539,6 +63570,8 @@ class DatingApp {
         const items = (this.marketplaceItems || [])
             .filter((item) => item.category === category)
             .filter((item) => this.matchesListingLocationScope({
+                region: item.region || item.state || item.province || '',
+                metro: item.metro || '',
                 city: item.city || '',
                 country: item.country || '',
                 label: [item.city, item.country].filter(Boolean).join(', ')

@@ -44,6 +44,16 @@ K_CATEGORIES = [("cars-trucks", "174", "vehicles", "vehicles"),
 CL_CATEGORIES = [("cta", "vehicles", "vehicles"), ("pta", "vehicles", "auto_parts"),
                  ("rea", "real_estate", "for_sale"), ("apa", "real_estate", "for_rent_long"),
                  ("ele", "electronics", "other")]
+# Canonical /view/d URLs no longer contain the source area's hostname.
+CL_REGIONS = {
+    "newyork": "New York City", "atlanta": "Atlanta / Metro",
+    "miami": "Miami", "tampa": "Tampa Bay", "orlando": "Orlando", "jacksonville": "Jacksonville",
+    "houston": "Houston / Surrounding", "dallas": "Dallas / Fort Worth", "austin": "Austin",
+    "sanantonio": "San Antonio", "elpaso": "El Paso", "mcallen": "McAllen", "lubbock": "Lubbock",
+}
+US_STATES = dict(zip(
+    "AL AK AZ AR CA CO CT DE DC FL GA HI ID IL IN IA KS KY LA ME MD MA MI MN MS MO MT NE NV NH NJ NM NY NC ND OH OK OR PA RI SC SD TN TX UT VT VA WA WV WI WY".split(),
+    "Alabama|Alaska|Arizona|Arkansas|California|Colorado|Connecticut|Delaware|District of Columbia|Florida|Georgia|Hawaii|Idaho|Illinois|Indiana|Iowa|Kansas|Kentucky|Louisiana|Maine|Maryland|Massachusetts|Michigan|Minnesota|Mississippi|Missouri|Montana|Nebraska|Nevada|New Hampshire|New Jersey|New Mexico|New York|North Carolina|North Dakota|Ohio|Oklahoma|Oregon|Pennsylvania|Rhode Island|South Carolina|South Dakota|Tennessee|Texas|Utah|Vermont|Virginia|Washington|West Virginia|Wisconsin|Wyoming".split("|")))
 JA_CATEGORIES = [("cars/", "vehicles", "vehicles"), ("car-parts/car-parts/", "vehicles", "auto_parts"),
                  ("car-parts/car-accessories/", "vehicles", "auto_parts"), ("car-parts/tyres-and-rims/", "vehicles", "tires_rims"),
                  ("other/real-estate/", "real_estate", "for_sale"), ("other/telephones/", "electronics", "phones_accessories"),
@@ -173,6 +183,12 @@ def craigslist_row(body, url, region, category, subcategory, checked):
                seller="", year=(re.search(r"\b(?:19|20)\d{2}\b", row["title"])[0] if category == "vehicles" and subcategory == "vehicles" and re.search(r"\b(?:19|20)\d{2}\b", row["title"]) else ""))
     attrs = json.loads(row["attributes"])
     attrs.update(sourceRegion=region, sourceCategory=subcategory if category == "vehicles" else category, sourcePostedAt=(soup.select_one("time[datetime]") or {}).get("datetime", ""))
+    # Search area can contain cross-posts from other states; use the item's address.
+    source_state = clean(address.get("addressRegion"))
+    if source_state:
+        attrs["region"] = US_STATES.get(source_state.upper(), source_state)
+        if attrs["region"] == "New York" and city in {"Brooklyn", "Bronx", "Manhattan", "Queens", "Staten Island"}:
+            attrs["searchMetro"] = "New York City"
     if source_category:
         attrs['sourceCategoryCode'] = source_category[2]
     facts = craigslist_source_specifications(soup)
@@ -533,7 +549,7 @@ def main():
             host = urlsplit(row.get("source_url") or "").netloc
             if host.endswith(".craigslist.org") and host not in {"www.craigslist.org"}:
                 regions.setdefault(host.split(".")[0], row["city"])
-        regions.update(houston="Houston / Surrounding", atlanta="Atlanta / Metro", newyork="New York City")
+        regions.update(CL_REGIONS)
         tasks = [(region, city, cat) for region, city in regions.items() for cat in CL_CATEGORIES if not category_filter or cat[1] in category_filter]
         def load_cl(task):
             region, city, (cat, category, subcategory) = task

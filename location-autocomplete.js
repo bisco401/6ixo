@@ -23,7 +23,7 @@
         }
         return cache.get(name);
     }
-    async function search(value, { limit = 12 } = {}) {
+    async function search(value, { limit = 12, regions = [] } = {}) {
         const text = normalize(value).slice(0, 160);
         const parts = text.split(',').map(part => part.trim()).filter(Boolean);
         const query = parts[0] || '', qualifiers = parts.slice(1);
@@ -34,6 +34,14 @@
             .map(row => ({ id: `country-${row.code}`, city: '', country: row.name, countryCode: row.code, region: '', label: row.name, type: 'country', exact: countryNames(row).includes(query) }));
         if (!query) return countryResults;
         const countryMap = new Map(countries.map(row => [row.code, row]));
+        // Home supports state/province scopes. City-only controls omit this list.
+        const regionResults = regions.filter(row => (normalize(row.name).startsWith(query) || normalize(row.abbr) === query)
+            && qualifiers.every(part => {
+                const country = countries.find(country => country.name === row.country);
+                return country && countryNames(country).some(name => name.startsWith(part));
+            })).map(row => ({ id: `region-${row.country}-${row.abbr}`, city: '', region: row.name,
+                country: row.country, label: `${row.name}, ${row.country}`, type: 'region',
+                exact: [normalize(row.name), normalize(row.abbr)].includes(query) }));
         const key = prefixKey(query);
         let cityResults = [];
         if (Array.from(query).length >= 2 && catalog.shards.includes(key)) {
@@ -45,8 +53,10 @@
         }
         // Population makes a short prefix useful: Atlanta should precede the
         // much smaller settlement named Atla. Exact city names get a modest boost.
-        return [...countryResults, ...cityResults].sort((a, b) => Number(b.type === 'country' && b.exact) - Number(a.type === 'country' && a.exact)
+        return [...countryResults, ...regionResults, ...cityResults].sort((a, b) => Number(b.type === 'country' && b.exact) - Number(a.type === 'country' && a.exact)
+            || Number(b.type === 'region' && b.exact) - Number(a.type === 'region' && a.exact)
             || Number(b.type === 'country') - Number(a.type === 'country')
+            || Number(b.type === 'region') - Number(a.type === 'region')
             || (b.population || 0) * (b.exact ? 1.15 : 1) - (a.population || 0) * (a.exact ? 1.15 : 1)
             || Number(b.exact) - Number(a.exact)
             || a.label.localeCompare(b.label)).slice(0, Math.min(50, Math.max(1, limit)));

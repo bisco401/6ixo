@@ -349,6 +349,14 @@ test('production seller cards never invent reviews, verification, or completed t
   assert.equal(f.app.computeSellerTrustMetrics({listings:[{}],reviews:[{}]}),null);
   const meta = f.app.buildReviewMeta({fallbackRating:4.9,fallbackReviews:98});
   assert.equal(meta.ratingValue,null); assert.equal(meta.reviewCount,0); assert.equal(meta.ratingText,'Not rated');
+  for (const seller of ['New seller', 'TEST audit — temporary']) {
+    const listing = {id:'new-listing',seller,title:'New listing'};
+    f.app.marketplaceItems = [listing];
+    const sellerMeta = f.app.getMarketplaceSellerReviewMeta(listing);
+    assert.equal(sellerMeta.reviewCount,0);
+    assert.equal(sellerMeta.ratingValue,null);
+    assert.equal(sellerMeta.ratingText,'Not rated');
+  }
   const evidence = f.app.getSellerProfileEvidence({id:'vehicle-1',description:'Car rental'});
   assert.equal(evidence.verified,false); assert.equal(evidence.ratingValue,null); assert.equal(evidence.reviewCount,0);
   assert.equal(evidence.bio,'Car rental');

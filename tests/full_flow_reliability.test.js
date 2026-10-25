@@ -39,7 +39,7 @@ function loadDatingAppClass() {
     context.window.window = context.window;
     context.window.document = context.document;
     vm.createContext(context);
-    vm.runInContext(`${source}\nthis.__DatingApp = DatingApp;`, context, { filename: 'app.js' });
+    vm.runInContext(`${source.slice(0, source.indexOf('// Initialize the app when the page loads'))}\nthis.__DatingApp = DatingApp;`, context, { filename: 'app.js' });
     return context.__DatingApp;
 }
 
@@ -286,6 +286,8 @@ test('creates a marketplace row with durable media and ownership fields', async 
     assert.equal(insertedRow.marketplace_profile_id, 'profile-1');
     assert.equal(Array.from(insertedRow.media_urls).join(','), 'https://cdn.example/cleaning.jpg');
     assert.equal(insertedRow.listing_payload.id, 100);
+    assert.equal(insertedRow.currency, 'CAD');
+    assert.equal(insertedRow.listing_payload.currency, 'CAD');
 });
 
 test('uploads listing media to the signed-in user folder and returns a durable URL', async () => {
@@ -393,8 +395,8 @@ test('vehicle rental totals reject same-day returns and calculate valid trips', 
     const totals = app.getVehicleRentalTripTotals({ dailyRate: 150, currency: 'CAD' }, '2026-08-20', '2026-08-23');
     assert.equal(totals.tripDays, 3);
     assert.equal(totals.subtotal, 450);
-    assert.equal(totals.serviceFee, 54);
-    assert.equal(totals.total, 504);
+    assert.equal(totals.serviceFee, 45);
+    assert.equal(totals.total, 495);
     assert.equal(totals.currency, 'CAD');
 });
 

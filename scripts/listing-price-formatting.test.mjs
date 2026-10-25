@@ -98,3 +98,31 @@ test('legacy importers, structured prices, auction prices and booking totals ret
         assert.equal(app.formatMarketplaceMoney(1250.75,{currency}),`${currency} 1,250.75`);
     }
 });
+
+test('posted ads persist their displayed currency and retain it after a server reload', async () => {
+    const postedApp = Object.assign(Object.create(context.App.prototype), {
+        currentUser: {id:'seller-test'},
+        supabase: {from(table) {
+            assert.equal(table,'marketplace_listings');
+            return {insert(row) {return {select() {return {single:async () => ({data:{...row,public_id:'ml_test'},error:null})};}};}};
+        }}
+    });
+    for (const [priceText, country, currency, expected] of [
+        ['1.00 CAD','Canada',undefined,'CAD'],
+        ['1.00 CAD','Canada','USD','CAD'],
+        ['US$1.00','Canada',undefined,'USD'],
+        ['1.00','Canada',undefined,'CAD'],
+        ['1.00','Ghana',undefined,'GHS'],
+        ['1.00','Canada','USD','USD'],
+        ['Free','Canada',undefined,'CAD']
+    ]) {
+        const item = {category:'other',title:'Test ad',price:priceText === 'Free' ? 0 : 1,priceText,country,currency};
+        const row = await postedApp.createSupabaseMarketplaceListing(item);
+        assert.equal(row.currency,expected);
+        assert.equal(row.listing_payload.currency,expected);
+        assert.equal(item.currency,currency,'saving does not mutate the caller');
+        const restored = postedApp.normalizeSupabaseMarketplaceListingRow(JSON.parse(JSON.stringify(row)));
+        assert.equal(restored.currency,expected);
+        assert.equal(postedApp.formatMarketplaceMoney(restored.price,restored),`${expected} ${row.price.toFixed(2)}`);
+    }
+});

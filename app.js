@@ -4169,6 +4169,7 @@ class DatingApp {
             throw new Error('Vehicle rentals must use the approved-host listing flow.');
         }
         const payload = JSON.parse(JSON.stringify(item || {}));
+        payload.currency = this.getListingCurrency(payload.priceText || payload.price, payload) || 'USD';
         const mediaUrls = Array.isArray(payload.images)
             ? payload.images.map((value) => String(value || '').trim()).filter(Boolean)
             : [];
@@ -4180,7 +4181,7 @@ class DatingApp {
             title: String(payload.title || '').trim(),
             description: String(payload.description || '').trim() || null,
             price: Number.isFinite(Number(payload.price)) ? Number(payload.price) : null,
-            currency: String(payload.currency || 'USD').trim().toUpperCase() || 'USD',
+            currency: payload.currency,
             city: String(payload.city || '').trim() || null,
             country: String(payload.country || '').trim() || null,
             status: payload.sold === true ? 'sold' : 'published',
@@ -27990,7 +27991,7 @@ class DatingApp {
         if (importedListing && storedAverage === null && !Number.isFinite(explicitRating) && !Number.isFinite(explicitReviews)) {
             return { ratingValue: 0, ratingText: 'New', reviewCount: 0, reviewCountText: '0' };
         }
-        const baseReviews = 12 + (listingCount * 7) + (Math.abs(seed) % 34);
+        const baseReviews = this.authBypassEnabled ? 12 + (listingCount * 7) + (Math.abs(seed) % 34) : 0;
         return this.buildReviewMeta({
             rating: storedAverage ?? (Number.isFinite(explicitRating) ? explicitRating : item?.sellerRating),
             reviews: Number.isFinite(explicitReviews) ? explicitReviews : (baseReviews + storedReviews.length),
@@ -68095,6 +68096,7 @@ class DatingApp {
 	            category,
 	            price: listingPrice,
 	            priceText: priceInputText,
+                currency: this.getListingCurrency(priceInputText, { country }) || 'USD',
 	            country,
 	            city,
 	            description,

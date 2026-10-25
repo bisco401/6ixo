@@ -22,7 +22,7 @@
     "seo:indexnow": "node scripts/submit-indexnow.mjs",
     "seo:indexnow:dry-run": "node scripts/submit-indexnow.mjs --dry-run",
     "test:escrow": "node --test scripts/escrow-checkout.test.mjs",
-    "test:arrive": "node scripts/arrive-category-navigation.test.mjs && node --test scripts/arrive-day-planner.test.mjs",
+    "test:arrive": "node scripts/arrive-category-navigation.test.mjs",
     "test:home-filters": "node --test scripts/home-filters.test.mjs",
     "test:prices": "node --test scripts/listing-price-formatting.test.mjs"
   },

@@ -2220,7 +2220,6 @@ class DatingApp {
 	    }
 
     syncTopbarAuthUi() {
-        window.SIXO_ARRIVE_PLANNER?.refreshIdentity(this);
         const signedIn = Boolean(this.isSignedIn);
         const loggingOut = Boolean(this.authLogoutInFlight);
         const homeAuth = document.querySelector('#home-content .home-auth');
@@ -2980,7 +2979,6 @@ class DatingApp {
         this.setSignedIn(true, { email: user.email || '' });
         this.setDatingSignedIn(true, { email: user.email || '' });
         this.syncCurrentUserFromSupabaseUser(user);
-        window.SIXO_ARRIVE_PLANNER?.refreshIdentity(this);
         if (sameAccount) return;
         void this.subscribeMarketplaceUserRealtime();
         void this.loadMarketplaceConversations({ force: true });
@@ -38800,7 +38798,6 @@ class DatingApp {
     }
 
     renderDatingScheduleList() {
-        window.SIXO_ARRIVE_PLANNER?.refresh(this);
         const list = document.getElementById('dating-schedule-list');
         if (!list) {
             this.renderProfileArriveTrips();
@@ -39239,7 +39236,6 @@ class DatingApp {
                                 ${reviewRow}
                                 ${safePlan ? `<div class="arrive-plus-preview-plan">${safePlan}</div>` : ''}
                                 <p class="arrive-plus-preview-brief">${safeBrief}</p>
-                                ${kind !== 'profile' ? '<button type="button" class="arrive-add-to-plan" data-arrive-add>Add to itinerary</button>' : ''}
                                 <div class="arrive-plus-preview-actions">
                                     <button type="button" class="arrive-plus-preview-open-btn">${safeOpenLabel}</button>
                                     ${rawMapQuery ? `<button type="button" class="arrive-plus-preview-map-btn" data-map-query="${safeMapQuery}">View on map</button>` : ''}
@@ -39538,12 +39534,6 @@ class DatingApp {
                 }
             };
             card.addEventListener('click', (event) => {
-                if (event.target.closest('[data-arrive-add]')) {
-                    event.preventDefault();
-                    event.stopPropagation();
-                    window.SIXO_ARRIVE_PLANNER?.addListing(this, previewItem);
-                    return;
-                }
                 if (lockedPreview && previewItem.kind === 'profile') {
                     event.preventDefault();
                     event.stopPropagation();
@@ -39640,10 +39630,6 @@ class DatingApp {
         bindPreviewRefresh(notesInput);
         form.addEventListener('submit', async (event) => {
             event.preventDefault();
-            if (event.submitter?.id !== 'dating-schedule-submit' && window.SIXO_ARRIVE_PLANNER) {
-                await window.SIXO_ARRIVE_PLANNER.mount(this)?.create();
-                return;
-            }
             const destination = (destinationInput?.value || '').trim();
             const hasStructuredDestination = this.isCityCountryDestination(destination);
             const startDate = startInput?.value || '';
@@ -55999,7 +55985,6 @@ class DatingApp {
     }
 
     loadArrivePlus() {
-        window.SIXO_ARRIVE_PLANNER?.mount(this);
         this.currentDatingCategoryFilter = 'all';
         this.setupDatingSchedule();
         this.renderDatingScheduleList();

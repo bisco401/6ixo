@@ -31692,6 +31692,45 @@ body.media-lightbox-open { overflow: hidden; }
     font-size: 0.84rem;
 }
 
+#arrive-content .arrive-plus-intro {
+    padding: 18px 0;
+    color: #60728a;
+}
+
+#arrive-content .arrive-plus-intro h3 {
+    margin: 0 0 8px;
+    color: #20344d;
+    font-size: 23px;
+}
+
+#arrive-content .arrive-plus-intro p {
+    margin: 0;
+    line-height: 1.6;
+}
+
+#arrive-content .arrive-plus-request-note {
+    grid-column: 1 / -1;
+    margin: 0;
+    color: #718198;
+    font-size: 11px;
+    line-height: 1.5;
+}
+
+#arrive-content .schedule-action {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+}
+
+#arrive-content .schedule-action > label {
+    display: none;
+}
+
+#arrive-content .schedule-action > button {
+    flex: 1 1 170px;
+}
+
 :is(#dating-content, #arrive-content) .arrive-plus-grid {
     display: grid;
     grid-template-columns: minmax(280px, 0.88fr) minmax(360px, 1.12fr);

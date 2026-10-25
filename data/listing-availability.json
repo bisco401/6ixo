@@ -1,5 +1,5 @@
 {
-  "checkedAt": "2026-10-25T21:15:51.776Z",
+  "checkedAt": "2026-10-25T21:18:15.412Z",
   "listings": {
     "craigslist.org/view/d/bastrop-used-2025-cadillac-xt4-fwd-4d/fuqr_3uo8rgowpq1ctwx-a": {
       "availability": "sold",
@@ -12810,9 +12810,13 @@
       "reason": "All offers for this exact listing are unavailable"
     },
     "kijiji.ca/v-pet-services/city-of-toronto/nail-and-wing-clipping-for-your-bird-text-647-490-7156/1745203218": {
-      "availability": "unavailable",
-      "checkedAt": "2026-10-25T03:59:30Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1745203218",
+      "sourceUrl": "https://www.kijiji.ca/v-pet-services/city-of-toronto/nail-and-wing-clipping-for-your-bird-text-647-490-7156/1745203218",
+      "availability": "gone",
+      "checkedAt": "2026-10-25T21:18:15.412Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-pet-services/city-of-toronto/c143l1700273?radius=50.0&ll=43.64%2C-79.39&adRemoved=1745203218",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-room-rental-roommate/ville-de-montreal/chambre-privee-a-montreal-tout-inclus-fille-etudiante-ou-femme/1745178760": {
       "availability": "unavailable",

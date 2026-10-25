@@ -1,5 +1,5 @@
 {
-  "checkedAt": "2026-10-25T18:46:52.993Z",
+  "checkedAt": "2026-10-25T21:15:51.776Z",
   "listings": {
     "craigslist.org/view/d/bastrop-used-2025-cadillac-xt4-fwd-4d/fuqr_3uo8rgowpq1ctwx-a": {
       "availability": "sold",
@@ -12920,7 +12920,7 @@
       "id": "kijiji-1745218503",
       "sourceUrl": "https://www.kijiji.ca/v-renovation-window-door-trim/city-of-toronto/get-a-real-price-in-5-minutes-for-windows-and-doors/1745218503",
       "availability": "gone",
-      "checkedAt": "2026-10-25T06:56:14.916Z",
+      "checkedAt": "2026-10-25T21:15:51.776Z",
       "httpStatus": 200,
       "resolvedUrl": "https://www.kijiji.ca/b-renovation-window-door-trim/city-of-toronto/c736l1700273?radius=50.0&ll=43.71%2C-79.29&adRemoved=1745218503",
       "reason": "Source returned a removed-ad redirect or HTTP 404/410."
@@ -13252,9 +13252,13 @@
       "resolvedUrl": "https://www.kijiji.ca/b-tvs/mississauga-peel-region/c15093002l1700276?radius=50.0&ll=43.74%2C-79.7&adRemoved=1745151888"
     },
     "kijiji.ca/v-renovation-window-door-trim/mississauga-peel-region/big-discount-deal-windows-and-doors-installation/1745218604": {
-      "availability": "unavailable",
-      "checkedAt": "2026-10-25T12:36:55Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1745218604",
+      "sourceUrl": "https://www.kijiji.ca/v-renovation-window-door-trim/mississauga-peel-region/big-discount-deal-windows-and-doors-installation/1745218604",
+      "availability": "gone",
+      "checkedAt": "2026-10-25T21:15:51.776Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-renovation-window-door-trim/mississauga-peel-region/c736l1700276?radius=50.0&ll=43.71%2C-79.64&adRemoved=1745218604",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-bed-mattress/city-of-toronto/new-hydrolic-liftup-storage-bed-queen-bed-storage-bed-bed/1745159502": {
       "availability": "unavailable",
@@ -14104,6 +14108,33 @@
       "availability": "unavailable",
       "checkedAt": "2026-10-25T18:32:29Z",
       "reason": "All offers for this exact listing are unavailable"
+    },
+    "kijiji.ca/v-bed-mattress/city-of-toronto/no-tax-twin-full-queen-king-mattress-mattress/1745292300": {
+      "id": "kijiji-1745292300",
+      "sourceUrl": "https://www.kijiji.ca/v-bed-mattress/city-of-toronto/no-tax-twin-full-queen-king-mattress-mattress/1745292300",
+      "availability": "gone",
+      "checkedAt": "2026-10-25T21:15:51.776Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-bed-mattress/city-of-toronto/c246l1700273?radius=50.0&ll=43.76%2C-79.22&adRemoved=1745292300",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "kijiji.ca/v-washer-dryer/hamilton/can-deliver-lg-27-white-frontloadwasher-dryer-w-pedestals/1745232288": {
+      "id": "kijiji-1745232288",
+      "sourceUrl": "https://www.kijiji.ca/v-washer-dryer/hamilton/can-deliver-lg-27-white-frontloadwasher-dryer-w-pedestals/1745232288",
+      "availability": "gone",
+      "checkedAt": "2026-10-25T21:15:51.776Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-washer-dryer/hamilton/c700l80014?radius=50.0&ll=43.25769%2C-79.84019&adRemoved=1745232288",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "kijiji.ca/v-dining-table-set/hamilton/dining-table-and-chairs/1745218687": {
+      "id": "kijiji-1745218687",
+      "sourceUrl": "https://www.kijiji.ca/v-dining-table-set/hamilton/dining-table-and-chairs/1745218687",
+      "availability": "gone",
+      "checkedAt": "2026-10-25T21:15:51.776Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-dining-table-set/hamilton/c243l80014?radius=50.0&ll=43.18%2C-79.5&adRemoved=1745218687",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     }
   }
 }

@@ -1,5 +1,5 @@
 {
-  "checkedAt": "2026-10-25T12:36:55Z",
+  "checkedAt": "2026-10-25T12:49:43.582Z",
   "listings": {
     "craigslist.org/view/d/bastrop-used-2025-cadillac-xt4-fwd-4d/fuqr_3uo8rgowpq1ctwx-a": {
       "availability": "sold",
@@ -13959,19 +13959,31 @@
       "reason": "Exact source URL returned HTTP 410"
     },
     "kijiji.ca/v-pet-services/mississauga-peel-region/bird-sitting-in-mississauga/1745264010": {
-      "availability": "unavailable",
-      "checkedAt": "2026-10-25T12:36:55Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1745264010",
+      "sourceUrl": "https://www.kijiji.ca/v-pet-services/mississauga-peel-region/bird-sitting-in-mississauga/1745264010",
+      "availability": "gone",
+      "checkedAt": "2026-10-25T12:49:43.582Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-pet-services/mississauga-peel-region/c143l1700276?radius=50.0&ll=43.61%2C-79.64&adRemoved=1745264010",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-renovation-window-door-trim/hamilton/windows-doors-order-today-save-immediately/1745232728": {
-      "availability": "unavailable",
-      "checkedAt": "2026-10-25T12:36:55Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1745232728",
+      "sourceUrl": "https://www.kijiji.ca/v-renovation-window-door-trim/hamilton/windows-doors-order-today-save-immediately/1745232728",
+      "availability": "gone",
+      "checkedAt": "2026-10-25T12:49:43.582Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-renovation-window-door-trim/hamilton/c736l80014?radius=50.0&ll=43.2%2C-79.56&adRemoved=1745232728",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-washer-dryer/hamilton/whirlpool-27-white-frontloadstackable-washer-electric-dryer-se/1745232401": {
-      "availability": "unavailable",
-      "checkedAt": "2026-10-25T12:36:55Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1745232401",
+      "sourceUrl": "https://www.kijiji.ca/v-washer-dryer/hamilton/whirlpool-27-white-frontloadstackable-washer-electric-dryer-se/1745232401",
+      "availability": "gone",
+      "checkedAt": "2026-10-25T12:49:43.582Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-washer-dryer/hamilton/c700l80014?radius=50.0&ll=43.25769%2C-79.84019&adRemoved=1745232401",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "craigslist.org/view/d/south-ozone-park/4178uzx3fbeqh5kesrru1a": {
       "availability": "gone",
@@ -14004,14 +14016,22 @@
       "reason": "All offers for this exact listing are unavailable"
     },
     "kijiji.ca/v-buy-sell-other/city-of-toronto/demolition-service/1745285231": {
-      "availability": "unavailable",
-      "checkedAt": "2026-10-25T12:36:55Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1745285231",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/demolition-service/1745285231",
+      "availability": "gone",
+      "checkedAt": "2026-10-25T12:49:43.582Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.77%2C-79.41&adRemoved=1745285231",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-pet-services/mississauga-peel-region/bird-sitting-in-mississauga/1745285224": {
-      "availability": "unavailable",
-      "checkedAt": "2026-10-25T12:36:55Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1745285224",
+      "sourceUrl": "https://www.kijiji.ca/v-pet-services/mississauga-peel-region/bird-sitting-in-mississauga/1745285224",
+      "availability": "gone",
+      "checkedAt": "2026-10-25T12:49:43.582Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-pet-services/mississauga-peel-region/c143l1700276?radius=50.0&ll=43.61%2C-79.64&adRemoved=1745285224",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-tires-rims/city-of-toronto/for-sale-set-michelin-195-65-r15-winter-tire-and-rims-250/1745266739": {
       "availability": "unavailable",

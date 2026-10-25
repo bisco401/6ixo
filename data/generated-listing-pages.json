@@ -1,5 +1,5 @@
 {
-  "count": 3615,
+  "count": 3605,
   "listings": [
     {
       "id": "apify-b9b18084f762",
@@ -2141,21 +2141,6 @@
       "categoryKey": "real-estate"
     },
     {
-      "id": "kijiji-1745269251",
-      "slug": "1-bed-1-bath-full-basement-with-parking-near-stc-november--1745269251",
-      "url": "https://6ixo.com/listing/1-bed-1-bath-full-basement-with-parking-near-stc-november--1745269251/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/b1/b1897193-8fc3-4724-aee0-f0c5f4cdcebe?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/7b/7b460a83-4419-45b9-8d99-79cdf37d222c?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/38/38099cd4-0ba1-4f56-9dbf-318c617e1faf?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/7e/7e3eb77f-2a3d-4d1d-b89b-5560febc152e?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/06/065d1e56-5c7e-47c0-9205-c8254c94d47b?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/4a/4adcd3c3-c103-4fe8-81cf-7409f5b80e9c?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/6c/6cccdd59-80d9-495a-abc9-ee2f9a3fdffb?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "real-estate"
-    },
-    {
       "id": "kijiji-1745269053",
       "slug": "private-room-for-rent-1745269053",
       "url": "https://6ixo.com/listing/private-room-for-rent-1745269053/",
@@ -2299,24 +2284,6 @@
       "categoryKey": "jobs"
     },
     {
-      "id": "kijiji-1745258665",
-      "slug": "your-oasis-large-3-bedroom-in-highly-desired-west-mountain-1745258665",
-      "url": "https://6ixo.com/listing/your-oasis-large-3-bedroom-in-highly-desired-west-mountain-1745258665/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/d8/d8be16bb-d7a9-4dba-9ca3-24eb0733b176?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/30/300722e4-51f1-4a16-a838-2a60f4accb44?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/fe/fe120a97-e380-441b-a389-885e986b12b8?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/6e/6e877221-04ef-4920-bf33-810632e06043?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/9f/9f9c2095-271e-4ee9-bbb2-f3313ff5723b?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/30/3074c367-499e-4c65-9721-cb52ee90c730?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/23/2376951e-1d81-478c-81b0-a58402f3d51c?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/f8/f881f672-c9ac-435a-b5db-5afa23189dbc?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/de/de7879b7-8db5-4869-89eb-bf715742ab6c?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/35/35c55c8e-c10e-4f3b-9a2a-3c0cc865e841?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "real-estate"
-    },
-    {
       "id": "kijiji-1745257981",
       "slug": "shared-basement-room-for-400-girls-only-1745257981",
       "url": "https://6ixo.com/listing/shared-basement-room-for-400-girls-only-1745257981/",
@@ -2419,34 +2386,6 @@
       "categoryKey": "real-estate"
     },
     {
-      "id": "kijiji-1745250575",
-      "slug": "female-only-2-rooms-now-mohawk-college-st-jos-hospital-1745250575",
-      "url": "https://6ixo.com/listing/female-only-2-rooms-now-mohawk-college-st-jos-hospital-1745250575/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/4f/4f6c605d-7329-48dd-89b4-c7620bbb5e99?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/62/6274ea85-d6cb-4d64-bbfc-e721c16a4403?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/6a/6a13b712-50e5-4b1e-87ed-407c2ff9128f?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/06/06094cda-e2c7-4b02-a994-e43bbe4b9f3c?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/ec/ec75e353-69f5-41c6-9d53-eee78632722e?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/2d/2dd7d10d-ead2-4be9-9071-991d104ad9ba?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/40/4004813c-9da0-405e-8b72-e0daa651cb69?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "real-estate"
-    },
-    {
-      "id": "kijiji-1745250389",
-      "slug": "all-inclusive-room-female-general-hospital-oak-ave-now-1745250389",
-      "url": "https://6ixo.com/listing/all-inclusive-room-female-general-hospital-oak-ave-now-1745250389/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/b6/b6cd2193-2e0b-43b2-95ef-7d39104a4055?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/5a/5a13e9e7-3e90-45b3-b267-0d7e1a293a82?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/02/02577a60-1695-4876-93fe-4cc9951e157e?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/88/889e6367-a8e6-46c5-8de6-50adefa7e236?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/6a/6aed023f-2c3e-474f-b527-3b3ad87580f6?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "real-estate"
-    },
-    {
       "id": "kijiji-1745247629",
       "slug": "handyman-in-service-1745247629",
       "url": "https://6ixo.com/listing/handyman-in-service-1745247629/",
@@ -2475,16 +2414,6 @@
         "https://oxglow.com.gh/uploads/medium/2014-honda-civic-xo0oP55-1792834607-3-medium.jpg"
       ],
       "categoryKey": "vehicles"
-    },
-    {
-      "id": "kijiji-1745241939",
-      "slug": "all-season-car-mats-for-sale-1745241939",
-      "url": "https://6ixo.com/listing/all-season-car-mats-for-sale-1745241939/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/18/18f70545-cba7-4b30-ab46-6ea340f9ef47?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/f7/f70e6720-7d10-466e-a871-70eaea30f58f?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "auto-parts"
     },
     {
       "id": "allsopp-dubai-l-312134",
@@ -2762,17 +2691,6 @@
         "https://images.craigslist.org/01010_iDH46UJvuyG_0850co_600x450.jpg",
         "https://images.craigslist.org/01616_aZfMzlXCZk5_0co0gw_600x450.jpg",
         "https://images.craigslist.org/00t0t_b0sTwWjnw5t_0co0gw_600x450.jpg"
-      ],
-      "categoryKey": "real-estate"
-    },
-    {
-      "id": "craigslist-hkCv1963Txqo1Atf9DzRdY",
-      "slug": "apartamento-3-habitaciones-2-banos-1atf9dzrdy",
-      "url": "https://6ixo.com/listing/apartamento-3-habitaciones-2-banos-1atf9dzrdy/",
-      "images": [
-        "https://images.craigslist.org/01515_6Jm9FIXdZXg_0rS0Ba_600x450.jpg",
-        "https://images.craigslist.org/00v0v_gwZGzUDB9Ny_0rS0Ba_600x450.jpg",
-        "https://images.craigslist.org/00505_7xlwFXgvC2x_0rS0Ba_600x450.jpg"
       ],
       "categoryKey": "real-estate"
     },
@@ -9370,15 +9288,6 @@
       "categoryKey": "real-estate"
     },
     {
-      "id": "allsopp-dubai-l-308237",
-      "slug": "2-bedroom-apartment-for-rent-safi-1a-town-square-bail308237",
-      "url": "https://6ixo.com/listing/2-bedroom-apartment-for-rent-safi-1a-town-square-bail308237/",
-      "images": [
-        "https://images.allsoppandallsopp.com/public/temp/a0OdK000003RxiDUAS_s_2-bedroom-apartment-in-safi-1a-town-square-aed-80k-allsopp-and-allsopp-geminigeneratedimagef6v0l9f6v0l9f6v0.jpeg"
-      ],
-      "categoryKey": "real-estate"
-    },
-    {
       "id": "allsopp-dubai-l-310065",
       "slug": "1-bedroom-apartment-for-rent-park-island-dubai-marina-bail310065",
       "url": "https://6ixo.com/listing/1-bedroom-apartment-for-rent-park-island-dubai-marina-bail310065/",
@@ -11892,18 +11801,6 @@
         "https://images.craigslist.org/00j0j_dqI5mC0qryS_0hk0co_600x450.jpg",
         "https://images.craigslist.org/00s0s_i1J0qZ9IOdj_0hk0co_600x450.jpg",
         "https://images.craigslist.org/00e0e_8n0iiTIQAx9_0hk0co_600x450.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "craigslist-dqeS0y_M8RGnT7Kk1zqZkw",
-      "slug": "2023-tesla-model-3-awd-sedan-performance-t7kk1zqzkw",
-      "url": "https://6ixo.com/listing/2023-tesla-model-3-awd-sedan-performance-t7kk1zqzkw/",
-      "images": [
-        "https://images.craigslist.org/00N0N_PQCx0gEUnR_0hk0co_600x450.jpg",
-        "https://images.craigslist.org/00H0H_7WGAiy497az_0hk0co_600x450.jpg",
-        "https://images.craigslist.org/00f0f_5cyxDqp1apb_0hk0co_600x450.jpg",
-        "https://images.craigslist.org/00D0D_1b86LYhDTar_0hk0co_600x450.jpg"
       ],
       "categoryKey": "vehicles"
     },
@@ -22615,19 +22512,6 @@
         "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/46/46775135-7bce-4e51-8db1-689c27ea9229?rule=kijijica-1600-webp"
       ],
       "categoryKey": "electronics"
-    },
-    {
-      "id": "kijiji-1744727759",
-      "slug": "bf-goodrich-all-terrain-t-a-tires-300-1744727759",
-      "url": "https://6ixo.com/listing/bf-goodrich-all-terrain-t-a-tires-300-1744727759/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/9f/9fcaf25f-a0c8-4b03-b91d-dc7b885a4c5b?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/20/205a91e1-16bd-413f-81c8-a13f6ef16cb3?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/0c/0cdc06fb-bafa-40c5-be06-7cc2bd20ba72?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/77/773f4676-1589-4036-b768-d9dc85453d98?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/9e/9eb96903-d2a4-4038-967c-c3e0d22d56f9?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "auto-parts"
     },
     {
       "id": "kijiji-1744727257",
@@ -33939,15 +33823,6 @@
       "categoryKey": "real-estate"
     },
     {
-      "id": "allsopp-dubai-pjm190729",
-      "slug": "3-bedroom-apartment-for-rent-shams-1-shams-jumeirah-beach--ipjm190729",
-      "url": "https://6ixo.com/listing/3-bedroom-apartment-for-rent-shams-1-shams-jumeirah-beach--ipjm190729/",
-      "images": [
-        "https://images.allsoppandallsopp.com/public/temp/a0O4S000000VEtNUAW_s_3-bedroom-apartment-in-shams-1-shams-jumeirah-beach-residence-aed-170k-allsopp-and-allsopp-dsc07416-hdr.jpg"
-      ],
-      "categoryKey": "real-estate"
-    },
-    {
       "id": "kijiji-1744195627",
       "slug": "office-space-for-rent-in-brampton-1744195627",
       "url": "https://6ixo.com/listing/office-space-for-rent-in-brampton-1744195627/",
@@ -44963,9 +44838,6 @@
       "url": "https://6ixo.com/listings/real-estate/page/16/"
     },
     {
-      "url": "https://6ixo.com/listings/real-estate/page/17/"
-    },
-    {
       "url": "https://6ixo.com/listings/services/"
     },
     {
@@ -52818,6 +52690,56 @@
       "id": "craigslist-o7jvchUJfN6b9dvdpgjATX",
       "slug": "hood-9dvdpgjatx",
       "url": "https://6ixo.com/listing/hood-9dvdpgjatx/"
+    },
+    {
+      "id": "kijiji-1745269251",
+      "slug": "1-bed-1-bath-full-basement-with-parking-near-stc-november--1745269251",
+      "url": "https://6ixo.com/listing/1-bed-1-bath-full-basement-with-parking-near-stc-november--1745269251/"
+    },
+    {
+      "id": "kijiji-1745258665",
+      "slug": "your-oasis-large-3-bedroom-in-highly-desired-west-mountain-1745258665",
+      "url": "https://6ixo.com/listing/your-oasis-large-3-bedroom-in-highly-desired-west-mountain-1745258665/"
+    },
+    {
+      "id": "kijiji-1745250575",
+      "slug": "female-only-2-rooms-now-mohawk-college-st-jos-hospital-1745250575",
+      "url": "https://6ixo.com/listing/female-only-2-rooms-now-mohawk-college-st-jos-hospital-1745250575/"
+    },
+    {
+      "id": "kijiji-1745250389",
+      "slug": "all-inclusive-room-female-general-hospital-oak-ave-now-1745250389",
+      "url": "https://6ixo.com/listing/all-inclusive-room-female-general-hospital-oak-ave-now-1745250389/"
+    },
+    {
+      "id": "kijiji-1745241939",
+      "slug": "all-season-car-mats-for-sale-1745241939",
+      "url": "https://6ixo.com/listing/all-season-car-mats-for-sale-1745241939/"
+    },
+    {
+      "id": "craigslist-hkCv1963Txqo1Atf9DzRdY",
+      "slug": "apartamento-3-habitaciones-2-banos-1atf9dzrdy",
+      "url": "https://6ixo.com/listing/apartamento-3-habitaciones-2-banos-1atf9dzrdy/"
+    },
+    {
+      "id": "allsopp-dubai-l-308237",
+      "slug": "2-bedroom-apartment-for-rent-safi-1a-town-square-bail308237",
+      "url": "https://6ixo.com/listing/2-bedroom-apartment-for-rent-safi-1a-town-square-bail308237/"
+    },
+    {
+      "id": "craigslist-dqeS0y_M8RGnT7Kk1zqZkw",
+      "slug": "2023-tesla-model-3-awd-sedan-performance-t7kk1zqzkw",
+      "url": "https://6ixo.com/listing/2023-tesla-model-3-awd-sedan-performance-t7kk1zqzkw/"
+    },
+    {
+      "id": "kijiji-1744727759",
+      "slug": "bf-goodrich-all-terrain-t-a-tires-300-1744727759",
+      "url": "https://6ixo.com/listing/bf-goodrich-all-terrain-t-a-tires-300-1744727759/"
+    },
+    {
+      "id": "allsopp-dubai-pjm190729",
+      "slug": "3-bedroom-apartment-for-rent-shams-1-shams-jumeirah-beach--ipjm190729",
+      "url": "https://6ixo.com/listing/3-bedroom-apartment-for-rent-shams-1-shams-jumeirah-beach--ipjm190729/"
     }
   ]
 }

@@ -1,5 +1,5 @@
 {
-  "count": 3623,
+  "count": 3615,
   "listings": [
     {
       "id": "apify-b9b18084f762",
@@ -2250,18 +2250,6 @@
         "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/a0/a0643e2b-82d9-4c5a-8ad7-9ac1a3224c21?rule=kijijica-1600-webp"
       ],
       "categoryKey": "real-estate"
-    },
-    {
-      "id": "kijiji-1745266739",
-      "slug": "for-sale-set-michelin-195-65-r15-winter-tire-and-rims-250-1745266739",
-      "url": "https://6ixo.com/listing/for-sale-set-michelin-195-65-r15-winter-tire-and-rims-250-1745266739/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/82/82823df7-e070-4115-8376-862b01d65b53?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/df/df23423c-1cf5-44e9-a3ac-816c229538f9?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/a0/a0ef7a51-9353-4378-bae5-cb09dd67005a?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/c8/c8c6cb42-f201-4549-aa90-265dc2374c3b?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "auto-parts"
     },
     {
       "id": "kijiji-1745265696",
@@ -10736,66 +10724,6 @@
         "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/e5/e50528fe-b0ff-4086-b125-d3aef18ab47f?rule=kijijica-1600-webp"
       ],
       "categoryKey": "real-estate"
-    },
-    {
-      "id": "kijiji-1745087408",
-      "slug": "2014-bmw-x6-xdrive-clean-title-safetied-command-start-1745087408",
-      "url": "https://6ixo.com/listing/2014-bmw-x6-xdrive-clean-title-safetied-command-start-1745087408/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/fb/fbe52408-9cb2-43a9-a6c1-884fd60ba560?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/2d/2da1cf68-d99c-4a9f-98a9-4197c378a689?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/43/4327d988-41e1-475f-9f2f-2bc9b88601ad?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/18/1806ea5c-caa0-4506-9dbe-3e3a7d06872e?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/43/43af55bb-1c5a-44b6-a12c-9bc4e5c006df?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/96/966e3802-a90a-46dc-85b3-6e49d0e40558?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/e6/e6691b67-983e-4c5a-b938-c905b86e1c6c?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/be/be0dcbd8-3d14-4be6-9dfc-981d93407dc7?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/eb/eb29a354-bc9f-45b0-a078-f29b56cda09c?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/e5/e58c2b83-7f65-4d0a-a48c-a5abc323b7da?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/9d/9ddcb692-1c40-4646-98b8-fddd0840c696?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/0f/0fd620f1-0d13-4a30-84c9-6ac4ebb1b7ec?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "kijiji-1745087407",
-      "slug": "2023-jeep-grand-cherokee-limited-4x4-loaded-clean-title-sa-1745087407",
-      "url": "https://6ixo.com/listing/2023-jeep-grand-cherokee-limited-4x4-loaded-clean-title-sa-1745087407/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/bf/bfa2906d-b94d-4b69-b64b-3a408eadc7a2?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/37/370cf416-2fc2-437d-8966-5275919194a3?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/aa/aaec1cff-0f35-4953-815d-e35cbf30ad46?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/37/3771294c-9585-443c-a0ba-1b1df3e4ccf1?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/a4/a4bfdaec-ba7f-41d3-b5c2-0816ded8dabe?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/f0/f04e7404-5825-4b3b-b5fa-3017e8cdfa01?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/45/4506b563-a13b-43cf-b5a6-30c7d014224a?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/99/997bdd17-4573-4489-bd96-43079e24b954?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/32/320c82a2-e569-4e78-9e73-fda7c17819a7?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/6c/6c595f39-e22b-4f8a-9dd8-e721bf6f5720?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/bb/bb723140-8c42-4c54-8567-5fb68caab901?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/61/619a11f2-9985-4b2e-9690-a231ff7da1c5?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "kijiji-1745087398",
-      "slug": "2020-hyundai-elantra-preffered-clean-title-safetied-2-sets-1745087398",
-      "url": "https://6ixo.com/listing/2020-hyundai-elantra-preffered-clean-title-safetied-2-sets-1745087398/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/5e/5e59a648-bb40-43b0-8aed-284e28cde1b7?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/47/47d64f19-8efc-4bba-85e3-31f90a6ae1a5?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/43/430466bf-a6d4-4c40-8cad-163cfd47de8a?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/7b/7be7cce5-7e06-4929-a249-f37eaea2e159?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/32/32bca881-aa19-4fc2-9128-d2cbeab032f7?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/77/77e0e4e0-1b2b-4584-9b77-e5beef918807?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/fd/fdb19966-d8a8-4dde-bd20-483f85d8737e?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/d1/d13e5f66-a4d5-4126-97b4-77fc9d0e18ce?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/23/233a73f2-3e2a-4f71-a0ac-b3118ca74c69?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/3f/3f5a22c4-3ece-4cbc-bbfc-54860f2afc35?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/d2/d2b4ec44-90c8-4df2-898d-5d1d269e001c?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/29/29c8d190-b5cc-41f7-94c4-39da768130ac?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "vehicles"
     },
     {
       "id": "kijiji-1745087365",
@@ -20069,17 +19997,6 @@
       "categoryKey": "services"
     },
     {
-      "id": "kijiji-1744826583",
-      "slug": "professional-cleaning-services-1744826583",
-      "url": "https://6ixo.com/listing/professional-cleaning-services-1744826583/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/07/07ef2f72-7d69-41ee-ad60-b9dc67ea2dcb?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/1c/1cc7a8c9-6ca0-4ab4-b854-4b2004c106f1?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/20/20aa7058-2dd7-41ce-addd-295516303858?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "services"
-    },
-    {
       "id": "kijiji-1744826594",
       "slug": "hiring-brow-expert-at-sk-hair-salon-1744826594",
       "url": "https://6ixo.com/listing/hiring-brow-expert-at-sk-hair-salon-1744826594/",
@@ -25267,6 +25184,15 @@
       "url": "https://6ixo.com/listing/2025-forthing-u-tour-adubai2064/",
       "images": [
         "https://storage.albacars.ae/vehicles/35a4efeb-818a-4fa4-a820-d4bc9a87c279/c47edd4e-2b9d-4b66-a3a9-d9e2b198cd4f.jpeg"
+      ],
+      "categoryKey": "vehicles"
+    },
+    {
+      "id": "alba-dubai-2063",
+      "slug": "2024-gmc-hummer-ev-adubai2063",
+      "url": "https://6ixo.com/listing/2024-gmc-hummer-ev-adubai2063/",
+      "images": [
+        "https://storage.albacars.ae/vehicles/drafts/2063/1.jpg"
       ],
       "categoryKey": "vehicles"
     },
@@ -33223,18 +33149,6 @@
       "categoryKey": "vehicles"
     },
     {
-      "id": "craigslist-v6f8zt4AgbYMNzz2UFcprH",
-      "slug": "2017-jaguar-xf-35t-premium-nzz2ufcprh",
-      "url": "https://6ixo.com/listing/2017-jaguar-xf-35t-premium-nzz2ufcprh/",
-      "images": [
-        "https://images.craigslist.org/00c0c_akCKYx0dI7v_0t20CI_600x450.jpg",
-        "https://images.craigslist.org/00h0h_bgvVkMxP8dn_0t20CI_600x450.jpg",
-        "https://images.craigslist.org/00k0k_l0DvnCPUyYn_0t20CI_600x450.jpg",
-        "https://images.craigslist.org/00808_imqwEkrol57_0t20CI_600x450.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
       "id": "craigslist-hwHX6xmDPn8zyQCFcFjgTF",
       "slug": "1998-explorer-hood-yqcfcfjgtf",
       "url": "https://6ixo.com/listing/1998-explorer-hood-yqcfcfjgtf/",
@@ -33493,18 +33407,6 @@
         "https://images.craigslist.org/00H0H_aB6Mx1up390_0jm0ew_600x450.jpg",
         "https://images.craigslist.org/00q0q_cWClno7P8dc_0jm0ew_600x450.jpg",
         "https://images.craigslist.org/00C0C_ptVulvbxmK_0jm0ew_600x450.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "craigslist-pJjBZMPBm2641tkSXCovq2",
-      "slug": "2002-chevy-silverado-z71-4x4-for-sale-1tksxcovq2",
-      "url": "https://6ixo.com/listing/2002-chevy-silverado-z71-4x4-for-sale-1tksxcovq2/",
-      "images": [
-        "https://images.craigslist.org/00t0t_bwhfplBodwE_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/00E0E_fgD87f1TVQm_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/00M0M_8qvh5GYXY9v_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/00x0x_1rCkxqoOC0e_0CI0t2_600x450.jpg"
       ],
       "categoryKey": "vehicles"
     },
@@ -33886,18 +33788,6 @@
       "categoryKey": "vehicles"
     },
     {
-      "id": "craigslist-rAxCFwgEfW321DtyznD9JC",
-      "slug": "2021-ford-e-450-rv-forest-river-forester-class-c-3011-ds-1-1dtyznd9jc",
-      "url": "https://6ixo.com/listing/2021-ford-e-450-rv-forest-river-forester-class-c-3011-ds-1-1dtyznd9jc/",
-      "images": [
-        "https://images.craigslist.org/01616_l9OLeOY41yK_0cU09H_600x450.jpg",
-        "https://images.craigslist.org/00A0A_8di7KOtGbV_0cU09H_600x450.jpg",
-        "https://images.craigslist.org/00Y0Y_ijDZHKY9Dmw_0cU09H_600x450.jpg",
-        "https://images.craigslist.org/01515_hx4vIl6S9BR_0cU09H_600x450.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
       "id": "craigslist-hGfd19rCgcoSvPqgsvC3qb",
       "slug": "wheel-lift-l-arm-vpqgsvc3qb",
       "url": "https://6ixo.com/listing/wheel-lift-l-arm-vpqgsvc3qb/",
@@ -33964,18 +33854,6 @@
         "https://images.craigslist.org/00303_3tF4wlh6jIx_0CI0pO_600x450.jpg"
       ],
       "categoryKey": "vehicles"
-    },
-    {
-      "id": "craigslist-o7jvchUJfN6b9dvdpgjATX",
-      "slug": "hood-9dvdpgjatx",
-      "url": "https://6ixo.com/listing/hood-9dvdpgjatx/",
-      "images": [
-        "https://images.craigslist.org/00u0u_aUgwUZm7vjF_0t20CI_600x450.jpg",
-        "https://images.craigslist.org/00s0s_gT63YylvU4I_0t20CI_600x450.jpg",
-        "https://images.craigslist.org/00A0A_lHTz7oAqLvP_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/00707_4WZmfIAl1Wc_0t20CI_600x450.jpg"
-      ],
-      "categoryKey": "auto-parts"
     },
     {
       "id": "craigslist-ifRxG5NfYMwRWxCepJig36",
@@ -45103,9 +44981,6 @@
       "url": "https://6ixo.com/listings/services/page/5/"
     },
     {
-      "url": "https://6ixo.com/listings/services/page/6/"
-    },
-    {
       "url": "https://6ixo.com/listings/jobs/"
     },
     {
@@ -45908,6 +45783,9 @@
     },
     {
       "url": "https://6ixo.com/cars-for-sale/united-arab-emirates/"
+    },
+    {
+      "url": "https://6ixo.com/cars-for-sale/united-arab-emirates/page/2/"
     },
     {
       "url": "https://6ixo.com/cars-for-sale/united-states/"
@@ -50217,11 +50095,6 @@
       "url": "https://6ixo.com/listing/servic-repair-install-home-appliances-1744635980/"
     },
     {
-      "id": "alba-dubai-2063",
-      "slug": "2024-gmc-hummer-ev-adubai2063",
-      "url": "https://6ixo.com/listing/2024-gmc-hummer-ev-adubai2063/"
-    },
-    {
       "id": "kijiji-1744593391",
       "slug": "looking-for-job-1744593391",
       "url": "https://6ixo.com/listing/looking-for-job-1744593391/"
@@ -52900,6 +52773,51 @@
       "id": "apify-2438db8de1b3",
       "slug": "2024-honda-crv-sports-hybrid-38db8de1b3",
       "url": "https://6ixo.com/listing/2024-honda-crv-sports-hybrid-38db8de1b3/"
+    },
+    {
+      "id": "kijiji-1745266739",
+      "slug": "for-sale-set-michelin-195-65-r15-winter-tire-and-rims-250-1745266739",
+      "url": "https://6ixo.com/listing/for-sale-set-michelin-195-65-r15-winter-tire-and-rims-250-1745266739/"
+    },
+    {
+      "id": "kijiji-1745087408",
+      "slug": "2014-bmw-x6-xdrive-clean-title-safetied-command-start-1745087408",
+      "url": "https://6ixo.com/listing/2014-bmw-x6-xdrive-clean-title-safetied-command-start-1745087408/"
+    },
+    {
+      "id": "kijiji-1745087407",
+      "slug": "2023-jeep-grand-cherokee-limited-4x4-loaded-clean-title-sa-1745087407",
+      "url": "https://6ixo.com/listing/2023-jeep-grand-cherokee-limited-4x4-loaded-clean-title-sa-1745087407/"
+    },
+    {
+      "id": "kijiji-1745087398",
+      "slug": "2020-hyundai-elantra-preffered-clean-title-safetied-2-sets-1745087398",
+      "url": "https://6ixo.com/listing/2020-hyundai-elantra-preffered-clean-title-safetied-2-sets-1745087398/"
+    },
+    {
+      "id": "kijiji-1744826583",
+      "slug": "professional-cleaning-services-1744826583",
+      "url": "https://6ixo.com/listing/professional-cleaning-services-1744826583/"
+    },
+    {
+      "id": "craigslist-v6f8zt4AgbYMNzz2UFcprH",
+      "slug": "2017-jaguar-xf-35t-premium-nzz2ufcprh",
+      "url": "https://6ixo.com/listing/2017-jaguar-xf-35t-premium-nzz2ufcprh/"
+    },
+    {
+      "id": "craigslist-pJjBZMPBm2641tkSXCovq2",
+      "slug": "2002-chevy-silverado-z71-4x4-for-sale-1tksxcovq2",
+      "url": "https://6ixo.com/listing/2002-chevy-silverado-z71-4x4-for-sale-1tksxcovq2/"
+    },
+    {
+      "id": "craigslist-rAxCFwgEfW321DtyznD9JC",
+      "slug": "2021-ford-e-450-rv-forest-river-forester-class-c-3011-ds-1-1dtyznd9jc",
+      "url": "https://6ixo.com/listing/2021-ford-e-450-rv-forest-river-forester-class-c-3011-ds-1-1dtyznd9jc/"
+    },
+    {
+      "id": "craigslist-o7jvchUJfN6b9dvdpgjATX",
+      "slug": "hood-9dvdpgjatx",
+      "url": "https://6ixo.com/listing/hood-9dvdpgjatx/"
     }
   ]
 }

@@ -2,6 +2,7 @@ import { recordPromotionTaxTransaction, reversePromotionTaxRefunds } from '../_s
 import { refundRentalPayment } from '../_shared/rental-settlement.ts';
 import { isRentalPayoutReady } from '../_shared/rental-payout.ts';
 import Stripe from 'https://esm.sh/stripe@14.25.0?target=denonext';
+import { promotionPaymentStatus } from '../_shared/promotion-payment-state.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.49.8';
 import {
   PROMOTION_DURATION_HOURS,
@@ -176,22 +177,13 @@ async function persistPromoRedemptionFromPaymentIntent(event: Stripe.Event, inte
   if (error) throw error;
 }
 
-function paymentEntitlementStatus(intent: Stripe.PaymentIntent): string {
-  const status = String(intent.status || '').toLowerCase();
-  if (status === 'succeeded') return 'paid';
-  if (status === 'processing') return 'processing';
-  if (status === 'canceled') return 'cancelled';
-  if (status === 'requires_payment_method') return 'failed';
-  return 'pending';
-}
-
 async function syncPaymentEntitlementFromIntent(event: Stripe.Event, intent: Stripe.PaymentIntent) {
   if (!supabaseAdmin) throw new Error('Supabase admin client is not configured for entitlement persistence.');
   const userId = toText(intent.metadata?.user_id);
   const placement = toText(intent.metadata?.placement)?.toLowerCase() || '';
   if (!userId || !placement || placement.endsWith('_booking')) return;
 
-  const status = paymentEntitlementStatus(intent);
+  const status = await promotionPaymentStatus(stripe, intent);
   const { error } = await supabaseAdmin.from('payment_entitlements').upsert({
     user_id: userId,
     stripe_payment_intent_id: intent.id,
@@ -288,9 +280,10 @@ async function syncAdCampaignFromIntent(intent: Stripe.PaymentIntent) {
 
   const { data: entitlement } = await supabaseAdmin
     .from('payment_entitlements')
-    .select('id')
+    .select('id,status')
     .eq('stripe_payment_intent_id', intent.id)
     .maybeSingle();
+  if (entitlement?.status !== 'paid') return;
   const startsAt = new Date();
   const endsAt = new Date(startsAt.getTime() + (PROMOTION_DURATION_HOURS[placement] * 60 * 60 * 1000));
   const { error } = await supabaseAdmin.from('ad_campaigns').upsert({

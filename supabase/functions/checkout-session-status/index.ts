@@ -1,5 +1,6 @@
 import Stripe from 'https://esm.sh/stripe@14.25.0?target=denonext';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.49.8';
+import { promotionPaymentStatus } from '../_shared/promotion-payment-state.ts';
 import { SUBSCRIPTION_PLANS, isSubscriptionPlanKey } from '../_shared/monetization-catalog.ts';
 
 const STRIPE_SECRET_KEY = Deno.env.get('STRIPE_SECRET_KEY') || '';
@@ -133,25 +134,29 @@ Deno.serve(async (req) => {
       }), { status: 200, headers });
     }
 
-    const paid = session.status === 'complete' && session.payment_status === 'paid';
+    let paid = session.status === 'complete' && session.payment_status === 'paid';
+    let paymentStatus = session.payment_status as string;
     const paymentIntentId = objectId(session.payment_intent);
     if (paid && paymentIntentId) {
       const intent = typeof session.payment_intent === 'string'
         ? await stripe.paymentIntents.retrieve(paymentIntentId)
         : session.payment_intent as Stripe.PaymentIntent;
-      const { error } = await supabaseAdmin.from('payment_entitlements').upsert({
+      const status = await promotionPaymentStatus(stripe, intent);
+      const { data: entitlement, error } = await supabaseAdmin.from('payment_entitlements').upsert({
         user_id: user.id,
         stripe_payment_intent_id: intent.id,
         placement: String(intent.metadata?.placement || session.metadata?.placement || ''),
         request_id: String(intent.metadata?.request_id || '') || null,
         amount_cents: Number(intent.amount_received || intent.amount || 0),
         currency: String(intent.currency || 'usd').toUpperCase(),
-        status: intent.status === 'succeeded' ? 'paid' : 'processing',
+        status,
         livemode: Boolean(intent.livemode),
-        paid_at: intent.status === 'succeeded' ? new Date().toISOString() : null,
+        paid_at: status === 'paid' ? new Date().toISOString() : null,
         metadata: { checkout_session_id: session.id, intent_metadata: intent.metadata || {} },
-      }, { onConflict: 'stripe_payment_intent_id' });
+      }, { onConflict: 'stripe_payment_intent_id' }).select('status').single();
       if (error) throw error;
+      paymentStatus = String(entitlement.status);
+      paid = paymentStatus === 'paid';
     }
 
     return new Response(JSON.stringify({
@@ -159,7 +164,7 @@ Deno.serve(async (req) => {
       kind: 'one_time_payment',
       paid,
       status: session.status,
-      paymentStatus: session.payment_status,
+      paymentStatus,
       sessionId: session.id,
       paymentIntentId: paymentIntentId || null,
       amountTotal: session.amount_total,

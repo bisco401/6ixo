@@ -1,5 +1,6 @@
 import Stripe from 'https://esm.sh/stripe@14.25.0?target=denonext';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.49.8';
+import { promotionPaymentStatus } from '../_shared/promotion-payment-state.ts';
 
 const STRIPE_SECRET_KEY = Deno.env.get('STRIPE_SECRET_KEY') || '';
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL') || '';
@@ -51,15 +52,6 @@ async function getAuthenticatedUser(req: Request) {
   return data.user;
 }
 
-function entitlementStatus(intent: Stripe.PaymentIntent): string {
-  const value = String(intent.status || '').toLowerCase();
-  if (value === 'succeeded') return 'paid';
-  if (value === 'processing') return 'processing';
-  if (value === 'canceled') return 'cancelled';
-  if (value === 'requires_payment_method') return 'failed';
-  return 'pending';
-}
-
 async function syncEntitlement(intent: Stripe.PaymentIntent, userId: string) {
   if (!supabaseAdmin) throw new RequestError(500, 'Payment verification is not configured.');
   const metadataUserId = normalizeText(intent.metadata?.user_id, 80);
@@ -71,7 +63,7 @@ async function syncEntitlement(intent: Stripe.PaymentIntent, userId: string) {
     throw new RequestError(400, 'This payment is not a promotion entitlement.');
   }
 
-  const nextStatus = entitlementStatus(intent);
+  const nextStatus = await promotionPaymentStatus(stripe, intent);
   const row = {
     user_id: userId,
     stripe_payment_intent_id: intent.id,
@@ -124,6 +116,7 @@ async function consumeEntitlement(
       consumed_at: new Date().toISOString(),
     })
     .eq('id', entitlement.id)
+    .eq('status', 'paid')
     .is('consumed_at', null)
     .select('*')
     .maybeSingle();

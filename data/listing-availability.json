@@ -1,5 +1,5 @@
 {
-  "checkedAt": "2026-10-25T06:42:49Z",
+  "checkedAt": "2026-10-25T06:56:14.916Z",
   "listings": {
     "craigslist.org/view/d/bastrop-used-2025-cadillac-xt4-fwd-4d/fuqr_3uo8rgowpq1ctwx-a": {
       "availability": "sold",
@@ -13000,9 +13000,13 @@
       "resolvedUrl": "https://www.kijiji.ca/b-refrigerator-fridge/hamilton/c696l80014?radius=50.0&ll=43.2%2C-79.89&adRemoved=1745108537"
     },
     "kijiji.ca/v-renovation-window-door-trim/city-of-toronto/get-a-real-price-in-5-minutes-for-windows-and-doors/1745218503": {
-      "availability": "unavailable",
-      "checkedAt": "2026-10-25T06:42:49Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1745218503",
+      "sourceUrl": "https://www.kijiji.ca/v-renovation-window-door-trim/city-of-toronto/get-a-real-price-in-5-minutes-for-windows-and-doors/1745218503",
+      "availability": "gone",
+      "checkedAt": "2026-10-25T06:56:14.916Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-renovation-window-door-trim/city-of-toronto/c736l1700273?radius=50.0&ll=43.71%2C-79.29&adRemoved=1745218503",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "craigslist.org/view/d/meriden-2007-subaru-forester-premium/wm3hfaxpx2sk8z3hexidpj": {
       "availability": "gone",
@@ -13202,9 +13206,13 @@
       "resolvedUrl": "https://www.kijiji.ca/b-short-term-rental/mississauga-peel-region/c42l1700276?radius=50.0&ll=43.76%2C-79.77&adRemoved=1744192556"
     },
     "kijiji.ca/v-plumbing-sink-toilet-shower/mississauga-peel-region/cooling-heating-expert-all-gta-gas-fitter-416-871-7673/1745232471": {
-      "availability": "unavailable",
-      "checkedAt": "2026-10-25T06:42:49Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1745232471",
+      "sourceUrl": "https://www.kijiji.ca/v-plumbing-sink-toilet-shower/mississauga-peel-region/cooling-heating-expert-all-gta-gas-fitter-416-871-7673/1745232471",
+      "availability": "gone",
+      "checkedAt": "2026-10-25T06:56:14.916Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-plumbing-sink-toilet-shower/mississauga-peel-region/c734l1700276?radius=50.0&ll=43.6%2C-79.6&adRemoved=1745232471",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "craigslist.org/view/d/lithia-springs-print-2004-toyota-tacoma/uqosd92rpn4xayujcfjbvk": {
       "availability": "gone",
@@ -13330,9 +13338,13 @@
       "resolvedUrl": "https://www.kijiji.ca/b-tvs/mississauga-peel-region/c15093002l1700276?radius=50.0&ll=43.74%2C-79.7&adRemoved=1745151888"
     },
     "kijiji.ca/v-renovation-window-door-trim/mississauga-peel-region/big-discount-deal-windows-and-doors-installation/1745218604": {
-      "availability": "unavailable",
-      "checkedAt": "2026-10-25T06:42:49Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1745218604",
+      "sourceUrl": "https://www.kijiji.ca/v-renovation-window-door-trim/mississauga-peel-region/big-discount-deal-windows-and-doors-installation/1745218604",
+      "availability": "gone",
+      "checkedAt": "2026-10-25T06:56:14.916Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-renovation-window-door-trim/mississauga-peel-region/c736l1700276?radius=50.0&ll=43.71%2C-79.64&adRemoved=1745218604",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-bed-mattress/city-of-toronto/new-hydrolic-liftup-storage-bed-queen-bed-storage-bed-bed/1745159502": {
       "availability": "unavailable",
@@ -13999,19 +14011,31 @@
       "reason": "Exact source URL returned HTTP 410"
     },
     "kijiji.ca/v-pet-services/mississauga-peel-region/bird-sitting-in-mississauga/1745264010": {
-      "availability": "unavailable",
-      "checkedAt": "2026-10-25T06:42:49Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1745264010",
+      "sourceUrl": "https://www.kijiji.ca/v-pet-services/mississauga-peel-region/bird-sitting-in-mississauga/1745264010",
+      "availability": "gone",
+      "checkedAt": "2026-10-25T06:56:14.916Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-pet-services/mississauga-peel-region/c143l1700276?radius=50.0&ll=43.61%2C-79.64&adRemoved=1745264010",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-renovation-window-door-trim/hamilton/windows-doors-order-today-save-immediately/1745232728": {
-      "availability": "unavailable",
-      "checkedAt": "2026-10-25T06:42:49Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1745232728",
+      "sourceUrl": "https://www.kijiji.ca/v-renovation-window-door-trim/hamilton/windows-doors-order-today-save-immediately/1745232728",
+      "availability": "gone",
+      "checkedAt": "2026-10-25T06:56:14.916Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-renovation-window-door-trim/hamilton/c736l80014?radius=50.0&ll=43.2%2C-79.56&adRemoved=1745232728",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-washer-dryer/hamilton/whirlpool-27-white-frontloadstackable-washer-electric-dryer-se/1745232401": {
-      "availability": "unavailable",
-      "checkedAt": "2026-10-25T06:42:49Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1745232401",
+      "sourceUrl": "https://www.kijiji.ca/v-washer-dryer/hamilton/whirlpool-27-white-frontloadstackable-washer-electric-dryer-se/1745232401",
+      "availability": "gone",
+      "checkedAt": "2026-10-25T06:56:14.916Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-washer-dryer/hamilton/c700l80014?radius=50.0&ll=43.25769%2C-79.84019&adRemoved=1745232401",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "craigslist.org/view/d/south-ozone-park/4178uzx3fbeqh5kesrru1a": {
       "availability": "gone",

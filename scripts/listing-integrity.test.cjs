@@ -75,6 +75,16 @@ assert.equal(integrity.matchCrawlResult([{html:'no URL'}],url),null,'URL-less re
 const product = (name,u,image) => ({'@type':'Product',name,url:u,image});
 const ld = `<script type="application/ld+json">${JSON.stringify({'@graph':[product('Other','https://example.com/other',unrelated),product('Own','https://example.com/own',own)]})}</script>`;
 assert.deepEqual(integrity.extract(ld,{source_url:'https://example.com/own'}).images,[own.replace('640','1600')]);
+const lexoUrl = 'https://www.lexoinc.com/Inventory/Details/4210f234-605d-43fd-a111-053ff5882cb8';
+const lexoHtml = fs.readFileSync(require('node:path').join(__dirname, '../tests/fixtures/regional-sources/texas.html'), 'utf8');
+const lexoRow = {source_url:lexoUrl,title:'2020 Mercedes-Benz A-Class',attributes:'{}'};
+const lexoGallery = integrity.extract(lexoHtml,lexoRow).images;
+assert.equal(lexoGallery.length,6,'The exact dealer gallery survives recurring photo verification');
+assert.equal(integrity.verifyRecord(lexoRow,lexoHtml).row.image_urls.split('|').length,4,'The published dealer gallery retains the four-photo limit');
+assert.equal(integrity.extract(lexoHtml.replace('"url": "'+lexoGallery[0]+'"','"url": "https://example.com/foreign.jpg"'),lexoRow).images.length,1,'A foreign gallery cannot match the primary vehicle cover');
+assert.equal(integrity.extract(lexoHtml.replace('<link href="'+lexoUrl+'"','<link href="https://www.lexoinc.com/Inventory/Details/other"'),lexoRow).images.length,1,'A different canonical page cannot provide the gallery');
+assert.equal(integrity.extract(lexoHtml+'<script type="application/ld+json">{"@type":"ImageGallery","Image":[]}</script>',lexoRow).images.length,1,'Ambiguous multiple galleries fall back to the identified cover');
+assert.equal(integrity.extract(lexoHtml,{...lexoRow,source_url:lexoUrl.replace('4210f234','00000000')}).matched,false,'Another listing cannot borrow this dealer gallery');
 assert.deepEqual(integrity.extract(`<img src="${own}">`,{source_url:url}).images,[],'A page-wide image search must never become a gallery');
 const clUrl='https://www.craigslist.org/view/d/example/own-id';
 const clImages=Array.from({length:8},(_,i)=>`https://images.craigslist.org/own-${i}_600x450.jpg`);

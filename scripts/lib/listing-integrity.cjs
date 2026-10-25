@@ -554,7 +554,19 @@ function createListingIntegrity() {
       if (identities.length) return identities.some(sameUrl);
       return sameUrl(canonical) && String(e.name || '').trim().toLowerCase() === String(row.title || '').trim().toLowerCase();
     });
-    if (primary) return { images: [...new Set(imageValues(primary.image).map(v => normalizeImage(v, url)).filter(Boolean))].slice(0,12), title: row.title || primary.name || '', sourceTitle: primary.name || '', sourceUrl: url, matched: true, method: 'primary_structured_data' };
+    if (primary) {
+      let images = imageValues(primary.image).map(v => normalizeImage(v, url)).filter(Boolean);
+      // Lexo places its own gallery beside the Car entity. Bind it to the
+      // exact canonical listing and cover; never borrow a related gallery.
+      if (/^https?:\/\/(?:www\.)?lexoinc\.com\/Inventory\/Details\//i.test(url) && sameUrl(canonical)) {
+        const galleries = entities.filter(e => e?.['@type'] === 'ImageGallery');
+        if (galleries.length === 1) {
+          const gallery = imageValues(galleries[0].Image).map(v => normalizeImage(v, url)).filter(Boolean);
+          if (gallery.length && gallery[0] === images[0]) images = gallery;
+        }
+      }
+      return { images: [...new Set(images)].slice(0,12), title: row.title || primary.name || '', sourceTitle: primary.name || '', sourceUrl: url, matched: true, method: 'primary_structured_data' };
+    }
     // Craigslist's gallery is a dedicated data object, never map/nearby ad images.
     if (/craigslist\.org/.test(url) && (sameUrl(canonical) || entities.some(e => e?.['@type'] === 'BreadcrumbList' && (e.itemListElement || []).some(i => sameUrl(i.item))))) {
       const gallery = String(html).match(/(?:var\s+)?imgList\s*=\s*(\[[\s\S]*?\]);/)?.[1];

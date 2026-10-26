@@ -1,5 +1,5 @@
 {
-  "checkedAt": "2026-10-26T07:00:14Z",
+  "checkedAt": "2026-10-26T07:12:49.774Z",
   "listings": {
     "craigslist.org/view/d/bastrop-used-2025-cadillac-xt4-fwd-4d/fuqr_3uo8rgowpq1ctwx-a": {
       "availability": "sold",
@@ -13784,9 +13784,13 @@
       "reason": "Exact source URL returned HTTP 410"
     },
     "kijiji.ca/v-pet-services/mississauga-peel-region/bird-sitting-in-mississauga/1745264010": {
-      "availability": "unavailable",
-      "checkedAt": "2026-10-26T07:00:14Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1745264010",
+      "sourceUrl": "https://www.kijiji.ca/v-pet-services/mississauga-peel-region/bird-sitting-in-mississauga/1745264010",
+      "availability": "gone",
+      "checkedAt": "2026-10-26T07:12:49.774Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-pet-services/mississauga-peel-region/c143l1700276?radius=50.0&ll=43.61%2C-79.64&adRemoved=1745264010",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-renovation-window-door-trim/hamilton/windows-doors-order-today-save-immediately/1745232728": {
       "availability": "unavailable",
@@ -13829,14 +13833,22 @@
       "reason": "All offers for this exact listing are unavailable"
     },
     "kijiji.ca/v-buy-sell-other/city-of-toronto/demolition-service/1745285231": {
-      "availability": "unavailable",
-      "checkedAt": "2026-10-26T07:00:14Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1745285231",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/demolition-service/1745285231",
+      "availability": "gone",
+      "checkedAt": "2026-10-26T07:12:49.774Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.77%2C-79.41&adRemoved=1745285231",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-pet-services/mississauga-peel-region/bird-sitting-in-mississauga/1745285224": {
-      "availability": "unavailable",
-      "checkedAt": "2026-10-26T07:00:14Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1745285224",
+      "sourceUrl": "https://www.kijiji.ca/v-pet-services/mississauga-peel-region/bird-sitting-in-mississauga/1745285224",
+      "availability": "gone",
+      "checkedAt": "2026-10-26T07:12:49.774Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-pet-services/mississauga-peel-region/c143l1700276?radius=50.0&ll=43.61%2C-79.64&adRemoved=1745285224",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-tires-rims/city-of-toronto/for-sale-set-michelin-195-65-r15-winter-tire-and-rims-250/1745266739": {
       "availability": "unavailable",
@@ -13894,9 +13906,13 @@
       "reason": "Exact source URL returned HTTP 410"
     },
     "kijiji.ca/v-heater-humidifier-dehumidifier/hamilton/air-conditioner-air-conditioner-air-conditioner-air-conditioner/1745285003": {
-      "availability": "unavailable",
-      "checkedAt": "2026-10-26T07:00:14Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1745285003",
+      "sourceUrl": "https://www.kijiji.ca/v-heater-humidifier-dehumidifier/hamilton/air-conditioner-air-conditioner-air-conditioner-air-conditioner/1745285003",
+      "availability": "gone",
+      "checkedAt": "2026-10-26T07:12:49.774Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-heater-humidifier-dehumidifier/hamilton/c692l80014?radius=50.0&ll=43.25%2C-79.89&adRemoved=1745285003",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-apartments-condos/city-of-toronto/1-bed-1-bath-full-basement-with-parking-near-stc-november-1st/1745269251": {
       "availability": "unavailable",
@@ -13954,9 +13970,13 @@
       "reason": "All offers for this exact listing are unavailable"
     },
     "kijiji.ca/v-bed-mattress/city-of-toronto/no-tax-twin-full-queen-king-mattress-mattress/1745292300": {
-      "availability": "unavailable",
-      "checkedAt": "2026-10-26T07:00:14Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1745292300",
+      "sourceUrl": "https://www.kijiji.ca/v-bed-mattress/city-of-toronto/no-tax-twin-full-queen-king-mattress-mattress/1745292300",
+      "availability": "gone",
+      "checkedAt": "2026-10-26T07:12:49.774Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-bed-mattress/city-of-toronto/c246l1700273?radius=50.0&ll=43.76%2C-79.22&adRemoved=1745292300",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-washer-dryer/hamilton/can-deliver-lg-27-white-frontloadwasher-dryer-w-pedestals/1745232288": {
       "availability": "unavailable",

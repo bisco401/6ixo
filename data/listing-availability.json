@@ -1,5 +1,5 @@
 {
-  "checkedAt": "2026-10-26T14:07:49Z",
+  "checkedAt": "2026-10-26T14:23:14.671Z",
   "listings": {
     "craigslist.org/view/d/bastrop-used-2025-cadillac-xt4-fwd-4d/fuqr_3uo8rgowpq1ctwx-a": {
       "availability": "sold",
@@ -14016,9 +14016,13 @@
       "reason": "Kijiji redirected the exact ad to a confirmed removal"
     },
     "kijiji.ca/v-buy-sell-other/city-of-toronto/demolition-service/1745330019": {
-      "availability": "unavailable",
-      "checkedAt": "2026-10-26T14:07:49Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1745330019",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/demolition-service/1745330019",
+      "availability": "gone",
+      "checkedAt": "2026-10-26T14:23:14.671Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.77%2C-79.41&adRemoved=1745330019",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-other-auto-parts-and-accessories/hamilton/all-season-car-mats-for-sale/1745292340": {
       "availability": "unavailable",
@@ -14026,9 +14030,13 @@
       "reason": "Kijiji redirected the exact ad to a confirmed removal"
     },
     "kijiji.ca/v-pet-services/mississauga-peel-region/bird-sitting-in-mississauga/1745330057": {
-      "availability": "unavailable",
-      "checkedAt": "2026-10-26T14:07:49Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1745330057",
+      "sourceUrl": "https://www.kijiji.ca/v-pet-services/mississauga-peel-region/bird-sitting-in-mississauga/1745330057",
+      "availability": "gone",
+      "checkedAt": "2026-10-26T14:23:14.671Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-pet-services/mississauga-peel-region/c143l1700276?radius=50.0&ll=43.61%2C-79.64&adRemoved=1745330057",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-industrial-shelving-racking/mississauga-peel-region/used-redirack-pallet-racking-beams-8-long-x-3-thick-for-sale/1745285213": {
       "availability": "unavailable",
@@ -14104,6 +14112,24 @@
       "availability": "sold",
       "checkedAt": "2026-10-26T14:07:49Z",
       "reason": "All offers for this exact listing are unavailable"
+    },
+    "kijiji.ca/v-art-collectibles/city-of-toronto/victoria-day-sale-15x15-auto-open-pullout-based-heat-press/1737257973": {
+      "id": "kijiji-1737257973",
+      "sourceUrl": "https://www.kijiji.ca/v-art-collectibles/city-of-toronto/victoria-day-sale-15x15-auto-open-pullout-based-heat-press/1737257973",
+      "availability": "gone",
+      "checkedAt": "2026-10-26T14:23:14.671Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-art-collectibles/city-of-toronto/c12l1700273?radius=50.0&ll=43.75%2C-79.48&adRemoved=1737257973",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "kijiji.ca/v-cars-trucks/hamilton/2023-kia-sportage-hybrid-ex-hybrid-leather-awd/1743257615": {
+      "id": "kijiji-1743257615",
+      "sourceUrl": "https://www.kijiji.ca/v-cars-trucks/hamilton/2023-kia-sportage-hybrid-ex-hybrid-leather-awd/1743257615",
+      "availability": "gone",
+      "checkedAt": "2026-10-26T14:23:14.671Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-cars-trucks/hamilton/c174l80014?adRemoved=1743257615&ll=43.1937818%2C-79.89652989999999&radius=150.0&rb=50",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     }
   }
 }

@@ -1,5 +1,5 @@
 {
-  "count": 3767,
+  "count": 3766,
   "listings": [
     {
       "id": "apify-b9b18084f762",
@@ -37798,26 +37798,6 @@
       "categoryKey": "vehicles"
     },
     {
-      "id": "kijiji-1743712009",
-      "slug": "2015-ford-f-150-xlt-sport-super-crew-157-4wd-3-5l-6cyl-saf-1743712009",
-      "url": "https://6ixo.com/listing/2015-ford-f-150-xlt-sport-super-crew-157-4wd-3-5l-6cyl-saf-1743712009/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/b1/b1634e9a-3efd-428a-b919-45545df8ad23?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/d4/d480cfb0-eb5d-4a40-8c11-4e78f77776a0?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/4b/4becec5f-6066-4275-b54b-923e8ff141bf?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/80/80f4fbdc-01be-4871-ba41-5f6b9db0da5a?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/34/34663b0f-0f82-41f5-9dba-d05bbdb01ea7?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/71/712a1643-18b0-4640-8e23-da5548537851?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/82/8257d51d-1abc-4c66-9268-517e100c5c52?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/25/25c18c1f-3a8a-4f35-8644-36f2b265fab5?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/f3/f3f80942-d641-4f0c-8d16-37e784d6ea6b?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/8c/8ce2d433-be11-437c-82a8-cdef006f3426?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/b2/b2558ec5-ba49-49cf-aa7a-14baf97efa9a?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/69/69d99d72-eb36-4357-9d98-f2d4e7f9c080?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
       "id": "kijiji-1743707275",
       "slug": "tek-tower-condo-for-rent-2-beds-2-baths-1-parking-1-locker-1743707275",
       "url": "https://6ixo.com/listing/tek-tower-condo-for-rent-2-beds-2-baths-1-parking-1-locker-1743707275/",
@@ -54942,6 +54922,11 @@
       "id": "samtronix-gy-15846251692192",
       "slug": "samsung-watch-ultra-2-47mm-6251692192",
       "url": "https://6ixo.com/listing/samsung-watch-ultra-2-47mm-6251692192/"
+    },
+    {
+      "id": "kijiji-1743712009",
+      "slug": "2015-ford-f-150-xlt-sport-super-crew-157-4wd-3-5l-6cyl-saf-1743712009",
+      "url": "https://6ixo.com/listing/2015-ford-f-150-xlt-sport-super-crew-157-4wd-3-5l-6cyl-saf-1743712009/"
     }
   ]
 }

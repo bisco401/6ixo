@@ -1,5 +1,5 @@
 {
-  "count": 3783,
+  "count": 3773,
   "listings": [
     {
       "id": "apify-b9b18084f762",
@@ -11716,18 +11716,6 @@
       "categoryKey": "real-estate"
     },
     {
-      "id": "craigslist-ayxcmAPhRhNUw3LPxKTB4a",
-      "slug": "2010-volkswagen-jetta-se-w3lpxktb4a",
-      "url": "https://6ixo.com/listing/2010-volkswagen-jetta-se-w3lpxktb4a/",
-      "images": [
-        "https://images.craigslist.org/00B0B_i6uKVoQWtWo_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/00H0H_9eApMFv3aje_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/00000_5zWbUwfyeIB_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/00V0V_6PsLztsL4jx_0CI0t2_600x450.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
       "id": "craigslist-ryY1ytKeTxiPKErenGN1Lz",
       "slug": "2001-chevrolet-corvette-convertible-1-owner-low-61k-miles--kerengn1lz",
       "url": "https://6ixo.com/listing/2001-chevrolet-corvette-convertible-1-owner-low-61k-miles--kerengn1lz/",
@@ -12513,21 +12501,6 @@
       "categoryKey": "auto-parts"
     },
     {
-      "id": "kijiji-1745088979",
-      "slug": "2-rooms-available-for-rent-november-or-december-01-2026-1745088979",
-      "url": "https://6ixo.com/listing/2-rooms-available-for-rent-november-or-december-01-2026-1745088979/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/d6/d61be2ae-999f-4c7b-8e5d-18b771aedd0f?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/56/569a77c8-4866-492d-aed9-5db8d2bb5ae3?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/7d/7d613bf1-1c08-4153-ac1d-c28c34694601?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/24/2441713a-68a6-41ce-926d-8358fe9cda5f?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/bd/bd51d983-c257-47df-9b1f-604f22bc6d75?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/c6/c629ffa6-6933-4404-9d35-75850b865e72?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/25/25724239-0f1d-46e1-87ec-6013b6a980d4?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "real-estate"
-    },
-    {
       "id": "kijiji-1745088977",
       "slug": "sony-bravia-9-ii-class-true-rgb-4k-hdr-google-tv-with-gemi-1745088977",
       "url": "https://6ixo.com/listing/sony-bravia-9-ii-class-true-rgb-4k-hdr-google-tv-with-gemi-1745088977/",
@@ -12731,17 +12704,6 @@
         "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/dd/dd96066b-ddf7-484d-b678-93d9ca70e9af?rule=kijijica-1600-webp"
       ],
       "categoryKey": "buy-and-sell"
-    },
-    {
-      "id": "kijiji-1745087915",
-      "slug": "4-winter-nakkapeliitta-r3-tires-on-rims-5-years-old-430-1745087915",
-      "url": "https://6ixo.com/listing/4-winter-nakkapeliitta-r3-tires-on-rims-5-years-old-430-1745087915/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/fd/fd23c092-a7dc-436d-853b-f5bf8e49acc5?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/87/8751c5b3-b518-4ed7-ad45-73818d1805e6?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/54/54e4238e-3f96-47f0-bc55-067a3fb7e3d0?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "auto-parts"
     },
     {
       "id": "kijiji-1741026317",
@@ -12958,19 +12920,6 @@
         "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/96/96b51284-1794-468c-b0c9-4bd7888551ac?rule=kijijica-1600-webp"
       ],
       "categoryKey": "vehicles"
-    },
-    {
-      "id": "kijiji-1745086917",
-      "slug": "3-disc-changer-with-two-speakers-remote-1745086917",
-      "url": "https://6ixo.com/listing/3-disc-changer-with-two-speakers-remote-1745086917/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/36/36c951a6-7346-44eb-8db1-05d7c2cc3bfa?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/2e/2e7e689f-22ab-46c7-be27-ce81dc7b916b?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/01/0171c6b5-41a0-4ea6-979a-ecadf70383f2?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/3b/3be5608f-d672-4d50-a8f2-f926922ce64b?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/c4/c43bf7e9-0d83-4ff2-bddf-9aeaec6e89d5?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "electronics"
     },
     {
       "id": "kijiji-1745086881",
@@ -17899,15 +17848,6 @@
       "categoryKey": "services"
     },
     {
-      "id": "samtronix-gy-15924315652256",
-      "slug": "bts-2515-portable-speaker-4315652256",
-      "url": "https://6ixo.com/listing/bts-2515-portable-speaker-4315652256/",
-      "images": [
-        "https://samtronixguyana.com/cdn/shop/files/CIDEACM10017ULTRASIMTABLET_8GBRAM1TBSTORAGE_-2026-10-17T165005.429_1024x.png?v=1792236017"
-      ],
-      "categoryKey": "electronics"
-    },
-    {
       "id": "samtronix-gy-15924222066848",
       "slug": "saiya-pb-12-power-bank-22-5w-4222066848",
       "url": "https://6ixo.com/listing/saiya-pb-12-power-bank-22-5w-4222066848/",
@@ -20730,36 +20670,6 @@
         "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/97/97ebf7f1-ac93-4136-b402-cd38269e5248?rule=kijijica-1600-webp"
       ],
       "categoryKey": "real-estate"
-    },
-    {
-      "id": "kijiji-1744913222",
-      "slug": "225-60r17-milemax-ws207-winter-tires-1744913222",
-      "url": "https://6ixo.com/listing/225-60r17-milemax-ws207-winter-tires-1744913222/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/0b/0b48a2d0-58fe-44f9-95e9-8ed91cbfac22?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/50/50bee3c0-8efa-4b4a-a7a6-2dfd7404dd39?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/04/04b5db40-a969-46ee-b691-c4769ac8c6dc?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/d9/d93a6fa4-d7c4-49d3-a4e1-742acf99455b?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/d3/d3a440fa-5ec2-43c0-8bc1-01b082f5d931?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/38/38d0a4a6-97a0-46d4-818c-61160c7a757f?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/b2/b27e7a99-501e-45bf-8da3-6cf3499cb6c0?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "auto-parts"
-    },
-    {
-      "id": "kijiji-1744913217",
-      "slug": "225-50r17-milemax-ws305-winter-tires-1744913217",
-      "url": "https://6ixo.com/listing/225-50r17-milemax-ws305-winter-tires-1744913217/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/e1/e1f59db9-2511-480d-b442-201540dfc5f0?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/72/720e93e1-c71f-4700-ac8d-d2597e6d8bb2?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/d4/d41c639a-56b8-442f-9521-1142e519e59b?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/75/7539ff81-cdf7-4f15-bf91-b536264c6dd3?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/d4/d4eaa602-afd9-4f95-b000-ae95b32c9cd8?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/f1/f1fe4eed-24cd-454f-a7de-1bbbb6abe777?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/ff/ff13a07b-7cd8-4586-887d-21f4e86f3709?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "auto-parts"
     },
     {
       "id": "kijiji-1744913137",
@@ -28406,15 +28316,6 @@
       "categoryKey": "real-estate"
     },
     {
-      "id": "allsopp-dubai-l-311119",
-      "slug": "3-bedroom-apartment-for-rent-the-mayfair-town-square-bail311119",
-      "url": "https://6ixo.com/listing/3-bedroom-apartment-for-rent-the-mayfair-town-square-bail311119/",
-      "images": [
-        "https://images.allsoppandallsopp.com/public/temp/a0OdK000003bMB7UAM_s_3-bedroom-apartment-in-the-mayfair-town-square-aed-155k-allsopp-and-allsopp-1.jpg"
-      ],
-      "categoryKey": "real-estate"
-    },
-    {
       "id": "allsopp-dubai-l-311128",
       "slug": "1-bedroom-apartment-for-rent-upside-living-business-bay-bail311128",
       "url": "https://6ixo.com/listing/1-bedroom-apartment-for-rent-upside-living-business-bay-bail311128/",
@@ -35172,18 +35073,6 @@
       "categoryKey": "vehicles"
     },
     {
-      "id": "craigslist-kdpkfHcxDZP8vNxHxHiLim",
-      "slug": "2013-ram-2500-6-7-cummins-vnxhxhilim",
-      "url": "https://6ixo.com/listing/2013-ram-2500-6-7-cummins-vnxhxhilim/",
-      "images": [
-        "https://images.craigslist.org/00W0W_8kj53LoZuML_0bC0pS_600x450.jpg",
-        "https://images.craigslist.org/01717_rtTuhLYQpQ_0bC0pS_600x450.jpg",
-        "https://images.craigslist.org/00X0X_axsZZnYSiHX_0bC0pS_600x450.jpg",
-        "https://images.craigslist.org/00F0F_bnrCSU31CGd_0bC0pS_600x450.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
       "id": "craigslist-hwHX6xmDPn8zyQCFcFjgTF",
       "slug": "1998-explorer-hood-yqcfcfjgtf",
       "url": "https://6ixo.com/listing/1998-explorer-hood-yqcfcfjgtf/",
@@ -35430,18 +35319,6 @@
       "images": [
         "https://images.craigslist.org/00t0t_8bzucwFNqkA_0jm0ew_600x450.jpg",
         "https://images.craigslist.org/00E0E_4Fbr2li1uET_0jm0ew_600x450.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "craigslist-jubI3Au58RGyIP-8BU9siQ",
-      "slug": "subaru-outback-cash-yip8bu9siq",
-      "url": "https://6ixo.com/listing/subaru-outback-cash-yip8bu9siq/",
-      "images": [
-        "https://images.craigslist.org/00Y0Y_gGOGm6EuIM3_0jm0ew_600x450.jpg",
-        "https://images.craigslist.org/00H0H_aB6Mx1up390_0jm0ew_600x450.jpg",
-        "https://images.craigslist.org/00q0q_cWClno7P8dc_0jm0ew_600x450.jpg",
-        "https://images.craigslist.org/00C0C_ptVulvbxmK_0jm0ew_600x450.jpg"
       ],
       "categoryKey": "vehicles"
     },
@@ -46733,9 +46610,6 @@
       "url": "https://6ixo.com/listings/page/105/"
     },
     {
-      "url": "https://6ixo.com/listings/page/106/"
-    },
-    {
       "url": "https://6ixo.com/listings/electronics/"
     },
     {
@@ -46758,9 +46632,6 @@
     },
     {
       "url": "https://6ixo.com/listings/electronics/page/8/"
-    },
-    {
-      "url": "https://6ixo.com/listings/electronics/page/9/"
     },
     {
       "url": "https://6ixo.com/listings/vehicles/"
@@ -47373,9 +47244,6 @@
     },
     {
       "url": "https://6ixo.com/listings/country/guyana/page/5/"
-    },
-    {
-      "url": "https://6ixo.com/listings/country/guyana/page/6/"
     },
     {
       "url": "https://6ixo.com/listings/country/jamaica/electronics/"
@@ -55072,6 +54940,56 @@
       "id": "apify-2438db8de1b3",
       "slug": "2024-honda-crv-sports-hybrid-38db8de1b3",
       "url": "https://6ixo.com/listing/2024-honda-crv-sports-hybrid-38db8de1b3/"
+    },
+    {
+      "id": "craigslist-ayxcmAPhRhNUw3LPxKTB4a",
+      "slug": "2010-volkswagen-jetta-se-w3lpxktb4a",
+      "url": "https://6ixo.com/listing/2010-volkswagen-jetta-se-w3lpxktb4a/"
+    },
+    {
+      "id": "kijiji-1745088979",
+      "slug": "2-rooms-available-for-rent-november-or-december-01-2026-1745088979",
+      "url": "https://6ixo.com/listing/2-rooms-available-for-rent-november-or-december-01-2026-1745088979/"
+    },
+    {
+      "id": "kijiji-1745087915",
+      "slug": "4-winter-nakkapeliitta-r3-tires-on-rims-5-years-old-430-1745087915",
+      "url": "https://6ixo.com/listing/4-winter-nakkapeliitta-r3-tires-on-rims-5-years-old-430-1745087915/"
+    },
+    {
+      "id": "kijiji-1745086917",
+      "slug": "3-disc-changer-with-two-speakers-remote-1745086917",
+      "url": "https://6ixo.com/listing/3-disc-changer-with-two-speakers-remote-1745086917/"
+    },
+    {
+      "id": "samtronix-gy-15924315652256",
+      "slug": "bts-2515-portable-speaker-4315652256",
+      "url": "https://6ixo.com/listing/bts-2515-portable-speaker-4315652256/"
+    },
+    {
+      "id": "kijiji-1744913222",
+      "slug": "225-60r17-milemax-ws207-winter-tires-1744913222",
+      "url": "https://6ixo.com/listing/225-60r17-milemax-ws207-winter-tires-1744913222/"
+    },
+    {
+      "id": "kijiji-1744913217",
+      "slug": "225-50r17-milemax-ws305-winter-tires-1744913217",
+      "url": "https://6ixo.com/listing/225-50r17-milemax-ws305-winter-tires-1744913217/"
+    },
+    {
+      "id": "allsopp-dubai-l-311119",
+      "slug": "3-bedroom-apartment-for-rent-the-mayfair-town-square-bail311119",
+      "url": "https://6ixo.com/listing/3-bedroom-apartment-for-rent-the-mayfair-town-square-bail311119/"
+    },
+    {
+      "id": "craigslist-kdpkfHcxDZP8vNxHxHiLim",
+      "slug": "2013-ram-2500-6-7-cummins-vnxhxhilim",
+      "url": "https://6ixo.com/listing/2013-ram-2500-6-7-cummins-vnxhxhilim/"
+    },
+    {
+      "id": "craigslist-jubI3Au58RGyIP-8BU9siQ",
+      "slug": "subaru-outback-cash-yip8bu9siq",
+      "url": "https://6ixo.com/listing/subaru-outback-cash-yip8bu9siq/"
     }
   ]
 }

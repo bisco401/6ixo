@@ -1,5 +1,5 @@
 {
-  "count": 3667,
+  "count": 3665,
   "listings": [
     {
       "id": "import-9bdb7a5c1e6c3f7b6f",
@@ -8547,17 +8547,6 @@
         "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/4d/4d7f0505-f1dc-4033-8fbf-c1197432ae36?rule=kijijica-1600-webp"
       ],
       "categoryKey": "auto-parts"
-    },
-    {
-      "id": "kijiji-1745104984",
-      "slug": "stand-fan-for-living-16-tilt-head-oscillating-pedestal-fan-1745104984",
-      "url": "https://6ixo.com/listing/stand-fan-for-living-16-tilt-head-oscillating-pedestal-fan-1745104984/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/dc/dc5397ca-7652-45b4-838f-c21256dcdbb7?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/bc/bc1fc7f6-6e78-4519-8186-4de6017a9f99?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/ad/ad75b628-12fc-49c0-811c-0b53676ed4c9?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "buy-and-sell"
     },
     {
       "id": "kijiji-1742836008",
@@ -34258,17 +34247,6 @@
       "categoryKey": "auto-parts"
     },
     {
-      "id": "craigslist-4XB6EXKF5pDt5Nm4xeRegT",
-      "slug": "48-hitachi-t-v-5nm4xeregt",
-      "url": "https://6ixo.com/listing/48-hitachi-t-v-5nm4xeregt/",
-      "images": [
-        "https://images.craigslist.org/00G0G_3XouTWmI4Of_0t20CI_600x450.jpg",
-        "https://images.craigslist.org/00b0b_80EexazqJgb_0t20CI_600x450.jpg",
-        "https://images.craigslist.org/01717_k0x5cDIXMJP_0t20CI_600x450.jpg"
-      ],
-      "categoryKey": "electronics"
-    },
-    {
       "id": "craigslist-jgixKnWc38kUBvgCs8g4Hb",
       "slug": "2007-gmc-sierra-2500-4x4-bvgcs8g4hb",
       "url": "https://6ixo.com/listing/2007-gmc-sierra-2500-4x4-bvgcs8g4hb/",
@@ -45890,9 +45868,6 @@
       "url": "https://6ixo.com/listings/country/canada/page/40/"
     },
     {
-      "url": "https://6ixo.com/listings/country/canada/page/41/"
-    },
-    {
       "url": "https://6ixo.com/listings/country/china/electronics/"
     },
     {
@@ -53507,6 +53482,16 @@
       "id": "allsopp-dubai-pjm190729",
       "slug": "3-bedroom-apartment-for-rent-shams-1-shams-jumeirah-beach--ipjm190729",
       "url": "https://6ixo.com/listing/3-bedroom-apartment-for-rent-shams-1-shams-jumeirah-beach--ipjm190729/"
+    },
+    {
+      "id": "kijiji-1745104984",
+      "slug": "stand-fan-for-living-16-tilt-head-oscillating-pedestal-fan-1745104984",
+      "url": "https://6ixo.com/listing/stand-fan-for-living-16-tilt-head-oscillating-pedestal-fan-1745104984/"
+    },
+    {
+      "id": "craigslist-4XB6EXKF5pDt5Nm4xeRegT",
+      "slug": "48-hitachi-t-v-5nm4xeregt",
+      "url": "https://6ixo.com/listing/48-hitachi-t-v-5nm4xeregt/"
     }
   ]
 }

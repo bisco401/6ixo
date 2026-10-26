@@ -1,5 +1,5 @@
 {
-  "count": 3665,
+  "count": 3664,
   "listings": [
     {
       "id": "import-9bdb7a5c1e6c3f7b6f",
@@ -37336,26 +37336,6 @@
       "categoryKey": "fashion"
     },
     {
-      "id": "kijiji-1743371206",
-      "slug": "2018-acura-mdx-elite-sh-awd-camera-leather-gps-1743371206",
-      "url": "https://6ixo.com/listing/2018-acura-mdx-elite-sh-awd-camera-leather-gps-1743371206/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/f2/f239a0c5-1852-4c8a-80ed-2950cec408bc?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/4f/4fd999d5-6d16-4c53-ac6d-24f4a222dfee?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/6f/6f295446-42e3-43a9-91f5-6c86ddce3e20?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/3c/3c87ff4c-c724-40a4-84c0-2fcc78a1cc1d?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/26/26e6f768-d968-46c7-933d-dbf7a3d9e537?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/ff/ff07daf9-132f-495f-8db5-2493ab72a2fb?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/64/6478ec93-a563-44a2-acd3-cc9a918a22e3?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/88/8849b40d-fbbe-4b39-9ad2-e6efad040b8f?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/e7/e7f6e3c3-7480-4809-aac0-89095c933dc5?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/71/7164915d-34a7-487f-a303-8de0c9b2d5e6?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/40/4069e473-2591-4f4b-b1b4-d1457987ecc0?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/5e/5e348b2f-cf3c-4423-aa79-6113085d8a8b?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
       "id": "kijiji-1743350159",
       "slug": "2024-ford-f-150-xlt-fx4-off-road-package-bedliner-3-5l-1743350159",
       "url": "https://6ixo.com/listing/2024-ford-f-150-xlt-fx4-off-road-package-bedliner-3-5l-1743350159/",
@@ -53492,6 +53472,11 @@
       "id": "craigslist-4XB6EXKF5pDt5Nm4xeRegT",
       "slug": "48-hitachi-t-v-5nm4xeregt",
       "url": "https://6ixo.com/listing/48-hitachi-t-v-5nm4xeregt/"
+    },
+    {
+      "id": "kijiji-1743371206",
+      "slug": "2018-acura-mdx-elite-sh-awd-camera-leather-gps-1743371206",
+      "url": "https://6ixo.com/listing/2018-acura-mdx-elite-sh-awd-camera-leather-gps-1743371206/"
     }
   ]
 }

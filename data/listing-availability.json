@@ -1,5 +1,5 @@
 {
-  "checkedAt": "2026-10-26T18:45:24Z",
+  "checkedAt": "2026-10-26T18:58:08.015Z",
   "listings": {
     "craigslist.org/view/d/bastrop-used-2025-cadillac-xt4-fwd-4d/fuqr_3uo8rgowpq1ctwx-a": {
       "availability": "sold",
@@ -14071,9 +14071,13 @@
       "reason": "All offers for this exact listing are unavailable"
     },
     "kijiji.ca/v-art-collectibles/city-of-toronto/victoria-day-sale-15x15-auto-open-pullout-based-heat-press/1737257973": {
-      "availability": "unavailable",
-      "checkedAt": "2026-10-26T18:45:24Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1737257973",
+      "sourceUrl": "https://www.kijiji.ca/v-art-collectibles/city-of-toronto/victoria-day-sale-15x15-auto-open-pullout-based-heat-press/1737257973",
+      "availability": "gone",
+      "checkedAt": "2026-10-26T18:58:08.015Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-art-collectibles/city-of-toronto/c12l1700273?radius=50.0&ll=43.75%2C-79.48&adRemoved=1737257973",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-cars-trucks/hamilton/2023-kia-sportage-hybrid-ex-hybrid-leather-awd/1743257615": {
       "id": "kijiji-1743257615",

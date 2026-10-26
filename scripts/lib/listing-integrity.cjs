@@ -1,6 +1,6 @@
 // Shared by the browser, repair tool and generated n8n workflows. No DOM/URL globals required.
 function createListingIntegrity() {
-  const VERSION = '2026-10-24.1';
+  const VERSION = '2026-10-26.1';
   const decode = (value = '') => String(value || '').replace(/\\u002f/gi, '/').replace(/\\u0026/gi, '&').replace(/\\\//g, '/').replace(/&amp;/gi, '&').replace(/&quot;|&#34;/gi, '"').replace(/&#39;|&apos;/gi, "'");
   const key = (value = '') => decode(value).trim().replace(/^https?:\/\/(?:www\.)?/i, '').replace(/[?#].*$/, '').replace(/\/$/, '').toLowerCase();
   // Ad IDs survive edits to the human-readable portion of a source URL.
@@ -115,7 +115,13 @@ function createListingIntegrity() {
     // title-only so a car mentioning its stereo or a house mentioning appliances stays put.
     const t0 = title.toLowerCase();
     const declared = String(row.app_category || row.appCategory || '').toLowerCase();
-    const vehicleSource = /kijiji\.ca\/v-(?:cars-trucks|classic-cars|motorcycles|other-auto-parts-and-accessories|auto-body-parts|auto-parts-tires|engine-engine-parts|transmission-drivetrain|tires-rims)\//i.test(url);
+    const vehicleSource = /kijiji\.ca\/v-(?:cars-trucks|classic-cars|motorcycles|other-auto-parts-and-accessories|auto-body-parts|auto-parts-tires|engine-engine-parts|engines-and-engine-parts|transmission-drivetrain|tires-rims)\//i.test(url);
+    const copy = decode(String(row.description || '').replace(/<[^>]*>/g, ' ')).replace(/\s+/g, ' ');
+    if ((declared === 'vehicles' || vehicleSource) && (
+      /\bengine\s+(?:with\s+)?installation\s+only\b/i.test(copy)
+      || /\b(?:don['’]?t|do not)\s+sell\s+engines?\s+alone\b/i.test(copy)
+      || (/\bbring\s+us\s+your\s+brake\s+parts\b/i.test(copy) && /\blabou?r\s+fee\b/i.test(copy))
+    )) return route('services', 'other', 'explicit_service_only');
     if ((declared === 'vehicles' || vehicleSource) && /^\s*wanted\b/.test(t0)) return route('community', 'other', 'wanted_item');
     if (declared === 'vehicles' && ['auto_parts', 'tires_rims'].includes(row.app_subcategory) && /\b(?:rims?|tires?|tyres?)\b/.test(t0)
         && !/\b(?:parts|shine|cover|caps?|spacer|sticker|strips?|changer|balancer|fender|lathe|straightener|repair|tools)\b/.test(t0)) return route('vehicles', 'tires_rims', 'product_type');
@@ -345,7 +351,25 @@ function createListingIntegrity() {
   const galleryLimit = row => /(?:^|\.)kijiji\.ca\//i.test(key(sourceUrl(row))) ? 12 : 4;
   const limitPublicFields = row => {
     const result = { ...row };
-    const a = attrs(result.attributes);
+    let a = attrs(result.attributes);
+    // Keep source miles literal. Generic field aliases can put a miles/SMI
+    // reading into mileageKm, including in already cached imported records.
+    const mileageLabel = label => /^(?:mileage|odometer)(?:\s*\([^)]*\)|\s+km)?$/i.test(String(label || '').trim());
+    const firstMileage = (a.sourceSpecifications || []).find(fact => mileageLabel(fact.label));
+    const inMiles = value => /\b(?:miles?|SMI)\b/i.test(String(value || ''));
+    const literalMiles = firstMileage && inMiles(firstMileage.value) ? firstMileage.value : inMiles(result.mileage_km) ? result.mileage_km : null;
+    if (literalMiles !== null) {
+      const literal = { label: 'Mileage (miles)', value: String(literalMiles).replace(/\bSMI\b/gi, 'miles'), key: '' };
+      const corrected = { ...a };
+      delete corrected.mileageKm;
+      result.mileage_km = '';
+      for (const field of ['details', 'sourceSpecifications']) {
+        const facts = Array.isArray(a[field]) ? a[field] : [];
+        corrected[field] = [literal, ...facts.filter(fact => fact.key !== 'mileageKm' && !mileageLabel(fact.label))];
+      }
+      result.attributes = JSON.stringify(corrected);
+      a = corrected;
+    }
     // A source odometer without units is not a kilometre measurement. Some
     // upstream normalizers alias "odometer" to mileageKm and append a generated
     // km fact. Keep the first literal source fact and discard that inference.

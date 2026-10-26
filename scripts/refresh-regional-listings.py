@@ -129,7 +129,7 @@ def liusedcars_row(body, url, checked):
     row = refresh.row_base(url, text(soup.select_one("#listing-main h1")), location[2], "United States", phone,
                            images, "vehicles", "vehicles", checked, "LIUsedCars")
     row.update(seller=location[1], make=facts.get("Make", ""), model=facts.get("Model", ""),
-               year=facts.get("Year", ""), trim=facts.get("Trim Level", ""), condition="used")
+               year=facts.get("Year", ""), trim=facts.get("Trim Level", ""), condition=facts.get("Condition", "").lower())
     amount = re.sub(r"[^\d.]", "", facts.pop("Price", ""))
     mileage = text(soup.select_one("#listing-top-info .mileage"))
     facts.pop("Mileage", None)
@@ -187,6 +187,15 @@ def vehicle_schema_row(body, url, checked, source):
         facts["Mileage"] = f"{mileage['value']:,} {unit}"
         if unit == "km":
             row["mileage_km"] = str(mileage["value"])
+    elif source == "mekina":
+        # This source omits the odometer from JSON-LD, including new cars at 0 km.
+        # Read only its primary details table and retain the explicit unit.
+        label = next((n for n in soup.select("dl dt") if text(n) == "Mileage"), None)
+        value = text(label.find_next_sibling("dd")) if label else ""
+        match = re.fullmatch(r"([\d,]+(?:\.\d+)?)\s+km", value, re.I)
+        if match:
+            row["mileage_km"] = match[1].replace(",", "")
+            facts["Mileage"] = value
     if source == "atlanta":
         facts["Price terms"] = "Source retail price, including listed dealer fees; taxes and registration may be additional"
     return finish(row, offer.get("price"), offer.get("priceCurrency"), facts, region, "Atlanta" if source == "atlanta" else "")

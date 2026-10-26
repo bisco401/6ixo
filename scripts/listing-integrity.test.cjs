@@ -4,6 +4,13 @@ const vm = require('node:vm');
 const integrity = require('./lib/listing-integrity.cjs');
 assert.equal(integrity.classify({ title: 'Looking To Sell A Car? Get Cash And Towing FREE!', source_url: 'https://www.kijiji.ca/v-other-auto-parts-and-accessories/hamilton/cash/1745000000', app_category: 'vehicles', app_subcategory: 'auto_parts' }).app_category, 'services', 'Vehicle buying and towing ads do not enter parts inventory');
 assert.equal(integrity.classify({ title: '2015 Toyota Corolla - cash offers only', app_category: 'vehicles', app_subcategory: 'vehicles' }).app_category, 'vehicles', 'A vehicle asking for cash offers remains inventory');
+for (const description of ['ENGINE INSTALLATION ONLY. We source the engine.', 'WE DONT SELL ENGINES ALONE.', 'FRONT LABOUR FEE $120. BRING US YOUR BRAKE PARTS.']) {
+ const row = { title: 'NISSAN ENGINE / BRAKE PARTS', source_url: 'https://www.kijiji.ca/v-engines-and-engine-parts/city-of-toronto/engine/123', app_category: 'vehicles', app_subcategory: 'auto_parts', description };
+ const route = integrity.classify(row);
+ assert.equal(route.app_category, 'services', 'Explicit labour-only offers do not enter parts inventory');
+ assert.equal(integrity.classify({ ...row, ...route }).app_category, 'services', 'Service routing survives repeated feed and profile normalization');
+}
+assert.equal(integrity.classify({ title: 'Nissan engine for sale', app_category: 'vehicles', app_subcategory: 'auto_parts', description: 'Engine available separately; installation available at extra cost.' }).app_category, 'vehicles', 'Real engine inventory with optional fitting remains parts');
 const odometerRow = { source_url: 'https://newyork.craigslist.org/cto/d/own-car/123.html', mileage_km: '', attributes: JSON.stringify({ mileageKm: '102,519', sourceSpecifications: [{ label: 'Odometer (source units)', value: '102,519' }, { label: 'Odometer (source units)', value: '102,519 km' }], details: [{ label: 'Odometer (source units)', value: '102,519', key: 'mileageKm' }, { label: 'Mileage', value: '102,519 km', key: 'mileageKm' }, { label: 'VIN', value: 'source-vin' }] }) };
 const literalOdometer = integrity.applyRepair(odometerRow);
 assert.equal(JSON.parse(literalOdometer.attributes).mileageKm, undefined, 'An upstream odometer alias cannot invent kilometre units');
@@ -13,6 +20,15 @@ assert.deepEqual(integrity.applyRepair(literalOdometer), literalOdometer, 'Odome
 for (const value of ['0', '102519']) assert.equal(integrity.applyRepair({ ...odometerRow, mileage_km: value }).mileage_km, value, 'Explicit kilometre columns remain authoritative');
 const explicitKm = { ...odometerRow, attributes: JSON.stringify({ mileageKm: 69775, sourceSpecifications: [{ label: 'Odometer (source units)', value: '69,775 km' }] }) };
 assert.equal(JSON.parse(integrity.applyRepair(explicitKm).attributes).mileageKm, 69775, 'Literal source kilometres are retained');
+const milesRow = { source_url: 'https://dealer.example/own-car', mileage_km: '134,797 miles', attributes: JSON.stringify({ mileageKm: 134797, sourceSpecifications: [{ label: 'Mileage', value: '134,797 miles' }, { label: 'Mileage (km)', value: '134797 km' }], details: [{ label: 'Mileage', value: '134,797 miles', key: 'mileageKm' }, { label: 'VIN', value: 'own-vin' }] }) };
+for (const unit of ['miles', 'SMI']) {
+ const corrected = integrity.applyRepair({ ...milesRow, attributes: milesRow.attributes.replaceAll('miles', unit) });
+ assert.equal(corrected.mileage_km, '', 'Source miles cannot enter a kilometre column');
+ assert.equal(JSON.parse(corrected.attributes).mileageKm, undefined);
+ assert.deepEqual(JSON.parse(corrected.attributes).details, [{ label: 'Mileage (miles)', value: '134,797 miles', key: '' }, { label: 'VIN', value: 'own-vin' }]);
+ assert.deepEqual(integrity.applyRepair(corrected), corrected, 'Literal mile repair is idempotent');
+}
+assert.equal(JSON.parse(integrity.applyRepair({ mileage_km: '0 miles' }).attributes).sourceSpecifications[0].value, '0 miles', 'A literal miles column without attributes is retained as a source fact');
 for (const [item, expected] of [
  [{title:'External drive',app_category:'other',app_subcategory:'miscellaneous'}, ['electronics','computers_tablets']],
  [{title:'Samsung a55 5g 256gb',app_category:'electronics',app_subcategory:'computers_tablets'}, ['electronics','phones_accessories']],
@@ -143,6 +159,9 @@ const cachedOdometerAttributes = { ...JSON.parse(odometerRow.attributes), mileag
 const cachedOdometer = app.normalizeCsvScrapedListingRow({ ...row, ...odometerRow, title: '2015 Subaru XV Crosstrek', app_category: 'vehicles', app_subcategory: 'vehicles', target_surface: 'vehicles', attributes: JSON.stringify(cachedOdometerAttributes) }).item;
 assert.equal(cachedOdometer.mileageKm, null, 'Cached imports cannot expose a unitless reading as kilometres');
 assert.ok(!cachedOdometer.details?.some(fact => fact.key === 'mileageKm'), 'Public/profile facts cannot retain an inferred kilometre label');
+const cachedMiles = app.normalizeCsvScrapedListingRow({ ...row, ...milesRow, title: '2008 Volkswagen Jetta', country: 'United States', app_category: 'vehicles', app_subcategory: 'vehicles', target_surface: 'vehicles' }).item;
+assert.equal(cachedMiles.mileageKm, null, 'Cached source miles cannot be shown as kilometres');
+assert.ok(cachedMiles.specifications?.some(fact => fact.label === 'Mileage (miles)' && fact.value === '134,797 miles'), 'Public/profile facts retain the literal source reading');
 app.scrapedListingIntegrityRepairs={[integrity.key(url)]:{title:row.title,images:[own],checkedAt:'2026-09-06T00:00:00Z'}};
 const normalized=app.normalizeCsvScrapedListingRow(row);
 assert.equal(normalized.item.category,'clothing');

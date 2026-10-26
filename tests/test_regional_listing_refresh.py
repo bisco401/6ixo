@@ -78,6 +78,22 @@ class RegionalSourceTests(unittest.TestCase):
         self.assertNotIn("1600", row["attributes"])
         self.assertNotIn("Engine", row["description"])
 
+    def test_condition_is_unspecified_without_a_listing_fact(self):
+        row = module.parse_listing("liusedcars", fixture("liusedcars"), URLS["liusedcars"], CHECKED)
+        self.assertEqual(row["condition"], "")
+        soup = module.BeautifulSoup(fixture("liusedcars"), "html.parser")
+        soup.select_one("#attributes").append(module.BeautifulSoup(
+            "<li><span>Condition:</span>Used</li>", "html.parser"))
+        row = module.parse_listing("liusedcars", str(soup), URLS["liusedcars"], CHECKED)
+        self.assertEqual(row["condition"], "used")
+
+    def test_visible_odometer_preserves_zero_and_requires_km(self):
+        for value, expected in [("0 km", "0"), ("12,345 km", "12345"), ("12,345", ""), ("12,345 miles", "")]:
+            with self.subTest(value=value):
+                body = fixture("mekina") + "<dl><div><dt>Mileage</dt><dd>" + value + "</dd></div></dl>"
+                row = module.parse_listing("mekina", body, URLS["mekina"], CHECKED)
+                self.assertEqual(row.get("mileage_km", ""), expected)
+
     def test_property_requires_listing_agent_not_site_footer_phone(self):
         body = fixture("betoch").replace('href="tel:0911084039"', 'href="/contact"')
         body += '<footer><a href="tel:0911084039">Call site</a></footer>'

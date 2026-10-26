@@ -1,5 +1,5 @@
 {
-  "count": 3772,
+  "count": 3767,
   "listings": [
     {
       "id": "apify-b9b18084f762",
@@ -11349,21 +11349,6 @@
       "categoryKey": "real-estate"
     },
     {
-      "id": "kijiji-1745092378",
-      "slug": "2010-dodge-ram-1500-sxt-1745092378",
-      "url": "https://6ixo.com/listing/2010-dodge-ram-1500-sxt-1745092378/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/20/2012ca62-7257-4c9a-92e4-fa9ee3918940?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/a1/a1d7da08-122e-42db-a74d-80ddbee8f022?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/f2/f2f950b5-37b3-4859-8a24-57b4553b2a43?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/f1/f151682b-7e84-4f9d-93e8-41843744b43b?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/f2/f2dbb27b-c701-474e-890a-92e9a9c5bb9b?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/99/997c2cd0-8a5b-41de-b6c7-ddf47408b908?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/6a/6a6d5462-a9f7-4cfc-a14c-fab60ce6cf46?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
       "id": "kijiji-1745092327",
       "slug": "2012-vw-jetta-tdi-diesel-top-trim-1745092327",
       "url": "https://6ixo.com/listing/2012-vw-jetta-tdi-diesel-top-trim-1745092327/",
@@ -12016,29 +12001,6 @@
       "categoryKey": "real-estate"
     },
     {
-      "id": "kijiji-1745091602",
-      "slug": "cuisiniere-stainless-vitroceramique-lg-1745091602",
-      "url": "https://6ixo.com/listing/cuisiniere-stainless-vitroceramique-lg-1745091602/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/81/816b5cf6-97cf-4c59-90a9-61f6ae544c20?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/83/83c1d210-ddbe-4fd8-8ba3-8c035f1981c6?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/2d/2d378405-6c10-49cc-8af7-129c0943b353?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "buy-and-sell"
-    },
-    {
-      "id": "kijiji-1745091513",
-      "slug": "cuisiniere-stainless-vitroceramique-jenn-air-1745091513",
-      "url": "https://6ixo.com/listing/cuisiniere-stainless-vitroceramique-jenn-air-1745091513/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/10/10adcfe7-925d-43f8-8094-e480a867e4aa?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/dc/dc9ad942-b0b2-423d-b12c-3fe8eef82f6f?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/b1/b174a6c3-e068-4690-86a1-b800c8454a43?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/3c/3cfa6a83-fcbe-40b8-83a2-3bbe39e605d4?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "buy-and-sell"
-    },
-    {
       "id": "kijiji-1745091399",
       "slug": "kovo-appartements-locatifs-ecoresponsables-lasalle-1745091399",
       "url": "https://6ixo.com/listing/kovo-appartements-locatifs-ecoresponsables-lasalle-1745091399/",
@@ -12073,17 +12035,6 @@
         "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/35/358160d9-41fc-408f-b8f0-cc79eddcffc6?rule=kijijica-1600-webp"
       ],
       "categoryKey": "real-estate"
-    },
-    {
-      "id": "kijiji-1745091322",
-      "slug": "cuisiniere-inox-encastrable-vitro-convection-lg-1745091322",
-      "url": "https://6ixo.com/listing/cuisiniere-inox-encastrable-vitro-convection-lg-1745091322/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/23/23a4482b-414e-4c91-a7e1-94c69bbb3445?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/ca/ca20136d-cb22-4ac3-b9d8-b02f424282f1?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/19/19364d4a-4f91-4f83-aa6d-c89cde85d259?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "buy-and-sell"
     },
     {
       "id": "kijiji-1745091207",
@@ -40012,15 +39963,6 @@
       "categoryKey": "vehicles"
     },
     {
-      "id": "samtronix-gy-15846251692192",
-      "slug": "samsung-watch-ultra-2-47mm-6251692192",
-      "url": "https://6ixo.com/listing/samsung-watch-ultra-2-47mm-6251692192/",
-      "images": [
-        "https://samtronixguyana.com/cdn/shop/files/Untitleddesign_38_1024x.png?v=1787909049"
-      ],
-      "categoryKey": "electronics"
-    },
-    {
       "id": "kijiji-1742659522",
       "slug": "2024-nissan-kicks-sv-apple-car-play-android-auto-1742659522",
       "url": "https://6ixo.com/listing/2024-nissan-kicks-sv-apple-car-play-android-auto-1742659522/",
@@ -54975,6 +54917,31 @@
       "id": "kijiji-1743257615",
       "slug": "2023-kia-sportage-hybrid-ex-hybrid-leather-awd-1743257615",
       "url": "https://6ixo.com/listing/2023-kia-sportage-hybrid-ex-hybrid-leather-awd-1743257615/"
+    },
+    {
+      "id": "kijiji-1745092378",
+      "slug": "2010-dodge-ram-1500-sxt-1745092378",
+      "url": "https://6ixo.com/listing/2010-dodge-ram-1500-sxt-1745092378/"
+    },
+    {
+      "id": "kijiji-1745091602",
+      "slug": "cuisiniere-stainless-vitroceramique-lg-1745091602",
+      "url": "https://6ixo.com/listing/cuisiniere-stainless-vitroceramique-lg-1745091602/"
+    },
+    {
+      "id": "kijiji-1745091513",
+      "slug": "cuisiniere-stainless-vitroceramique-jenn-air-1745091513",
+      "url": "https://6ixo.com/listing/cuisiniere-stainless-vitroceramique-jenn-air-1745091513/"
+    },
+    {
+      "id": "kijiji-1745091322",
+      "slug": "cuisiniere-inox-encastrable-vitro-convection-lg-1745091322",
+      "url": "https://6ixo.com/listing/cuisiniere-inox-encastrable-vitro-convection-lg-1745091322/"
+    },
+    {
+      "id": "samtronix-gy-15846251692192",
+      "slug": "samsung-watch-ultra-2-47mm-6251692192",
+      "url": "https://6ixo.com/listing/samsung-watch-ultra-2-47mm-6251692192/"
     }
   ]
 }

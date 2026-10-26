@@ -179,6 +179,34 @@
       "seller_phone_verified": true
     },
     {
+      "id": "545",
+      "url": "https://sebu.co.ke/3-seater-sofa-f5vx5e2c7",
+      "lastmod": "2026-10-26",
+      "title": "3 Seater Sofa",
+      "amount": 3000,
+      "negotiable": "yes",
+      "description": "a 3 seater good condition sofa",
+      "created_at": "2026-10-26T07:04:47.778Z",
+      "category": "home-furniture-and-appliances",
+      "category_name": "Home, Furniture and Appliances",
+      "subcategory": "furniture",
+      "subcategory_name": "Furniture",
+      "region": "kiambu",
+      "region_name": "Kiambu",
+      "area": "biashara",
+      "area_name": "Biashara",
+      "images": [
+        "https://pictures.sebu.co.ke/ads/1792998106556-4970af6d-c349-4f93-a64b-64c7d50b1454.jpg"
+      ],
+      "dynamic": {
+        "furniture_type": "Sofa",
+        "material": "wooden",
+        "condition": "Used"
+      },
+      "seller": "Petershine Ndungu",
+      "seller_phone_verified": true
+    },
+    {
       "id": "170",
       "url": "https://sebu.co.ke/365-days-to-knowing-god-for-girls-u9hvk",
       "lastmod": "2026-05-09",
@@ -465,6 +493,34 @@
         "tool_type": "Other",
         "power_source": "Electric",
         "brand": "*ALDEEPO*Micro (3.1A) Charger"
+      },
+      "seller": "Quick Serve Solutions",
+      "seller_phone_verified": true
+    },
+    {
+      "id": "546",
+      "url": "https://sebu.co.ke/aldeepo-pro-30-000-mah-f62ydilef",
+      "lastmod": "2026-10-26",
+      "title": "Aldeepo Pro 30,000 Mah",
+      "amount": 3850,
+      "negotiable": "no",
+      "description": "Aldeepo Pro 30,000 Mah",
+      "created_at": "2026-10-26T08:34:14.853Z",
+      "category": "home-furniture-and-appliances",
+      "category_name": "Home, Furniture and Appliances",
+      "subcategory": "tools-and-equipment",
+      "subcategory_name": "Tools and Equipment",
+      "region": "mombasa",
+      "region_name": "Mombasa",
+      "area": "shanzu",
+      "area_name": "Shanzu",
+      "images": [
+        "https://pictures.sebu.co.ke/ads/1793003596338-47b3f2d6-299b-4404-aca6-4acc0a440220.jpg"
+      ],
+      "dynamic": {
+        "tool_type": "Other",
+        "power_source": "Battery",
+        "brand": "Aldeepo"
       },
       "seller": "Quick Serve Solutions",
       "seller_phone_verified": true
@@ -2847,6 +2903,72 @@
       "seller_phone_verified": true
     },
     {
+      "id": "536",
+      "url": "https://sebu.co.ke/home-schooling-classes-ewmxa9jmp",
+      "lastmod": "2026-10-25",
+      "title": "Home Schooling Classes",
+      "amount": 500,
+      "negotiable": "no",
+      "description": "I will guide your child on how to blend and read words, sentences and paragraphs.",
+      "created_at": "2026-10-25T10:54:04.571Z",
+      "category": "education-and-training",
+      "category_name": "Education and Training",
+      "subcategory": "tuition-and-coaching",
+      "subcategory_name": "Tuition and Coaching",
+      "region": "kiambu",
+      "region_name": "Kiambu",
+      "area": "juja",
+      "area_name": "Juja",
+      "images": [
+        "https://pictures.sebu.co.ke/ads/1792925543376-2c714baf-db66-41ba-b4dd-e874d5cf5467.jpg"
+      ],
+      "dynamic": {
+        "subject": "English and Kiswahili",
+        "level": "Primary",
+        "mode": "In-person"
+      },
+      "seller": "Victor Chomba",
+      "seller_phone_verified": true
+    },
+    {
+      "id": "530",
+      "url": "https://sebu.co.ke/hp-desktop-eq0jk8i9j",
+      "lastmod": "2026-10-24",
+      "title": "Hp Desktop",
+      "amount": 18000,
+      "negotiable": "yes",
+      "description": "WE SELL ALL COMPUTERS/MONITORS/ACCESSORIES/LAPTOPS BOTH NEW AND REFURBISHED",
+      "created_at": "2026-10-25T11:04:39.971Z",
+      "category": "electronics",
+      "category_name": "Electronics",
+      "subcategory": "laptops-and-computers",
+      "subcategory_name": "Laptops and Computers",
+      "region": "nairobi",
+      "region_name": "Nairobi",
+      "area": "nairobi-cbd",
+      "area_name": "Nairobi CBD",
+      "images": [
+        "https://pictures.sebu.co.ke/ads/1792855915503-90be24e6-17e5-4604-b6e1-1bc8a6c53015.jpg",
+        "https://pictures.sebu.co.ke/ads/1792856338567-f22a16c3-e4a4-439c-a984-f45461e7a01b.jpg"
+      ],
+      "dynamic": {
+        "type": "Desktop",
+        "brand": "HP",
+        "model": "8300",
+        "processor": "Intel Core i5",
+        "generation": "4th Gen",
+        "ram": "4GB",
+        "storage": "SSD + HDD Combo",
+        "screen_size": "17\"",
+        "graphics": "Integrated",
+        "condition": "Refurbished",
+        "os": "Windows 11",
+        "color": "Black"
+      },
+      "seller": "Erick Otieno Okoth",
+      "seller_phone_verified": true
+    },
+    {
       "id": "523",
       "url": "https://sebu.co.ke/ict-support-ej0ssvitm",
       "lastmod": "2026-10-24",
@@ -2874,6 +2996,42 @@
         "availability": "24/7 / Emergency"
       },
       "seller": "Humphrey Odero",
+      "seller_phone_verified": true
+    },
+    {
+      "id": "544",
+      "url": "https://sebu.co.ke/infinix-buds-f4ksvmjmx",
+      "lastmod": "2026-10-25",
+      "title": "Infinix Buds",
+      "amount": 2500,
+      "negotiable": "yes",
+      "description": "quality sounds with noise counselation",
+      "created_at": "2026-10-25T16:56:20.593Z",
+      "category": "electronics",
+      "category_name": "Electronics",
+      "subcategory": "smart-watches-and-wearables",
+      "subcategory_name": "Smart Watches and Wearables",
+      "region": "kericho",
+      "region_name": "Kericho",
+      "area": "litein",
+      "area_name": "Litein",
+      "images": [
+        "https://pictures.sebu.co.ke/ads/1792946985636-98abfc6f-4028-485a-b9c2-008c6ef82ced.jpg",
+        "https://pictures.sebu.co.ke/ads/1792947006711-2c907062-cd51-4ddd-8beb-ad7cf03f113e.jpg"
+      ],
+      "dynamic": {
+        "type": "Smart Band",
+        "display_type": "Other",
+        "features": "Multiple Sports Modes",
+        "battery_life": "10+ Days",
+        "condition": "Brand New",
+        "color": "white",
+        "os": "Wear OS",
+        "screen_size": "Other",
+        "brand": "Other",
+        "model": "Nc (XE28)"
+      },
+      "seller": "Bongei nico",
       "seller_phone_verified": true
     },
     {
@@ -3035,34 +3193,6 @@
         "condition": "New"
       },
       "seller": "Chly",
-      "seller_phone_verified": true
-    },
-    {
-      "id": "336",
-      "url": "https://sebu.co.ke/jikokoa-pthg0",
-      "lastmod": "2026-10-20",
-      "title": "Jikokoa",
-      "amount": 4100,
-      "negotiable": "yes",
-      "description": "It is very efficient,consumes little charcoal with minimal smoke emissions",
-      "created_at": "2026-10-20T23:46:06.468Z",
-      "category": "home-furniture-and-appliances",
-      "category_name": "Home, Furniture and Appliances",
-      "subcategory": "cookware-and-kitchen",
-      "subcategory_name": "Cookware and Kitchen",
-      "region": "kiambu",
-      "region_name": "Kiambu",
-      "area": "witeithie",
-      "area_name": "Witeithie",
-      "images": [
-        "https://pictures.sebu.co.ke/ads/1792539782785-0b3158fe-0c03-4a62-88c7-fefaf62e00de.jpg"
-      ],
-      "dynamic": {
-        "item_type": "Cookware",
-        "material": "stainless steel",
-        "set_included": "one"
-      },
-      "seller": "Cornelius Kipchirchir",
       "seller_phone_verified": true
     },
     {
@@ -3279,6 +3409,44 @@
         "color": "black, grey, red, broze etc",
         "engine_size": "2800",
         "condition": "Used"
+      },
+      "seller": "MARTIN MUSYOKA",
+      "seller_phone_verified": true
+    },
+    {
+      "id": "553",
+      "url": "https://sebu.co.ke/landcruiser-tours-fdr8xr6ht",
+      "lastmod": "2026-10-26",
+      "title": "Landcruiser Tours",
+      "amount": 5500000,
+      "negotiable": "yes",
+      "description": "SOLD AS IS.",
+      "created_at": "2026-10-26T18:13:00.568Z",
+      "category": "vehicles",
+      "category_name": "Vehicles",
+      "subcategory": "cars-for-sale",
+      "subcategory_name": "Cars for Sale",
+      "region": "kajiado",
+      "region_name": "Kajiado",
+      "area": "kitengela",
+      "area_name": "Kitengela",
+      "images": [
+        "https://pictures.sebu.co.ke/ads/1793036180941-5b0fb30d-70f7-4430-ae9e-0c8571586501.jpg",
+        "https://pictures.sebu.co.ke/ads/1793036185020-8fc1be04-3758-427f-a432-3d95c13e0542.jpg",
+        "https://pictures.sebu.co.ke/ads/1793036190626-69f19c1d-88fd-4206-90cf-1270463b8394.jpg",
+        "https://pictures.sebu.co.ke/ads/1793036197055-99f4cc3c-9251-48ce-a342-b025f3a6ccdc.jpg"
+      ],
+      "dynamic": {
+        "make": "Toyota",
+        "model": "Land Cruiser",
+        "year": "2011",
+        "transmission": "Manual",
+        "fuel_type": "Diesel",
+        "body_type": "Wagon",
+        "color": "cream",
+        "engine_size": "4200",
+        "condition": "Used",
+        "mileage": "150000"
       },
       "seller": "MARTIN MUSYOKA",
       "seller_phone_verified": true
@@ -4975,6 +5143,36 @@
       "seller_phone_verified": true
     },
     {
+      "id": "539",
+      "url": "https://sebu.co.ke/makuti-sisal-poles-and-mazerus-ez3bhcn0o",
+      "lastmod": "2026-10-25",
+      "title": "Makuti,Sisal Poles, And Mazerus",
+      "amount": 250,
+      "negotiable": "yes",
+      "description": "reach us today for makuti, sisal poles, mazerus and pokomo mat",
+      "created_at": "2026-10-25T13:26:47.545Z",
+      "category": "business-and-industrial",
+      "category_name": "Business and Industrial",
+      "subcategory": "construction-and-tools",
+      "subcategory_name": "Construction and Tools",
+      "region": "nairobi",
+      "region_name": "Nairobi",
+      "area": "ruai",
+      "area_name": "Ruai",
+      "images": [
+        "https://pictures.sebu.co.ke/ads/1792934469517-62cbb4a2-09fa-42cd-80a0-93ae9027c899.jpg",
+        "https://pictures.sebu.co.ke/ads/1792934500123-835fbc0c-91ce-43ab-a8a2-d52715367d3e.jpg",
+        "https://pictures.sebu.co.ke/ads/1792934517961-90e4674b-3e2b-4804-a238-a1704edbc1fd.jpg",
+        "https://pictures.sebu.co.ke/ads/1792934538062-d5d09944-1e85-426d-9ed0-4a3f3724d027.jpg"
+      ],
+      "dynamic": {
+        "item_type": "Hammer",
+        "brand": "brand new"
+      },
+      "seller": "makuti roofing expert",
+      "seller_phone_verified": true
+    },
+    {
       "id": "259",
       "url": "https://sebu.co.ke/makuti-thatched-umbrella-ryi0s",
       "lastmod": "2026-09-12",
@@ -5480,6 +5678,42 @@
       "seller_phone_verified": true
     },
     {
+      "id": "540",
+      "url": "https://sebu.co.ke/motorcycle-f0nqasiik",
+      "lastmod": "2026-10-25",
+      "title": "Motorcycle",
+      "amount": 95000,
+      "negotiable": "yes",
+      "description": "am selling a used Honda ace 125 that is in good condition,privately used,selling to upgrade",
+      "created_at": "2026-10-25T15:34:38.389Z",
+      "category": "vehicles",
+      "category_name": "Vehicles",
+      "subcategory": "motorcycles-and-scooters",
+      "subcategory_name": "Motorcycles and Scooters",
+      "region": "machakos",
+      "region_name": "Machakos",
+      "area": "mutituni",
+      "area_name": "Mutituni",
+      "images": [
+        "https://pictures.sebu.co.ke/ads/1792944559067-ba35b1be-8cd8-4c8a-a96d-01a9d3b22387.jpg",
+        "https://pictures.sebu.co.ke/ads/1792945655205-rotated-659fd7e9-583b-45a2-9b56-9a7f2dfe3eb2.jpg",
+        "https://pictures.sebu.co.ke/ads/1792945637414-rotated-24baa40c-bb51-4684-8646-eb3faf91ba85.jpg",
+        "https://pictures.sebu.co.ke/ads/1792944585526-f5505f32-0b34-4713-8c43-bdb836967b28.jpg"
+      ],
+      "dynamic": {
+        "make": "Honda",
+        "model": "Other",
+        "year": "2022",
+        "mileage": "30000",
+        "engine_size": "125",
+        "type": "Other",
+        "transmission": "Manual",
+        "condition": "Used"
+      },
+      "seller": "Amos Munyao",
+      "seller_phone_verified": true
+    },
+    {
       "id": "74",
       "url": "https://sebu.co.ke/mounting-frames-printing-gjzj6",
       "lastmod": "2025-10-27",
@@ -5652,6 +5886,45 @@
         "shoe_type": "Sneakers"
       },
       "seller": "Wamaxi Trendywear and cosmetics",
+      "seller_phone_verified": true
+    },
+    {
+      "id": "535",
+      "url": "https://sebu.co.ke/nec-laptop-evcgkj7xz",
+      "lastmod": "2026-10-25",
+      "title": "Nec Laptop",
+      "amount": 19000,
+      "negotiable": "yes",
+      "description": "the laptop is in good condition ready to use",
+      "created_at": "2026-10-25T10:45:56.349Z",
+      "category": "electronics",
+      "category_name": "Electronics",
+      "subcategory": "laptops-and-computers",
+      "subcategory_name": "Laptops and Computers",
+      "region": "kiambu",
+      "region_name": "Kiambu",
+      "area": "juja",
+      "area_name": "Juja",
+      "images": [
+        "https://pictures.sebu.co.ke/ads/1792924871545-fa3a5eb8-c815-4fbb-a361-f9cb939c888f.jpg",
+        "https://pictures.sebu.co.ke/ads/1792924876809-b703e018-8696-4ebe-a971-96946afe1f62.jpg",
+        "https://pictures.sebu.co.ke/ads/1792924881943-620e3218-d78d-49c2-b298-f9143347ae94.jpg"
+      ],
+      "dynamic": {
+        "type": "Laptop",
+        "brand": "Other",
+        "model": "Nec",
+        "processor": "Intel Core i5",
+        "generation": "7th Gen",
+        "ram": "8GB",
+        "storage": "256GB SSD",
+        "screen_size": "24\"",
+        "graphics": "Not Sure",
+        "condition": "Refurbished",
+        "os": "Windows 11",
+        "color": "GREY"
+      },
+      "seller": "Victor Chomba",
       "seller_phone_verified": true
     },
     {
@@ -7289,32 +7562,31 @@
       "seller_phone_verified": true
     },
     {
-      "id": "359",
-      "url": "https://sebu.co.ke/paypal-solution-kenya-f35te",
-      "lastmod": "2026-10-21",
-      "title": "Paypal Solution Kenya",
-      "amount": 2000,
-      "negotiable": "yes",
-      "description": "I withdraw funds from permanent limited Paypal and other Paypal issues",
-      "created_at": "2026-10-21T19:03:02.469Z",
-      "category": "gigs-and-freelance",
-      "category_name": "Gigs and Freelance",
-      "subcategory": "data-entry-and-admin-tasks",
-      "subcategory_name": "Data Entry and Admin Tasks",
-      "region": "kisumu",
-      "region_name": "Kisumu",
-      "area": "central-kisumu",
-      "area_name": "Central Kisumu",
+      "id": "532",
+      "url": "https://sebu.co.ke/ovane-esgt11ktg",
+      "lastmod": "2026-10-25",
+      "title": "Ovane",
+      "amount": 2500,
+      "negotiable": "no",
+      "description": "klapsten ovane imported from German stores south Africa",
+      "created_at": "2026-10-25T06:37:22.569Z",
+      "category": "home-furniture-and-appliances",
+      "category_name": "Home, Furniture and Appliances",
+      "subcategory": "cookware-and-kitchen",
+      "subcategory_name": "Cookware and Kitchen",
+      "region": "nairobi",
+      "region_name": "Nairobi",
+      "area": "nairobi-cbd",
+      "area_name": "Nairobi CBD",
       "images": [
-        "https://pictures.sebu.co.ke/ads/1792608918928-ecacf36e-d9f8-445c-a2e3-cb3b2446c4f9.jpg",
-        "https://pictures.sebu.co.ke/ads/1792608923495-5d010956-f1cf-42bd-af6b-bf07b47c824e.jpg"
+        "https://pictures.sebu.co.ke/ads/1792909463162-6cf48b8b-cd04-464a-9830-de99c2bc8e7f.jpg",
+        "https://pictures.sebu.co.ke/ads/1792909481242-0172a5e9-fcd9-4d72-af57-8d284337cb3f.jpg",
+        "https://pictures.sebu.co.ke/ads/1792909500036-ab716931-5e9a-4ced-bd6b-fe4a2e1881bf.jpg"
       ],
       "dynamic": {
-        "duration": "one week",
-        "task_type": "PayPal",
-        "software_used": "phone, laptop"
+        "item_type": "Cookware"
       },
-      "seller": "Collen Cee",
+      "seller": "Drone's international",
       "seller_phone_verified": true
     },
     {
@@ -7837,6 +8109,42 @@
         "region": ""
       },
       "seller": "Caroline Mokeira",
+      "seller_phone_verified": true
+    },
+    {
+      "id": "537",
+      "url": "https://sebu.co.ke/s23ultra-128gb-exvlllo8l",
+      "lastmod": "2026-10-25",
+      "title": "S23ultra 128gb",
+      "amount": 59500,
+      "negotiable": "yes",
+      "description": "Clean as new..everything working perfectly. prove of ownership",
+      "created_at": "2026-10-25T11:28:48.944Z",
+      "category": "electronics",
+      "category_name": "Electronics",
+      "subcategory": "mobile-phones",
+      "subcategory_name": "Mobile Phones",
+      "region": "nairobi",
+      "region_name": "Nairobi",
+      "area": "baba-dogo",
+      "area_name": "Baba Dogo",
+      "images": [
+        "https://pictures.sebu.co.ke/ads/1792927573665-71f6688a-103c-40e4-be83-2917b261292c.jpg",
+        "https://pictures.sebu.co.ke/ads/1792927580336-d01bf6f0-2435-49b6-ad02-ed836d486226.jpg",
+        "https://pictures.sebu.co.ke/ads/1792927587737-443c1ebb-d4f4-4592-8187-35346a589968.jpg",
+        "https://pictures.sebu.co.ke/ads/1792927594054-b70a2e4f-0f84-412c-af65-8e09219c12a4.jpg"
+      ],
+      "dynamic": {
+        "brand": "Samsung",
+        "model": "s23ultra",
+        "storage": "128GB",
+        "ram": "12GB",
+        "condition": "Used",
+        "battery": "5000",
+        "os": "Android",
+        "color": "Golden"
+      },
+      "seller": "Fanuel Auto",
       "seller_phone_verified": true
     },
     {
@@ -8527,6 +8835,40 @@
       "seller_phone_verified": true
     },
     {
+      "id": "533",
+      "url": "https://sebu.co.ke/smartphone-etgx57gho",
+      "lastmod": "2026-10-25",
+      "title": "Smartphone",
+      "amount": 19000,
+      "negotiable": "yes",
+      "description": "original brand-new product with 1 year warranty",
+      "created_at": "2026-10-25T10:49:24.488Z",
+      "category": "electronics",
+      "category_name": "Electronics",
+      "subcategory": "mobile-phones",
+      "subcategory_name": "Mobile Phones",
+      "region": "kericho",
+      "region_name": "Kericho",
+      "area": "litein",
+      "area_name": "Litein",
+      "images": [
+        "https://pictures.sebu.co.ke/ads/1792925153716-92848f15-e70e-42a9-9d8a-8ca2cf632416.jpg",
+        "https://pictures.sebu.co.ke/ads/1792925176484-4f987f0f-c6b4-4e4f-9c1f-b566afd2b822.jpg"
+      ],
+      "dynamic": {
+        "brand": "Infinix",
+        "model": "hot 70i",
+        "storage": "128GB",
+        "ram": "4GB",
+        "condition": "Brand New",
+        "color": "black",
+        "battery": "6000",
+        "os": "Android"
+      },
+      "seller": "Bongei nico",
+      "seller_phone_verified": true
+    },
+    {
       "id": "527",
       "url": "https://sebu.co.ke/sneakers-enupdfp9a",
       "lastmod": "2026-10-24",
@@ -8713,6 +9055,37 @@
         "warranty": "7 Days"
       },
       "seller": "Paul Nganga",
+      "seller_phone_verified": true
+    },
+    {
+      "id": "541",
+      "url": "https://sebu.co.ke/sportswear-f1uwqi6pu",
+      "lastmod": "2026-10-25",
+      "title": "Sportswear 🛍⚽🏆",
+      "amount": 1700,
+      "negotiable": "yes",
+      "description": "Our jerseys range from 1700-2300\n26/27 season kits = 1700✅\n25/26 season kits = 900✅\nRetro kits = 2300✅\nInternational jerseys = 1500✅\nHappy shopping 🛍❤",
+      "created_at": "2026-10-25T15:40:13.265Z",
+      "category": "fashion",
+      "category_name": "Fashion",
+      "subcategory": "sportswear",
+      "subcategory_name": "Sportswear",
+      "region": "nairobi",
+      "region_name": "Nairobi",
+      "area": "baba-dogo",
+      "area_name": "Baba Dogo",
+      "images": [
+        "https://pictures.sebu.co.ke/ads/1792942458650-baa08196-70e1-476d-845f-1ce63ac72e0e.jpg",
+        "https://pictures.sebu.co.ke/ads/1792942468129-67afd5d1-49c6-45ff-88da-dcdf5af8de3c.jpg",
+        "https://pictures.sebu.co.ke/ads/1792942476927-8515fa94-42b3-4d9b-8395-563476f0fdbe.jpg",
+        "https://pictures.sebu.co.ke/ads/1792942487195-997cd414-a3fe-4af0-9199-14654fdc3925.jpg"
+      ],
+      "dynamic": {
+        "sports_type": "Football",
+        "size": "Small - 2xl",
+        "brand": "PLAYER VERSION KITS"
+      },
+      "seller": "BRIAN MUSUNGU",
       "seller_phone_verified": true
     },
     {

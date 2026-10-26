@@ -1,5 +1,5 @@
 {
-  "count": 3773,
+  "count": 3772,
   "listings": [
     {
       "id": "apify-b9b18084f762",
@@ -7313,7 +7313,7 @@
       "slug": "1-bedroom-apartment-for-rent-the-torch-dubai-marina-isup177054",
       "url": "https://6ixo.com/listing/1-bedroom-apartment-for-rent-the-torch-dubai-marina-isup177054/",
       "images": [
-        "https://images.allsoppandallsopp.com/public/temp/a0O4S000000VJKIUA4_s_1-bedroom-apartment-in-the-torch-dubai-marina-aed-83k-allsopp-and-allsopp-img3952.jpeg"
+        "https://images.allsoppandallsopp.com/public/temp/a0O4S000000VJKIUA4_s_1-bedroom-apartment-in-the-torch-dubai-marina-aed-80k-allsopp-and-allsopp-img3952.jpeg"
       ],
       "categoryKey": "real-estate"
     },
@@ -23999,7 +23999,7 @@
       "slug": "1-bedroom-apartment-for-rent-jenna-main-square-town-square-bail310277",
       "url": "https://6ixo.com/listing/1-bedroom-apartment-for-rent-jenna-main-square-town-square-bail310277/",
       "images": [
-        "https://images.allsoppandallsopp.com/public/temp/a0OdK000002O4HRUA0_s_1-bedroom-apartment-in-jenna-main-square-town-square-aed-67k-allsopp-and-allsopp-whatsapp-image-2026-09-22-at-112146-8.jpeg"
+        "https://images.allsoppandallsopp.com/public/temp/a0OdK000002O4HRUA0_s_1-bedroom-apartment-in-jenna-main-square-town-square-aed-65k-allsopp-and-allsopp-whatsapp-image-2026-09-22-at-112146-8.jpeg"
       ],
       "categoryKey": "real-estate"
     },
@@ -38845,26 +38845,6 @@
         "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/d7/d74038a6-464b-49b0-882c-9e40bebeeb87?rule=kijijica-1600-webp"
       ],
       "categoryKey": "services"
-    },
-    {
-      "id": "kijiji-1743257615",
-      "slug": "2023-kia-sportage-hybrid-ex-hybrid-leather-awd-1743257615",
-      "url": "https://6ixo.com/listing/2023-kia-sportage-hybrid-ex-hybrid-leather-awd-1743257615/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/86/86f2f9a9-0a29-4e9e-96ac-481d3e0bc30f?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/43/439128d1-1ef0-47fb-bf45-d73d0ba47980?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/cf/cf8a2b70-3b63-433b-8b65-a49f92bf2e35?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/d8/d85743a3-ce39-47a1-90a2-cf16d6df213a?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/f5/f571c9d8-5f22-4371-9fb3-d03771d0e445?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/9e/9ec46319-af2f-4a14-bdee-727e6d657845?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/a4/a4be00b7-2b54-4145-8ec6-8e965604cdef?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/e5/e5a3c7e4-9840-4bb2-a4ce-c4281b534ed2?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/1e/1ea942f0-d714-41b7-8f61-a46de715f8d5?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/95/957716e0-6d0d-4d34-b122-a9d253ea9551?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/40/404afe68-5e93-4fa6-980f-3c29a6115122?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/4e/4eb19eaf-aa50-413b-847f-37d4bd0d2029?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "vehicles"
     },
     {
       "id": "kijiji-1743256769",
@@ -54990,6 +54970,11 @@
       "id": "craigslist-jubI3Au58RGyIP-8BU9siQ",
       "slug": "subaru-outback-cash-yip8bu9siq",
       "url": "https://6ixo.com/listing/subaru-outback-cash-yip8bu9siq/"
+    },
+    {
+      "id": "kijiji-1743257615",
+      "slug": "2023-kia-sportage-hybrid-ex-hybrid-leather-awd-1743257615",
+      "url": "https://6ixo.com/listing/2023-kia-sportage-hybrid-ex-hybrid-leather-awd-1743257615/"
     }
   ]
 }

@@ -1,5 +1,5 @@
 {
-  "checkedAt": "2026-10-26T21:10:14.587Z",
+  "checkedAt": "2026-10-26T21:24:41.748496+00:00",
   "listings": {
     "craigslist.org/view/d/bastrop-used-2025-cadillac-xt4-fwd-4d/fuqr_3uo8rgowpq1ctwx-a": {
       "availability": "sold",
@@ -16557,6 +16557,14 @@
       "httpStatus": 200,
       "sourceUrl": "https://www.kijiji.ca/v-cars-trucks/oakville-halton-region/2025-lincoln-corsair-premiere-awd-pano-sunroof-360-camera/1739962870",
       "resolvedUrl": "https://www.kijiji.ca/b-cars-trucks/oakville-halton-region/c174l1700277?adRemoved=1739962870&ll=43.4888384%2C-79.70633169999999&radius=150.0&rb=50"
+    },
+    "allsoppandallsopp.com/dubai/property/lettings/l-311456": {
+      "availability": "unavailable",
+      "checkedAt": "2026-10-26T21:24:41.748496+00:00",
+      "sourceUrl": "https://www.allsoppandallsopp.com/dubai/property/lettings/L-311456",
+      "reason": "Exact property L-311456 is marked To Let - Off-Market",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.allsoppandallsopp.com/dubai/property/lettings/L-311456"
     }
   }
 }

@@ -1,5 +1,5 @@
 {
-  "count": 3940,
+  "count": 3939,
   "listings": [
     {
       "id": "import-9bdb7a5c1e6c3f7b6f",
@@ -27222,15 +27222,6 @@
         "https://oxglow.com.gh/uploads/medium/auusda-laptop-21712-1791719003-3-medium.jpeg"
       ],
       "categoryKey": "electronics"
-    },
-    {
-      "id": "allsopp-dubai-l-311456",
-      "slug": "1-bedroom-apartment-for-rent-liva-town-square-bail311456",
-      "url": "https://6ixo.com/listing/1-bedroom-apartment-for-rent-liva-town-square-bail311456/",
-      "images": [
-        "https://images.allsoppandallsopp.com/public/temp/a0OdK000003LcuzUAC_s_1-bedroom-apartment-in-liva-town-square-aed-59k-allsopp-and-allsopp-img9907.jpeg"
-      ],
-      "categoryKey": "real-estate"
     },
     {
       "id": "allsopp-dubai-l-311495",
@@ -57341,6 +57332,11 @@
       "id": "kijiji-1738603811",
       "slug": "2024-volkswagen-taos-comfortline-clean-carfax-vw-service-1738603811",
       "url": "https://6ixo.com/listing/2024-volkswagen-taos-comfortline-clean-carfax-vw-service-1738603811/"
+    },
+    {
+      "id": "allsopp-dubai-l-311456",
+      "slug": "1-bedroom-apartment-for-rent-liva-town-square-bail311456",
+      "url": "https://6ixo.com/listing/1-bedroom-apartment-for-rent-liva-town-square-bail311456/"
     }
   ]
 }

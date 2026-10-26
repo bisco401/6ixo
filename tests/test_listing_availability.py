@@ -2,6 +2,7 @@ import importlib.util
 import pathlib
 import csv
 import hashlib
+import json
 import tempfile
 from types import SimpleNamespace
 from unittest.mock import patch
@@ -39,6 +40,21 @@ class AvailabilityTest(unittest.TestCase):
         self.assertEqual(module.classify(self.row, 404, "<title>Just a moment</title>")[0], "unknown")
         for title in ["Robot Challenge Screen", "Bot Verification", "Verifying your browser"]:
             self.assertEqual(module.classify(self.row, 404, '<title>'+title+'</title>')[0], 'unknown')
+
+    def test_exact_property_state_outranks_stale_available_offer(self):
+        row = {**self.row, "source_url": "https://www.allsoppandallsopp.com/dubai/property/lettings/L-123"}
+        offer = '<h1>Toyota Corolla 2022</h1><script type="application/ld+json">' + json.dumps({"@type": "Product", "url": row["source_url"], "offers": {"availability": "https://schema.org/InStock"}}) + '</script>'
+        def body(state, reference="L-123", deleted=False):
+            fields = {"pba__broker_s_listing_id__c": [reference], "pba__status__c": [state], "isdeleted": [deleted]}
+            data = {"props": {"pageProps": {"data": {"data": {"listingDetails": {"hits": {"hits": [{"fields": fields}]}}}}}}}
+            return offer + '<script id="__NEXT_DATA__">' + json.dumps(data) + '</script>'
+        self.assertEqual(module.classify(row, 200, body("To Let - Off-Market"))[0], "unavailable")
+        self.assertEqual(module.classify(row, 200, body("Sold"))[0], "sold")
+        self.assertEqual(module.classify(row, 200, body("To Let - Live", deleted=True))[0], "unavailable")
+        self.assertEqual(module.classify(row, 200, body("Offered"))[0], "unknown")
+        self.assertEqual(module.classify(row, 200, body("To Let - Live"))[0], "active")
+        self.assertEqual(module.classify(row, 200, body("To Let - Off-Market", reference="L-OTHER"))[0], "active")
+        self.assertEqual(module.classify(row, 200, body("To Let - Live", deleted="false"))[0], "active")
 
     def test_exact_404_hides_without_deleting(self):
         availability, reason = module.classify(self.row, 404, "Missing")

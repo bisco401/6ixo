@@ -78,6 +78,28 @@ def classify(row, status, body, resolved_url=""):
         return "gone", f"Exact source URL returned HTTP {status}"
     if not 200 <= status < 400:
         return "unknown", f"Unexpected HTTP {status}"
+    if host(original_parts) == "allsoppandallsopp.com":
+        # The exact property's source state outranks its sometimes stale
+        # InStock Product offer. Never read this from recommended properties.
+        script = soup.select_one("script#__NEXT_DATA__")
+        try:
+            data = json.loads(script.get_text()) if script else {}
+            fields = data["props"]["pageProps"]["data"]["data"]["listingDetails"]["hits"]["hits"][0]["fields"]
+            def field(name):
+                value = fields.get(name)
+                return value[0] if isinstance(value, list) and value else value
+            reference = str(field("pba__broker_s_listing_id__c") or "")
+            if reference and original_parts.path.rstrip("/").rsplit("/", 1)[-1] == reference:
+                state = str(field("pba__status__c") or "").strip()
+                removed = any(field(name) in (True, "true", "True") for name in ("isdeleted", "pba_archived__c"))
+                if re.search(r"\bsold\b", state, re.I):
+                    return "sold", f"Exact property {reference} is marked {state}"
+                if removed or re.search(r"\b(?:off[ -]market|withdrawn|expired|deleted|archived)\b", state, re.I):
+                    return "unavailable", f"Exact property {reference} is marked {state or 'deleted/archived'}"
+                if state and state != "To Let - Live":
+                    return "unknown", f"Exact property {reference} has source status {state}; final availability is unconfirmed"
+        except (ValueError, KeyError, IndexError, TypeError):
+            pass
     title = row.get("title", "")
     words = [w for w in re.findall(r"[\w]+", title.lower()) if len(w) >= 3 and w not in {"sale", "used", "with", "for", "the", "and", "wholesale", "export"}]
     identity = (heading + " " + page_title).lower()

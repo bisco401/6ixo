@@ -1,5 +1,5 @@
 {
-  "checkedAt": "2026-10-27T06:48:04Z",
+  "checkedAt": "2026-10-27T07:00:56.746Z",
   "listings": {
     "craigslist.org/view/d/bastrop-used-2025-cadillac-xt4-fwd-4d/fuqr_3uo8rgowpq1ctwx-a": {
       "availability": "sold",
@@ -14923,6 +14923,15 @@
       "availability": "gone",
       "checkedAt": "2026-10-27T06:48:04Z",
       "reason": "Exact source URL returned HTTP 404"
+    },
+    "craigslist.org/view/d/marietta-2017-gmc-acadia-financing/lkv6tanb8rg8gpgc7de5gw": {
+      "id": "craigslist-lKV6TAnB8RG8GPGc7de5Gw",
+      "sourceUrl": "https://www.craigslist.org/view/d/marietta-2017-gmc-acadia-financing/lKV6TAnB8RG8GPGc7de5Gw",
+      "availability": "gone",
+      "checkedAt": "2026-10-27T07:00:56.746Z",
+      "httpStatus": 410,
+      "resolvedUrl": "https://www.craigslist.org/view/d/marietta-2017-gmc-acadia-financing/lKV6TAnB8RG8GPGc7de5Gw",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     }
   }
 }

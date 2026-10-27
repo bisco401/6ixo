@@ -1,5 +1,5 @@
 {
-  "count": 3990,
+  "count": 3985,
   "listings": [
     {
       "id": "apify-b9b18084f762",
@@ -25525,15 +25525,6 @@
       "categoryKey": "real-estate"
     },
     {
-      "id": "allsopp-dubai-dub701393",
-      "slug": "studio-apartment-for-rent-marina-view-dubai-marina-idub701393",
-      "url": "https://6ixo.com/listing/studio-apartment-for-rent-marina-view-dubai-marina-idub701393/",
-      "images": [
-        "https://images.allsoppandallsopp.com/public/temp/a0O4S000000V44gUAC_s_apartment-in-marina-view-dubai-marina-aed-60k-allsopp-and-allsopp-whatsapp-image-2026-10-05-at-164023.jpeg"
-      ],
-      "categoryKey": "real-estate"
-    },
-    {
       "id": "allsopp-dubai-l-307298",
       "slug": "2-bedroom-apartment-for-rent-botanica-tower-dubai-marina-bail307298",
       "url": "https://6ixo.com/listing/2-bedroom-apartment-for-rent-botanica-tower-dubai-marina-bail307298/",
@@ -28695,15 +28686,6 @@
       "categoryKey": "real-estate"
     },
     {
-      "id": "allsopp-dubai-l-304557",
-      "slug": "studio-apartment-for-rent-sky-gardens-difc-bail304557",
-      "url": "https://6ixo.com/listing/studio-apartment-for-rent-sky-gardens-difc-bail304557/",
-      "images": [
-        "https://images.allsoppandallsopp.com/public/temp/a0OdK000000XrFGUA0_s_apartment-in-sky-gardens-difc-aed-90k-allsopp-and-allsopp-chatgpt-image-oct-5-2026-124039-pm.png"
-      ],
-      "categoryKey": "real-estate"
-    },
-    {
       "id": "jacars-2527389",
       "slug": "toyota-harrier-2-0l-2021-ars2527389",
       "url": "https://6ixo.com/listing/toyota-harrier-2-0l-2021-ars2527389/",
@@ -29942,15 +29924,6 @@
         "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/92/924c2843-542e-4f76-aba8-278ebd33589e?rule=kijijica-1600-webp"
       ],
       "categoryKey": "services"
-    },
-    {
-      "id": "allsopp-dubai-l-310747",
-      "slug": "studio-apartment-for-rent-carson-damac-hills-bail310747",
-      "url": "https://6ixo.com/listing/studio-apartment-for-rent-carson-damac-hills-bail310747/",
-      "images": [
-        "https://images.allsoppandallsopp.com/public/temp/a0OdK000003aVzdUAE_s_apartment-in-carson-damac-hills-aed-52k-allsopp-and-allsopp-dsc02899.jpg"
-      ],
-      "categoryKey": "real-estate"
     },
     {
       "id": "alba-dubai-2064",
@@ -35876,15 +35849,6 @@
       "categoryKey": "vehicles"
     },
     {
-      "id": "alba-dubai-2006",
-      "slug": "2020-ram-1500-v8-adubai2006",
-      "url": "https://6ixo.com/listing/2020-ram-1500-v8-adubai2006/",
-      "images": [
-        "https://storage.albacars.ae/vehicles/drafts/2006/1.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
       "id": "kijiji-1742616114",
       "slug": "2025-hyundai-elantra-hybrid-luxury-hybrid-leather-low-km-1742616114",
       "url": "https://6ixo.com/listing/2025-hyundai-elantra-hybrid-luxury-hybrid-leather-low-km-1742616114/",
@@ -37825,16 +37789,6 @@
         "https://images.craigslist.org/00w0w_gU9VH4ObtwK_0t20CI_600x450.jpg",
         "https://images.craigslist.org/00101_7ftZly52ZYb_0t20CI_600x450.jpg",
         "https://images.craigslist.org/00o0o_9ujVoZOeBsI_0t20CI_600x450.jpg"
-      ],
-      "categoryKey": "auto-parts"
-    },
-    {
-      "id": "craigslist-jyxm9R4yec6anScNWwRVBG",
-      "slug": "bakflip-truck-bed-cover-nscnwwrvbg",
-      "url": "https://6ixo.com/listing/bakflip-truck-bed-cover-nscnwwrvbg/",
-      "images": [
-        "https://images.craigslist.org/00i0i_a699klxrfS_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/00S0S_jr61wxmhoF0_0CI0t2_600x450.jpg"
       ],
       "categoryKey": "auto-parts"
     },
@@ -58190,6 +58144,31 @@
       "id": "apify-abbb0afaece7",
       "slug": "ps4-standard-bb0afaece7",
       "url": "https://6ixo.com/listing/ps4-standard-bb0afaece7/"
+    },
+    {
+      "id": "allsopp-dubai-dub701393",
+      "slug": "studio-apartment-for-rent-marina-view-dubai-marina-idub701393",
+      "url": "https://6ixo.com/listing/studio-apartment-for-rent-marina-view-dubai-marina-idub701393/"
+    },
+    {
+      "id": "allsopp-dubai-l-304557",
+      "slug": "studio-apartment-for-rent-sky-gardens-difc-bail304557",
+      "url": "https://6ixo.com/listing/studio-apartment-for-rent-sky-gardens-difc-bail304557/"
+    },
+    {
+      "id": "allsopp-dubai-l-310747",
+      "slug": "studio-apartment-for-rent-carson-damac-hills-bail310747",
+      "url": "https://6ixo.com/listing/studio-apartment-for-rent-carson-damac-hills-bail310747/"
+    },
+    {
+      "id": "alba-dubai-2006",
+      "slug": "2020-ram-1500-v8-adubai2006",
+      "url": "https://6ixo.com/listing/2020-ram-1500-v8-adubai2006/"
+    },
+    {
+      "id": "craigslist-jyxm9R4yec6anScNWwRVBG",
+      "slug": "bakflip-truck-bed-cover-nscnwwrvbg",
+      "url": "https://6ixo.com/listing/bakflip-truck-bed-cover-nscnwwrvbg/"
     }
   ]
 }

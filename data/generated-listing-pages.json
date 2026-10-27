@@ -1,5 +1,5 @@
 {
-  "count": 3985,
+  "count": 3975,
   "listings": [
     {
       "id": "apify-b9b18084f762",
@@ -2505,18 +2505,6 @@
         "https://static.overfuel.com/photos/2200/2098063/1hNIEBiw1600x01791844437ueclFs7Sj3oxMLGuAM0Pf15T6w.webp",
         "https://static.overfuel.com/photos/2200/2098063/xTtnQEZJ1600x01791844628ueclXImgwtLxjnQFjrIkR04E2w.webp",
         "https://static.overfuel.com/photos/2200/2098063/J4kVIbtF1600x01791844441uecl2TQaajcFpn1hiVinNwvTpg.webp"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "import-807fce6481ed7f6fe0",
-      "slug": "2003-ford-focus-se-comfort-81ed7f6fe0",
-      "url": "https://6ixo.com/listing/2003-ford-focus-se-comfort-81ed7f6fe0/",
-      "images": [
-        "https://cdn05.carsforsale.com/1a0dca82ebd97e2a113910fe204891d8/800x600/2003-ford-focus-se-comfort-4dr-sedan-w-zetec.jpg",
-        "https://cdn05.carsforsale.com/2e0d88b61167b4cfaf06efeb8509b672/800x600/2003-ford-focus-se-comfort-4dr-sedan-w-zetec.jpg",
-        "https://cdn05.carsforsale.com/3b78464d3c7f10ca4e9b09f7a670fab4/800x600/2003-ford-focus-se-comfort-4dr-sedan-w-zetec.jpg",
-        "https://cdn05.carsforsale.com/3a401000f25b8a9fdde1e0cf04579eb2/800x600/2003-ford-focus-se-comfort-4dr-sedan-w-zetec.jpg"
       ],
       "categoryKey": "vehicles"
     },
@@ -5509,15 +5497,6 @@
       "categoryKey": "auto-parts"
     },
     {
-      "id": "kijiji-1745351435",
-      "slug": "tankless-water-heater-tankless-water-heater-tankless-1745351435",
-      "url": "https://6ixo.com/listing/tankless-water-heater-tankless-water-heater-tankless-1745351435/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/58/5807d389-ad3a-451e-8413-77b6035f7bb1?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "buy-and-sell"
-    },
-    {
       "id": "kijiji-1745350802",
       "slug": "lululemon-headbands-and-u-shaped-headband-1745350802",
       "url": "https://6ixo.com/listing/lululemon-headbands-and-u-shaped-headband-1745350802/",
@@ -5754,24 +5733,6 @@
         "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/50/50ce4e6c-126c-47f8-a570-54e00880168d?rule=kijijica-1600-webp",
         "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/35/35202bca-fa32-4687-bdde-7c0a8680bb63?rule=kijijica-1600-webp",
         "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/c3/c3f52448-7a1d-4ceb-8828-0cc28aae7c45?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "real-estate"
-    },
-    {
-      "id": "kijiji-1745336738",
-      "slug": "your-oasis-large-3-bedroom-in-highly-desired-west-mountain-1745336738",
-      "url": "https://6ixo.com/listing/your-oasis-large-3-bedroom-in-highly-desired-west-mountain-1745336738/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/77/77be81a7-6852-4e58-a224-304305d808a0?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/1f/1f2a9204-a723-464d-acab-40679231af66?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/2d/2dacff0f-ebb7-4448-b6c1-c8f18c270eb3?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/66/6623ecc3-68a1-44c6-9c96-2d48a9955b40?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/e3/e33cad59-2a28-489d-914d-2172af77ad81?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/28/28e50233-5952-4dbf-95ff-d757347ee48e?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/ea/ea3ae4f0-ddb1-4268-b180-f61643c087b7?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/9f/9fa20b7c-21b6-444d-ac10-787db39e729a?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/85/85ccccf2-5218-43df-8699-72339e256d7e?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/79/79f10a2e-9dd2-4b95-9b0c-b7845da91ebd?rule=kijijica-1600-webp"
       ],
       "categoryKey": "real-estate"
     },
@@ -7025,18 +6986,6 @@
         "https://images.craigslist.org/00K0K_4GpQJovDdK4_0cU09G_600x450.jpg",
         "https://images.craigslist.org/00303_3qRR36Xo8KG_0cU09G_600x450.jpg",
         "https://images.craigslist.org/00z0z_lb2rNq9uYBd_0cU09G_600x450.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "craigslist-95SxCkvbuYtPXJZgE4Tv6r",
-      "slug": "2018-nissan-maxima-sv-leather-105k-miles-2-owner-clean-car-xjzge4tv6r",
-      "url": "https://6ixo.com/listing/2018-nissan-maxima-sv-leather-105k-miles-2-owner-clean-car-xjzge4tv6r/",
-      "images": [
-        "https://images.craigslist.org/00P0P_di0xWES4uJH_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/00B0B_gbJu7LCMYuG_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/00U0U_6pJzdOdtckD_0Cd0t2_600x450.jpg",
-        "https://images.craigslist.org/00c0c_gZQvLOsT3ZP_0BX0t2_600x450.jpg"
       ],
       "categoryKey": "vehicles"
     },
@@ -14567,24 +14516,6 @@
       "categoryKey": "real-estate"
     },
     {
-      "id": "kijiji-1745092327",
-      "slug": "2012-vw-jetta-tdi-diesel-top-trim-1745092327",
-      "url": "https://6ixo.com/listing/2012-vw-jetta-tdi-diesel-top-trim-1745092327/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/80/80b14c5a-dddc-4db1-8427-a85df27f10e8?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/f1/f1cf0b77-a169-457d-939a-193743ce4ba3?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/ab/ab7f73b9-9ddf-497e-a5eb-21296003098d?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/94/947ce388-fdee-46a8-8a77-4da33975c8b1?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/97/97cdccca-fe09-47bd-a5b1-7cffe53dccc4?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/ef/efea82dd-d948-4eaf-b355-bb1bb60baa3c?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/25/25c5fc2d-e3ce-4687-a9a5-88efae1cc42c?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/18/187cc00d-3bf9-441c-8875-135a25ef966c?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/9d/9d396791-e96c-4c2f-9c96-f5328a695f86?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/57/57c27d23-246d-491b-bcee-da4daed6094d?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
       "id": "kijiji-1745092326",
       "slug": "2026-chevrolet-silverado-1500lt-diesel-6-6-box-leather-1745092326",
       "url": "https://6ixo.com/listing/2026-chevrolet-silverado-1500lt-diesel-6-6-box-leather-1745092326/",
@@ -15235,15 +15166,6 @@
         "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/35/358160d9-41fc-408f-b8f0-cc79eddcffc6?rule=kijijica-1600-webp"
       ],
       "categoryKey": "real-estate"
-    },
-    {
-      "id": "kijiji-1745091207",
-      "slug": "az-driver-needed-for-montreal-runs-1745091207",
-      "url": "https://6ixo.com/listing/az-driver-needed-for-montreal-runs-1745091207/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/7e/7e30792f-d5e3-4b3f-8a0f-05f25650c700?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "jobs"
     },
     {
       "id": "kijiji-1745091098",
@@ -24058,23 +23980,6 @@
       "categoryKey": "real-estate"
     },
     {
-      "id": "kijiji-1744881524",
-      "slug": "basement-unit-with-2-1-bedrooms-for-rent-1744881524",
-      "url": "https://6ixo.com/listing/basement-unit-with-2-1-bedrooms-for-rent-1744881524/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/b1/b11b2f42-c852-4e9b-84b2-6dfccb36767f?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/63/63618d53-9181-4e44-a463-75b616eacb18?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/2e/2e4736a5-f962-4d7c-975d-5f60f3fd9aad?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/53/53d858bd-b232-4a36-9b0a-50ec301bed71?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/2e/2e83d78a-9d5b-48d8-add4-a01b2302e8b4?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/17/1792a985-7cd2-4acb-89b4-163e0fa537bb?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/49/4998917e-d87c-4820-9451-2741059ee78d?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/d0/d0fdbd0e-6f0a-422c-8e99-73d4581c8213?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/57/57d1c778-9e88-4aff-936b-95a264736737?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "real-estate"
-    },
-    {
       "id": "kijiji-1739391457",
       "slug": "sell-your-mac-or-ipad-now-1739391457",
       "url": "https://6ixo.com/listing/sell-your-mac-or-ipad-now-1739391457/",
@@ -24507,16 +24412,6 @@
       "images": [
         "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/3e/3e869672-a90e-40b5-bd17-e0b877ba78f2?rule=kijijica-1600-webp",
         "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/81/81486e33-bf49-41a9-b930-ad44344dffc5?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "buy-and-sell"
-    },
-    {
-      "id": "kijiji-1744837216",
-      "slug": "lennox-healthy-climate-hrv5-200-tpd-51-1744837216",
-      "url": "https://6ixo.com/listing/lennox-healthy-climate-hrv5-200-tpd-51-1744837216/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/9b/9b2d35b6-816c-4a78-90b6-add1afa2ef58?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/81/8192376d-c0e3-486f-b53a-41fb09a44eaf?rule=kijijica-1600-webp"
       ],
       "categoryKey": "buy-and-sell"
     },
@@ -35813,15 +35708,6 @@
       "categoryKey": "vehicles"
     },
     {
-      "id": "allsopp-dubai-l-310441",
-      "slug": "1-bedroom-apartment-for-rent-burj-views-downtown-dubai-bail310441",
-      "url": "https://6ixo.com/listing/1-bedroom-apartment-for-rent-burj-views-downtown-dubai-bail310441/",
-      "images": [
-        "https://images.allsoppandallsopp.com/public/temp/a0O4S000000V1AYUA0_s_1-bedroom-apartment-in-burj-views-downtown-dubai-aed-100k-allsopp-and-allsopp-1.jpeg"
-      ],
-      "categoryKey": "real-estate"
-    },
-    {
       "id": "allsopp-dubai-l-310732",
       "slug": "2-bedroom-apartment-for-rent-bahar-jumeirah-beach-residenc-bail310732",
       "url": "https://6ixo.com/listing/2-bedroom-apartment-for-rent-bahar-jumeirah-beach-residenc-bail310732/",
@@ -37455,18 +37341,6 @@
         "https://images.craigslist.org/00t0t_4VWjP4GCBJ7_0t20CI_600x450.jpg",
         "https://images.craigslist.org/01616_fJigyVz1qMD_0t20CI_600x450.jpg",
         "https://images.craigslist.org/00g0g_2F60aWcR4CO_0CI0t2_600x450.jpg"
-      ],
-      "categoryKey": "electronics"
-    },
-    {
-      "id": "craigslist-cBXZtchdgin6h9EpuDtqHr",
-      "slug": "lg-xboom-mini-hi-fi-shelf-stereo-system-h9epudtqhr",
-      "url": "https://6ixo.com/listing/lg-xboom-mini-hi-fi-shelf-stereo-system-h9epudtqhr/",
-      "images": [
-        "https://images.craigslist.org/00r0r_juXBhKe7sCu_0CI0hq_600x450.jpg",
-        "https://images.craigslist.org/00707_eab1VvpdYyq_0hq0CI_600x450.jpg",
-        "https://images.craigslist.org/00J0J_hAzkXLO7aYh_0hq0CI_600x450.jpg",
-        "https://images.craigslist.org/00000_eR9X2wHjdbt_0hq0CI_600x450.jpg"
       ],
       "categoryKey": "electronics"
     },
@@ -49599,9 +49473,6 @@
       "url": "https://6ixo.com/listings/country/canada/real-estate/page/5/"
     },
     {
-      "url": "https://6ixo.com/listings/country/canada/real-estate/page/6/"
-    },
-    {
       "url": "https://6ixo.com/listings/country/canada/services/"
     },
     {
@@ -49789,9 +49660,6 @@
     },
     {
       "url": "https://6ixo.com/listings/country/canada/page/40/"
-    },
-    {
-      "url": "https://6ixo.com/listings/country/canada/page/41/"
     },
     {
       "url": "https://6ixo.com/listings/country/china/electronics/"
@@ -58169,6 +58037,56 @@
       "id": "craigslist-jyxm9R4yec6anScNWwRVBG",
       "slug": "bakflip-truck-bed-cover-nscnwwrvbg",
       "url": "https://6ixo.com/listing/bakflip-truck-bed-cover-nscnwwrvbg/"
+    },
+    {
+      "id": "import-807fce6481ed7f6fe0",
+      "slug": "2003-ford-focus-se-comfort-81ed7f6fe0",
+      "url": "https://6ixo.com/listing/2003-ford-focus-se-comfort-81ed7f6fe0/"
+    },
+    {
+      "id": "kijiji-1745351435",
+      "slug": "tankless-water-heater-tankless-water-heater-tankless-1745351435",
+      "url": "https://6ixo.com/listing/tankless-water-heater-tankless-water-heater-tankless-1745351435/"
+    },
+    {
+      "id": "kijiji-1745336738",
+      "slug": "your-oasis-large-3-bedroom-in-highly-desired-west-mountain-1745336738",
+      "url": "https://6ixo.com/listing/your-oasis-large-3-bedroom-in-highly-desired-west-mountain-1745336738/"
+    },
+    {
+      "id": "craigslist-95SxCkvbuYtPXJZgE4Tv6r",
+      "slug": "2018-nissan-maxima-sv-leather-105k-miles-2-owner-clean-car-xjzge4tv6r",
+      "url": "https://6ixo.com/listing/2018-nissan-maxima-sv-leather-105k-miles-2-owner-clean-car-xjzge4tv6r/"
+    },
+    {
+      "id": "kijiji-1745092327",
+      "slug": "2012-vw-jetta-tdi-diesel-top-trim-1745092327",
+      "url": "https://6ixo.com/listing/2012-vw-jetta-tdi-diesel-top-trim-1745092327/"
+    },
+    {
+      "id": "kijiji-1745091207",
+      "slug": "az-driver-needed-for-montreal-runs-1745091207",
+      "url": "https://6ixo.com/listing/az-driver-needed-for-montreal-runs-1745091207/"
+    },
+    {
+      "id": "kijiji-1744881524",
+      "slug": "basement-unit-with-2-1-bedrooms-for-rent-1744881524",
+      "url": "https://6ixo.com/listing/basement-unit-with-2-1-bedrooms-for-rent-1744881524/"
+    },
+    {
+      "id": "kijiji-1744837216",
+      "slug": "lennox-healthy-climate-hrv5-200-tpd-51-1744837216",
+      "url": "https://6ixo.com/listing/lennox-healthy-climate-hrv5-200-tpd-51-1744837216/"
+    },
+    {
+      "id": "allsopp-dubai-l-310441",
+      "slug": "1-bedroom-apartment-for-rent-burj-views-downtown-dubai-bail310441",
+      "url": "https://6ixo.com/listing/1-bedroom-apartment-for-rent-burj-views-downtown-dubai-bail310441/"
+    },
+    {
+      "id": "craigslist-cBXZtchdgin6h9EpuDtqHr",
+      "slug": "lg-xboom-mini-hi-fi-shelf-stereo-system-h9epudtqhr",
+      "url": "https://6ixo.com/listing/lg-xboom-mini-hi-fi-shelf-stereo-system-h9epudtqhr/"
     }
   ]
 }

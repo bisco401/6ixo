@@ -1,5 +1,5 @@
 {
-  "count": 3997,
+  "count": 3994,
   "listings": [
     {
       "id": "hgc-dubai-5d752f9d2d998011",
@@ -5430,15 +5430,6 @@
       "categoryKey": "real-estate"
     },
     {
-      "id": "kijiji-1745353719",
-      "slug": "get-a-iptv-month-free-ultra-hd-view-1745353719",
-      "url": "https://6ixo.com/listing/get-a-iptv-month-free-ultra-hd-view-1745353719/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/4d/4d2bd33d-cead-45a7-90de-ae03d7867ea0?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "electronics"
-    },
-    {
       "id": "kijiji-1745353228",
       "slug": "now-hiring-restaurant-staff-1745353228",
       "url": "https://6ixo.com/listing/now-hiring-restaurant-staff-1745353228/",
@@ -6970,15 +6961,6 @@
         "https://images.allsoppandallsopp.com/public/temp/a0OdK000003YrcrUAC_s_1-bedroom-apartment-in-mag-318-business-bay-aed-150k-allsopp-and-allsopp-modern-bedroom-with-balcony-views.png"
       ],
       "categoryKey": "real-estate"
-    },
-    {
-      "id": "alba-dubai-2210",
-      "slug": "2024-tesla-model-y-performance-awd-adubai2210",
-      "url": "https://6ixo.com/listing/2024-tesla-model-y-performance-awd-adubai2210/",
-      "images": [
-        "https://storage.albacars.ae/vehicles/drafts/2210/1.jpg"
-      ],
-      "categoryKey": "vehicles"
     },
     {
       "id": "alba-dubai-2206",
@@ -32417,17 +32399,6 @@
       "categoryKey": "auto-parts"
     },
     {
-      "id": "jacars-2528421",
-      "slug": "17-inch-rims-and-5-lugs-new-arrival-brand-new-ars2528421",
-      "url": "https://6ixo.com/listing/17-inch-rims-and-5-lugs-new-arrival-brand-new-ars2528421/",
-      "images": [
-        "https://cdn2.jacars.net/media/cache/bf/52/bf52cc00d41bcca286d8192742e7c2ac.webp",
-        "https://cdn2.jacars.net/media/cache/c5/89/c5891cd93ce32f90cc2a5ffa9a9793bf.webp",
-        "https://cdn2.jacars.net/media/cache/de/2b/de2bf78012440a10e9d8fb2db876e703.webp"
-      ],
-      "categoryKey": "auto-parts"
-    },
-    {
       "id": "jacars-2528419",
       "slug": "17-inch-rims-and-5-lugs-new-arrivalbrand-new-ars2528419",
       "url": "https://6ixo.com/listing/17-inch-rims-and-5-lugs-new-arrivalbrand-new-ars2528419/",
@@ -32435,6 +32406,17 @@
         "https://cdn2.jacars.net/media/cache/44/7b/447b76678775e5db94b7210c8061fa6a.webp",
         "https://cdn2.jacars.net/media/cache/0f/72/0f726079cdfb535d83127a3d45e19d53.webp",
         "https://cdn2.jacars.net/media/cache/0d/02/0d020f022a45ab860627fd6a3b2444d2.webp"
+      ],
+      "categoryKey": "auto-parts"
+    },
+    {
+      "id": "jacars-2528418",
+      "slug": "17-inch-rims-and-5-lugs-new-arrival-brand-new-ars2528418",
+      "url": "https://6ixo.com/listing/17-inch-rims-and-5-lugs-new-arrival-brand-new-ars2528418/",
+      "images": [
+        "https://cdn2.jacars.net/media/cache/22/8d/228d0ef05530096aecf7aefa456541ab.webp",
+        "https://cdn2.jacars.net/media/cache/6a/88/6a882825f3b148d715c0c882c2f841a3.webp",
+        "https://cdn2.jacars.net/media/cache/cd/a9/cda9214eb1909c900fac02b31925b435.webp"
       ],
       "categoryKey": "auto-parts"
     },
@@ -43987,18 +43969,6 @@
       "categoryKey": "vehicles"
     },
     {
-      "id": "jacars-2519712",
-      "slug": "toyota-hilux-2-8l-2026-ars2519712",
-      "url": "https://6ixo.com/listing/toyota-hilux-2-8l-2026-ars2519712/",
-      "images": [
-        "https://cdn2.jacars.net/media/cache/04/40/044028935b43f731ff19cbe0cacda0c7.webp",
-        "https://cdn2.jacars.net/media/cache/37/a8/37a87f311156d7a717ab0a862dba9805.webp",
-        "https://cdn2.jacars.net/media/cache/bc/99/bc99499de1d6fd2d5b38a94c0035f18a.webp",
-        "https://cdn2.jacars.net/media/cache/d6/65/d665b74efb3e4eae2b691b14004520a2.webp"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
       "id": "jacars-2519711",
       "slug": "ford-ranger-raptor-3-0l-2025-ars2519711",
       "url": "https://6ixo.com/listing/ford-ranger-raptor-3-0l-2025-ars2519711/",
@@ -49324,9 +49294,6 @@
     },
     {
       "url": "https://6ixo.com/listings/page/111/"
-    },
-    {
-      "url": "https://6ixo.com/listings/page/112/"
     },
     {
       "url": "https://6ixo.com/listings/electronics/"
@@ -58221,6 +58188,26 @@
       "id": "allsopp-dubai-l-310469",
       "slug": "2-bedroom-apartment-for-rent-midtown-dubai-production-city-bail310469",
       "url": "https://6ixo.com/listing/2-bedroom-apartment-for-rent-midtown-dubai-production-city-bail310469/"
+    },
+    {
+      "id": "kijiji-1745353719",
+      "slug": "get-a-iptv-month-free-ultra-hd-view-1745353719",
+      "url": "https://6ixo.com/listing/get-a-iptv-month-free-ultra-hd-view-1745353719/"
+    },
+    {
+      "id": "alba-dubai-2210",
+      "slug": "2024-tesla-model-y-performance-awd-adubai2210",
+      "url": "https://6ixo.com/listing/2024-tesla-model-y-performance-awd-adubai2210/"
+    },
+    {
+      "id": "jacars-2528421",
+      "slug": "17-inch-rims-and-5-lugs-new-arrival-brand-new-ars2528421",
+      "url": "https://6ixo.com/listing/17-inch-rims-and-5-lugs-new-arrival-brand-new-ars2528421/"
+    },
+    {
+      "id": "jacars-2519712",
+      "slug": "toyota-hilux-2-8l-2026-ars2519712",
+      "url": "https://6ixo.com/listing/toyota-hilux-2-8l-2026-ars2519712/"
     }
   ]
 }

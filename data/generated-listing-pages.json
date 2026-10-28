@@ -1,5 +1,5 @@
 {
-  "count": 4055,
+  "count": 4053,
   "listings": [
     {
       "id": "apify-b9b18084f762",
@@ -18005,15 +18005,6 @@
       "categoryKey": "real-estate"
     },
     {
-      "id": "alba-dubai-334",
-      "slug": "2021-mercedes-benz-gla-2021-badubai334",
-      "url": "https://6ixo.com/listing/2021-mercedes-benz-gla-2021-badubai334/",
-      "images": [
-        "https://storage.albacars.ae/vehicles/3494aee4-01ff-4c14-81e5-6a8458e7642a/4a1403d7-c81a-4c8c-a2d8-5371a6b5e6bf.jpeg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
       "id": "alba-dubai-2151",
       "slug": "2024-bmw-x1-m35i-xdrive-adubai2151",
       "url": "https://6ixo.com/listing/2024-bmw-x1-m35i-xdrive-adubai2151/",
@@ -18360,15 +18351,6 @@
         "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/0e/0ed0b777-af05-41c8-a010-b35b835dc92f?rule=kijijica-1600-webp"
       ],
       "categoryKey": "real-estate"
-    },
-    {
-      "id": "kijiji-1745059765",
-      "slug": "taxi-company-for-sale-1745059765",
-      "url": "https://6ixo.com/listing/taxi-company-for-sale-1745059765/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/25/256a7b8a-f310-4931-b2ad-81cc000aff9d?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "jobs"
     },
     {
       "id": "kijiji-1745059282",
@@ -59227,6 +59209,16 @@
       "id": "apify-abbb0afaece7",
       "slug": "ps4-standard-bb0afaece7",
       "url": "https://6ixo.com/listing/ps4-standard-bb0afaece7/"
+    },
+    {
+      "id": "alba-dubai-334",
+      "slug": "2021-mercedes-benz-gla-2021-badubai334",
+      "url": "https://6ixo.com/listing/2021-mercedes-benz-gla-2021-badubai334/"
+    },
+    {
+      "id": "kijiji-1745059765",
+      "slug": "taxi-company-for-sale-1745059765",
+      "url": "https://6ixo.com/listing/taxi-company-for-sale-1745059765/"
     }
   ]
 }

@@ -1,5 +1,5 @@
 {
-  "count": 4042,
+  "count": 4041,
   "listings": [
     {
       "id": "apify-b9b18084f762",
@@ -7950,7 +7950,7 @@
       "url": "https://6ixo.com/listing/spacious-2br-1ba-apartment-with-beautiful-views-dawtvdkmqh/",
       "images": [
         "https://images.craigslist.org/00n0n_6wuu61nLhzz_0oo0ww_600x450.jpg",
-        "https://images.craigslist.org/00Z0Z_cWWzQFzpbkQ_0CI0t2_600x450.jpg",
+        "https://images.craigslist.org/00f0f_9JWAX5ymlAH_0CI0t2_600x450.jpg",
         "https://images.craigslist.org/00s0s_1hlMFBq6q9Y_0oo0ww_600x450.jpg",
         "https://images.craigslist.org/00j0j_28fFjFgdjiX_0oo0ww_600x450.jpg"
       ],
@@ -8689,10 +8689,10 @@
       "slug": "newly-renovated-apt-on-the-3-rd-floor-fzkputuh2t",
       "url": "https://6ixo.com/listing/newly-renovated-apt-on-the-3-rd-floor-fzkputuh2t/",
       "images": [
-        "https://images.craigslist.org/01616_e0YXt6PaOPB_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/00J0J_2iLQeys2ZGm_0t20CI_600x450.jpg",
-        "https://images.craigslist.org/00P0P_6eXrCo16u0z_0t20CI_600x450.jpg",
-        "https://images.craigslist.org/00p0p_6NJkClu5GWR_0t20CI_600x450.jpg"
+        "https://images.craigslist.org/00G0G_hAVbPf8gKr6_0eP096_600x450.jpg",
+        "https://images.craigslist.org/00A0A_9TQLlbKZOtY_0CI0t2_600x450.jpg",
+        "https://images.craigslist.org/00202_isoAsE3pfsh_0CI0t2_600x450.jpg",
+        "https://images.craigslist.org/00N0N_e6rO7O72BzN_0t20CI_600x450.jpg"
       ],
       "categoryKey": "real-estate"
     },
@@ -42257,26 +42257,6 @@
       "categoryKey": "vehicles"
     },
     {
-      "id": "kijiji-1743251062",
-      "slug": "2021-nissan-murano-platinum-1743251062",
-      "url": "https://6ixo.com/listing/2021-nissan-murano-platinum-1743251062/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/3b/3bbd2dba-0561-4028-a0ff-bcf349c97be8?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/5c/5c98737b-b6c9-4bdd-b876-51acb37e12eb?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/80/80d4596c-3298-4bfa-a80a-1cb7160049d2?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/9a/9ac30383-f962-4caa-8889-c1a8b139dfd5?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/37/37ae4c1c-778d-4521-984d-3ce726ded842?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/34/349dae16-6392-4c61-8775-39277c8e4180?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/15/15bf0d6b-a379-42c9-ae94-99870f4b2143?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/f2/f2b5c969-48bc-4509-a9ed-fc42a45a783c?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/6c/6cd87345-0824-4009-9e9a-4180e9c3f542?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/f2/f2cd638b-8f40-4e59-a8bc-90cc5bfbdd38?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/e8/e8daefac-a6e4-48ab-86ba-bad9f219ca1d?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/90/90220a72-0cde-453c-a038-680fe5f790da?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
       "id": "kijiji-1735072989",
       "slug": "ultra-500-golf-balls-1735072989",
       "url": "https://6ixo.com/listing/ultra-500-golf-balls-1735072989/",
@@ -59157,6 +59137,11 @@
       "id": "samtronix-gy-15030909337760",
       "slug": "oukitel-wp28e-16gb-ram-64gb-storage-0909337760",
       "url": "https://6ixo.com/listing/oukitel-wp28e-16gb-ram-64gb-storage-0909337760/"
+    },
+    {
+      "id": "kijiji-1743251062",
+      "slug": "2021-nissan-murano-platinum-1743251062",
+      "url": "https://6ixo.com/listing/2021-nissan-murano-platinum-1743251062/"
     }
   ]
 }

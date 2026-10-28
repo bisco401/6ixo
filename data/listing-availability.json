@@ -1,5 +1,5 @@
 {
-  "checkedAt": "2026-10-28T12:31:36Z",
+  "checkedAt": "2026-10-28T12:45:18.190Z",
   "listings": {
     "craigslist.org/view/d/bastrop-used-2025-cadillac-xt4-fwd-4d/fuqr_3uo8rgowpq1ctwx-a": {
       "availability": "sold",
@@ -14677,34 +14677,58 @@
       "reason": "All offers for this exact listing are unavailable"
     },
     "kijiji.ca/v-buy-sell-other/city-of-toronto/sagetra-commercial-tomato-slicer/1745414792": {
-      "availability": "unavailable",
-      "checkedAt": "2026-10-28T12:31:36Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1745414792",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/sagetra-commercial-tomato-slicer/1745414792",
+      "availability": "gone",
+      "checkedAt": "2026-10-28T12:45:18.190Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1745414792",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-buy-sell-other/city-of-toronto/vitamix-36019-commercial-bar-blender-48-oz-vm0145/1745414794": {
-      "availability": "unavailable",
-      "checkedAt": "2026-10-28T12:31:36Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1745414794",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/vitamix-36019-commercial-bar-blender-48-oz-vm0145/1745414794",
+      "availability": "gone",
+      "checkedAt": "2026-10-28T12:45:18.190Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1745414794",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-buy-sell-other/city-of-toronto/eurodib-20-qt-commercial-spiral-mixer/1745414775": {
-      "availability": "unavailable",
-      "checkedAt": "2026-10-28T12:31:36Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1745414775",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/eurodib-20-qt-commercial-spiral-mixer/1745414775",
+      "availability": "gone",
+      "checkedAt": "2026-10-28T12:45:18.190Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1745414775",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-buy-sell-other/city-of-toronto/medsup-21-white-polypropylene-bouffant-cap-1000pcs/1745414762": {
-      "availability": "unavailable",
-      "checkedAt": "2026-10-28T12:31:36Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1745414762",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/medsup-21-white-polypropylene-bouffant-cap-1000pcs/1745414762",
+      "availability": "gone",
+      "checkedAt": "2026-10-28T12:45:18.190Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1745414762",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-buy-sell-other/city-of-toronto/waring-four-slice-commercial-toaster-without-box/1745414746": {
-      "availability": "unavailable",
-      "checkedAt": "2026-10-28T12:31:36Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1745414746",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/waring-four-slice-commercial-toaster-without-box/1745414746",
+      "availability": "gone",
+      "checkedAt": "2026-10-28T12:45:18.190Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1745414746",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-buy-sell-other/city-of-toronto/sagetra-triple-commercial-sink-dents/1745414758": {
-      "availability": "unavailable",
-      "checkedAt": "2026-10-28T12:31:36Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1745414758",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/sagetra-triple-commercial-sink-dents/1745414758",
+      "availability": "gone",
+      "checkedAt": "2026-10-28T12:45:18.190Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1745414758",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "albacars.ae/buy-used-cars/vehicle/334-mercedes-benz-gla": {
       "availability": "sold",
@@ -14725,6 +14749,15 @@
       "availability": "sold",
       "checkedAt": "2026-10-28T12:31:36Z",
       "reason": "All offers for this exact listing are unavailable"
+    },
+    "kijiji.ca/v-driver-security-jobs/winnipeg/looking-for-class-1-driver-for-schedule-run/1744605008": {
+      "id": "kijiji-1744605008",
+      "sourceUrl": "https://www.kijiji.ca/v-driver-security-jobs/winnipeg/looking-for-class-1-driver-for-schedule-run/1744605008",
+      "availability": "gone",
+      "checkedAt": "2026-10-28T12:45:18.190Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-driver-security-jobs/winnipeg/c148l1700192?radius=50.0&ll=49.83%2C-97.18&adRemoved=1744605008",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     }
   }
 }

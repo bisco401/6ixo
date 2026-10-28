@@ -1,5 +1,5 @@
 {
-  "checkedAt": "2026-10-28T06:35:10Z",
+  "checkedAt": "2026-10-28T06:48:06.168Z",
   "listings": {
     "craigslist.org/view/d/bastrop-used-2025-cadillac-xt4-fwd-4d/fuqr_3uo8rgowpq1ctwx-a": {
       "availability": "sold",
@@ -14616,9 +14616,13 @@
       "reason": "Exact source URL returned HTTP 410"
     },
     "kijiji.ca/v-buy-sell-other/city-of-toronto/eurodib-10-commercial-manual-meat-slicer/1745392994": {
-      "availability": "unavailable",
-      "checkedAt": "2026-10-28T06:35:10Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1745392994",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/eurodib-10-commercial-manual-meat-slicer/1745392994",
+      "availability": "gone",
+      "checkedAt": "2026-10-28T06:48:06.168Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1745392994",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-bed-mattress/hamilton/truck-available/1745341572": {
       "availability": "unavailable",

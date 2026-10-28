@@ -1,5 +1,5 @@
 {
-  "count": 4069,
+  "count": 4065,
   "listings": [
     {
       "id": "hgc-dubai-5d752f9d2d998011",
@@ -9815,20 +9815,6 @@
       "categoryKey": "services"
     },
     {
-      "id": "kijiji-1745185701",
-      "slug": "nice-2018-mazda-3-for-sale-1745185701",
-      "url": "https://6ixo.com/listing/nice-2018-mazda-3-for-sale-1745185701/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/7d/7d6a8093-17fe-4119-9ab6-53da05b34c16?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/d0/d05cf1cd-df7c-48b6-b1fc-ac36b530610c?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/3d/3d880ec6-d27d-4921-a09b-48df0399f4e6?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/ba/ba6877dc-5232-4c65-93bc-d693ccde6c62?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/20/20574d90-2f19-4cd5-bc7d-ff75618f8ec3?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/71/71f8b109-efa2-4966-ab5a-4846b7eb6b7f?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
       "id": "kijiji-1745184722",
       "slug": "daily-ridesahre-1745184722",
       "url": "https://6ixo.com/listing/daily-ridesahre-1745184722/",
@@ -14207,15 +14193,6 @@
       "url": "https://6ixo.com/listing/2025-used-jetour-t2-luxury-adubai2166/",
       "images": [
         "https://storage.albacars.ae/vehicles/drafts/2166/1.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "alba-dubai-2167",
-      "slug": "2024-used-jetour-t2-luxury-plus-adubai2167",
-      "url": "https://6ixo.com/listing/2024-used-jetour-t2-luxury-plus-adubai2167/",
-      "images": [
-        "https://storage.albacars.ae/vehicles/drafts/2167/1.jpg"
       ],
       "categoryKey": "vehicles"
     },
@@ -25695,18 +25672,6 @@
         "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/19/19e5d900-8480-4612-985d-020bc39b032f?rule=kijijica-1600-webp"
       ],
       "categoryKey": "services"
-    },
-    {
-      "id": "kijiji-1744835135",
-      "slug": "2016-mazda-cx-3-gx-suv-1744835135",
-      "url": "https://6ixo.com/listing/2016-mazda-cx-3-gx-suv-1744835135/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/a9/a9c94bea-7ecd-4fae-bc45-8de9b652ba67?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/3d/3de3a04a-3740-4b40-a44b-9f08cc9d6937?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/e5/e5e5fb55-48ce-42a2-8bd5-b43dbe6a8ecb?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/81/8142dc09-b95d-4b41-854b-83def2627374?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "vehicles"
     },
     {
       "id": "kijiji-1743931791",
@@ -43152,26 +43117,6 @@
       "categoryKey": "real-estate"
     },
     {
-      "id": "kijiji-1743011873",
-      "slug": "209-furby-1-br-available-now-1743011873",
-      "url": "https://6ixo.com/listing/209-furby-1-br-available-now-1743011873/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/77/77bdcd4f-7feb-4a6f-8d45-b758b1652966?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/ef/effff846-9dec-4624-b2c5-4227d6c0da1f?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/41/41b5ab27-4851-463c-911b-68bc3508bc30?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/ab/ab4cda53-5f19-450e-94f5-9f81889f4930?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/a4/a4739b26-ceda-4e57-8240-9a9698b805e1?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/14/14caf713-3697-4d37-bf51-23ddd599c235?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/e9/e93f2ecc-c852-41aa-bacc-b0ef308f3c04?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/53/534d2a6a-204d-4091-8d37-354d2732c85a?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/cb/cbae5f13-15dc-45f4-a8b5-779625c1415c?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/54/5486cc45-6edf-4516-b01a-671bb803a0fd?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/23/23349ef3-3d36-41df-b129-a0937c6cccd2?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/9c/9c71d3d9-fa6e-46af-aa6b-7f37e82afa73?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "real-estate"
-    },
-    {
       "id": "homehub-gy-e45232c7-d252-4b7b-a872-717046abadc1",
       "slug": "mocha-2-bedroom-apartment-for-rent-7046abadc1",
       "url": "https://6ixo.com/listing/mocha-2-bedroom-apartment-for-rent-7046abadc1/",
@@ -50146,9 +50091,6 @@
     },
     {
       "url": "https://6ixo.com/listings/page/113/"
-    },
-    {
-      "url": "https://6ixo.com/listings/page/114/"
     },
     {
       "url": "https://6ixo.com/listings/electronics/"
@@ -59313,6 +59255,26 @@
       "id": "craigslist-oFnHSrqkCcqb843YVPEAmG",
       "slug": "kensington-1br-heat-hot-water-included-separate-kitchen-ne-843yvpeamg",
       "url": "https://6ixo.com/listing/kensington-1br-heat-hot-water-included-separate-kitchen-ne-843yvpeamg/"
+    },
+    {
+      "id": "kijiji-1745185701",
+      "slug": "nice-2018-mazda-3-for-sale-1745185701",
+      "url": "https://6ixo.com/listing/nice-2018-mazda-3-for-sale-1745185701/"
+    },
+    {
+      "id": "alba-dubai-2167",
+      "slug": "2024-used-jetour-t2-luxury-plus-adubai2167",
+      "url": "https://6ixo.com/listing/2024-used-jetour-t2-luxury-plus-adubai2167/"
+    },
+    {
+      "id": "kijiji-1744835135",
+      "slug": "2016-mazda-cx-3-gx-suv-1744835135",
+      "url": "https://6ixo.com/listing/2016-mazda-cx-3-gx-suv-1744835135/"
+    },
+    {
+      "id": "kijiji-1743011873",
+      "slug": "209-furby-1-br-available-now-1743011873",
+      "url": "https://6ixo.com/listing/209-furby-1-br-available-now-1743011873/"
     }
   ]
 }

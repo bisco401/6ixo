@@ -1,5 +1,5 @@
 {
-  "count": 4051,
+  "count": 4042,
   "listings": [
     {
       "id": "apify-b9b18084f762",
@@ -18845,18 +18845,6 @@
       "categoryKey": "real-estate"
     },
     {
-      "id": "craigslist-5cnE9SRbP8zeGbF6KuYuwK",
-      "slug": "no-fee-mint-spac-1br-larg-liv-rm-qn-br-beautiful-eik-close-gbf6kuyuwk",
-      "url": "https://6ixo.com/listing/no-fee-mint-spac-1br-larg-liv-rm-qn-br-beautiful-eik-close-gbf6kuyuwk/",
-      "images": [
-        "https://images.craigslist.org/00000_f53PgEWubvY_0jm0pO_600x450.jpg",
-        "https://images.craigslist.org/00303_4sqbcKHmrnR_0jm0pO_600x450.jpg",
-        "https://images.craigslist.org/00D0D_kMaZ83aHmbl_0jm0pO_600x450.jpg",
-        "https://images.craigslist.org/01111_6cQAHdgEnmN_0jm0pO_600x450.jpg"
-      ],
-      "categoryKey": "real-estate"
-    },
-    {
       "id": "craigslist-t7JcmnqRV45i3E7vG9UsHz",
       "slug": "large-loft-w-bright-windows-exposed-brick-3e7vg9ushz",
       "url": "https://6ixo.com/listing/large-loft-w-bright-windows-exposed-brick-3e7vg9ushz/",
@@ -20214,18 +20202,6 @@
       "categoryKey": "real-estate"
     },
     {
-      "id": "craigslist-2vLsjoWDjsGciZyrtaVPc3",
-      "slug": "gorgeous-1br-in-bay-terrace-fully-furnished-izyrtavpc3",
-      "url": "https://6ixo.com/listing/gorgeous-1br-in-bay-terrace-fully-furnished-izyrtavpc3/",
-      "images": [
-        "https://images.craigslist.org/00J0J_bF35ULqegvV_0t20CI_600x450.jpg",
-        "https://images.craigslist.org/00u0u_jNma2gTRrR4_0t20CI_600x450.jpg",
-        "https://images.craigslist.org/00808_iEQAZ5nmCe7_0t20CI_600x450.jpg",
-        "https://images.craigslist.org/00k0k_e1nJJeCnxY1_0t20CI_600x450.jpg"
-      ],
-      "categoryKey": "real-estate"
-    },
-    {
       "id": "craigslist-gQqtCuXTM2PjkTrAAAoMdU",
       "slug": "stunning-studio-duplex-w-d-in-unit-central-air-park-slope-ktraaaomdu",
       "url": "https://6ixo.com/listing/stunning-studio-duplex-w-d-in-unit-central-air-park-slope-ktraaaomdu/",
@@ -20279,15 +20255,6 @@
       "url": "https://6ixo.com/listing/1-bedroom-apartment-for-rent-vera-residences-vera-residenc-bail274120/",
       "images": [
         "https://images.allsoppandallsopp.com/public/temp/a0OdK000000jzk5UAA_s_1-bedroom-apartment-in-vera-residences-vera-residences-business-bay-aed-80k-allsopp-and-allsopp-4c05e91f-776b-456d-9751-2c71df59527a.jpeg"
-      ],
-      "categoryKey": "real-estate"
-    },
-    {
-      "id": "allsopp-dubai-l-308338",
-      "slug": "3-bedroom-apartment-for-rent-hameni-tower-jumeirah-village-bail308338",
-      "url": "https://6ixo.com/listing/3-bedroom-apartment-for-rent-hameni-tower-jumeirah-village-bail308338/",
-      "images": [
-        "https://images.allsoppandallsopp.com/public/temp/a0OdK000000VBf8UAG_s_3-bedroom-apartment-in-hameni-tower-jumeirah-village-circle-aed-220k-allsopp-and-allsopp-1.jpg"
       ],
       "categoryKey": "real-estate"
     },
@@ -24754,15 +24721,6 @@
       "categoryKey": "electronics"
     },
     {
-      "id": "alba-dubai-2112",
-      "slug": "2023-bmw-330i-m-sport-adubai2112",
-      "url": "https://6ixo.com/listing/2023-bmw-330i-m-sport-adubai2112/",
-      "images": [
-        "https://storage.albacars.ae/vehicles/drafts/2112/1.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
       "id": "craigslist-RO0EggjJ8RGCvK-FU2M3ig",
       "slug": "1995-dodge-ram-2500-laramie-sport-4x4-5-9l-12-valve-0-rust-cvkfu2m3ig",
       "url": "https://6ixo.com/listing/1995-dodge-ram-2500-laramie-sport-4x4-5-9l-12-valve-0-rust-cvkfu2m3ig/",
@@ -25651,15 +25609,6 @@
         "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/bd/bdb5b6b8-cd05-4662-b815-423e00b9d9c9?rule=kijijica-1600-webp"
       ],
       "categoryKey": "real-estate"
-    },
-    {
-      "id": "kijiji-1744830685",
-      "slug": "az-local-drivers-6-7k-1744830685",
-      "url": "https://6ixo.com/listing/az-local-drivers-6-7k-1744830685/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/ba/ba178463-1730-4e39-8c75-84f720dc7095?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "jobs"
     },
     {
       "id": "kijiji-1742847713",
@@ -28189,18 +28138,6 @@
         "https://images.craigslist.org/00z0z_iySGXrC6CTk_0CI0t2_600x450.jpg",
         "https://images.craigslist.org/01010_7aYXmOWt814_0CI0t2_600x450.jpg",
         "https://images.craigslist.org/00202_fr2NGb3HjQ7_0CI0t2_600x450.jpg"
-      ],
-      "categoryKey": "real-estate"
-    },
-    {
-      "id": "craigslist-d9u2VdQnky697qjtnE2fhp",
-      "slug": "brand-new-apartment-ready-to-move-in-7qjtne2fhp",
-      "url": "https://6ixo.com/listing/brand-new-apartment-ready-to-move-in-7qjtne2fhp/",
-      "images": [
-        "https://images.craigslist.org/00e0e_9L10X3ZqCn6_0t20CI_600x450.jpg",
-        "https://images.craigslist.org/00v0v_iaCnss4EOJd_0t20CI_600x450.jpg",
-        "https://images.craigslist.org/01414_fShA8o7eO1a_0t20CI_600x450.jpg",
-        "https://images.craigslist.org/01414_9g4GHe9wAYK_0t20CI_600x450.jpg"
       ],
       "categoryKey": "real-estate"
     },
@@ -30775,15 +30712,6 @@
       "url": "https://6ixo.com/listing/2025-forthing-u-tour-adubai2064/",
       "images": [
         "https://storage.albacars.ae/vehicles/35a4efeb-818a-4fa4-a820-d4bc9a87c279/c47edd4e-2b9d-4b66-a3a9-d9e2b198cd4f.jpeg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "alba-dubai-2063",
-      "slug": "2024-gmc-hummer-ev-adubai2063",
-      "url": "https://6ixo.com/listing/2024-gmc-hummer-ev-adubai2063/",
-      "images": [
-        "https://storage.albacars.ae/vehicles/drafts/2063/1.jpg"
       ],
       "categoryKey": "vehicles"
     },
@@ -40293,24 +40221,6 @@
         "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/5b/5b3fd707-35be-4280-84b4-23316f863b0e?rule=kijijica-1600-webp"
       ],
       "categoryKey": "services"
-    },
-    {
-      "id": "samtronix-gy-14553031835808",
-      "slug": "nokia-105-3031835808",
-      "url": "https://6ixo.com/listing/nokia-105-3031835808/",
-      "images": [
-        "https://samtronixguyana.com/cdn/shop/files/nokia105_1024x.png?v=1726647383"
-      ],
-      "categoryKey": "electronics"
-    },
-    {
-      "id": "samtronix-gy-15030909337760",
-      "slug": "oukitel-wp28e-16gb-ram-64gb-storage-0909337760",
-      "url": "https://6ixo.com/listing/oukitel-wp28e-16gb-ram-64gb-storage-0909337760/",
-      "images": [
-        "https://samtronixguyana.com/cdn/shop/files/https___static.arvutitark.ee_public_media-hub-olev_2024_08_646888_0-16603300-1723701197_1024x.webp?v=1740139270"
-      ],
-      "categoryKey": "electronics"
     },
     {
       "id": "kijiji-1743988999",
@@ -50259,9 +50169,6 @@
       "url": "https://6ixo.com/listings/jobs/page/4/"
     },
     {
-      "url": "https://6ixo.com/listings/jobs/page/5/"
-    },
-    {
       "url": "https://6ixo.com/listings/fashion/"
     },
     {
@@ -50374,9 +50281,6 @@
     },
     {
       "url": "https://6ixo.com/listings/country/canada/jobs/page/4/"
-    },
-    {
-      "url": "https://6ixo.com/listings/country/canada/jobs/page/5/"
     },
     {
       "url": "https://6ixo.com/listings/country/canada/fashion/"
@@ -59208,6 +59112,51 @@
       "id": "kijiji-1744605008",
       "slug": "looking-for-class-1-driver-for-sysco-deliveries-1744605008",
       "url": "https://6ixo.com/listing/looking-for-class-1-driver-for-sysco-deliveries-1744605008/"
+    },
+    {
+      "id": "craigslist-5cnE9SRbP8zeGbF6KuYuwK",
+      "slug": "no-fee-mint-spac-1br-larg-liv-rm-qn-br-beautiful-eik-close-gbf6kuyuwk",
+      "url": "https://6ixo.com/listing/no-fee-mint-spac-1br-larg-liv-rm-qn-br-beautiful-eik-close-gbf6kuyuwk/"
+    },
+    {
+      "id": "craigslist-2vLsjoWDjsGciZyrtaVPc3",
+      "slug": "gorgeous-1br-in-bay-terrace-fully-furnished-izyrtavpc3",
+      "url": "https://6ixo.com/listing/gorgeous-1br-in-bay-terrace-fully-furnished-izyrtavpc3/"
+    },
+    {
+      "id": "allsopp-dubai-l-308338",
+      "slug": "3-bedroom-apartment-for-rent-hameni-tower-jumeirah-village-bail308338",
+      "url": "https://6ixo.com/listing/3-bedroom-apartment-for-rent-hameni-tower-jumeirah-village-bail308338/"
+    },
+    {
+      "id": "alba-dubai-2112",
+      "slug": "2023-bmw-330i-m-sport-adubai2112",
+      "url": "https://6ixo.com/listing/2023-bmw-330i-m-sport-adubai2112/"
+    },
+    {
+      "id": "kijiji-1744830685",
+      "slug": "az-local-drivers-6-7k-1744830685",
+      "url": "https://6ixo.com/listing/az-local-drivers-6-7k-1744830685/"
+    },
+    {
+      "id": "craigslist-d9u2VdQnky697qjtnE2fhp",
+      "slug": "brand-new-apartment-ready-to-move-in-7qjtne2fhp",
+      "url": "https://6ixo.com/listing/brand-new-apartment-ready-to-move-in-7qjtne2fhp/"
+    },
+    {
+      "id": "alba-dubai-2063",
+      "slug": "2024-gmc-hummer-ev-adubai2063",
+      "url": "https://6ixo.com/listing/2024-gmc-hummer-ev-adubai2063/"
+    },
+    {
+      "id": "samtronix-gy-14553031835808",
+      "slug": "nokia-105-3031835808",
+      "url": "https://6ixo.com/listing/nokia-105-3031835808/"
+    },
+    {
+      "id": "samtronix-gy-15030909337760",
+      "slug": "oukitel-wp28e-16gb-ram-64gb-storage-0909337760",
+      "url": "https://6ixo.com/listing/oukitel-wp28e-16gb-ram-64gb-storage-0909337760/"
     }
   ]
 }

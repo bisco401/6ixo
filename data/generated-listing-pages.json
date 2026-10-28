@@ -1,5 +1,5 @@
 {
-  "count": 4053,
+  "count": 4051,
   "listings": [
     {
       "id": "apify-b9b18084f762",
@@ -209,7 +209,7 @@
       "slug": "2-bedroom-apartment-for-rent-the-mayfair-town-square-bail312425",
       "url": "https://6ixo.com/listing/2-bedroom-apartment-for-rent-the-mayfair-town-square-bail312425/",
       "images": [
-        "https://images.allsoppandallsopp.com/public/temp/a0OdK000003hGSnUAM_s_2-bedroom-apartment-in-the-mayfair-town-square-aed-120k-allsopp-and-allsopp-geminigeneratedimagevk3io1vk3io1vk3i.jpg"
+        "https://images.allsoppandallsopp.com/public/temp/a0OdK000003hGSnUAM_s_2-bedroom-apartment-in-the-mayfair-town-square-aed-120k-allsopp-and-allsopp-whatsapp-image-2026-10-28-at-140024-1.jpeg"
       ],
       "categoryKey": "real-estate"
     },
@@ -7463,18 +7463,6 @@
         "https://images.craigslist.org/01313_95VYJH5ie1K_0gw0co_600x450.jpg",
         "https://images.craigslist.org/00S0S_ilULXF5kLD_0gw0co_600x450.jpg",
         "https://images.craigslist.org/00707_g2Zh8CYNely_0gw0co_600x450.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "craigslist-plRKYcLQ8RGLfIn6heQhjQ",
-      "slug": "2007-toyota-rav4-awd-all-wheel-drive-rav-4-limited-4dr-suv-fin6heqhjq",
-      "url": "https://6ixo.com/listing/2007-toyota-rav4-awd-all-wheel-drive-rav-4-limited-4dr-suv-fin6heqhjq/",
-      "images": [
-        "https://images.craigslist.org/00w0w_2Sm521NMonU_0jm0ew_600x450.jpg",
-        "https://images.craigslist.org/00F0F_jWrRh1uTbz4_0jm0c2_600x450.jpg",
-        "https://images.craigslist.org/00o0o_5XdJ7KUfQfR_0jm0c2_600x450.jpg",
-        "https://images.craigslist.org/00606_8xUeDt8aeVg_0jm0c2_600x450.jpg"
       ],
       "categoryKey": "vehicles"
     },
@@ -17982,7 +17970,7 @@
       "slug": "studio-apartment-for-rent-jumeirah-garden-city-al-satwa-bail311713",
       "url": "https://6ixo.com/listing/studio-apartment-for-rent-jumeirah-garden-city-al-satwa-bail311713/",
       "images": [
-        "https://images.allsoppandallsopp.com/public/temp/a0OdK000003dqBVUAY_s_apartment-in-jumeirah-garden-city-al-satwa-aed-75k-allsopp-and-allsopp-whatsapp-image-2026-10-06-at-61658-pm-2.jpeg"
+        "https://images.allsoppandallsopp.com/public/temp/a0OdK000003dqBVUAY_s_apartment-in-jumeirah-garden-city-al-satwa-aed-70k-allsopp-and-allsopp-whatsapp-image-2026-10-06-at-61658-pm-2.jpeg"
       ],
       "categoryKey": "real-estate"
     },
@@ -20308,7 +20296,7 @@
       "slug": "1-bedroom-apartment-for-rent-al-alka-greens-idub206846",
       "url": "https://6ixo.com/listing/1-bedroom-apartment-for-rent-al-alka-greens-idub206846/",
       "images": [
-        "https://images.allsoppandallsopp.com/public/temp/a0O4S000000V3KkUAK_s_1-bedroom-apartment-in-al-alka-greens-aed-95k-allsopp-and-allsopp-whatsapp-image-2026-09-30-at-25738-pm-1.jpeg"
+        "https://images.allsoppandallsopp.com/public/temp/a0O4S000000V3KkUAK_s_1-bedroom-apartment-in-al-alka-greens-aed-90k-allsopp-and-allsopp-whatsapp-image-2026-09-30-at-25738-pm-1.jpeg"
       ],
       "categoryKey": "real-estate"
     },
@@ -31083,15 +31071,6 @@
         "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/da/da699afb-2c9f-44cb-ab30-a029b54ec523?rule=kijijica-1600-webp"
       ],
       "categoryKey": "services"
-    },
-    {
-      "id": "kijiji-1744605008",
-      "slug": "looking-for-class-1-driver-for-sysco-deliveries-1744605008",
-      "url": "https://6ixo.com/listing/looking-for-class-1-driver-for-sysco-deliveries-1744605008/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/a9/a9313354-c397-4408-bc0f-330e36a416b1?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "jobs"
     },
     {
       "id": "kijiji-1744254372",
@@ -59219,6 +59198,16 @@
       "id": "kijiji-1745059765",
       "slug": "taxi-company-for-sale-1745059765",
       "url": "https://6ixo.com/listing/taxi-company-for-sale-1745059765/"
+    },
+    {
+      "id": "craigslist-plRKYcLQ8RGLfIn6heQhjQ",
+      "slug": "2007-toyota-rav4-awd-all-wheel-drive-rav-4-limited-4dr-suv-fin6heqhjq",
+      "url": "https://6ixo.com/listing/2007-toyota-rav4-awd-all-wheel-drive-rav-4-limited-4dr-suv-fin6heqhjq/"
+    },
+    {
+      "id": "kijiji-1744605008",
+      "slug": "looking-for-class-1-driver-for-sysco-deliveries-1744605008",
+      "url": "https://6ixo.com/listing/looking-for-class-1-driver-for-sysco-deliveries-1744605008/"
     }
   ]
 }

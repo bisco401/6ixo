@@ -1,11 +1,12 @@
 import { escapeHtml as esc } from './seo.mjs';
 
 export const categoryRoutes = [
-  ['listings', 'Current listings'], ['cars-for-sale', 'Cars for sale'], ['car-rentals', 'Car rentals'],
+  ['cars-for-sale', 'Cars for sale'], ['apartments-for-rent', 'Apartments for rent'],
+  ['phones-for-sale', 'Phones for sale'], ['services', 'Local services'], ['jobs', 'Jobs'], ['events', 'Events'],
+  ['listings', 'Current listings'], ['car-rentals', 'Car rentals'],
   ['auto-parts', 'Auto parts'], ['short-term-rentals', 'Short-term rentals'], ['real-estate', 'Real estate'],
-  ['apartments-for-rent', 'Apartments for rent'], ['electronics', 'Electronics'], ['phones-for-sale', 'Phones for sale'],
-  ['fashion', 'Fashion'], ['buy-and-sell', 'Buy and sell'], ['services', 'Local services'],
-  ['jobs', 'Jobs'], ['community', 'Community'], ['events', 'Events'], ['rewards', 'Rewards']
+  ['electronics', 'Electronics'], ['fashion', 'Fashion'], ['buy-and-sell', 'Buy and sell'],
+  ['community', 'Community'], ['rewards', 'Rewards']
 ];
 const introductions = {
   listings: 'Browse marketplace listings with photos, prices and seller locations.',

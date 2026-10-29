@@ -5,7 +5,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { generate, schemaEntity } from './generate-listing-seo-pages.mjs';
 import { generateSitemap } from './generate-sitemap.mjs';
-import { ORIGIN, parseCsv, crawlAllowed, httpUrl, jsonLd } from './lib/seo.mjs';
+import { ORIGIN, parseCsv, crawlAllowed, httpUrl, jsonLd, meta, pageFile } from './lib/seo.mjs';
 import { searchTopics, searchGroups, countryGroups } from './lib/marketplace-search.mjs';
 
 test('specific searches distinguish rental apartments and mobile phones from other ads', () => {
@@ -86,6 +86,27 @@ test('topic pages are crawlable and retired location pages stop allowing indexin
   const pageTwo = await fs.readFile(path.join(root, 'phones-for-sale/united-arab-emirates/dubai/page/2/index.html'), 'utf8');
   const pageThree = await fs.readFile(path.join(root, 'phones-for-sale/united-arab-emirates/dubai/page/3/index.html'), 'utf8');
   assert.notEqual(pageTwo.match(/<title>(.*?)<\/title>/)[1], pageThree.match(/<title>(.*?)<\/title>/)[1]);
+  // Cover marketplace, category, country and city pagination, including URLs
+  // already advertised in the old sitemap before this policy was introduced.
+  await fs.writeFile(path.join(root, 'robots.txt'), 'User-agent: *\nAllow: /');
+  await fs.writeFile(path.join(root, 'sitemap.xml'), `<urlset><url><loc>${ORIGIN}/phones-for-sale/united-arab-emirates/dubai/page/2/</loc><lastmod>2026-10-01</lastmod></url></urlset>`);
+  for (const index of first.indexes) {
+    const pathname = new URL(index.url).pathname;
+    const page = await fs.readFile(path.join(root, pageFile(pathname)), 'utf8');
+    const robots = meta(page, 'name', 'robots').split(/[\s,]+/);
+    assert.ok(robots.includes('follow'), index.url);
+    assert.equal(robots.includes('noindex'), /\/page\/\d+\/$/.test(pathname), index.url);
+    assert.equal(meta(page, 'rel', 'canonical', 'href', 'link'), index.url);
+  }
+  await generateSitemap(root);
+  const sitemap = await fs.readFile(path.join(root, 'sitemap.xml'), 'utf8');
+  const sitemapUrls = new Set([...sitemap.matchAll(/<loc>(.*?)<\/loc>/g)].map(match => match[1]));
+  assert.ok(![...sitemapUrls].some(url => /\/page\/\d+\/$/.test(url)));
+  for (const listing of first.listings) assert.ok(sitemapUrls.has(listing.url), listing.url);
+  for (const index of first.indexes.filter(index => !/\/page\/\d+\/$/.test(index.url))) assert.ok(sitemapUrls.has(index.url), index.url);
+  assert.match(pageTwo, /class="listing-index-card"/);
+  assert.match(pageTwo, /href="\/phones-for-sale\/united-arab-emirates\/dubai\/"/);
+  assert.match(pageTwo, /href="\/phones-for-sale\/united-arab-emirates\/dubai\/page\/3\/"/);
   rows.slice(0, 80).forEach(r => { r.status = 'rejected'; });
   await writeFeed();
   const second = await generate(root);
@@ -150,6 +171,8 @@ test('inventory builds paginate, deduplicate, preserve URLs, retire sold pages, 
   assert.ok(listingHtml.includes('class="button" href="/listings/electronics/">Browse on 6ixo'));
   const firstState = await generateSitemap(root, new Date('2026-10-08T16:00:00Z'));
   const sitemapBefore = await fs.readFile(path.join(root, 'sitemap.xml'), 'utf8');
+  assert.ok(!sitemapBefore.includes('/page/2/'));
+  for (const listing of first.listings) assert.ok(sitemapBefore.includes(`<loc>${listing.url}</loc>`));
   const statBefore = await fs.stat(listingFile);
   await generate(root);
   await generateSitemap(root, new Date('2026-10-09T16:00:00Z'));

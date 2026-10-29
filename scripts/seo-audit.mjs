@@ -27,6 +27,14 @@ const pageFile = (pathname) => pathname === '/' ? 'index.html' : path.join(pathn
 const sitemapXml = await fs.readFile(path.join(ROOT, 'sitemap.xml'), 'utf8');
 const robotsTxt = await fs.readFile(path.join(ROOT, 'robots.txt'), 'utf8');
 const urls = [...sitemapXml.matchAll(/<loc>([^<]+)<\/loc>/g)].map((match) => decode(match[1].trim()));
+const urlSet = new Set(urls);
+let manifest = { listings: [], indexes: [], retired: [] };
+try {
+  manifest = JSON.parse(await fs.readFile(path.join(ROOT, 'data/generated-listing-pages.json'), 'utf8'));
+} catch (error) { errors.push(`Invalid listing manifest: ${error.message}`); }
+// Follow pagination even though it is excluded from search results. Listings
+// beyond page one must still be reachable and remain in the XML sitemap.
+const crawlUrls = [...new Set([...urls, ...(manifest.indexes || []).map(index => index.url)])];
 
 try {
   const indexNowConfig = JSON.parse(await fs.readFile(path.join(ROOT, 'indexnow.config.json'), 'utf8'));
@@ -59,7 +67,7 @@ const linksByPage = new Map();
 const structuredTypesByPage = new Map();
 const inbound = new Map();
 
-for (const url of urls) {
+for (const url of crawlUrls) {
   let parsed;
   try {
     parsed = new URL(url);
@@ -83,6 +91,7 @@ for (const url of urls) {
   }
 
   const label = parsed.pathname;
+  const paginated = /\/page\/\d+\/$/.test(parsed.pathname);
   const title = decode(html.match(/<title>([^<]*)<\/title>/i)?.[1]?.trim() ?? '');
   const description = decode(attr(html, 'meta', 'name', 'description'));
   const robots = decode(attr(html, 'meta', 'name', 'robots')).toLowerCase();
@@ -107,11 +116,17 @@ for (const url of urls) {
   if (!description) errors.push(`${label}: missing meta description`);
   if (description.length < 70 || description.length > 165) warnings.push(`${label}: meta description is ${description.length} characters`);
   const directives = robots.split(/[\s,]+/);
-  if (!directives.includes('index') || !directives.includes('follow') || directives.includes('noindex') || directives.includes('none')) errors.push(`${label}: sitemap page must allow indexing and following`);
+  if (paginated) {
+    if (urlSet.has(url)) errors.push(`${label}: numbered browsing page must not be in the sitemap`);
+    if (!directives.includes('noindex') || !directives.includes('follow') || directives.includes('index') || directives.includes('nofollow') || directives.includes('none')) errors.push(`${label}: numbered browsing page must use noindex, follow`);
+  } else {
+    if (!urlSet.has(url)) errors.push(`${label}: active landing page is missing from the sitemap`);
+    if (!directives.includes('index') || !directives.includes('follow') || directives.includes('noindex') || directives.includes('none')) errors.push(`${label}: sitemap page must allow indexing and following`);
+  }
   if (count(html, /<link\b(?=[^>]*\brel=["']canonical["'])[^>]*>/gi) !== 1) errors.push(`${label}: expected exactly one canonical link`);
   if (count(html, /<meta\b(?=[^>]*\bname=["']description["'])[^>]*>/gi) !== 1) errors.push(`${label}: expected exactly one meta description`);
   if (!/<meta\b[^>]*\bname=["']viewport["']/i.test(html)) errors.push(`${label}: missing mobile viewport`);
-  if (!robots.includes('max-image-preview:large')) errors.push(`${label}: robots meta must allow large image previews`);
+  if (!paginated && !robots.includes('max-image-preview:large')) errors.push(`${label}: robots meta must allow large image previews`);
   if (canonical !== url) errors.push(`${label}: canonical is ${canonical || 'missing'}, expected ${url}`);
   if (h1Count !== 1) errors.push(`${label}: expected exactly one h1, found ${h1Count}`);
 
@@ -167,7 +182,7 @@ for (const url of urls) {
   }
 }
 
-for (const url of urls) {
+for (const url of crawlUrls) {
   const pathname = new URL(url).pathname;
   const types = structuredTypesByPage.get(url) || new Set();
   if (pathname === '/') {
@@ -183,10 +198,10 @@ for (const url of urls) {
   }
 }
 
-for (const url of urls) {
+for (const url of crawlUrls) {
   const pathname = new URL(url).pathname;
   if (!crawlAllowed(url, robotsTxt)) {
-    errors.push(`${pathname}: sitemap URL is blocked by robots.txt`);
+    errors.push(`${pathname}: public page is blocked by robots.txt`);
   }
 }
 
@@ -198,7 +213,7 @@ for (let index = 0; index < queue.length; index++) {
   reachable.add(url);
   for (const link of linksByPage.get(url) || []) if (!reachable.has(link) && linksByPage.has(link)) queue.push(link);
 }
-for (const url of urls) if (!reachable.has(url)) errors.push(`${new URL(url).pathname}: not reachable through crawlable links from home`);
+for (const url of crawlUrls) if (!reachable.has(url)) errors.push(`${new URL(url).pathname}: not reachable through crawlable links from home`);
 
 const checkedTargets = new Set();
 for (const [source, links] of linksByPage) for (const link of links) {
@@ -210,8 +225,6 @@ for (const [source, links] of linksByPage) for (const link of links) {
 }
 
 try {
-  const manifest = JSON.parse(await fs.readFile(path.join(ROOT, 'data/generated-listing-pages.json'), 'utf8'));
-  const urlSet = new Set(urls);
   if (manifest.count !== manifest.listings.length) errors.push('Listing manifest count does not match its entries');
   if (new Set(manifest.listings.map(l => l.id)).size !== manifest.count) errors.push('Listing manifest contains duplicate identities');
   for (const listing of manifest.listings) {
@@ -245,4 +258,4 @@ if (errors.length) {
   process.exit(1);
 }
 
-console.log(`SEO audit passed for ${urls.length} indexable pages with ${warnings.length} warning(s).`);
+console.log(`SEO audit passed for ${urls.length} indexable pages and ${crawlUrls.length - urls.length} crawlable pagination pages with ${warnings.length} warning(s).`);

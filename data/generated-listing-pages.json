@@ -1,5 +1,5 @@
 {
-  "count": 4223,
+  "count": 4205,
   "listings": [
     {
       "id": "apify-b9b18084f762",
@@ -5415,15 +5415,6 @@
       "categoryKey": "community"
     },
     {
-      "id": "kijiji-1745440421",
-      "slug": "no-tax-cansdian-made-sofa-set-sofa-couch-sectional-1745440421",
-      "url": "https://6ixo.com/listing/no-tax-cansdian-made-sofa-set-sofa-couch-sectional-1745440421/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/21/211db95a-92bb-4b76-abb3-617826006764?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "buy-and-sell"
-    },
-    {
       "id": "kijiji-1745440219",
       "slug": "pearson-and-buffalo-airport-runs-1745440219",
       "url": "https://6ixo.com/listing/pearson-and-buffalo-airport-runs-1745440219/",
@@ -5434,25 +5425,6 @@
         "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/56/56517f64-8763-47d9-a679-03181be07ed4?rule=kijijica-1600-webp"
       ],
       "categoryKey": "community"
-    },
-    {
-      "id": "kijiji-1745440196",
-      "slug": "no-tax-twin-double-queen-king-canadian-mattress-ma-1745440196",
-      "url": "https://6ixo.com/listing/no-tax-twin-double-queen-king-canadian-mattress-ma-1745440196/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/90/906fb8fc-baf3-41c4-88ea-5f19a465519d?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/d9/d93b15fd-7699-4249-a0a4-f308058eb421?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "buy-and-sell"
-    },
-    {
-      "id": "kijiji-1745439754",
-      "slug": "water-heater-tankless-water-heater-water-heater-installed-1745439754",
-      "url": "https://6ixo.com/listing/water-heater-tankless-water-heater-water-heater-installed-1745439754/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/7b/7b2c8e2d-e4b1-42fc-98de-3075afc4e81f?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "buy-and-sell"
     },
     {
       "id": "kijiji-1745439720",
@@ -5503,26 +5475,6 @@
         "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/07/07cefccb-29be-4b9c-9245-099ac2c8fb2d?rule=kijijica-1600-webp"
       ],
       "categoryKey": "auto-parts"
-    },
-    {
-      "id": "kijiji-1745438626",
-      "slug": "tankless-water-heater-tankless-water-heater-tankless-1745438626",
-      "url": "https://6ixo.com/listing/tankless-water-heater-tankless-water-heater-tankless-1745438626/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/3f/3f7e9460-9a5e-459f-8488-8cf28a305b2e?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "buy-and-sell"
-    },
-    {
-      "id": "kijiji-1745438513",
-      "slug": "now-hiring-general-labour-etobicoke-area-apply-today-1745438513",
-      "url": "https://6ixo.com/listing/now-hiring-general-labour-etobicoke-area-apply-today-1745438513/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/67/67ab5d4d-40fc-4c20-8de2-e46ccdf2d94d?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/50/502e5153-4da9-4f7d-9677-fb5424c30ea2?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/71/7152422f-eff5-4ee7-bb25-f0ee34ca9861?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "jobs"
     },
     {
       "id": "kijiji-1745438092",
@@ -5678,24 +5630,6 @@
         "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/15/15e01851-3def-4dc5-abd4-0fceb4264799?rule=kijijica-1600-webp"
       ],
       "categoryKey": "buy-and-sell"
-    },
-    {
-      "id": "kijiji-1745435444",
-      "slug": "logo-design-toronto-graphic-design-illustration-1745435444",
-      "url": "https://6ixo.com/listing/logo-design-toronto-graphic-design-illustration-1745435444/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/c2/c201a90d-3620-478a-9e82-5bd63e00a44e?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/28/28e6d86a-39f5-4d68-b194-ce3937c1522c?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/1d/1dc0421f-1204-4184-90d6-a5ffcd8cbb7d?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/97/97ff38fb-19c1-4118-aa21-36974c3af32b?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/18/184468a8-fdda-435b-93c9-9390113dc5a7?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/02/02737b83-4d2c-413a-bf27-8bd06131580b?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/45/45eeb4bf-1eb2-4d70-89fc-a52092ac573d?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/f1/f19f9178-bddc-43ef-af73-6a9dc964260a?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/37/371085c4-af5e-4a0f-bee8-9c129d608530?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/4b/4b8fc63f-1780-412b-90b8-37398dbd7a7d?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "community"
     },
     {
       "id": "kijiji-1745434536",
@@ -8792,30 +8726,6 @@
       "categoryKey": "vehicles"
     },
     {
-      "id": "craigslist-rMKQdxe2Hds7ugdyWLpF8F",
-      "slug": "2014-subaru-xv-crosstrek-premium-awd-automatic-cold-a-c-cl-ugdywlpf8f",
-      "url": "https://6ixo.com/listing/2014-subaru-xv-crosstrek-premium-awd-automatic-cold-a-c-cl-ugdywlpf8f/",
-      "images": [
-        "https://images.craigslist.org/00909_19MFw9i1Ehk_0CI0t9_600x450.jpg",
-        "https://images.craigslist.org/00u0u_h8CJILh1Irp_0CI0t9_600x450.jpg",
-        "https://images.craigslist.org/00V0V_hYTiSZYSg7K_0CI0t9_600x450.jpg",
-        "https://images.craigslist.org/00y0y_7u9lQyW2dTG_0CI0t9_600x450.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "craigslist-cmfVBQJVzLDRAPYfeL8QRg",
-      "slug": "2015-chevrolet-equinox-lt-awd-suv-gas-saver-backup-camera--apyfel8qrg",
-      "url": "https://6ixo.com/listing/2015-chevrolet-equinox-lt-awd-suv-gas-saver-backup-camera--apyfel8qrg/",
-      "images": [
-        "https://images.craigslist.org/00G0G_6BywpoUa530_0CI0lM_600x450.jpg",
-        "https://images.craigslist.org/00V0V_hTshZRYSKGV_0CI0lM_600x450.jpg",
-        "https://images.craigslist.org/00N0N_bMe8AvscWbc_0CI0lM_600x450.jpg",
-        "https://images.craigslist.org/00202_7rJaGN1kYv8_0CI0lM_600x450.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
       "id": "craigslist-hVfHGupLTt37rR7rtkDetT",
       "slug": "2010-ford-f-150-harley-davidson-complete-interior-like-new-rr7rtkdett",
       "url": "https://6ixo.com/listing/2010-ford-f-150-harley-davidson-complete-interior-like-new-rr7rtkdett/",
@@ -9315,18 +9225,6 @@
         "https://images.craigslist.org/00L0L_20j8tXCYCsI_0CI0t2_600x450.jpg",
         "https://images.craigslist.org/00u0u_gtb5Z49lowS_0CI0t2_600x450.jpg",
         "https://images.craigslist.org/00Y0Y_fwMHdSkb4Bv_0CI0t2_600x450.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "craigslist-nA3BF2xGatCF6fjuN47r5y",
-      "slug": "2017-dodge-journey-sxt-6fjun47r5y",
-      "url": "https://6ixo.com/listing/2017-dodge-journey-sxt-6fjun47r5y/",
-      "images": [
-        "https://images.craigslist.org/00Y0Y_gXg2XraRF5T_0t20CI_600x450.jpg",
-        "https://images.craigslist.org/00S0S_1VpfwF0Ad0U_0t20CI_600x450.jpg",
-        "https://images.craigslist.org/01010_1CgkTYLVQKJ_0t20CI_600x450.jpg",
-        "https://images.craigslist.org/00101_9Qj3D5ANrz7_0t20CI_600x450.jpg"
       ],
       "categoryKey": "vehicles"
     },
@@ -10719,18 +10617,6 @@
       "categoryKey": "vehicles"
     },
     {
-      "id": "craigslist-ag6PnKrBVCPZyqSmoWfdQb",
-      "slug": "2016-jeep-renegade-sport-yqsmowfdqb",
-      "url": "https://6ixo.com/listing/2016-jeep-renegade-sport-yqsmowfdqb/",
-      "images": [
-        "https://images.craigslist.org/01313_mnkEsOdeqf_0t20CI_600x450.jpg",
-        "https://images.craigslist.org/00L0L_11sgyOLJ4B1_0t20CI_600x450.jpg",
-        "https://images.craigslist.org/00J0J_9ZtrXFquafY_0t20CI_600x450.jpg",
-        "https://images.craigslist.org/00i0i_ff3BBLvd74A_0t20CI_600x450.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
       "id": "craigslist-cws2VNPHqR6xR3tBpyAafN",
       "slug": "2024-chevy-siverado-2500-high-country-1-owner-r3tbpyaafn",
       "url": "https://6ixo.com/listing/2024-chevy-siverado-2500-high-country-1-owner-r3tbpyaafn/",
@@ -11774,18 +11660,6 @@
         "https://images.craigslist.org/00z0z_1OxJwVz9vlb_0CI0t2_600x450.jpg",
         "https://images.craigslist.org/00D0D_lt2ZaVwkqc8_0CI0t2_600x450.jpg",
         "https://images.craigslist.org/00T0T_19PLdkgWovJ_0CI0t2_600x450.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "craigslist-3NMVVBnYMvofiWJmEK6EZZ",
-      "slug": "2007-toyota-tundra-limited-5-7l-v8-4wd-crew-max-5-7-8cyl-iwjmek6ezz",
-      "url": "https://6ixo.com/listing/2007-toyota-tundra-limited-5-7l-v8-4wd-crew-max-5-7-8cyl-iwjmek6ezz/",
-      "images": [
-        "https://images.craigslist.org/00w0w_55B6jclRuZs_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/00I0I_3FzjYZzfUXx_0t20CI_600x450.jpg",
-        "https://images.craigslist.org/00C0C_eGC0csYMBjA_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/01616_7z4eJU5cRLs_0CI0t2_600x450.jpg"
       ],
       "categoryKey": "vehicles"
     },
@@ -14651,17 +14525,6 @@
       "categoryKey": "real-estate"
     },
     {
-      "id": "kijiji-1745177932",
-      "slug": "new-saint-laurent-opyum-patent-leather-heeled-sandals-size-1745177932",
-      "url": "https://6ixo.com/listing/new-saint-laurent-opyum-patent-leather-heeled-sandals-size-1745177932/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/85/853d8271-85fd-4dc8-9a19-dd519ff1d3ff?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/ce/ce0be996-5138-4958-9c9d-683bf6fc2d26?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/e7/e7905f78-286c-43d5-bafc-689db16a5ebf?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "fashion"
-    },
-    {
       "id": "kijiji-1745177719",
       "slug": "19-audi-q5-oem-wheels-5x112-1745177719",
       "url": "https://6ixo.com/listing/19-audi-q5-oem-wheels-5x112-1745177719/",
@@ -14924,17 +14787,6 @@
         "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/dc/dc7ec1f9-be01-4e1e-81b5-6c5110695f94?rule=kijijica-1600-webp"
       ],
       "categoryKey": "real-estate"
-    },
-    {
-      "id": "kijiji-1745176641",
-      "slug": "416-655-2220-avis-heating-service-59-and-24-hour-avis-hvac-1745176641",
-      "url": "https://6ixo.com/listing/416-655-2220-avis-heating-service-59-and-24-hour-avis-hvac-1745176641/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/e9/e90d6e8d-6cd7-494a-8d11-417facb9bd8e?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/6f/6fd91661-46d9-4d3d-90b3-8f8ae6fb7a55?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/7c/7c2c21e8-aa8c-4dc5-9e16-f2f4c7790033?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "buy-and-sell"
     },
     {
       "id": "kijiji-1745176636",
@@ -26877,26 +26729,6 @@
       "categoryKey": "electronics"
     },
     {
-      "id": "kijiji-1743301844",
-      "slug": "2024-honda-hr-v-ex-l-navigation-1-owner-no-accidents-1743301844",
-      "url": "https://6ixo.com/listing/2024-honda-hr-v-ex-l-navigation-1-owner-no-accidents-1743301844/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/a6/a661d565-9996-404c-a72c-04079f188ec2?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/21/215dc8c0-7a8b-40b2-a7eb-be8756582f07?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/e2/e2d23e53-3446-46d3-89e5-0c8d81945537?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/94/9421260c-f55a-4e8e-9dcd-720350d84eed?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/f5/f557c1e6-feae-4adb-a3fa-af19e2df03b1?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/42/420d5607-0590-44d4-b5e1-c50347e84aae?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/3d/3d16574c-10c0-40a1-bbcd-f9109ca430b7?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/ac/ac4265ca-6013-4e28-83a7-4abbdf62417e?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/04/04ec4df7-38e7-4e91-bad1-fdd0fafd366b?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/ca/ca77c305-ffa9-4f8e-90ab-abf9e5629333?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/9f/9f5657bb-7ca0-45bf-9545-01028eefd1ff?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/d6/d6ecc96c-a453-4c94-b220-42fbf6f252f5?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
       "id": "kijiji-1744907001",
       "slug": "beautiful-new-house-for-rent-4-bed-2-bath-in-kleefeld-mb-1744907001",
       "url": "https://6ixo.com/listing/beautiful-new-house-for-rent-4-bed-2-bath-in-kleefeld-mb-1744907001/",
@@ -27613,26 +27445,6 @@
         "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/b2/b2e2df33-2ba6-4e3a-9ec2-9233c28de1fb?rule=kijijica-1600-webp"
       ],
       "categoryKey": "real-estate"
-    },
-    {
-      "id": "kijiji-1744847094",
-      "slug": "2023-ford-bronco-sport-big-bend-1744847094",
-      "url": "https://6ixo.com/listing/2023-ford-bronco-sport-big-bend-1744847094/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/86/862f7e3c-d3ee-4b2a-92e1-ec9b4645a186?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/c0/c01d41d2-3bc7-4f65-af86-166bdd138e1e?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/47/4747cd8b-98bc-45c5-97d5-58753313a6bf?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/91/9132a09a-dee1-4517-a13a-92ea812b25de?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/d4/d4cf8517-8bf7-4e30-8a4c-a11a1a9707ba?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/2b/2b128499-429d-45f8-98f8-587d6caab4f6?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/f9/f9c6e122-337c-463b-94e1-f5784f23e272?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/d8/d8d41623-deea-4b24-a825-256dbc7033b8?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/0f/0f1ae0f1-13bd-4ef1-a6d3-230ea2eb4c89?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/62/62018604-abf8-402c-9a5e-7c5e02f2ef8b?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/f9/f9674c28-78f5-491c-ab0d-1b298a14bb4f?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/23/239c99e2-f8dc-41fb-ab5d-defc0426c485?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "vehicles"
     },
     {
       "id": "apify-afb9d7c0bf4f",
@@ -32958,15 +32770,6 @@
         "https://oxglow.com.gh/uploads/medium/2019-model-honda-accord-0e4DyU-1791628269-2-medium.jpg"
       ],
       "categoryKey": "vehicles"
-    },
-    {
-      "id": "kijiji-1744620196",
-      "slug": "flooring-work-15-hr-no-cash-job-1744620196",
-      "url": "https://6ixo.com/listing/flooring-work-15-hr-no-cash-job-1744620196/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/35/35582cf9-90b9-44cb-ae32-e223ac577410?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "jobs"
     },
     {
       "id": "kijiji-1744619461",
@@ -38445,18 +38248,6 @@
         "https://images.craigslist.org/00c0c_8LMfaz4FIaK_0CI0t2_600x450.jpg",
         "https://images.craigslist.org/00p0p_6cc2tWWwdwi_0CI0t2_600x450.jpg",
         "https://images.craigslist.org/00D0D_4dAq0p7XQqw_0CI0t2_600x450.jpg"
-      ],
-      "categoryKey": "real-estate"
-    },
-    {
-      "id": "craigslist-hDaQMT7BGC26qK8Eadfw92",
-      "slug": "astoria-one-furnished-room-for-rent-by-owner-qk8eadfw92",
-      "url": "https://6ixo.com/listing/astoria-one-furnished-room-for-rent-by-owner-qk8eadfw92/",
-      "images": [
-        "https://images.craigslist.org/00d0d_iUeI4TrLfV4_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/00505_B56PHrg51_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/00w0w_kjnC4bAizyg_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/00N0N_44UfgFjb3eW_0CI0t2_600x450.jpg"
       ],
       "categoryKey": "real-estate"
     },
@@ -44240,15 +44031,6 @@
       "url": "https://6ixo.com/listing/hotwav-x100-gt-8gb-ram-256gb-storage-3615226016/",
       "images": [
         "https://samtronixguyana.com/cdn/shop/files/Untitleddesign_75_1024x.png?v=1789038386"
-      ],
-      "categoryKey": "electronics"
-    },
-    {
-      "id": "samtronix-gy-15863643799712",
-      "slug": "cubot-kingkong-x-16gb-256gb-storage-3643799712",
-      "url": "https://6ixo.com/listing/cubot-kingkong-x-16gb-256gb-storage-3643799712/",
-      "images": [
-        "https://samtronixguyana.com/cdn/shop/files/Untitleddesign_83_1024x.png?v=1789040432"
       ],
       "categoryKey": "electronics"
     },
@@ -52028,9 +51810,6 @@
       "url": "https://6ixo.com/listings/page/117/"
     },
     {
-      "url": "https://6ixo.com/listings/page/118/"
-    },
-    {
       "url": "https://6ixo.com/listings/electronics/"
     },
     {
@@ -52352,9 +52131,6 @@
       "url": "https://6ixo.com/listings/jobs/page/4/"
     },
     {
-      "url": "https://6ixo.com/listings/jobs/page/5/"
-    },
-    {
       "url": "https://6ixo.com/listings/fashion/"
     },
     {
@@ -52470,9 +52246,6 @@
     },
     {
       "url": "https://6ixo.com/listings/country/canada/jobs/page/4/"
-    },
-    {
-      "url": "https://6ixo.com/listings/country/canada/jobs/page/5/"
     },
     {
       "url": "https://6ixo.com/listings/country/canada/fashion/"
@@ -52632,9 +52405,6 @@
     },
     {
       "url": "https://6ixo.com/listings/country/canada/page/40/"
-    },
-    {
-      "url": "https://6ixo.com/listings/country/canada/page/41/"
     },
     {
       "url": "https://6ixo.com/listings/country/china/electronics/"
@@ -61872,6 +61642,96 @@
       "id": "samtronix-gy-15882866229408",
       "slug": "apple-iphone-18-pro-max-e-sim-512gb-storage-2866229408",
       "url": "https://6ixo.com/listing/apple-iphone-18-pro-max-e-sim-512gb-storage-2866229408/"
+    },
+    {
+      "id": "kijiji-1745440421",
+      "slug": "no-tax-cansdian-made-sofa-set-sofa-couch-sectional-1745440421",
+      "url": "https://6ixo.com/listing/no-tax-cansdian-made-sofa-set-sofa-couch-sectional-1745440421/"
+    },
+    {
+      "id": "kijiji-1745440196",
+      "slug": "no-tax-twin-double-queen-king-canadian-mattress-ma-1745440196",
+      "url": "https://6ixo.com/listing/no-tax-twin-double-queen-king-canadian-mattress-ma-1745440196/"
+    },
+    {
+      "id": "kijiji-1745439754",
+      "slug": "water-heater-tankless-water-heater-water-heater-installed-1745439754",
+      "url": "https://6ixo.com/listing/water-heater-tankless-water-heater-water-heater-installed-1745439754/"
+    },
+    {
+      "id": "kijiji-1745438626",
+      "slug": "tankless-water-heater-tankless-water-heater-tankless-1745438626",
+      "url": "https://6ixo.com/listing/tankless-water-heater-tankless-water-heater-tankless-1745438626/"
+    },
+    {
+      "id": "kijiji-1745438513",
+      "slug": "now-hiring-general-labour-etobicoke-area-apply-today-1745438513",
+      "url": "https://6ixo.com/listing/now-hiring-general-labour-etobicoke-area-apply-today-1745438513/"
+    },
+    {
+      "id": "kijiji-1745435444",
+      "slug": "logo-design-toronto-graphic-design-illustration-1745435444",
+      "url": "https://6ixo.com/listing/logo-design-toronto-graphic-design-illustration-1745435444/"
+    },
+    {
+      "id": "craigslist-rMKQdxe2Hds7ugdyWLpF8F",
+      "slug": "2014-subaru-xv-crosstrek-premium-awd-automatic-cold-a-c-cl-ugdywlpf8f",
+      "url": "https://6ixo.com/listing/2014-subaru-xv-crosstrek-premium-awd-automatic-cold-a-c-cl-ugdywlpf8f/"
+    },
+    {
+      "id": "craigslist-cmfVBQJVzLDRAPYfeL8QRg",
+      "slug": "2015-chevrolet-equinox-lt-awd-suv-gas-saver-backup-camera--apyfel8qrg",
+      "url": "https://6ixo.com/listing/2015-chevrolet-equinox-lt-awd-suv-gas-saver-backup-camera--apyfel8qrg/"
+    },
+    {
+      "id": "craigslist-nA3BF2xGatCF6fjuN47r5y",
+      "slug": "2017-dodge-journey-sxt-6fjun47r5y",
+      "url": "https://6ixo.com/listing/2017-dodge-journey-sxt-6fjun47r5y/"
+    },
+    {
+      "id": "craigslist-ag6PnKrBVCPZyqSmoWfdQb",
+      "slug": "2016-jeep-renegade-sport-yqsmowfdqb",
+      "url": "https://6ixo.com/listing/2016-jeep-renegade-sport-yqsmowfdqb/"
+    },
+    {
+      "id": "craigslist-3NMVVBnYMvofiWJmEK6EZZ",
+      "slug": "2007-toyota-tundra-limited-5-7l-v8-4wd-crew-max-5-7-8cyl-iwjmek6ezz",
+      "url": "https://6ixo.com/listing/2007-toyota-tundra-limited-5-7l-v8-4wd-crew-max-5-7-8cyl-iwjmek6ezz/"
+    },
+    {
+      "id": "kijiji-1745177932",
+      "slug": "new-saint-laurent-opyum-patent-leather-heeled-sandals-size-1745177932",
+      "url": "https://6ixo.com/listing/new-saint-laurent-opyum-patent-leather-heeled-sandals-size-1745177932/"
+    },
+    {
+      "id": "kijiji-1745176641",
+      "slug": "416-655-2220-avis-heating-service-59-and-24-hour-avis-hvac-1745176641",
+      "url": "https://6ixo.com/listing/416-655-2220-avis-heating-service-59-and-24-hour-avis-hvac-1745176641/"
+    },
+    {
+      "id": "kijiji-1743301844",
+      "slug": "2024-honda-hr-v-ex-l-navigation-1-owner-no-accidents-1743301844",
+      "url": "https://6ixo.com/listing/2024-honda-hr-v-ex-l-navigation-1-owner-no-accidents-1743301844/"
+    },
+    {
+      "id": "kijiji-1744847094",
+      "slug": "2023-ford-bronco-sport-big-bend-1744847094",
+      "url": "https://6ixo.com/listing/2023-ford-bronco-sport-big-bend-1744847094/"
+    },
+    {
+      "id": "kijiji-1744620196",
+      "slug": "flooring-work-15-hr-no-cash-job-1744620196",
+      "url": "https://6ixo.com/listing/flooring-work-15-hr-no-cash-job-1744620196/"
+    },
+    {
+      "id": "craigslist-hDaQMT7BGC26qK8Eadfw92",
+      "slug": "astoria-one-furnished-room-for-rent-by-owner-qk8eadfw92",
+      "url": "https://6ixo.com/listing/astoria-one-furnished-room-for-rent-by-owner-qk8eadfw92/"
+    },
+    {
+      "id": "samtronix-gy-15863643799712",
+      "slug": "cubot-kingkong-x-16gb-256gb-storage-3643799712",
+      "url": "https://6ixo.com/listing/cubot-kingkong-x-16gb-256gb-storage-3643799712/"
     }
   ]
 }

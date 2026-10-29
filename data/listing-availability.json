@@ -1,5 +1,5 @@
 {
-  "checkedAt": "2026-10-29T06:35:24Z",
+  "checkedAt": "2026-10-29T06:48:12.805Z",
   "listings": {
     "craigslist.org/view/d/bastrop-used-2025-cadillac-xt4-fwd-4d/fuqr_3uo8rgowpq1ctwx-a": {
       "availability": "sold",
@@ -14784,14 +14784,22 @@
       "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-buy-sell-other/city-of-toronto/wall-shelf-18-gauge-430-stainless-steel-12-x-60-saws1260/1745422771": {
-      "availability": "unavailable",
-      "checkedAt": "2026-10-29T03:59:50Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1745422771",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/wall-shelf-18-gauge-430-stainless-steel-12-x-60-saws1260/1745422771",
+      "availability": "gone",
+      "checkedAt": "2026-10-29T06:48:12.805Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1745422771",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-buy-sell-other/city-of-toronto/rosko-countertop-4-burner-commercial-gas-stovetop/1745422821": {
-      "availability": "unavailable",
-      "checkedAt": "2026-10-29T00:48:04Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1745422821",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/rosko-countertop-4-burner-commercial-gas-stovetop/1745422821",
+      "availability": "gone",
+      "checkedAt": "2026-10-29T06:48:12.805Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1745422821",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-buy-sell-other/city-of-toronto/eurodib-10-commercial-manual-meat-slicer/1745422760": {
       "availability": "unavailable",
@@ -14876,9 +14884,13 @@
       "resolvedUrl": "https://www.kijiji.ca/b-other-business-industrial/mississauga-peel-region/c145l1700276?radius=50.0&ll=43.7%2C-79.74&adRemoved=1745371677"
     },
     "kijiji.ca/v-buy-sell-other/city-of-toronto/sagetra-triple-commercial-sink-dents/1745437114": {
-      "availability": "unavailable",
-      "checkedAt": "2026-10-29T03:59:50Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1745437114",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/sagetra-triple-commercial-sink-dents/1745437114",
+      "availability": "gone",
+      "checkedAt": "2026-10-29T06:48:12.805Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1745437114",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-engines-and-engine-parts/city-of-toronto/honda-kia-hyundai-mazda-nissan-toyota-scion-engine-replacement/1745376861": {
       "availability": "unavailable",

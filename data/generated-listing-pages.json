@@ -1,5 +1,5 @@
 {
-  "count": 4236,
+  "count": 4223,
   "listings": [
     {
       "id": "apify-b9b18084f762",
@@ -5794,15 +5794,6 @@
       "categoryKey": "electronics"
     },
     {
-      "id": "kijiji-1745424801",
-      "slug": "help-needed-stoney-creek-on-1745424801",
-      "url": "https://6ixo.com/listing/help-needed-stoney-creek-on-1745424801/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/7b/7b322371-05ae-4942-b972-d73363465472?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "jobs"
-    },
-    {
       "id": "apify-5aa525a03fa0",
       "slug": "2015-nissan-juke-a525a03fa0",
       "url": "https://6ixo.com/listing/2015-nissan-juke-a525a03fa0/",
@@ -9419,17 +9410,6 @@
         "https://images.allsoppandallsopp.com/public/temp/a0OdK000003CUF7UAO_s_1-bedroom-apartment-in-the-edge-business-bay-aed-120k-allsopp-and-allsopp-whatsapp-image-2026-10-22-at-112255-1.jpeg"
       ],
       "categoryKey": "real-estate"
-    },
-    {
-      "id": "kijiji-1745354173",
-      "slug": "grand-cherokee-1745354173",
-      "url": "https://6ixo.com/listing/grand-cherokee-1745354173/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/21/2194ec5a-7d41-4802-9cde-b5890f5ee0c4?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/d0/d09e307e-bf63-4e16-8b33-091512f3f53d?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/b6/b648815f-8793-4b13-8b23-dd63bc8e1b79?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "vehicles"
     },
     {
       "id": "kijiji-1745354114",
@@ -18962,15 +18942,6 @@
         "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/ec/ec6a7b9f-5c83-40e7-bca9-a514b5575a3e?rule=kijijica-1600-webp"
       ],
       "categoryKey": "buy-and-sell"
-    },
-    {
-      "id": "kijiji-1745090092",
-      "slug": "brand-new-landline-phones-oct-20th-1745090092",
-      "url": "https://6ixo.com/listing/brand-new-landline-phones-oct-20th-1745090092/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/dc/dcf2783f-94ef-4581-81bd-29aec8db8a1a?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "electronics"
     },
     {
       "id": "kijiji-1745090017",
@@ -31306,18 +31277,6 @@
       "categoryKey": "auto-parts"
     },
     {
-      "id": "craigslist-886KPTkQvMUQcyxitHKR2H",
-      "slug": "2003-2005-dodge-ram-dually-steering-column-2500-3500-cyxithkr2h",
-      "url": "https://6ixo.com/listing/2003-2005-dodge-ram-dually-steering-column-2500-3500-cyxithkr2h/",
-      "images": [
-        "https://images.craigslist.org/00N0N_apd3C9w20jG_0t20CI_600x450.jpg",
-        "https://images.craigslist.org/01515_iDuSwvOiFRQ_0t20CI_600x450.jpg",
-        "https://images.craigslist.org/00W0W_7QvFSve8v2h_0t20CI_600x450.jpg",
-        "https://images.craigslist.org/00n0n_aZF4MuEPUBk_0CI0t2_600x450.jpg"
-      ],
-      "categoryKey": "auto-parts"
-    },
-    {
       "id": "craigslist-6H3sMbAXENzY5gYHNTZ1wZ",
       "slug": "bmw-roadster-z3-e36-rocker-panels-side-skirts-96-02-5gyhntz1wz",
       "url": "https://6ixo.com/listing/bmw-roadster-z3-e36-rocker-panels-side-skirts-96-02-5gyhntz1wz/",
@@ -40330,18 +40289,6 @@
       "categoryKey": "auto-parts"
     },
     {
-      "id": "craigslist-6gZX6EO78RGWNbdisn-2HQ",
-      "slug": "2017-chevrolet-silverado-1500-lt-2wd-crew-v8-1-owner-mint-wnbdisn2hq",
-      "url": "https://6ixo.com/listing/2017-chevrolet-silverado-1500-lt-2wd-crew-v8-1-owner-mint-wnbdisn2hq/",
-      "images": [
-        "https://images.craigslist.org/00707_7D0nerR3g8O_0g80c6_600x450.jpg",
-        "https://images.craigslist.org/00000_fjb9OdSD8GT_0g80c6_600x450.jpg",
-        "https://images.craigslist.org/00H0H_5GCy6REpwVN_0g80c6_600x450.jpg",
-        "https://images.craigslist.org/00r0r_hhsVVLmp22F_0g80c6_600x450.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
       "id": "craigslist-MjirKwm98RGhCtz9PGXS0g",
       "slug": "2000-plymouth-prowler-ctz9pgxs0g",
       "url": "https://6ixo.com/listing/2000-plymouth-prowler-ctz9pgxs0g/",
@@ -40480,30 +40427,6 @@
         "https://images.craigslist.org/00u0u_9ZBb3TxiePm_0ak07K_600x450.jpg",
         "https://images.craigslist.org/00V0V_dYhWdwrMt79_0ak07K_600x450.jpg",
         "https://images.craigslist.org/00o0o_e7t4TIiVrVY_0ak07K_600x450.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "craigslist-CA9wglG78RG0892KqrBkrQ",
-      "slug": "2020-infiniti-qx60-luxe-fwd-892kqrbkrq",
-      "url": "https://6ixo.com/listing/2020-infiniti-qx60-luxe-fwd-892kqrbkrq/",
-      "images": [
-        "https://images.craigslist.org/00V0V_jHpFJs29KTm_0ak07K_600x450.jpg",
-        "https://images.craigslist.org/00M0M_2I4q0Dw5SBy_0ak07K_600x450.jpg",
-        "https://images.craigslist.org/00n0n_c2U5TiqMDXF_0ak07K_600x450.jpg",
-        "https://images.craigslist.org/00C0C_2CwAmwBpwIj_0ak07K_600x450.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "craigslist-PjMkflG78RGjbNsYkOsWSw",
-      "slug": "2012-ford-taurus-4dr-sdn-limited-fwd-bnsykoswsw",
-      "url": "https://6ixo.com/listing/2012-ford-taurus-4dr-sdn-limited-fwd-bnsykoswsw/",
-      "images": [
-        "https://images.craigslist.org/01717_b6MqsefIGOT_0ak07K_600x450.jpg",
-        "https://images.craigslist.org/00p0p_kGbJlERcHGR_0ak07K_600x450.jpg",
-        "https://images.craigslist.org/00909_ezCRLouQAwx_0ak07K_600x450.jpg",
-        "https://images.craigslist.org/00P0P_3SReGRVGpNR_0ak07K_600x450.jpg"
       ],
       "categoryKey": "vehicles"
     },
@@ -41224,18 +41147,6 @@
       "categoryKey": "vehicles"
     },
     {
-      "id": "craigslist-t7nGRbpw75puveqU9C4yi8",
-      "slug": "1999-ford-ranger-vequ9c4yi8",
-      "url": "https://6ixo.com/listing/1999-ford-ranger-vequ9c4yi8/",
-      "images": [
-        "https://images.craigslist.org/00o0o_bRMO7dnyxEN_12w0Mo_600x450.jpg",
-        "https://images.craigslist.org/00h0h_2M6fB059aLI_12w0Mo_600x450.jpg",
-        "https://images.craigslist.org/00N0N_fyPODavMIcP_12w0Mo_600x450.jpg",
-        "https://images.craigslist.org/00w0w_27TkuLK5E6L_12w0Mo_600x450.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
       "id": "craigslist-2JsJfe1ZxiDWWcG2beFqiE",
       "slug": "2015-chevrolet-2500hd-reg-cab-gas-w-utility-bed-wcg2befqie",
       "url": "https://6ixo.com/listing/2015-chevrolet-2500hd-reg-cab-gas-w-utility-bed-wcg2befqie/",
@@ -41258,53 +41169,6 @@
         "https://images.craigslist.org/01414_1MYqj8D8Lz6_0CI0t2_600x450.jpg"
       ],
       "categoryKey": "auto-parts"
-    },
-    {
-      "id": "craigslist-wj4yqRLu4jxB7zsqh4GGaw",
-      "slug": "2016-lexus-350-is-7zsqh4ggaw",
-      "url": "https://6ixo.com/listing/2016-lexus-350-is-7zsqh4ggaw/",
-      "images": [
-        "https://images.craigslist.org/00Z0Z_cZIIKD0TtLN_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/00s0s_jfcZnsEZrG9_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/00R0R_3OibfklSNzc_0CI0t2_600x450.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "craigslist-wnXs3Tru1MzjWuS5QyZ5Ax",
-      "slug": "2019-ford-f-250-super-duty-wus5qyz5ax",
-      "url": "https://6ixo.com/listing/2019-ford-f-250-super-duty-wus5qyz5ax/",
-      "images": [
-        "https://images.craigslist.org/00J0J_86zctGIaGSv_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/00d0d_l6VaW7aLwWa_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/00707_fEXWVAosJc6_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/00p0p_dzQsEQu7r0B_0CI0t2_600x450.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "craigslist-rMLFih7HiSD21Syh3Zf2VE",
-      "slug": "2024-nissan-altima-1syh3zf2ve",
-      "url": "https://6ixo.com/listing/2024-nissan-altima-1syh3zf2ve/",
-      "images": [
-        "https://images.craigslist.org/00404_c37j22xharH_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/00h0h_gtIJrJkUnuY_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/00P0P_7vCbtY7WW0H_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/00J0J_7rbdIcwzHNq_0CI0t2_600x450.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "craigslist-pyA5pVxRkWjYzeToHGHNMp",
-      "slug": "we-finance-gas-saver-1-495-down-no-credit-check-zetohghnmp",
-      "url": "https://6ixo.com/listing/we-finance-gas-saver-1-495-down-no-credit-check-zetohghnmp/",
-      "images": [
-        "https://images.craigslist.org/00707_5OaW8NAADC6_0uY0ne_600x450.jpg",
-        "https://images.craigslist.org/00A0A_iAQErahuH2_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/00B0B_9VPCj7pVRGQ_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/00r0r_eWkvS7xzL0T_0CI0t2_600x450.jpg"
-      ],
-      "categoryKey": "vehicles"
     },
     {
       "id": "craigslist-hGfd19rCgcoSvPqgsvC3qb",
@@ -41359,18 +41223,6 @@
         "https://images.craigslist.org/01717_7NqcBdZHTxH_0jm0ew_600x450.jpg",
         "https://images.craigslist.org/00606_9gnHsX7QzxG_0jm0ew_600x450.jpg",
         "https://images.craigslist.org/00101_bhWjeXxTq2Z_0jm0ew_600x450.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "craigslist-ugwGAYJ8s6ZquLii3Zh5z3",
-      "slug": "2015-ford-f-250-lariat-ultimate-4x4-diesel-sunroof-norstar-ulii3zh5z3",
-      "url": "https://6ixo.com/listing/2015-ford-f-250-lariat-ultimate-4x4-diesel-sunroof-norstar-ulii3zh5z3/",
-      "images": [
-        "https://images.craigslist.org/00P0P_bvIg4iNF7oH_0CI0pA_600x450.jpg",
-        "https://images.craigslist.org/00X0X_bJ7isHmx1WO_0CI0pA_600x450.jpg",
-        "https://images.craigslist.org/00a0a_1PVIZzX3k0S_0CI0pA_600x450.jpg",
-        "https://images.craigslist.org/00303_3tF4wlh6jIx_0CI0pO_600x450.jpg"
       ],
       "categoryKey": "vehicles"
     },
@@ -43318,6 +43170,15 @@
       "categoryKey": "real-estate"
     },
     {
+      "id": "samtronix-gy-15883105599648",
+      "slug": "apple-watch-series-12-46mm-3105599648",
+      "url": "https://6ixo.com/listing/apple-watch-series-12-46mm-3105599648/",
+      "images": [
+        "https://samtronixguyana.com/cdn/shop/files/WATCHSERIES12_3_1024x.png?v=1789992545"
+      ],
+      "categoryKey": "electronics"
+    },
+    {
       "id": "kijiji-1717114278",
       "slug": "40-feet-hq-container-available-for-rent-1717114278",
       "url": "https://6ixo.com/listing/40-feet-hq-container-available-for-rent-1717114278/",
@@ -43329,15 +43190,6 @@
         "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/a4/a4834a1f-ee96-4052-8c19-3c83f0f1e131?rule=kijijica-1600-webp"
       ],
       "categoryKey": "buy-and-sell"
-    },
-    {
-      "id": "samtronix-gy-15882866229408",
-      "slug": "apple-iphone-18-pro-max-e-sim-512gb-storage-2866229408",
-      "url": "https://6ixo.com/listing/apple-iphone-18-pro-max-e-sim-512gb-storage-2866229408/",
-      "images": [
-        "https://samtronixguyana.com/cdn/shop/files/DISCPS5CallofDutyModernWarfare3New_2_f65749e7-27a2-4b32-a990-977a9d256066_1024x.png?v=1791200256"
-      ],
-      "categoryKey": "electronics"
     },
     {
       "id": "samtronix-gy-15868034580640",
@@ -53208,9 +53060,6 @@
       "url": "https://6ixo.com/listings/country/united-states/page/39/"
     },
     {
-      "url": "https://6ixo.com/listings/country/united-states/page/40/"
-    },
-    {
       "url": "https://6ixo.com/apartments-for-rent/"
     },
     {
@@ -56478,11 +56327,6 @@
       "id": "samtronix-gy-11940487954592",
       "slug": "samsung-galaxy-s22-ultra-5g-8gb-ram-128gb-storage-0487954592",
       "url": "https://6ixo.com/listing/samsung-galaxy-s22-ultra-5g-8gb-ram-128gb-storage-0487954592/"
-    },
-    {
-      "id": "samtronix-gy-15883105599648",
-      "slug": "apple-watch-series-12-46mm-3105599648",
-      "url": "https://6ixo.com/listing/apple-watch-series-12-46mm-3105599648/"
     },
     {
       "id": "samtronix-gy-15845205049504",
@@ -61958,6 +61802,76 @@
       "id": "samtronix-gy-15883370070176",
       "slug": "apple-iphone-duo-e-sim-512gb-storage-3370070176",
       "url": "https://6ixo.com/listing/apple-iphone-duo-e-sim-512gb-storage-3370070176/"
+    },
+    {
+      "id": "kijiji-1745424801",
+      "slug": "help-needed-stoney-creek-on-1745424801",
+      "url": "https://6ixo.com/listing/help-needed-stoney-creek-on-1745424801/"
+    },
+    {
+      "id": "kijiji-1745354173",
+      "slug": "grand-cherokee-1745354173",
+      "url": "https://6ixo.com/listing/grand-cherokee-1745354173/"
+    },
+    {
+      "id": "kijiji-1745090092",
+      "slug": "brand-new-landline-phones-oct-20th-1745090092",
+      "url": "https://6ixo.com/listing/brand-new-landline-phones-oct-20th-1745090092/"
+    },
+    {
+      "id": "craigslist-886KPTkQvMUQcyxitHKR2H",
+      "slug": "2003-2005-dodge-ram-dually-steering-column-2500-3500-cyxithkr2h",
+      "url": "https://6ixo.com/listing/2003-2005-dodge-ram-dually-steering-column-2500-3500-cyxithkr2h/"
+    },
+    {
+      "id": "craigslist-6gZX6EO78RGWNbdisn-2HQ",
+      "slug": "2017-chevrolet-silverado-1500-lt-2wd-crew-v8-1-owner-mint-wnbdisn2hq",
+      "url": "https://6ixo.com/listing/2017-chevrolet-silverado-1500-lt-2wd-crew-v8-1-owner-mint-wnbdisn2hq/"
+    },
+    {
+      "id": "craigslist-CA9wglG78RG0892KqrBkrQ",
+      "slug": "2020-infiniti-qx60-luxe-fwd-892kqrbkrq",
+      "url": "https://6ixo.com/listing/2020-infiniti-qx60-luxe-fwd-892kqrbkrq/"
+    },
+    {
+      "id": "craigslist-PjMkflG78RGjbNsYkOsWSw",
+      "slug": "2012-ford-taurus-4dr-sdn-limited-fwd-bnsykoswsw",
+      "url": "https://6ixo.com/listing/2012-ford-taurus-4dr-sdn-limited-fwd-bnsykoswsw/"
+    },
+    {
+      "id": "craigslist-t7nGRbpw75puveqU9C4yi8",
+      "slug": "1999-ford-ranger-vequ9c4yi8",
+      "url": "https://6ixo.com/listing/1999-ford-ranger-vequ9c4yi8/"
+    },
+    {
+      "id": "craigslist-wj4yqRLu4jxB7zsqh4GGaw",
+      "slug": "2016-lexus-350-is-7zsqh4ggaw",
+      "url": "https://6ixo.com/listing/2016-lexus-350-is-7zsqh4ggaw/"
+    },
+    {
+      "id": "craigslist-wnXs3Tru1MzjWuS5QyZ5Ax",
+      "slug": "2019-ford-f-250-super-duty-wus5qyz5ax",
+      "url": "https://6ixo.com/listing/2019-ford-f-250-super-duty-wus5qyz5ax/"
+    },
+    {
+      "id": "craigslist-rMLFih7HiSD21Syh3Zf2VE",
+      "slug": "2024-nissan-altima-1syh3zf2ve",
+      "url": "https://6ixo.com/listing/2024-nissan-altima-1syh3zf2ve/"
+    },
+    {
+      "id": "craigslist-pyA5pVxRkWjYzeToHGHNMp",
+      "slug": "we-finance-gas-saver-1-495-down-no-credit-check-zetohghnmp",
+      "url": "https://6ixo.com/listing/we-finance-gas-saver-1-495-down-no-credit-check-zetohghnmp/"
+    },
+    {
+      "id": "craigslist-ugwGAYJ8s6ZquLii3Zh5z3",
+      "slug": "2015-ford-f-250-lariat-ultimate-4x4-diesel-sunroof-norstar-ulii3zh5z3",
+      "url": "https://6ixo.com/listing/2015-ford-f-250-lariat-ultimate-4x4-diesel-sunroof-norstar-ulii3zh5z3/"
+    },
+    {
+      "id": "samtronix-gy-15882866229408",
+      "slug": "apple-iphone-18-pro-max-e-sim-512gb-storage-2866229408",
+      "url": "https://6ixo.com/listing/apple-iphone-18-pro-max-e-sim-512gb-storage-2866229408/"
     }
   ]
 }

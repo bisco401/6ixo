@@ -1,5 +1,5 @@
 {
-  "checkedAt": "2026-10-29T12:32:48Z",
+  "checkedAt": "2026-10-29T12:45:42.546Z",
   "listings": {
     "craigslist.org/view/d/bastrop-used-2025-cadillac-xt4-fwd-4d/fuqr_3uo8rgowpq1ctwx-a": {
       "availability": "sold",
@@ -14833,9 +14833,13 @@
       "resolvedUrl": "https://www.kijiji.ca/b-other-business-industrial/mississauga-peel-region/c145l1700276?radius=50.0&ll=43.7%2C-79.74&adRemoved=1745371677"
     },
     "kijiji.ca/v-buy-sell-other/city-of-toronto/sagetra-triple-commercial-sink-dents/1745437114": {
-      "availability": "unavailable",
-      "checkedAt": "2026-10-29T12:32:48Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1745437114",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/sagetra-triple-commercial-sink-dents/1745437114",
+      "availability": "gone",
+      "checkedAt": "2026-10-29T12:45:42.546Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1745437114",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-engines-and-engine-parts/city-of-toronto/honda-kia-hyundai-mazda-nissan-toyota-scion-engine-replacement/1745376861": {
       "availability": "unavailable",
@@ -15165,29 +15169,49 @@
       "reason": "Kijiji redirected the exact ad to a confirmed removal"
     },
     "kijiji.ca/v-buy-sell-other/mississauga-peel-region/demolition-for-sale/1745457309": {
-      "availability": "unavailable",
-      "checkedAt": "2026-10-29T12:32:48Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1745457309",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/mississauga-peel-region/demolition-for-sale/1745457309",
+      "availability": "gone",
+      "checkedAt": "2026-10-29T12:45:42.546Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/mississauga-peel-region/c26l1700276?radius=50.0&ll=43.58%2C-79.63&adRemoved=1745457309",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-buy-sell-other/city-of-toronto/wall-shelf-18-gauge-430-stainless-steel-12-x-60-saws1260/1745457302": {
-      "availability": "unavailable",
-      "checkedAt": "2026-10-29T12:32:48Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1745457302",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/wall-shelf-18-gauge-430-stainless-steel-12-x-60-saws1260/1745457302",
+      "availability": "gone",
+      "checkedAt": "2026-10-29T12:45:42.546Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1745457302",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-buy-sell-other/city-of-toronto/bosch-800-series-built-in-coffee-machine-bcm8450uc-stainless-ste/1745457298": {
-      "availability": "unavailable",
-      "checkedAt": "2026-10-29T12:32:48Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1745457298",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/bosch-800-series-built-in-coffee-machine-bcm8450uc-stainless-ste/1745457298",
+      "availability": "gone",
+      "checkedAt": "2026-10-29T12:45:42.546Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1745457298",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-buy-sell-other/city-of-toronto/sage-manufacturing-wall-shelf-12-x-48-stainless-steel-18-gauge/1745457284": {
-      "availability": "unavailable",
-      "checkedAt": "2026-10-29T12:32:48Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1745457284",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/sage-manufacturing-wall-shelf-12-x-48-stainless-steel-18-gauge/1745457284",
+      "availability": "gone",
+      "checkedAt": "2026-10-29T12:45:42.546Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1745457284",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-buy-sell-other/city-of-toronto/sagetra-double-sink-minor-dents/1745457262": {
-      "availability": "unavailable",
-      "checkedAt": "2026-10-29T12:32:48Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1745457262",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/sagetra-double-sink-minor-dents/1745457262",
+      "availability": "gone",
+      "checkedAt": "2026-10-29T12:45:42.546Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1745457262",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-general-labour-jobs/hamilton/help-needed-stoney-creek-on/1745424801": {
       "availability": "unavailable",

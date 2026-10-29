@@ -1,5 +1,5 @@
 {
-  "count": 4211,
+  "count": 4207,
   "listings": [
     {
       "id": "craigslist-4N76QEhhfko2unjRbQ9KXD",
@@ -11494,18 +11494,6 @@
       "categoryKey": "real-estate"
     },
     {
-      "id": "craigslist-2qXWrgWzFbkFZBmAq8pe1x",
-      "slug": "just-renovated-2br-1ba-in-jersey-city-heights-07307-1st-fl-zbmaq8pe1x",
-      "url": "https://6ixo.com/listing/just-renovated-2br-1ba-in-jersey-city-heights-07307-1st-fl-zbmaq8pe1x/",
-      "images": [
-        "https://images.craigslist.org/00N0N_6JNsSXid4Eq_0kE0rw_600x450.jpg",
-        "https://images.craigslist.org/01515_7ly2T6IvJnG_0kE0uY_600x450.jpg",
-        "https://images.craigslist.org/00S0S_hhRYexvViV_0kE0AH_600x450.jpg",
-        "https://images.craigslist.org/00v0v_lX0U59bHEUP_0kE0uY_600x450.jpg"
-      ],
-      "categoryKey": "real-estate"
-    },
-    {
       "id": "craigslist-b2Q5ejEpBBkjHGeDHu3SUk",
       "slug": "bayside-two-bedrooms-hgedhu3suk",
       "url": "https://6ixo.com/listing/bayside-two-bedrooms-hgedhu3suk/",
@@ -22092,18 +22080,6 @@
       "categoryKey": "vehicles"
     },
     {
-      "id": "craigslist-bJNDiEG55BCMHpbErNzZ7z",
-      "slug": "2007-honda-accord-ex-runs-great-clean-title-ready-today-hpbernzz7z",
-      "url": "https://6ixo.com/listing/2007-honda-accord-ex-runs-great-clean-title-ready-today-hpbernzz7z/",
-      "images": [
-        "https://images.craigslist.org/00202_9j1DBms9Dtf_0CI0lM_600x450.jpg",
-        "https://images.craigslist.org/00R0R_6gYonkD6Mp0_0CI0lM_600x450.jpg",
-        "https://images.craigslist.org/00X0X_leN6XAL1aTJ_0CI0lM_600x450.jpg",
-        "https://images.craigslist.org/00H0H_jJKNPkc3AUl_0CI0lM_600x450.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
       "id": "craigslist-mF8fjJXMgKtHYDEpDU3gYo",
       "slug": "real-1br-apartment-private-only-2150-laundry-ydepdu3gyo",
       "url": "https://6ixo.com/listing/real-1br-apartment-private-only-2150-laundry-ydepdu3gyo/",
@@ -29855,18 +29831,6 @@
       "categoryKey": "electronics"
     },
     {
-      "id": "craigslist-qDiG6d2vGFKK5tCP8vEoHB",
-      "slug": "2015-chevrolet-3500hd-srw-gas-w-knapheide-utiltiy-bed-5tcp8veohb",
-      "url": "https://6ixo.com/listing/2015-chevrolet-3500hd-srw-gas-w-knapheide-utiltiy-bed-5tcp8veohb/",
-      "images": [
-        "https://images.craigslist.org/00808_fouQwDMYZoX_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/00808_7F1kV5qhpXX_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/01717_5OvK0TCpPCh_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/01212_4nAwY0Hq8cT_0CI0t2_600x450.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
       "id": "craigslist-c7djb1YuakBjsHeNhvXeKi",
       "slug": "2023-ford-e350-7-3l-gas-with-refrigerated-box-truck-30k-mi-shenhvxeki",
       "url": "https://6ixo.com/listing/2023-ford-e350-7-3l-gas-with-refrigerated-box-truck-30k-mi-shenhvxeki/",
@@ -32852,18 +32816,6 @@
         "https://images.craigslist.org/01515_7aZe8wKmwP7_0fe0bq_600x450.jpg"
       ],
       "categoryKey": "vehicles"
-    },
-    {
-      "id": "craigslist-pBe7Edjk2VRYF3b6sVFwC7",
-      "slug": "free-parking-north-shore-unit-one-bedroom-apartment-laundr-f3b6svfwc7",
-      "url": "https://6ixo.com/listing/free-parking-north-shore-unit-one-bedroom-apartment-laundr-f3b6svfwc7/",
-      "images": [
-        "https://images.craigslist.org/00101_btwIUd5ZEDi_0ak07K_600x450.jpg",
-        "https://images.craigslist.org/00w0w_lm93RVsDOnG_0ak07K_600x450.jpg",
-        "https://images.craigslist.org/01717_2A6zgNvfsxK_0ak07K_600x450.jpg",
-        "https://images.craigslist.org/01414_aDQ6uPp6JFa_07K0ak_600x450.jpg"
-      ],
-      "categoryKey": "real-estate"
     },
     {
       "id": "craigslist-dHa4cB7gN8KWgzJws6ccGQ",
@@ -61439,6 +61391,26 @@
       "id": "kijiji-1736223449",
       "slug": "2026-nissan-rogue-1736223449",
       "url": "https://6ixo.com/listing/2026-nissan-rogue-1736223449/"
+    },
+    {
+      "id": "craigslist-2qXWrgWzFbkFZBmAq8pe1x",
+      "slug": "just-renovated-2br-1ba-in-jersey-city-heights-07307-1st-fl-zbmaq8pe1x",
+      "url": "https://6ixo.com/listing/just-renovated-2br-1ba-in-jersey-city-heights-07307-1st-fl-zbmaq8pe1x/"
+    },
+    {
+      "id": "craigslist-bJNDiEG55BCMHpbErNzZ7z",
+      "slug": "2007-honda-accord-ex-runs-great-clean-title-ready-today-hpbernzz7z",
+      "url": "https://6ixo.com/listing/2007-honda-accord-ex-runs-great-clean-title-ready-today-hpbernzz7z/"
+    },
+    {
+      "id": "craigslist-qDiG6d2vGFKK5tCP8vEoHB",
+      "slug": "2015-chevrolet-3500hd-srw-gas-w-knapheide-utiltiy-bed-5tcp8veohb",
+      "url": "https://6ixo.com/listing/2015-chevrolet-3500hd-srw-gas-w-knapheide-utiltiy-bed-5tcp8veohb/"
+    },
+    {
+      "id": "craigslist-pBe7Edjk2VRYF3b6sVFwC7",
+      "slug": "free-parking-north-shore-unit-one-bedroom-apartment-laundr-f3b6svfwc7",
+      "url": "https://6ixo.com/listing/free-parking-north-shore-unit-one-bedroom-apartment-laundr-f3b6svfwc7/"
     }
   ]
 }

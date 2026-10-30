@@ -1,5 +1,5 @@
 {
-  "count": 4230,
+  "count": 4228,
   "listings": [
     {
       "id": "apify-b9b18084f762",
@@ -5701,18 +5701,6 @@
       "categoryKey": "real-estate"
     },
     {
-      "id": "craigslist-bJFQ2N4NBNMh51VHKRH1ov",
-      "slug": "2015-chevrolet-tahoe-51vhkrh1ov",
-      "url": "https://6ixo.com/listing/2015-chevrolet-tahoe-51vhkrh1ov/",
-      "images": [
-        "https://images.craigslist.org/01010_BkDl8BQGN9_0kE0fu_600x450.jpg",
-        "https://images.craigslist.org/00g0g_e84da1dzjSw_0kE0fu_600x450.jpg",
-        "https://images.craigslist.org/00x0x_4nh5flWMyom_0kE0fu_600x450.jpg",
-        "https://images.craigslist.org/00s0s_lkMrzLdPrMz_0kE0fu_600x450.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
       "id": "craigslist-aExFQsV3miXMtPT69VR3ct",
       "slug": "2019-ford-f-250-f250-super-duty-ext-cab-4wd-4x4-swb-6-2l-v-tpt69vr3ct",
       "url": "https://6ixo.com/listing/2019-ford-f-250-f250-super-duty-ext-cab-4wd-4x4-swb-6-2l-v-tpt69vr3ct/",
@@ -7431,18 +7419,6 @@
         "https://images.craigslist.org/00O0O_4cBde8CEcLM_0CI0t2_600x450.jpg",
         "https://images.craigslist.org/00X0X_fOXa1fkcxjm_0CI0t2_600x450.jpg",
         "https://images.craigslist.org/00z0z_g7W82yM47C9_0CI0t2_600x450.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "craigslist-jEvnQLWhBbscquN1oDKyQb",
-      "slug": "2016-volkswagen-jetta-sedan-qun1odkyqb",
-      "url": "https://6ixo.com/listing/2016-volkswagen-jetta-sedan-qun1odkyqb/",
-      "images": [
-        "https://images.craigslist.org/00000_9FfHwxMgBUl_0nm0hw_600x450.jpg",
-        "https://images.craigslist.org/00C0C_5QlQ2dQbkJ6_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/00l0l_4uN5gQKtDMx_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/00e0e_55c6Q5u5Kw1_0CI0t2_600x450.jpg"
       ],
       "categoryKey": "vehicles"
     },
@@ -62488,6 +62464,16 @@
       "id": "allsopp-dubai-l-311495",
       "slug": "1-bedroom-apartment-for-rent-bliss-homes-dubai-land-reside-bail311495",
       "url": "https://6ixo.com/listing/1-bedroom-apartment-for-rent-bliss-homes-dubai-land-reside-bail311495/"
+    },
+    {
+      "id": "craigslist-bJFQ2N4NBNMh51VHKRH1ov",
+      "slug": "2015-chevrolet-tahoe-51vhkrh1ov",
+      "url": "https://6ixo.com/listing/2015-chevrolet-tahoe-51vhkrh1ov/"
+    },
+    {
+      "id": "craigslist-jEvnQLWhBbscquN1oDKyQb",
+      "slug": "2016-volkswagen-jetta-sedan-qun1odkyqb",
+      "url": "https://6ixo.com/listing/2016-volkswagen-jetta-sedan-qun1odkyqb/"
     }
   ]
 }

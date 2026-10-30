@@ -1,6 +1,6 @@
 {
   "https://6ixo.com/": {
-    "hash": "51e27af77ae2f0351f074dd21b942e67ca3e337a51e98e45a0dfcb9c6cd00793",
+    "hash": "dd11bfd549ec67b3969da27607a4a340e5257c3cfc68ebda853f2a65435a7dd9",
     "lastmod": "2026-10-30"
   },
   "https://6ixo.com/about/": {
@@ -164,7 +164,7 @@
     "lastmod": "2026-10-30"
   },
   "https://6ixo.com/cars-for-sale/united-states/": {
-    "hash": "7d1f23f5fca10248fe39d822a9738530a3096ac046f52cb1c8196ba42d877fc6",
+    "hash": "6503b3b460805a50d91dd61ebbf62c3e5dae6c336ae904d72100a24857739805",
     "lastmod": "2026-10-30"
   },
   "https://6ixo.com/community/": {
@@ -3347,10 +3347,6 @@
     "hash": "f50552f18240b9a2bc791d1adcee99012317f65914bac4b22c9f88de77854c49",
     "lastmod": "2026-10-30"
   },
-  "https://6ixo.com/listing/2015-chevrolet-tahoe-51vhkrh1ov/": {
-    "hash": "dc79a0ff0159e64dac4eea8787aa8596ebc54b6d2c8eff4539ba74cff6070fcf",
-    "lastmod": "2026-10-30"
-  },
   "https://6ixo.com/listing/2015-chevrolet-tahoe-ltz-in-house-finacing-only-2500-down-e1tjb9sql6/": {
     "hash": "d5171f0034e83671d591f3fcd71e9ef039da58947527a479c3ad2bafe3998f8c",
     "lastmod": "2026-10-30"
@@ -3938,10 +3934,6 @@
   "https://6ixo.com/listing/2016-volkswagen-jetta-1744476584/": {
     "hash": "9d3aa9c8aed5e154b952c3c648ed81083357b3d498e308cae50442ee0ad714fa",
     "lastmod": "2026-10-29"
-  },
-  "https://6ixo.com/listing/2016-volkswagen-jetta-sedan-qun1odkyqb/": {
-    "hash": "0164f6c3055c33e732f699f1f5dcf862818f8e1558df692b8906f4266b134626",
-    "lastmod": "2026-10-30"
   },
   "https://6ixo.com/listing/2016-winnebago-era-70x-sprinter-3500-mercedes-diesel-kpe8zbem9q/": {
     "hash": "c4d6f46a1dd924a4c66b8639ed00a26b356e0a9f2192d873abf2537c0e40f4fb",
@@ -17112,23 +17104,23 @@
     "lastmod": "2026-10-30"
   },
   "https://6ixo.com/listings/": {
-    "hash": "82a4b6d17311dfd1594b9c8f47b0a847b9a4b9d8e2ba8ee2a872e905d996cf86",
+    "hash": "db4f5bd631851cd80c62dd35769fc83033d1101b71e3fc0516e4526b677bc550",
     "lastmod": "2026-10-30"
   },
   "https://6ixo.com/listings/auto-parts/": {
-    "hash": "388c90e1317df39f198601eba1f98985e554c863bbd1109fd803e3460b66a647",
+    "hash": "eaf9a59e93002370944c4f9af762806a3e959ebb378bcd58db420a5f309d0f9d",
     "lastmod": "2026-10-30"
   },
   "https://6ixo.com/listings/buy-and-sell/": {
-    "hash": "b1328aa08230c2e9ddbba131700f074c92e2f0321b5c4b088873cf20316fd0de",
+    "hash": "1ce5529ddfa4d5cf3844e7ffc0d066631adaff9f9d3a49e9fe9dd3e839952cd3",
     "lastmod": "2026-10-30"
   },
   "https://6ixo.com/listings/car-rentals/": {
-    "hash": "ee7d3d4b9cd13bf0f40eb94cceaa5444196e2012b97e8988300448735a5c95e1",
+    "hash": "0e5232a3e4b23e16d1835131ee5a08c102f3e32c57b94248608d9a77b3bd8116",
     "lastmod": "2026-10-30"
   },
   "https://6ixo.com/listings/community/": {
-    "hash": "787536b33872fb80ab11a1dcb5ab260cd8d5d4cf8c29ce5b6f9bf331b7348cbf",
+    "hash": "be34dae46531c215a18845e41ede7807cda9df2e5691cbd03d5334ccc7331691",
     "lastmod": "2026-10-30"
   },
   "https://6ixo.com/listings/country/canada/": {
@@ -17296,7 +17288,7 @@
     "lastmod": "2026-10-30"
   },
   "https://6ixo.com/listings/country/united-states/": {
-    "hash": "05ad6ec9de5c0ce052c99694a50ea327b24bb62b1707ab149fbdb553942d247d",
+    "hash": "10b8759b3bee832ede7ef59573cb915f2943eeb497307310ba05d94f17765942",
     "lastmod": "2026-10-30"
   },
   "https://6ixo.com/listings/country/united-states/auto-parts/": {
@@ -17324,31 +17316,31 @@
     "lastmod": "2026-10-30"
   },
   "https://6ixo.com/listings/electronics/": {
-    "hash": "bf3fc10f3ad0d9e0c8cb010fbe2a7a4be4eda96c5fcd19c94a46451dac1cc79a",
+    "hash": "878f7c4a6d966c85c3bbd5cbde0ea18ba7c43049ae776c847d8324423ddca767",
     "lastmod": "2026-10-30"
   },
   "https://6ixo.com/listings/fashion/": {
-    "hash": "3b1e14b9398e148970d9ca10db44121ecdf11c305082c8cfce6c8ea2c78a6a18",
+    "hash": "54774178eedfa91aef9704a4f551622251c2e0589bebf3ffc213a46dd0014d14",
     "lastmod": "2026-10-30"
   },
   "https://6ixo.com/listings/jobs/": {
-    "hash": "b3812b27f9e8c8653a0d2dce1532882b39df3c63f8b78d948e499e592c9b68e2",
+    "hash": "c2405d91b2877a869df957240900cb59fe322f90b016f3087719b3825aa3d815",
     "lastmod": "2026-10-30"
   },
   "https://6ixo.com/listings/real-estate/": {
-    "hash": "6f7f75491d57692985fe669da71a4cb64e80d8b27d372371bc79196cc9596f57",
+    "hash": "17f25b89990f7e1b7c15621b31beb67cb29033a38b0a958d88f3beb6f07bb7d3",
     "lastmod": "2026-10-30"
   },
   "https://6ixo.com/listings/services/": {
-    "hash": "b2d6328c0c91fe7e0de20a339cbca9f8429a582032e5f74eb5201b358faf94ef",
+    "hash": "7563254ae77e86c4d5c7bf8616f6e1b2f11eb314ae47711106eea879deb2b218",
     "lastmod": "2026-10-30"
   },
   "https://6ixo.com/listings/short-term-rentals/": {
-    "hash": "a69b08965095ed74f3af9039a5e443f02cc151fe7be6160f63727844897d7760",
+    "hash": "54e749cb6fa6683569b013b4243842a34e94154ec26febdec81625492faab73c",
     "lastmod": "2026-10-30"
   },
   "https://6ixo.com/listings/vehicles/": {
-    "hash": "a4db5757a493d5aa5729146ba7ebe26276555b6bd9e83c410f5041489b000f04",
+    "hash": "bfc1e8a7a2e6c81e3edb2e756126d975764ae223ab73b5a9f9095b74424864dc",
     "lastmod": "2026-10-30"
   },
   "https://6ixo.com/phones-for-sale/": {

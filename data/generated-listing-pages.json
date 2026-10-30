@@ -1,5 +1,5 @@
 {
-  "count": 4255,
+  "count": 4254,
   "listings": [
     {
       "id": "apify-b9b18084f762",
@@ -24716,10 +24716,7 @@
       "slug": "jbl-headphone-gaming-tune720d-3909820576",
       "url": "https://6ixo.com/listing/jbl-headphone-gaming-tune720d-3909820576/",
       "images": [
-        "https://cdn.shopify.com/s/files/1/0604/1409/9616/files/CIDEACM10017ULTRASIMTABLET_8GBRAM1TBSTORAGE_-2026-10-17T154912.200.png?v=1792232365",
-        "https://cdn.shopify.com/s/files/1/0604/1409/9616/files/CIDEACM10017ULTRASIMTABLET_8GBRAM1TBSTORAGE_-2026-10-17T154941.958.png?v=1792232387",
-        "https://cdn.shopify.com/s/files/1/0604/1409/9616/files/CIDEACM10017ULTRASIMTABLET_8GBRAM1TBSTORAGE_-2026-10-17T155011.025.png?v=1792232416",
-        "https://cdn.shopify.com/s/files/1/0604/1409/9616/files/CIDEACM10017ULTRASIMTABLET_8GBRAM1TBSTORAGE_-2026-10-17T155031.927.png?v=1792232437"
+        "https://samtronixguyana.com/cdn/shop/files/CIDEACM10017ULTRASIMTABLET_8GBRAM1TBSTORAGE_-2026-10-17T154912.200_1024x.png?v=1792232365"
       ],
       "categoryKey": "electronics"
     },
@@ -28039,15 +28036,6 @@
       "url": "https://6ixo.com/listing/jbl-headphone-gaming-tune61d-8513782944/",
       "images": [
         "https://samtronixguyana.com/cdn/shop/files/WhiteandCaramelJBLHeadphones_1024x.png?v=1792078685"
-      ],
-      "categoryKey": "electronics"
-    },
-    {
-      "id": "samtronix-gy-15199838142624",
-      "slug": "jbl-headphone-gaming-tune720d-9838142624",
-      "url": "https://6ixo.com/listing/jbl-headphone-gaming-tune720d-9838142624/",
-      "images": [
-        "https://samtronixguyana.com/cdn/shop/files/CIDEACM10017ULTRASIMTABLET_8GBRAM1TBSTORAGE_85_1024x.png?v=1792077907"
       ],
       "categoryKey": "electronics"
     },
@@ -43587,10 +43575,7 @@
       "slug": "18-000-per-bedroom-3bedroom-apartment-for-short-term-renta-70faa8b3a3",
       "url": "https://6ixo.com/listing/18-000-per-bedroom-3bedroom-apartment-for-short-term-renta-70faa8b3a3/",
       "images": [
-        "https://opjnizbtppkynxzssijy.supabase.co/storage/v1/object/public/property-images/d650365a-ac27-4d55-aeec-71102b936691/1789948554726-nif3r4-enhanced.png",
-        "https://opjnizbtppkynxzssijy.supabase.co/storage/v1/object/public/property-images/d650365a-ac27-4d55-aeec-71102b936691/1789948590045-j4vtdya-enhanced.png",
-        "https://opjnizbtppkynxzssijy.supabase.co/storage/v1/object/public/property-images/d650365a-ac27-4d55-aeec-71102b936691/1789948681613-biz6fl-enhanced.png",
-        "https://opjnizbtppkynxzssijy.supabase.co/storage/v1/object/public/property-images/d650365a-ac27-4d55-aeec-71102b936691/1789948630892-k64xx-enhanced.png"
+        "https://opjnizbtppkynxzssijy.supabase.co/storage/v1/object/public/property-images/d650365a-ac27-4d55-aeec-71102b936691/1789948554726-nif3r4-enhanced.png"
       ],
       "categoryKey": "real-estate"
     },
@@ -62659,6 +62644,11 @@
       "id": "apify-5fb7ab80f292",
       "slug": "lenovo-thinkvision-t24i30-b7ab80f292",
       "url": "https://6ixo.com/listing/lenovo-thinkvision-t24i30-b7ab80f292/"
+    },
+    {
+      "id": "samtronix-gy-15199838142624",
+      "slug": "jbl-headphone-gaming-tune720d-9838142624",
+      "url": "https://6ixo.com/listing/jbl-headphone-gaming-tune720d-9838142624/"
     }
   ]
 }

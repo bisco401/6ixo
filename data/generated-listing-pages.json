@@ -1,5 +1,5 @@
 {
-  "count": 4372,
+  "count": 4373,
   "listings": [
     {
       "id": "import-67ff0ce3b61030a75c",
@@ -2457,6 +2457,15 @@
         "https://autostore.co.ke/wp-content/uploads/2025/08/ACfilter.webp"
       ],
       "categoryKey": "auto-parts"
+    },
+    {
+      "id": "dealer-7dd04fafedf489df19",
+      "slug": "new-mg-zs-1-5t-automatic-luxury-mexican-edition-gasoline-c-edf489df19",
+      "url": "https://6ixo.com/listing/new-mg-zs-1-5t-automatic-luxury-mexican-edition-gasoline-c-edf489df19/",
+      "images": [
+        "https://www.sinovcleglobal.com/storage/uploads/images/202610/29/1793243049_uc79FFOw7t.jpg"
+      ],
+      "categoryKey": "vehicles"
     },
     {
       "id": "apify-b9b18084f762",
@@ -5510,7 +5519,6 @@
       "url": "https://6ixo.com/listing/2016-2024-chevrolet-malibu-parting-out-stock-f36791-yuwtbzn81m/",
       "images": [
         "https://images.craigslist.org/00Q0Q_8dmJncpOzem_0t20CI_600x450.jpg",
-        "https://images.craigslist.org/00W0W_lEbWhYuC4G3_0kw0fJ_600x450.jpg",
         "https://images.craigslist.org/00505_2QzSJYtyfOi_0t20CI_600x450.jpg",
         "https://images.craigslist.org/00g0g_l2oLWD6miBt_0t20CI_600x450.jpg"
       ],
@@ -7700,7 +7708,6 @@
       "url": "https://6ixo.com/listing/2004-2005-infiniti-fx35-3-5-engine-for-sale-stock-fs94-cvbzggdphv/",
       "images": [
         "https://images.craigslist.org/00101_eMFV5BNO41D_0t20CI_600x450.jpg",
-        "https://images.craigslist.org/00W0W_lEbWhYuC4G3_0kw0fJ_600x450.jpg",
         "https://images.craigslist.org/00909_8iAtdZCboLg_0t20CI_600x450.jpg",
         "https://images.craigslist.org/00303_8abpqLmGRr7_0t20CI_600x450.jpg"
       ],
@@ -7924,7 +7931,6 @@
       "url": "https://6ixo.com/listing/2010-2019-ford-taurus-parting-out-stock-f36943-hlhjxzu5lr/",
       "images": [
         "https://images.craigslist.org/00w0w_hwXfuidwi3B_0t20CI_600x450.jpg",
-        "https://images.craigslist.org/00W0W_lEbWhYuC4G3_0kw0fJ_600x450.jpg",
         "https://images.craigslist.org/00G0G_36jppaCXapD_0t20CI_600x450.jpg",
         "https://images.craigslist.org/00W0W_3losNgQtmo_0t20CI_600x450.jpg"
       ],
@@ -10102,7 +10108,6 @@
       "url": "https://6ixo.com/listing/2006-2010-volkswagen-jetta-parting-out-stock-f36978-iglh5kwf7x/",
       "images": [
         "https://images.craigslist.org/01010_6A5HH6nVg2P_0t20CI_600x450.jpg",
-        "https://images.craigslist.org/00W0W_lEbWhYuC4G3_0kw0fJ_600x450.jpg",
         "https://images.craigslist.org/01515_hf45rjARb7x_0t20CI_600x450.jpg",
         "https://images.craigslist.org/00808_4d1D5q7vhSV_0t20CI_600x450.jpg"
       ],
@@ -12313,8 +12318,7 @@
       "images": [
         "https://images.craigslist.org/01616_d8VC47N3aIm_0t20CI_600x450.jpg",
         "https://images.craigslist.org/00p0p_9xOMN40fKyT_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/00U0U_1AZR9UqCdea_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/01515_fy10ZGls6R7_0dF06C_600x450.jpg"
+        "https://images.craigslist.org/00U0U_1AZR9UqCdea_0CI0t2_600x450.jpg"
       ],
       "categoryKey": "auto-parts"
     },
@@ -42568,8 +42572,7 @@
       "images": [
         "https://images.craigslist.org/00w0w_cK0k6ytvihp_0t20CI_600x450.jpg",
         "https://images.craigslist.org/00k0k_k0VOwykk5aO_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/01717_kIsRYLDN1fS_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/01515_fy10ZGls6R7_0dF06C_600x450.jpg"
+        "https://images.craigslist.org/01717_kIsRYLDN1fS_0CI0t2_600x450.jpg"
       ],
       "categoryKey": "auto-parts"
     },
@@ -64467,11 +64470,6 @@
       "id": "kijiji-1739013669",
       "slug": "2023-ford-f-150-xlt-5-0l-v8-remote-start-navigation-1739013669",
       "url": "https://6ixo.com/listing/2023-ford-f-150-xlt-5-0l-v8-remote-start-navigation-1739013669/"
-    },
-    {
-      "id": "dealer-7dd04fafedf489df19",
-      "slug": "new-mg-zs-1-5t-automatic-luxury-mexican-edition-gasoline-c-edf489df19",
-      "url": "https://6ixo.com/listing/new-mg-zs-1-5t-automatic-luxury-mexican-edition-gasoline-c-edf489df19/"
     }
   ]
 }

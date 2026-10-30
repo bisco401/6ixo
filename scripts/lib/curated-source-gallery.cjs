@@ -16,12 +16,16 @@ module.exports = function preferProductDescriptionGallery(verified, original, ht
     const parent = stack.at(-1) || {};
     const features = parent.features || classes.includes('features-tab');
     const active = parent.active || (classes.includes('tab-pane') && classes.includes('active'));
-    if (tag === 'img' && features && active) {
+    // The shared buying-process section contains a car-carrier photo, not
+    // this product. A description containing only that template must keep
+    // the already verified primary product cover.
+    const buyingProcess = parent.buyingProcess || classes.includes('page_quality2L');
+    if (tag === 'img' && features && active && !buyingProcess) {
       const src = attributes.match(/\bsrc\s*=\s*["']([^"']*)["']/i)?.[1] || '';
       const image = integrity.normalizeImage(src, integrity.sourceUrl(original));
       if (image && /\/storage\/uploads\/images\//.test(image)) images.push(image);
     }
-    if (!/^(?:area|base|br|col|embed|hr|img|input|link|meta|param|source|track|wbr)$/.test(tag) && !/\/\s*$/.test(attributes)) stack.push({ tag, features, active });
+    if (!/^(?:area|base|br|col|embed|hr|img|input|link|meta|param|source|track|wbr)$/.test(tag) && !/\/\s*$/.test(attributes)) stack.push({ tag, features, active, buyingProcess });
   }
   const gallery = [...new Set(images)].slice(0, 4);
   if (!gallery.length) return verified;

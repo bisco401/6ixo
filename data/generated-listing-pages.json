@@ -1,6 +1,132 @@
 {
-  "count": 4261,
+  "count": 4255,
   "listings": [
+    {
+      "id": "apify-b9b18084f762",
+      "slug": "yamaha-malta-6k5-2-b18084f762",
+      "url": "https://6ixo.com/listing/yamaha-malta-6k5-2-b18084f762/",
+      "images": [
+        "https://oxglow.com.gh/uploads/medium/1-yamaha-malta-6k5-2--53485227246297.jpg"
+      ],
+      "categoryKey": "auto-parts"
+    },
+    {
+      "id": "apify-5d4adaa6bb7c",
+      "slug": "vega-dx-crux-4adaa6bb7c",
+      "url": "https://6ixo.com/listing/vega-dx-crux-4adaa6bb7c/",
+      "images": [
+        "https://oxglow.com.gh/uploads/medium/1-vega-dx-crux-58339326233200.jpg"
+      ],
+      "categoryKey": "auto-parts"
+    },
+    {
+      "id": "apify-b50341363f69",
+      "slug": "vega-bolt-kakie-0341363f69",
+      "url": "https://6ixo.com/listing/vega-bolt-kakie-0341363f69/",
+      "images": [
+        "https://oxglow.com.gh/uploads/medium/1-vega-bolt-kakie-722579056731987.jpg"
+      ],
+      "categoryKey": "auto-parts"
+    },
+    {
+      "id": "apify-5b934b6e6ba3",
+      "slug": "original-car-parts-934b6e6ba3",
+      "url": "https://6ixo.com/listing/original-car-parts-934b6e6ba3/",
+      "images": [
+        "https://oxglow.com.gh/uploads/medium/1-original-car-parts-928277685333515.jpg"
+      ],
+      "categoryKey": "auto-parts"
+    },
+    {
+      "id": "apify-c267566b98f2",
+      "slug": "navigation-tape-for-elantra-67566b98f2",
+      "url": "https://6ixo.com/listing/navigation-tape-for-elantra-67566b98f2/",
+      "images": [
+        "https://oxglow.com.gh/uploads/medium/1-navigation-tape-for-elantra-279124955734242.jpg"
+      ],
+      "categoryKey": "auto-parts"
+    },
+    {
+      "id": "apify-be46b3301ece",
+      "slug": "multimedia-player-46b3301ece",
+      "url": "https://6ixo.com/listing/multimedia-player-46b3301ece/",
+      "images": [
+        "https://oxglow.com.gh/uploads/medium/1-multimedia-player-92344730632325.jpg"
+      ],
+      "categoryKey": "auto-parts"
+    },
+    {
+      "id": "apify-b0963b928b3e",
+      "slug": "motor-engine-963b928b3e",
+      "url": "https://6ixo.com/listing/motor-engine-963b928b3e/",
+      "images": [
+        "https://oxglow.com.gh/uploads/medium/1-motor-engine-361667831651549.jpg"
+      ],
+      "categoryKey": "auto-parts"
+    },
+    {
+      "id": "apify-84afbc2f8da5",
+      "slug": "dent-puller-at-car-deco-afbc2f8da5",
+      "url": "https://6ixo.com/listing/dent-puller-at-car-deco-afbc2f8da5/",
+      "images": [
+        "https://oxglow.com.gh/uploads/medium/1-dent-puller-at-car-deco--601645294846220.jpg"
+      ],
+      "categoryKey": "auto-parts"
+    },
+    {
+      "id": "apify-740e667e1e48",
+      "slug": "dashboards-0e667e1e48",
+      "url": "https://6ixo.com/listing/dashboards-0e667e1e48/",
+      "images": [
+        "https://oxglow.com.gh/uploads/medium/1-dashboards-261358927351944.jpg"
+      ],
+      "categoryKey": "auto-parts"
+    },
+    {
+      "id": "apify-449a30723f26",
+      "slug": "car-lights-led-and-normal-9a30723f26",
+      "url": "https://6ixo.com/listing/car-lights-led-and-normal-9a30723f26/",
+      "images": [
+        "https://oxglow.com.gh/uploads/medium/1-car-lights-led-and-normal--672069178233647.jpg"
+      ],
+      "categoryKey": "auto-parts"
+    },
+    {
+      "id": "apify-9471a08ff4cb",
+      "slug": "car-door-seal-71a08ff4cb",
+      "url": "https://6ixo.com/listing/car-door-seal-71a08ff4cb/",
+      "images": [
+        "https://oxglow.com.gh/uploads/medium/1-car-door-seal-52189704445468.jpg"
+      ],
+      "categoryKey": "auto-parts"
+    },
+    {
+      "id": "apify-6e5b4f355678",
+      "slug": "brand-new-5-112-20inch-rims-45-offset-nb-tyres-not-include-5b4f355678",
+      "url": "https://6ixo.com/listing/brand-new-5-112-20inch-rims-45-offset-nb-tyres-not-include-5b4f355678/",
+      "images": [
+        "https://oxglow.com.gh/uploads/medium/1-brand-new-5-112-20inch-rims-45-offset-nb-tyres-not-included--5959919936542.jpg"
+      ],
+      "categoryKey": "auto-parts"
+    },
+    {
+      "id": "apify-283b123b0194",
+      "slug": "ac-compressors-3b123b0194",
+      "url": "https://6ixo.com/listing/ac-compressors-3b123b0194/",
+      "images": [
+        "https://oxglow.com.gh/uploads/medium/1-ac-compressors-562277390352968.jpg"
+      ],
+      "categoryKey": "auto-parts"
+    },
+    {
+      "id": "apify-63134fd7eb6c",
+      "slug": "car-multimedia-players-134fd7eb6c",
+      "url": "https://6ixo.com/listing/car-multimedia-players-134fd7eb6c/",
+      "images": [
+        "https://oxglow.com.gh/uploads/medium/1-car-multimedia-players-571249764531945.jpg"
+      ],
+      "categoryKey": "auto-parts"
+    },
     {
       "id": "hgc-dubai-9f0effbe6756af4c",
       "slug": "asus-rog-pg248q-gaming-monitor-be6756af4c",
@@ -203,132 +329,6 @@
         "https://storage.albacars.ae/vehicles/drafts/2253/1.jpg"
       ],
       "categoryKey": "vehicles"
-    },
-    {
-      "id": "apify-b9b18084f762",
-      "slug": "yamaha-malta-6k5-2-b18084f762",
-      "url": "https://6ixo.com/listing/yamaha-malta-6k5-2-b18084f762/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/1-yamaha-malta-6k5-2--53485227246297.jpg"
-      ],
-      "categoryKey": "auto-parts"
-    },
-    {
-      "id": "apify-5d4adaa6bb7c",
-      "slug": "vega-dx-crux-4adaa6bb7c",
-      "url": "https://6ixo.com/listing/vega-dx-crux-4adaa6bb7c/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/1-vega-dx-crux-58339326233200.jpg"
-      ],
-      "categoryKey": "auto-parts"
-    },
-    {
-      "id": "apify-b50341363f69",
-      "slug": "vega-bolt-kakie-0341363f69",
-      "url": "https://6ixo.com/listing/vega-bolt-kakie-0341363f69/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/1-vega-bolt-kakie-722579056731987.jpg"
-      ],
-      "categoryKey": "auto-parts"
-    },
-    {
-      "id": "apify-5b934b6e6ba3",
-      "slug": "original-car-parts-934b6e6ba3",
-      "url": "https://6ixo.com/listing/original-car-parts-934b6e6ba3/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/1-original-car-parts-928277685333515.jpg"
-      ],
-      "categoryKey": "auto-parts"
-    },
-    {
-      "id": "apify-c267566b98f2",
-      "slug": "navigation-tape-for-elantra-67566b98f2",
-      "url": "https://6ixo.com/listing/navigation-tape-for-elantra-67566b98f2/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/1-navigation-tape-for-elantra-279124955734242.jpg"
-      ],
-      "categoryKey": "auto-parts"
-    },
-    {
-      "id": "apify-be46b3301ece",
-      "slug": "multimedia-player-46b3301ece",
-      "url": "https://6ixo.com/listing/multimedia-player-46b3301ece/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/1-multimedia-player-92344730632325.jpg"
-      ],
-      "categoryKey": "auto-parts"
-    },
-    {
-      "id": "apify-b0963b928b3e",
-      "slug": "motor-engine-963b928b3e",
-      "url": "https://6ixo.com/listing/motor-engine-963b928b3e/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/1-motor-engine-361667831651549.jpg"
-      ],
-      "categoryKey": "auto-parts"
-    },
-    {
-      "id": "apify-84afbc2f8da5",
-      "slug": "dent-puller-at-car-deco-afbc2f8da5",
-      "url": "https://6ixo.com/listing/dent-puller-at-car-deco-afbc2f8da5/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/1-dent-puller-at-car-deco--601645294846220.jpg"
-      ],
-      "categoryKey": "auto-parts"
-    },
-    {
-      "id": "apify-740e667e1e48",
-      "slug": "dashboards-0e667e1e48",
-      "url": "https://6ixo.com/listing/dashboards-0e667e1e48/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/1-dashboards-261358927351944.jpg"
-      ],
-      "categoryKey": "auto-parts"
-    },
-    {
-      "id": "apify-449a30723f26",
-      "slug": "car-lights-led-and-normal-9a30723f26",
-      "url": "https://6ixo.com/listing/car-lights-led-and-normal-9a30723f26/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/1-car-lights-led-and-normal--672069178233647.jpg"
-      ],
-      "categoryKey": "auto-parts"
-    },
-    {
-      "id": "apify-9471a08ff4cb",
-      "slug": "car-door-seal-71a08ff4cb",
-      "url": "https://6ixo.com/listing/car-door-seal-71a08ff4cb/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/1-car-door-seal-52189704445468.jpg"
-      ],
-      "categoryKey": "auto-parts"
-    },
-    {
-      "id": "apify-6e5b4f355678",
-      "slug": "brand-new-5-112-20inch-rims-45-offset-nb-tyres-not-include-5b4f355678",
-      "url": "https://6ixo.com/listing/brand-new-5-112-20inch-rims-45-offset-nb-tyres-not-include-5b4f355678/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/1-brand-new-5-112-20inch-rims-45-offset-nb-tyres-not-included--5959919936542.jpg"
-      ],
-      "categoryKey": "auto-parts"
-    },
-    {
-      "id": "apify-283b123b0194",
-      "slug": "ac-compressors-3b123b0194",
-      "url": "https://6ixo.com/listing/ac-compressors-3b123b0194/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/1-ac-compressors-562277390352968.jpg"
-      ],
-      "categoryKey": "auto-parts"
-    },
-    {
-      "id": "apify-63134fd7eb6c",
-      "slug": "car-multimedia-players-134fd7eb6c",
-      "url": "https://6ixo.com/listing/car-multimedia-players-134fd7eb6c/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/1-car-multimedia-players-571249764531945.jpg"
-      ],
-      "categoryKey": "auto-parts"
     },
     {
       "id": "kenya-retail-07945cdc6bb820f4",
@@ -2559,10 +2559,10 @@
       "slug": "2018-crv-touring-selling-edaf4783b5",
       "url": "https://6ixo.com/listing/2018-crv-touring-selling-edaf4783b5/",
       "images": [
-        "https://oxglow.com.gh/uploads/original/2018-crv-touring-selling-AUo6oge-1793268138-3.jpg",
-        "https://oxglow.com.gh/uploads/original/2018-crv-touring-selling-AUo6oge-1793268138-0.jpg",
-        "https://oxglow.com.gh/uploads/original/2018-crv-touring-selling-AUo6oge-1793268138-1.jpg",
-        "https://oxglow.com.gh/uploads/original/2018-crv-touring-selling-AUo6oge-1793268138-2.jpg"
+        "https://6ixo.com/data/oxglow-vehicles-images/58002-1.jpg",
+        "https://6ixo.com/data/oxglow-vehicles-images/58002-2.jpg",
+        "https://6ixo.com/data/oxglow-vehicles-images/58002-3.jpg",
+        "https://6ixo.com/data/oxglow-vehicles-images/58002-4.jpg"
       ],
       "categoryKey": "vehicles"
     },
@@ -2571,10 +2571,10 @@
       "slug": "hp-250-g6-notebook-pc-48cd364732",
       "url": "https://6ixo.com/listing/hp-250-g6-notebook-pc-48cd364732/",
       "images": [
-        "https://oxglow.com.gh/uploads/original/hp-250-g6-notebook-pc-R2eeV07-1793267313-0.jpg",
-        "https://oxglow.com.gh/uploads/original/hp-250-g6-notebook-pc-R2eeV07-1793267313-1.jpg",
-        "https://oxglow.com.gh/uploads/original/hp-250-g6-notebook-pc-R2eeV07-1793267313-2.jpg",
-        "https://oxglow.com.gh/uploads/original/hp-250-g6-notebook-pc-R2eeV07-1793267313-3.jpg"
+        "https://6ixo.com/data/oxglow-listing-images/apify-4348cd364732-1.jpg",
+        "https://6ixo.com/data/oxglow-listing-images/apify-4348cd364732-2.jpg",
+        "https://6ixo.com/data/oxglow-listing-images/apify-4348cd364732-3.jpg",
+        "https://6ixo.com/data/oxglow-listing-images/apify-4348cd364732-4.jpg"
       ],
       "categoryKey": "electronics"
     },
@@ -2583,10 +2583,10 @@
       "slug": "iphone-x-da3ccaff6f",
       "url": "https://6ixo.com/listing/iphone-x-da3ccaff6f/",
       "images": [
-        "https://oxglow.com.gh/uploads/original/iphone-x-21673-1793265210-0-medium.jpeg",
-        "https://oxglow.com.gh/uploads/original/iphone-x-21673-1793265210-1-medium.jpeg",
-        "https://oxglow.com.gh/uploads/original/iphone-x-21673-1793265210-3-medium.jpeg",
-        "https://oxglow.com.gh/uploads/original/iphone-x-21673-1793265210-4-medium.jpeg"
+        "https://6ixo.com/data/oxglow-listing-images/apify-5fda3ccaff6f-1.jpeg",
+        "https://6ixo.com/data/oxglow-listing-images/apify-5fda3ccaff6f-2.jpeg",
+        "https://6ixo.com/data/oxglow-listing-images/apify-5fda3ccaff6f-3.jpeg",
+        "https://6ixo.com/data/oxglow-listing-images/apify-5fda3ccaff6f-4.jpeg"
       ],
       "categoryKey": "electronics"
     },
@@ -39163,18 +39163,6 @@
       "categoryKey": "services"
     },
     {
-      "id": "apify-e10435e0c497",
-      "slug": "mercedes-benz-c300-0435e0c497",
-      "url": "https://6ixo.com/listing/mercedes-benz-c300-0435e0c497/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/mercedes-benz-c300-94T8h1-1791024663-3-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/mercedes-benz-c300-94T8h1-1791024662-0-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/mercedes-benz-c300-94T8h1-1791024662-1-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/mercedes-benz-c300-94T8h1-1791024663-2-medium.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
       "id": "kijiji-1743989086",
       "slug": "2027-grand-design-lineage-series-e-30dc-1743989086",
       "url": "https://6ixo.com/listing/2027-grand-design-lineage-series-e-30dc-1743989086/",
@@ -39211,30 +39199,6 @@
         "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/55/55ded1ea-71f0-412e-a3c4-6cf4efefd29c?rule=kijijica-1600-webp",
         "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/6c/6c116e68-9c73-47db-b2fd-09b70bfe6c03?rule=kijijica-1600-webp",
         "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/f7/f7b8f82b-cc47-4948-a3bf-69e84b1d9d36?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "apify-643153772d3e",
-      "slug": "toyota-vitz-3153772d3e",
-      "url": "https://6ixo.com/listing/toyota-vitz-3153772d3e/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/toyota-vitz-5A2Qh74-1791022656-5-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/toyota-vitz-5A2Qh74-1791022655-0-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/toyota-vitz-5A2Qh74-1791022655-1-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/toyota-vitz-5A2Qh74-1791022655-2-medium.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "apify-48db1cd53f94",
-      "slug": "2026-hyundai-tucson-db1cd53f94",
-      "url": "https://6ixo.com/listing/2026-hyundai-tucson-db1cd53f94/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/2026-hyundai-tucson-1yUA2F2-1791021459-6-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/2026-hyundai-tucson-1yUA2F2-1791021459-0-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/2026-hyundai-tucson-1yUA2F2-1791021459-1-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/2026-hyundai-tucson-1yUA2F2-1791021459-2-medium.jpg"
       ],
       "categoryKey": "vehicles"
     },
@@ -43272,18 +43236,6 @@
       "categoryKey": "vehicles"
     },
     {
-      "id": "apify-6ee8d422c49e",
-      "slug": "iphone-xr-e8d422c49e",
-      "url": "https://6ixo.com/listing/iphone-xr-e8d422c49e/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/iphone-xr-1790128700-0-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/iphone-xr-1790128656-0-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/iphone-xr-1790128656-1-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/iphone-xr-1790128657-2-medium.jpg"
-      ],
-      "categoryKey": "electronics"
-    },
-    {
       "id": "kijiji-1743834128",
       "slug": "2017-ford-mustang-ecoboost-1743834128",
       "url": "https://6ixo.com/listing/2017-ford-mustang-ecoboost-1743834128/",
@@ -43405,27 +43357,6 @@
         "https://opjnizbtppkynxzssijy.supabase.co/storage/v1/object/public/property-images/d650365a-ac27-4d55-aeec-71102b936691/1790085076400-acrlic-enhanced.png"
       ],
       "categoryKey": "real-estate"
-    },
-    {
-      "id": "apify-26f051b4af30",
-      "slug": "tcl-smart-tv-f051b4af30",
-      "url": "https://6ixo.com/listing/tcl-smart-tv-f051b4af30/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/tcl-smart-tv-F602P2k-1790076865-0-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/tcl-smart-tv-F602P2k-1790076865-1-medium.jpg"
-      ],
-      "categoryKey": "electronics"
-    },
-    {
-      "id": "apify-5fb7ab80f292",
-      "slug": "lenovo-thinkvision-t24i30-b7ab80f292",
-      "url": "https://6ixo.com/listing/lenovo-thinkvision-t24i30-b7ab80f292/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/lenovo-thinkvision-t24i30-56b8y6J-1790076043-0-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/lenovo-thinkvision-t24i30-56b8y6J-1790076043-1-medium.jpg",
-        "https://oxglow.com.gh/uploads/medium/lenovo-thinkvision-t24i30-56b8y6J-1790076043-2-medium.jpg"
-      ],
-      "categoryKey": "electronics"
     },
     {
       "id": "kijiji-1743805425",
@@ -62698,6 +62629,36 @@
       "id": "craigslist-mlsF7NPT8RGFobjC3PPfXg",
       "slug": "2mo-free-lux-2br-2ba-pool-gym-lounge-parking-objc3ppfxg",
       "url": "https://6ixo.com/listing/2mo-free-lux-2br-2ba-pool-gym-lounge-parking-objc3ppfxg/"
+    },
+    {
+      "id": "apify-e10435e0c497",
+      "slug": "mercedes-benz-c300-0435e0c497",
+      "url": "https://6ixo.com/listing/mercedes-benz-c300-0435e0c497/"
+    },
+    {
+      "id": "apify-643153772d3e",
+      "slug": "toyota-vitz-3153772d3e",
+      "url": "https://6ixo.com/listing/toyota-vitz-3153772d3e/"
+    },
+    {
+      "id": "apify-48db1cd53f94",
+      "slug": "2026-hyundai-tucson-db1cd53f94",
+      "url": "https://6ixo.com/listing/2026-hyundai-tucson-db1cd53f94/"
+    },
+    {
+      "id": "apify-6ee8d422c49e",
+      "slug": "iphone-xr-e8d422c49e",
+      "url": "https://6ixo.com/listing/iphone-xr-e8d422c49e/"
+    },
+    {
+      "id": "apify-26f051b4af30",
+      "slug": "tcl-smart-tv-f051b4af30",
+      "url": "https://6ixo.com/listing/tcl-smart-tv-f051b4af30/"
+    },
+    {
+      "id": "apify-5fb7ab80f292",
+      "slug": "lenovo-thinkvision-t24i30-b7ab80f292",
+      "url": "https://6ixo.com/listing/lenovo-thinkvision-t24i30-b7ab80f292/"
     }
   ]
 }

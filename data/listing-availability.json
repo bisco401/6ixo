@@ -1,5 +1,5 @@
 {
-  "checkedAt": "2026-10-30T06:35:36Z",
+  "checkedAt": "2026-10-30T06:48:44.088Z",
   "listings": {
     "craigslist.org/view/d/bastrop-used-2025-cadillac-xt4-fwd-4d/fuqr_3uo8rgowpq1ctwx-a": {
       "availability": "sold",
@@ -15140,9 +15140,13 @@
       "reason": "All offers for this exact listing are unavailable"
     },
     "kijiji.ca/v-buy-sell-other/city-of-toronto/waring-four-slice-commercial-toaster-without-box/1745480794": {
-      "availability": "unavailable",
-      "checkedAt": "2026-10-30T06:35:36Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1745480794",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/waring-four-slice-commercial-toaster-without-box/1745480794",
+      "availability": "gone",
+      "checkedAt": "2026-10-30T06:48:44.088Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1745480794",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-tires-rims/city-of-toronto/2026-crv-18-oem-rims-brand-new-firestone-all-season-tire/1745351909": {
       "availability": "unavailable",
@@ -15235,9 +15239,13 @@
       "reason": "Exact source URL returned HTTP 410"
     },
     "kijiji.ca/v-buy-sell-other/city-of-toronto/sagetra-triple-commercial-sink-dents/1745494332": {
-      "availability": "unavailable",
-      "checkedAt": "2026-10-30T06:35:36Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1745494332",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/sagetra-triple-commercial-sink-dents/1745494332",
+      "availability": "gone",
+      "checkedAt": "2026-10-30T06:48:44.088Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1745494332",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-cats-kittens/city-of-toronto/siberian-kittens-health-card-sample-food/1745216223": {
       "availability": "unavailable",

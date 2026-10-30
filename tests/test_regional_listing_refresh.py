@@ -26,6 +26,60 @@ def fixture(source):
 
 
 class RegionalSourceTests(unittest.TestCase):
+    def test_atlanta_primary_contact_price_does_not_inherit_old_or_recommended_prices(self):
+        url = URLS["atlanta"]
+        title, vin = "2022 Kia Sorento EX", "5XYRH4LF4NG098846"
+        vehicle = {"@type": ["Product", "Car"], "url": url, "name": title,
+                   "vehicleIdentificationNumber": vin, "vehicleModelDate": 2022,
+                   "brand": {"name": "Kia"}, "model": "Sorento",
+                   "itemCondition": "https://schema.org/UsedCondition",
+                   "mileageFromOdometer": {"value": 85249, "unitCode": "SMI"},
+                   "image": ["https://static.overfuel.com/photos/2200/own-vehicle/photo.webp"]}
+        dealer = {"@type": ["LocalBusiness", "AutoDealer"], "name": "Atlanta Best Used Cars",
+                  "@id": "https://www.atlantabestusedcars.com/#organization",
+                  "url": "https://www.atlantabestusedcars.com/", "telephone": "+17708005000",
+                  "openingHoursSpecification": [{"dayOfWeek": "Monday", "opens": "09:00", "closes": "20:00"}],
+                  "address": {"addressLocality": "Peachtree Corners", "addressRegion": "GA"}}
+        def document(vehicle_data=vehicle):
+            return (f'<link rel="canonical" href="{url}"><h1>{title}</h1>'
+                    f'<script type="application/ld+json">{json.dumps(vehicle_data)}</script>'
+                    f'<script type="application/ld+json">{json.dumps(dealer)}</script>'
+                    '<span data-cy="header-phone" role="button">(770) 800-5000</span>'
+                    '<div class="vdp-costpayment"><span>Call for price</span></div>'
+                    '<div class="vdp-details-grid">'
+                    f'<div class="vdp-detail"><div class="d-flex"><div><b>VIN</b></div><div>{vin}</div></div></div>'
+                    '<div class="vdp-detail"><div class="d-flex"><div><b>Passengers</b></div><div>5</div></div></div>'
+                    '<div class="vdp-detail"><div class="d-flex"><div><b>Engine</b></div><div>2.5L gasoline engine</div></div></div>'
+                    '</div><div class="dealer-notes">This vehicle has a Branded Title.</div>'
+                    '<aside class="related"><span>$999</span></aside>')
+        body = document()
+        row = module.parse_listing("atlanta", body, url, CHECKED)
+        self.assertEqual((row["price_text"], row["price_value"], row["currency"]), ("Call for price", "", ""))
+        self.assertEqual((row["seller"], row["city"], row["phone"]),
+                         ("Atlanta Best Used Cars", "Peachtree Corners", "+17708005000"))
+        self.assertEqual(row.get("mileage_km", ""), "")
+        self.assertIn('"label":"Passengers","value":"5"', row["attributes"])
+        self.assertIn('"label":"Title information","value":"Branded Title (dealer disclosure)"', row["attributes"])
+        self.assertEqual(json.loads(row["attributes"])["contactHours"], "Monday 09:00–20:00")
+        offer = {"url": url, "availability": "https://schema.org/InStock", "price": 18378,
+                 "priceCurrency": "USD", "seller": {"@id": dealer["@id"]}}
+        priced = module.parse_listing("atlanta", document({**vehicle, "offers": offer}).replace(
+            "Call for price", "Retail price $18,378"), url, CHECKED)
+        self.assertEqual((float(priced["price_value"]), priced["phone"]), (18378, "+17708005000"))
+        for invalid in [
+                body.replace("Call for price", "Contact dealer"),
+                body.replace("(770) 800-5000", "(770) 800-XXXX"),
+                body.replace(f'<div>{vin}</div>', '<div>FOREIGN-VIN</div>'),
+                body.replace('<link rel="canonical"', '<link rel="unrelated"'),
+                body.replace('<div class="vdp-costpayment"><span>Call for price</span></div>',
+                             '<aside class="related"><div class="vdp-costpayment">Call for price</div></aside>'),
+                body + '<p>This vehicle is sold</p>',
+                document({**vehicle, "offers": {**offer, "seller": {"@id": "https://unrelated.example/#organization"}}}),
+                document({**vehicle, "offers": {**offer, "url": url + "-other"}}),
+                document({**vehicle, "offers": {"availability": "https://schema.org/SoldOut"}})]:
+            with self.subTest(invalid=invalid[-100:]), self.assertRaises(ValueError):
+                module.parse_listing("atlanta", invalid, url, CHECKED)
+
     def test_real_source_fixtures_keep_price_contact_state_and_exact_images(self):
         expected = {
             "liusedcars": (1900, "USD", "New York", "+19145331895"),

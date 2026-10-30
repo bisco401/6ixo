@@ -87,11 +87,16 @@ def facts_dict(soup, selector, label_selector, value_selector):
     return result
 
 
-def finish(row, price, currency, facts, region="", metro=""):
-    if currency not in {"USD", "ETB"} or price is None or not math.isfinite(float(price)) or float(price) <= 0:
-        raise ValueError("No positive source price in the expected currency")
-    row.update(price_value=str(price), currency=currency,
-               price_text=f"{currency} {float(price):,.0f}")
+def finish(row, price, currency, facts, region="", metro="", contact_price=False):
+    if contact_price:
+        if price not in (None, "") or currency:
+            raise ValueError("Contact-price listings must not inherit an amount or currency")
+        row.update(price_value="", currency="", price_text="Call for price")
+    else:
+        if currency not in {"USD", "ETB"} or price is None or not math.isfinite(float(price)) or float(price) <= 0:
+            raise ValueError("No positive source price in the expected currency")
+        row.update(price_value=str(price), currency=currency,
+                   price_text=f"{currency} {float(price):,.0f}")
     facts = {k: clean(v) for k, v in facts.items() if clean(v).lower() not in {"", "none", "not specified", "n/a", "unknown"}}
     attrs = json.loads(row["attributes"])
     attrs.update(parser="regional_public_sources_v1", region=region, searchMetro=metro,
@@ -143,9 +148,67 @@ def vehicle_schema_row(body, url, checked, source):
     soup = BeautifulSoup(body, "html.parser")
     entity = own_entity(soup, url, {"Car", "Vehicle"})
     offer = entity.get("offers") or {}
-    if not isinstance(offer, dict) or str(offer.get("availability", "")).rsplit("/", 1)[-1] != "InStock":
+    contact_price = False
+    visible_facts = {}
+    # Atlanta's current pages omit Offer when the primary vehicle says Call for
+    # price. Bind this layout to its canonical vehicle, VIN and public dealer;
+    # never use prices or contact details from recommended inventory cards.
+    if source == "atlanta":
+        for node in reversed(soup.select('[class*="related"], [class*="recommend"], [class*="similar"]')):
+            node.decompose()
+        vin = str(entity.get("vehicleIdentificationNumber") or "")
+        for grid in soup.select(".vdp-details-grid"):
+            facts = {}
+            for node in grid.select(".vdp-detail"):
+                label = text(node.select_one("b")).rstrip(":")
+                pair = node.select_one(".d-flex")
+                cells = pair.find_all("div", recursive=False) if pair else []
+                if label and len(cells) == 2:
+                    facts[label] = text(cells[1])
+            if vin and facts.get("VIN") == vin:
+                visible_facts = facts
+    if source == "atlanta" and not offer:
+        costs = soup.select(".vdp-costpayment")
+        dealers = [e for e in schemas(soup) if "AutoDealer" in kinds(e)
+                   and e.get("name") == SOURCES[source][0]
+                   and availability.source_key(e.get("url") or "")
+                   == availability.source_key("https://www.atlantabestusedcars.com/")]
+        if (not canonical_matches(soup, url) or text(soup.select_one("h1")) != clean(entity.get("name"))
+                or not visible_facts or len(dealers) != 1
+                or not costs or not all(text(node).startswith("Call for price") for node in costs)):
+            raise ValueError("Exact primary contact-price vehicle not confirmed")
+        dealer = dealers[0]
+        telephone = phone_number(dealer.get("telephone"), "United States")
+        public_phones = {phone_number(n.get("href", "")[4:], "United States")
+                         for n in soup.select('a[href^="tel:"]')}
+        public_phones.update(phone_number(text(n), "United States")
+                             for n in soup.select('[data-cy="header-phone"], .vdp-costpayment [role="button"]'))
+        state, _ = availability.classify({"source_url": url, "title": entity.get("name", "")}, 200, body, url)
+        if not telephone or telephone not in public_phones or state != "active":
+            raise ValueError("Active vehicle and public dealer contact required")
+        offer = {"seller": dealer, "price": None, "priceCurrency": ""}
+        contact_price = True
+    if not contact_price and (not isinstance(offer, dict) or str(offer.get("availability", "")).rsplit("/", 1)[-1] != "InStock"):
         raise ValueError("No exact in-stock offer")
+    if offer.get("url") and availability.source_key(offer["url"]) != availability.source_key(url):
+        raise ValueError("Offer URL does not match the exact vehicle")
     seller = offer.get("seller") or {}
+    if source == "atlanta" and seller.get("@id") and not seller.get("name"):
+        dealers = [e for e in schemas(soup) if "AutoDealer" in kinds(e)
+                   and e.get("@id") == seller["@id"] and e.get("name") == SOURCES[source][0]
+                   and availability.source_key(e.get("url") or "")
+                   == availability.source_key("https://www.atlantabestusedcars.com/")]
+        if (len(dealers) != 1 or not canonical_matches(soup, url) or not visible_facts
+                or text(soup.select_one("h1")) != clean(entity.get("name"))):
+            raise ValueError("Exact vehicle/dealer reference not confirmed")
+        seller = dealers[0]
+        public_phones = {phone_number(n.get("href", "")[4:], "United States")
+                         for n in soup.select('a[href^="tel:"]')}
+        public_phones.update(phone_number(text(n), "United States")
+                             for n in soup.select('[data-cy="header-phone"], .vdp-costpayment [role="button"]'))
+        telephone = phone_number(seller.get("telephone"), "United States")
+        if not telephone or telephone not in public_phones:
+            raise ValueError("Public dealer contact not confirmed")
     address = seller.get("address") or {}
     country = "Ethiopia" if source == "mekina" else "United States"
     city = (offer.get("areaServed") or {}).get("name", "") if source == "mekina" else address.get("addressLocality", "")
@@ -157,7 +220,7 @@ def vehicle_schema_row(body, url, checked, source):
         if region != "Texas" or seller.get("name") != SOURCES[source][0] or len(dealers) != 1 or not canonical_matches(soup, url):
             raise ValueError("Texas dealer identity/address mismatch")
         seller = {**seller, "telephone": dealers[0].get("telephone")}
-    if offer.get("priceCurrency") != ("ETB" if source == "mekina" else "USD"):
+    if not contact_price and offer.get("priceCurrency") != ("ETB" if source == "mekina" else "USD"):
         raise ValueError("Unexpected source currency")
     images = entity.get("image") or []
     images = images if isinstance(images, list) else [images]
@@ -179,7 +242,9 @@ def vehicle_schema_row(body, url, checked, source):
     facts = {"Year": row["year"], "Make": row["make"], "Model": row["model"], "Trim": row["trim"],
              "Condition": row["condition"], "Transmission": row["transmission"], "Color": row["color"],
              "VIN": entity.get("vehicleIdentificationNumber"), "Body style": entity.get("bodyType"),
-             "Fuel": entity.get("fuelType") or (entity.get("vehicleEngine") or {}).get("fuelType")}
+             "Fuel": entity.get("fuelType") or (entity.get("vehicleEngine") or {}).get("fuelType"),
+             "Doors": entity.get("numberOfDoors"),
+             "Seats": entity.get("seatingCapacity") or entity.get("vehicleSeatingCapacity") or entity.get("numberOfSeats")}
     # No engine displacement: one provider has contradictory EV/combustion data.
     mileage = entity.get("mileageFromOdometer") or {}
     if mileage.get("value") is not None and mileage.get("unitCode") in {"SMI", "KMT"}:
@@ -197,8 +262,25 @@ def vehicle_schema_row(body, url, checked, source):
             row["mileage_km"] = match[1].replace(",", "")
             facts["Mileage"] = value
     if source == "atlanta":
-        facts["Price terms"] = "Source retail price, including listed dealer fees; taxes and registration may be additional"
-    return finish(row, offer.get("price"), offer.get("priceCurrency"), facts, region, "Atlanta" if source == "atlanta" else "")
+        facts.update(visible_facts)
+        if re.search(r"\bThis vehicle has a Branded Title\b", text(soup.select_one(".dealer-notes")), re.I):
+            facts["Title information"] = "Branded Title (dealer disclosure)"
+        facts["Price terms"] = ("Call for price" if contact_price else
+                                "Source retail price, including listed dealer fees; taxes and registration may be additional")
+    row = finish(row, offer.get("price"), offer.get("priceCurrency"), facts, region,
+                 "Atlanta" if source == "atlanta" else "", contact_price=contact_price)
+    if source == "atlanta":
+        hours = []
+        for item in seller.get("openingHoursSpecification", []):
+            days = item.get("dayOfWeek", [])
+            days = [days] if isinstance(days, str) else days
+            if item.get("opens") and item.get("closes"):
+                hours.extend(str(day).rsplit("/", 1)[-1] + " " + item["opens"] + "–" + item["closes"] for day in days)
+        if hours:
+            attributes = json.loads(row["attributes"])
+            attributes["contactHours"] = "; ".join(hours)
+            row["attributes"] = json.dumps(attributes, ensure_ascii=False, separators=(",", ":"))
+    return row
 
 
 def carsforsale_row(body, url, checked, source):

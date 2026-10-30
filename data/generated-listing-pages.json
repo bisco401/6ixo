@@ -1,5 +1,5 @@
 {
-  "count": 4254,
+  "count": 4237,
   "listings": [
     {
       "id": "apify-b9b18084f762",
@@ -12421,15 +12421,6 @@
       "categoryKey": "real-estate"
     },
     {
-      "id": "alba-dubai-292",
-      "slug": "2021-jaguar-f-pace-p250-s-badubai292",
-      "url": "https://6ixo.com/listing/2021-jaguar-f-pace-p250-s-badubai292/",
-      "images": [
-        "https://storage.albacars.ae/vehicles/ee07d3c5-03b3-4c91-82af-7f2e4897e7c5/128da5b9-d107-40db-aef0-be9a7bc8857a.jpeg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
       "id": "alba-dubai-2203",
       "slug": "2021-bmw-x6-m-competition-adubai2203",
       "url": "https://6ixo.com/listing/2021-bmw-x6-m-competition-adubai2203/",
@@ -12739,15 +12730,6 @@
       "url": "https://6ixo.com/listing/2026-212-t01-adventurer-adubai2196/",
       "images": [
         "https://storage.albacars.ae/vehicles/drafts/2196/1.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "alba-dubai-2195",
-      "slug": "2024-volvo-xc60-b5-ultimate-dark-adubai2195",
-      "url": "https://6ixo.com/listing/2024-volvo-xc60-b5-ultimate-dark-adubai2195/",
-      "images": [
-        "https://storage.albacars.ae/vehicles/0a5c210c-1c87-4323-b9c1-d84d364387a9/96c917c0-e708-42e5-b878-c347fd7aeb16.jpeg"
       ],
       "categoryKey": "vehicles"
     },
@@ -15261,24 +15243,6 @@
       "categoryKey": "jobs"
     },
     {
-      "id": "kijiji-1745178313",
-      "slug": "4-beds-modern-two-storey-home-for-rent-1300-42-wilder-lane-1745178313",
-      "url": "https://6ixo.com/listing/4-beds-modern-two-storey-home-for-rent-1300-42-wilder-lane-1745178313/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/d9/d9af4467-cea1-4876-ad6f-198e24e4e5b8?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/b6/b6d089b0-8488-42c2-881c-eaedc43d3108?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/ff/ffb4b035-5a16-4c29-b5bd-ce1887be3cf2?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/3b/3b090989-2703-402a-a19f-b263f68bfc48?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/e2/e2bdcdbd-170e-406a-82b6-ee506d7be7f9?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/9f/9f8a7901-0047-49e8-9014-d18f7d3b91b5?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/50/50495fed-73e8-4658-a6d6-ce8b66a70d0a?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/fd/fdd41daf-59de-4da5-9d6d-541c3d80d6d0?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/f0/f06516b6-fdb3-4c77-b3dc-4cb1ccbddf9f?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/e9/e9ea567c-b5bd-4d8e-acf6-d17dbbe84276?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "real-estate"
-    },
-    {
       "id": "kijiji-1745178227",
       "slug": "honda-civic-need-gone-1745178227",
       "url": "https://6ixo.com/listing/honda-civic-need-gone-1745178227/",
@@ -15565,17 +15529,6 @@
         "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/f9/f9c0a0cf-c6f3-493f-b930-7d36426ed111?rule=kijijica-1600-webp"
       ],
       "categoryKey": "buy-and-sell"
-    },
-    {
-      "id": "kijiji-1745176804",
-      "slug": "looking-for-girls-in-basement-rent-1745176804",
-      "url": "https://6ixo.com/listing/looking-for-girls-in-basement-rent-1745176804/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/c2/c211794b-5bb2-43f0-9821-1141230d77a9?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/71/710b68fa-15a6-499a-b536-282be3d55ab8?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/2a/2ac105c9-430d-41bc-8bce-c0eeaa77a8a3?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "real-estate"
     },
     {
       "id": "kijiji-1745176778",
@@ -18929,15 +18882,6 @@
       "url": "https://6ixo.com/listing/2-bedroom-apartment-for-rent-marina-promenade-dubai-marina-bail310119/",
       "images": [
         "https://images.allsoppandallsopp.com/public/temp/a0O4S000000V5QvUAK_s_2-bedroom-apartment-in-marina-promenade-dubai-marina-aed-150k-allsopp-and-allsopp-photo-2026-10-27-13-36-33-1.jpg"
-      ],
-      "categoryKey": "real-estate"
-    },
-    {
-      "id": "allsopp-dubai-l-309124",
-      "slug": "2-bedroom-apartment-for-rent-the-mayfair-town-square-bail309124",
-      "url": "https://6ixo.com/listing/2-bedroom-apartment-for-rent-the-mayfair-town-square-bail309124/",
-      "images": [
-        "https://images.allsoppandallsopp.com/public/temp/a0OdK000003UoQfUAK_s_2-bedroom-apartment-in-the-mayfair-town-square-aed-110k-allsopp-and-allsopp-3.jpg"
       ],
       "categoryKey": "real-estate"
     },
@@ -23159,6 +23103,15 @@
       "url": "https://6ixo.com/listing/1-bedroom-apartment-for-rent-vera-residences-vera-residenc-bail274120/",
       "images": [
         "https://images.allsoppandallsopp.com/public/temp/a0OdK000000jzk5UAA_s_1-bedroom-apartment-in-vera-residences-vera-residences-business-bay-aed-80k-allsopp-and-allsopp-4c05e91f-776b-456d-9751-2c71df59527a.jpeg"
+      ],
+      "categoryKey": "real-estate"
+    },
+    {
+      "id": "allsopp-dubai-l-308338",
+      "slug": "3-bedroom-apartment-for-rent-hameni-tower-jumeirah-village-bail308338",
+      "url": "https://6ixo.com/listing/3-bedroom-apartment-for-rent-hameni-tower-jumeirah-village-bail308338/",
+      "images": [
+        "https://images.allsoppandallsopp.com/public/temp/a0OdK000000VBf8UAG_s_3-bedroom-apartment-in-hameni-tower-jumeirah-village-circle-aed-220k-allsopp-and-allsopp-1.jpg"
       ],
       "categoryKey": "real-estate"
     },
@@ -34937,18 +34890,6 @@
       "categoryKey": "auto-parts"
     },
     {
-      "id": "craigslist-1fM14h5y3kMcgKuwmbGfrP",
-      "slug": "2023-dodge-hornet-low-miles-21-477-call-for-parts-only-gkuwmbgfrp",
-      "url": "https://6ixo.com/listing/2023-dodge-hornet-low-miles-21-477-call-for-parts-only-gkuwmbgfrp/",
-      "images": [
-        "https://images.craigslist.org/00303_cSeV61o7tGr_0t20CI_600x450.jpg",
-        "https://images.craigslist.org/00b0b_hVjljBw31Di_0t20CI_600x450.jpg",
-        "https://images.craigslist.org/00J0J_igpDPtduYDa_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/00d0d_kfRhAsEOzhE_0t20CI_600x450.jpg"
-      ],
-      "categoryKey": "auto-parts"
-    },
-    {
       "id": "craigslist-7UM7jXephJyYUXD1BjPQGP",
       "slug": "cadillac-escalade-call-make-offer-2015-2020-front-grille-w-uxd1bjpqgp",
       "url": "https://6ixo.com/listing/cadillac-escalade-call-make-offer-2015-2020-front-grille-w-uxd1bjpqgp/",
@@ -37928,15 +37869,6 @@
       "categoryKey": "real-estate"
     },
     {
-      "id": "allsopp-dubai-l-309459",
-      "slug": "2-bedroom-apartment-for-rent-mulberry-2-dubai-hills-estate-bail309459",
-      "url": "https://6ixo.com/listing/2-bedroom-apartment-for-rent-mulberry-2-dubai-hills-estate-bail309459/",
-      "images": [
-        "https://images.allsoppandallsopp.com/public/temp/a0O4S000000V2g1UAC_s_2-bedroom-apartment-in-mulberry-2-dubai-hills-estate-aed-170k-allsopp-and-allsopp-geminigeneratedimage13p1o213p1o213p1.jpeg"
-      ],
-      "categoryKey": "real-estate"
-    },
-    {
       "id": "allsopp-dubai-l-309817",
       "slug": "2-bedroom-apartment-for-rent-sadaf-7-jumeirah-beach-reside-bail309817",
       "url": "https://6ixo.com/listing/2-bedroom-apartment-for-rent-sadaf-7-jumeirah-beach-reside-bail309817/",
@@ -40836,30 +40768,6 @@
       "categoryKey": "vehicles"
     },
     {
-      "id": "craigslist-Qgncrhq88RG94O9A4g_ubQ",
-      "slug": "2007-bmw-z4-2dr-roadster-3-0i-94o9a4gubq",
-      "url": "https://6ixo.com/listing/2007-bmw-z4-2dr-roadster-3-0i-94o9a4gubq/",
-      "images": [
-        "https://images.craigslist.org/00L0L_969rQ9G0oo_0ak07K_600x450.jpg",
-        "https://images.craigslist.org/00j0j_hGaTONgmWeC_0ak07K_600x450.jpg",
-        "https://images.craigslist.org/00l0l_k0muUGuQDAC_0ak07K_600x450.jpg",
-        "https://images.craigslist.org/01515_cH3jTh6OO8R_0ak07K_600x450.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "craigslist-CMvLqhq88RGPVa5lbSCwDg",
-      "slug": "2008-ford-edge-4dr-limited-fwd-va5lbscwdg",
-      "url": "https://6ixo.com/listing/2008-ford-edge-4dr-limited-fwd-va5lbscwdg/",
-      "images": [
-        "https://images.craigslist.org/00d0d_10OjW8bfnt9_0ak07K_600x450.jpg",
-        "https://images.craigslist.org/00u0u_9ZBb3TxiePm_0ak07K_600x450.jpg",
-        "https://images.craigslist.org/00V0V_dYhWdwrMt79_0ak07K_600x450.jpg",
-        "https://images.craigslist.org/00o0o_e7t4TIiVrVY_0ak07K_600x450.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
       "id": "craigslist-9FhQrhg47mPJEfgvviQVnM",
       "slug": "yamaha-rx-v565-av-receiver-efgvviqvnm",
       "url": "https://6ixo.com/listing/yamaha-rx-v565-av-receiver-efgvviqvnm/",
@@ -41027,18 +40935,6 @@
         "https://images.craigslist.org/00U0U_1Ms978b9huR_0CI0cr_600x450.jpg",
         "https://images.craigslist.org/01616_aj2AtSVm2l9_0CI0jN_600x450.jpg",
         "https://images.craigslist.org/01717_7zQsFxlSADO_0CI0my_600x450.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "craigslist-uQubSBdJ2XjXk7LV6eYKrq",
-      "slug": "cadillac-srx-k7lv6eykrq",
-      "url": "https://6ixo.com/listing/cadillac-srx-k7lv6eykrq/",
-      "images": [
-        "https://images.craigslist.org/00s0s_3AKp6CVTKAF_0CI0jo_600x450.jpg",
-        "https://images.craigslist.org/01515_js0Lkj1mbl0_0CI0i0_600x450.jpg",
-        "https://images.craigslist.org/00c0c_bpAaAX7dyqy_0CI0wU_600x450.jpg",
-        "https://images.craigslist.org/01717_9Io0JQMBVwf_0CI0iT_600x450.jpg"
       ],
       "categoryKey": "vehicles"
     },
@@ -41273,16 +41169,6 @@
       "categoryKey": "electronics"
     },
     {
-      "id": "craigslist-ACYAjR-88RGyrtv-Y5X8Ow",
-      "slug": "lincoln-mkz-cash-yrtvy5x8ow",
-      "url": "https://6ixo.com/listing/lincoln-mkz-cash-yrtvy5x8ow/",
-      "images": [
-        "https://images.craigslist.org/00t0t_8bzucwFNqkA_0jm0ew_600x450.jpg",
-        "https://images.craigslist.org/00E0E_4Fbr2li1uET_0jm0ew_600x450.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
       "id": "craigslist-GMfhkwm98RGJG_O8oZagVw",
       "slug": "2023-ford-f150-f-150-f-150-xlsupercab-65-ft-box-for-only-3-jgo8ozagvw",
       "url": "https://6ixo.com/listing/2023-ford-f150-f-150-f-150-xlsupercab-65-ft-box-for-only-3-jgo8ozagvw/",
@@ -41419,39 +41305,6 @@
       "categoryKey": "electronics"
     },
     {
-      "id": "craigslist-ulUUXzu88RGiTdkG9PUP3A",
-      "slug": "2001-ford-f350-7-3l-4x4-0-rust-serviced-f-350-f250-2002-20-tdkg9pup3a",
-      "url": "https://6ixo.com/listing/2001-ford-f350-7-3l-4x4-0-rust-serviced-f-350-f250-2002-20-tdkg9pup3a/",
-      "images": [
-        "https://images.craigslist.org/00g0g_4cufPKgbZm1_0cU08B_600x450.jpg",
-        "https://images.craigslist.org/00R0R_lIAVZ1kSAn1_0cU08B_600x450.jpg",
-        "https://images.craigslist.org/00j0j_g4UqE2i942x_0cU08B_600x450.jpg",
-        "https://images.craigslist.org/00707_gw8yl9ZRvKe_0cU08B_600x450.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "craigslist-1J7xQ43i9vdQf7EjkbqGex",
-      "slug": "we-buy-cars-running-or-not-cash-on-the-spot-f7ejkbqgex",
-      "url": "https://6ixo.com/listing/we-buy-cars-running-or-not-cash-on-the-spot-f7ejkbqgex/",
-      "images": [
-        "https://images.craigslist.org/00l0l_4DTb8WRUJlK_0CI0t2_600x450.jpg"
-      ],
-      "categoryKey": "services"
-    },
-    {
-      "id": "craigslist-gKNejNpXLSZHtsH3ij1b2j",
-      "slug": "2024-honda-hr-v-sport-financing-available-tsh3ij1b2j",
-      "url": "https://6ixo.com/listing/2024-honda-hr-v-sport-financing-available-tsh3ij1b2j/",
-      "images": [
-        "https://images.craigslist.org/00w0w_6ZdwQ9V5UNf_0pO0jm_1200x900.jpg",
-        "https://images.craigslist.org/00c0c_8zBarKsGA3E_0ak07K_1200x900.jpg",
-        "https://images.craigslist.org/00101_aWPeCvvrXRs_0ak07K_1200x900.jpg",
-        "https://images.craigslist.org/00L0L_fHHcLOZC3hT_0ak07K_1200x900.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
       "id": "craigslist-prbKSrNHsr5xVSWQ5XsyWU",
       "slug": "2002-2006-jeep-liberty-passenger-rear-window-regulator-and-vswq5xsywu",
       "url": "https://6ixo.com/listing/2002-2006-jeep-liberty-passenger-rear-window-regulator-and-vswq5xsywu/",
@@ -41532,16 +41385,6 @@
       "categoryKey": "vehicles"
     },
     {
-      "id": "craigslist-kEy8vzYRK7P5i8XSCMEXAj",
-      "slug": "2019-chevrolet-1500-double-cab-4x4-truck-i8xscmexaj",
-      "url": "https://6ixo.com/listing/2019-chevrolet-1500-double-cab-4x4-truck-i8xscmexaj/",
-      "images": [
-        "https://images.craigslist.org/00t0t_68bMMmtGukV_0CI0ik_600x450.jpg",
-        "https://images.craigslist.org/00u0u_fxZhMBbuQLr_0CI0ik_600x450.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
       "id": "craigslist-uRXWbmw85Ccyzt57PQnFmU",
       "slug": "chrome-plating-bumpers-and-parts-zt57pqnfmu",
       "url": "https://6ixo.com/listing/chrome-plating-bumpers-and-parts-zt57pqnfmu/",
@@ -41572,42 +41415,6 @@
         "https://images.craigslist.org/00F0F_dvWu1ktppYb_0t20CI_600x450.jpg"
       ],
       "categoryKey": "electronics"
-    },
-    {
-      "id": "craigslist-uFHlskS88RGZVtkYKUTmWA",
-      "slug": "2008-dodge-durango-2wd-4dr-sxt-vtkykutmwa",
-      "url": "https://6ixo.com/listing/2008-dodge-durango-2wd-4dr-sxt-vtkykutmwa/",
-      "images": [
-        "https://images.craigslist.org/00707_59Ujkdeip29_0jm0ew_600x450.jpg",
-        "https://images.craigslist.org/00909_ijlJpLvnv9T_0jm0ew_600x450.jpg",
-        "https://images.craigslist.org/00X0X_gZz2WhNZrvq_0jm0ew_600x450.jpg",
-        "https://images.craigslist.org/00i0i_cmU3q1POhUM_0jm0ew_600x450.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "craigslist-jqmdvi-88RGWZ7LCn3yNgQ",
-      "slug": "2017-hyundai-elantra-limited-2-0l-auto-ulsan-z7lcn3yngq",
-      "url": "https://6ixo.com/listing/2017-hyundai-elantra-limited-2-0l-auto-ulsan-z7lcn3yngq/",
-      "images": [
-        "https://images.craigslist.org/00U0U_g8535BivJ29_0jm0ew_600x450.jpg",
-        "https://images.craigslist.org/01212_84xQUGDZkwZ_0jm0ew_600x450.jpg",
-        "https://images.craigslist.org/00w0w_1SUenibElz6_0jm0ew_600x450.jpg",
-        "https://images.craigslist.org/00v0v_crkp7XmJqs5_0jm0ew_600x450.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "craigslist-IIZNxBq88RGpvvP1FyK8Vg",
-      "slug": "2022-chevrolet-chevy-silverado-1500-ltd-2wd-crew-cab-custo-vvp1fyk8vg",
-      "url": "https://6ixo.com/listing/2022-chevrolet-chevy-silverado-1500-ltd-2wd-crew-cab-custo-vvp1fyk8vg/",
-      "images": [
-        "https://images.craigslist.org/00V0V_c0GZL3Wk8bi_0jm0ew_600x450.jpg",
-        "https://images.craigslist.org/01717_7NqcBdZHTxH_0jm0ew_600x450.jpg",
-        "https://images.craigslist.org/00606_9gnHsX7QzxG_0jm0ew_600x450.jpg",
-        "https://images.craigslist.org/00101_bhWjeXxTq2Z_0jm0ew_600x450.jpg"
-      ],
-      "categoryKey": "vehicles"
     },
     {
       "id": "craigslist-ifRxG5NfYMwRWxCepJig36",
@@ -43553,6 +43360,15 @@
       "categoryKey": "buy-and-sell"
     },
     {
+      "id": "samtronix-gy-15882866229408",
+      "slug": "apple-iphone-18-pro-max-e-sim-512gb-storage-2866229408",
+      "url": "https://6ixo.com/listing/apple-iphone-18-pro-max-e-sim-512gb-storage-2866229408/",
+      "images": [
+        "https://samtronixguyana.com/cdn/shop/files/DISCPS5CallofDutyModernWarfare3New_2_f65749e7-27a2-4b32-a990-977a9d256066_1024x.png?v=1791200256"
+      ],
+      "categoryKey": "electronics"
+    },
+    {
       "id": "samtronix-gy-15868034580640",
       "slug": "apple-iphone-18-pro-max-e-sim-256gb-storage-8034580640",
       "url": "https://6ixo.com/listing/apple-iphone-18-pro-max-e-sim-256gb-storage-8034580640/",
@@ -45294,16 +45110,6 @@
       "url": "https://6ixo.com/listing/techview-s17-pro-8gb-ram-64gb-storage-8571640992/",
       "images": [
         "https://samtronixguyana.com/cdn/shop/files/WhatsAppImage2026-02-16at10.56.21PM_1024x.jpg?v=1771318291"
-      ],
-      "categoryKey": "electronics"
-    },
-    {
-      "id": "craigslist-51r9VXE8y5MuKRacakrWgJ",
-      "slug": "hafler-200-220-amp-kracakrwgj",
-      "url": "https://6ixo.com/listing/hafler-200-220-amp-kracakrwgj/",
-      "images": [
-        "https://images.craigslist.org/00B0B_ffEMtcBqOf4_0gw08n_600x450.jpg",
-        "https://images.craigslist.org/00M0M_88S1hkypwmR_07E03P_600x450.jpg"
       ],
       "categoryKey": "electronics"
     },
@@ -52383,9 +52189,6 @@
       "url": "https://6ixo.com/listings/page/118/"
     },
     {
-      "url": "https://6ixo.com/listings/page/119/"
-    },
-    {
       "url": "https://6ixo.com/listings/electronics/"
     },
     {
@@ -53406,9 +53209,6 @@
       "url": "https://6ixo.com/listings/country/united-states/page/40/"
     },
     {
-      "url": "https://6ixo.com/listings/country/united-states/page/41/"
-    },
-    {
       "url": "https://6ixo.com/apartments-for-rent/"
     },
     {
@@ -53659,9 +53459,6 @@
     },
     {
       "url": "https://6ixo.com/cars-for-sale/united-states/page/28/"
-    },
-    {
-      "url": "https://6ixo.com/cars-for-sale/united-states/page/29/"
     }
   ],
   "retired": [
@@ -61686,11 +61483,6 @@
       "url": "https://6ixo.com/listing/gorgeous-1br-in-bay-terrace-fully-furnished-izyrtavpc3/"
     },
     {
-      "id": "allsopp-dubai-l-308338",
-      "slug": "3-bedroom-apartment-for-rent-hameni-tower-jumeirah-village-bail308338",
-      "url": "https://6ixo.com/listing/3-bedroom-apartment-for-rent-hameni-tower-jumeirah-village-bail308338/"
-    },
-    {
       "id": "alba-dubai-2112",
       "slug": "2023-bmw-330i-m-sport-adubai2112",
       "url": "https://6ixo.com/listing/2023-bmw-330i-m-sport-adubai2112/"
@@ -62201,11 +61993,6 @@
       "url": "https://6ixo.com/listing/2015-ford-f-250-lariat-ultimate-4x4-diesel-sunroof-norstar-ulii3zh5z3/"
     },
     {
-      "id": "samtronix-gy-15882866229408",
-      "slug": "apple-iphone-18-pro-max-e-sim-512gb-storage-2866229408",
-      "url": "https://6ixo.com/listing/apple-iphone-18-pro-max-e-sim-512gb-storage-2866229408/"
-    },
-    {
       "id": "kijiji-1745440421",
       "slug": "no-tax-cansdian-made-sofa-set-sofa-couch-sectional-1745440421",
       "url": "https://6ixo.com/listing/no-tax-cansdian-made-sofa-set-sofa-couch-sectional-1745440421/"
@@ -62649,6 +62436,101 @@
       "id": "samtronix-gy-15199838142624",
       "slug": "jbl-headphone-gaming-tune720d-9838142624",
       "url": "https://6ixo.com/listing/jbl-headphone-gaming-tune720d-9838142624/"
+    },
+    {
+      "id": "alba-dubai-292",
+      "slug": "2021-jaguar-f-pace-p250-s-badubai292",
+      "url": "https://6ixo.com/listing/2021-jaguar-f-pace-p250-s-badubai292/"
+    },
+    {
+      "id": "alba-dubai-2195",
+      "slug": "2024-volvo-xc60-b5-ultimate-dark-adubai2195",
+      "url": "https://6ixo.com/listing/2024-volvo-xc60-b5-ultimate-dark-adubai2195/"
+    },
+    {
+      "id": "kijiji-1745178313",
+      "slug": "4-beds-modern-two-storey-home-for-rent-1300-42-wilder-lane-1745178313",
+      "url": "https://6ixo.com/listing/4-beds-modern-two-storey-home-for-rent-1300-42-wilder-lane-1745178313/"
+    },
+    {
+      "id": "kijiji-1745176804",
+      "slug": "looking-for-girls-in-basement-rent-1745176804",
+      "url": "https://6ixo.com/listing/looking-for-girls-in-basement-rent-1745176804/"
+    },
+    {
+      "id": "allsopp-dubai-l-309124",
+      "slug": "2-bedroom-apartment-for-rent-the-mayfair-town-square-bail309124",
+      "url": "https://6ixo.com/listing/2-bedroom-apartment-for-rent-the-mayfair-town-square-bail309124/"
+    },
+    {
+      "id": "craigslist-1fM14h5y3kMcgKuwmbGfrP",
+      "slug": "2023-dodge-hornet-low-miles-21-477-call-for-parts-only-gkuwmbgfrp",
+      "url": "https://6ixo.com/listing/2023-dodge-hornet-low-miles-21-477-call-for-parts-only-gkuwmbgfrp/"
+    },
+    {
+      "id": "allsopp-dubai-l-309459",
+      "slug": "2-bedroom-apartment-for-rent-mulberry-2-dubai-hills-estate-bail309459",
+      "url": "https://6ixo.com/listing/2-bedroom-apartment-for-rent-mulberry-2-dubai-hills-estate-bail309459/"
+    },
+    {
+      "id": "craigslist-Qgncrhq88RG94O9A4g_ubQ",
+      "slug": "2007-bmw-z4-2dr-roadster-3-0i-94o9a4gubq",
+      "url": "https://6ixo.com/listing/2007-bmw-z4-2dr-roadster-3-0i-94o9a4gubq/"
+    },
+    {
+      "id": "craigslist-CMvLqhq88RGPVa5lbSCwDg",
+      "slug": "2008-ford-edge-4dr-limited-fwd-va5lbscwdg",
+      "url": "https://6ixo.com/listing/2008-ford-edge-4dr-limited-fwd-va5lbscwdg/"
+    },
+    {
+      "id": "craigslist-uQubSBdJ2XjXk7LV6eYKrq",
+      "slug": "cadillac-srx-k7lv6eykrq",
+      "url": "https://6ixo.com/listing/cadillac-srx-k7lv6eykrq/"
+    },
+    {
+      "id": "craigslist-ACYAjR-88RGyrtv-Y5X8Ow",
+      "slug": "lincoln-mkz-cash-yrtvy5x8ow",
+      "url": "https://6ixo.com/listing/lincoln-mkz-cash-yrtvy5x8ow/"
+    },
+    {
+      "id": "craigslist-ulUUXzu88RGiTdkG9PUP3A",
+      "slug": "2001-ford-f350-7-3l-4x4-0-rust-serviced-f-350-f250-2002-20-tdkg9pup3a",
+      "url": "https://6ixo.com/listing/2001-ford-f350-7-3l-4x4-0-rust-serviced-f-350-f250-2002-20-tdkg9pup3a/"
+    },
+    {
+      "id": "craigslist-1J7xQ43i9vdQf7EjkbqGex",
+      "slug": "we-buy-cars-running-or-not-cash-on-the-spot-f7ejkbqgex",
+      "url": "https://6ixo.com/listing/we-buy-cars-running-or-not-cash-on-the-spot-f7ejkbqgex/"
+    },
+    {
+      "id": "craigslist-gKNejNpXLSZHtsH3ij1b2j",
+      "slug": "2024-honda-hr-v-sport-financing-available-tsh3ij1b2j",
+      "url": "https://6ixo.com/listing/2024-honda-hr-v-sport-financing-available-tsh3ij1b2j/"
+    },
+    {
+      "id": "craigslist-kEy8vzYRK7P5i8XSCMEXAj",
+      "slug": "2019-chevrolet-1500-double-cab-4x4-truck-i8xscmexaj",
+      "url": "https://6ixo.com/listing/2019-chevrolet-1500-double-cab-4x4-truck-i8xscmexaj/"
+    },
+    {
+      "id": "craigslist-uFHlskS88RGZVtkYKUTmWA",
+      "slug": "2008-dodge-durango-2wd-4dr-sxt-vtkykutmwa",
+      "url": "https://6ixo.com/listing/2008-dodge-durango-2wd-4dr-sxt-vtkykutmwa/"
+    },
+    {
+      "id": "craigslist-jqmdvi-88RGWZ7LCn3yNgQ",
+      "slug": "2017-hyundai-elantra-limited-2-0l-auto-ulsan-z7lcn3yngq",
+      "url": "https://6ixo.com/listing/2017-hyundai-elantra-limited-2-0l-auto-ulsan-z7lcn3yngq/"
+    },
+    {
+      "id": "craigslist-IIZNxBq88RGpvvP1FyK8Vg",
+      "slug": "2022-chevrolet-chevy-silverado-1500-ltd-2wd-crew-cab-custo-vvp1fyk8vg",
+      "url": "https://6ixo.com/listing/2022-chevrolet-chevy-silverado-1500-ltd-2wd-crew-cab-custo-vvp1fyk8vg/"
+    },
+    {
+      "id": "craigslist-51r9VXE8y5MuKRacakrWgJ",
+      "slug": "hafler-200-220-amp-kracakrwgj",
+      "url": "https://6ixo.com/listing/hafler-200-220-amp-kracakrwgj/"
     }
   ]
 }

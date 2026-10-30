@@ -1,5 +1,5 @@
 {
-  "checkedAt": "2026-10-30T20:52:20Z",
+  "checkedAt": "2026-10-30T21:16:12.511Z",
   "listings": {
     "craigslist.org/view/d/bastrop-used-2025-cadillac-xt4-fwd-4d/fuqr_3uo8rgowpq1ctwx-a": {
       "availability": "sold",
@@ -18065,6 +18065,24 @@
       "httpStatus": 200,
       "sourceUrl": "https://www.kijiji.ca/v-cars-trucks/hamilton/2023-lincoln-aviator-reserve-awd-no-accidents-360-camera/1739409211",
       "resolvedUrl": "https://www.kijiji.ca/b-cars-trucks/hamilton/c174l80014?adRemoved=1739409211&ll=42.9325931%2C-79.80726109999999&radius=150.0&rb=50"
+    },
+    "kijiji.ca/v-bed-mattress/city-of-toronto/deal-luxury-contemporary-bed-queen-bed-bed-bed-frame/1745509285": {
+      "id": "kijiji-1745509285",
+      "sourceUrl": "https://www.kijiji.ca/v-bed-mattress/city-of-toronto/deal-luxury-contemporary-bed-queen-bed-bed-bed-frame/1745509285",
+      "availability": "gone",
+      "checkedAt": "2026-10-30T21:16:12.511Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-bed-mattress/city-of-toronto/c246l1700273?radius=50.0&ll=43.76%2C-79.22&adRemoved=1745509285",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "craigslist.org/view/d/loganville-2004-nissan-350z/22ubabfbszgbq4rit69lud": {
+      "id": "craigslist-22uBabFBszGBQ4Rit69Lud",
+      "sourceUrl": "https://www.craigslist.org/view/d/loganville-2004-nissan-350z/22uBabFBszGBQ4Rit69Lud",
+      "availability": "gone",
+      "checkedAt": "2026-10-30T21:16:12.511Z",
+      "httpStatus": 410,
+      "resolvedUrl": "https://www.craigslist.org/view/d/loganville-2004-nissan-350z/22uBabFBszGBQ4Rit69Lud",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     }
   }
 }

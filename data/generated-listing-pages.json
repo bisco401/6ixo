@@ -1,5 +1,5 @@
 {
-  "count": 4237,
+  "count": 4230,
   "listings": [
     {
       "id": "apify-b9b18084f762",
@@ -2625,15 +2625,6 @@
         "https://images.allsoppandallsopp.com/public/temp/a0OdK000003iHg9UAE_s_3-bedroom-apartment-in-beach-mansion-dubai-harbour-aed-330k-allsopp-and-allsopp-2bff1894-a415-41b5-aab0-c3bf636b9b9c.png"
       ],
       "categoryKey": "real-estate"
-    },
-    {
-      "id": "alba-dubai-2245",
-      "slug": "2024-volkswagen-golf-gti-p2-adubai2245",
-      "url": "https://6ixo.com/listing/2024-volkswagen-golf-gti-p2-adubai2245/",
-      "images": [
-        "https://storage.albacars.ae/vehicles/drafts/2245/1.jpg"
-      ],
-      "categoryKey": "vehicles"
     },
     {
       "id": "alba-dubai-2244",
@@ -8548,18 +8539,6 @@
       "categoryKey": "vehicles"
     },
     {
-      "id": "craigslist-2EUP1InR8RGkANdBwx4Wqg",
-      "slug": "2023-kia-telluride-financing-786-419-9215-andbwx4wqg",
-      "url": "https://6ixo.com/listing/2023-kia-telluride-financing-786-419-9215-andbwx4wqg/",
-      "images": [
-        "https://images.craigslist.org/00W0W_lpEuQ2u4YDQ_0jk0ew_600x450.jpg",
-        "https://images.craigslist.org/00y0y_6cwnsBkdKag_0jm0cU_600x450.jpg",
-        "https://images.craigslist.org/00y0y_aHzlGAECMJF_0jm0aV_600x450.jpg",
-        "https://images.craigslist.org/00v0v_aFOAMs7cEtS_0jm0ew_600x450.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
       "id": "craigslist-4ez26ZAeuHgt3TBvHZDZNZ",
       "slug": "2017-jeep-wrangler-sahara-unlimited-perfect-condition-7868-3tbvhzdznz",
       "url": "https://6ixo.com/listing/2017-jeep-wrangler-sahara-unlimited-perfect-condition-7868-3tbvhzdznz/",
@@ -8640,18 +8619,6 @@
         "https://images.craigslist.org/00j0j_id2weDgfB_0CI0nc_600x450.jpg",
         "https://images.craigslist.org/00E0E_9Zkbn2vIk3O_0CI0mY_600x450.jpg",
         "https://images.craigslist.org/00V0V_84rruMVOnfD_0CI0o2_600x450.jpg"
-      ],
-      "categoryKey": "real-estate"
-    },
-    {
-      "id": "craigslist-vZNX86VPJMT6My63dG7zoZ",
-      "slug": "cozy-1000sqft-2-1-2nd-floor-apt-in-downtownnpr-1st-sec-mov-my63dg7zoz",
-      "url": "https://6ixo.com/listing/cozy-1000sqft-2-1-2nd-floor-apt-in-downtownnpr-1st-sec-mov-my63dg7zoz/",
-      "images": [
-        "https://images.craigslist.org/00Q0Q_dfIKN7y1EfA_0x20oM_600x450.jpg",
-        "https://images.craigslist.org/00404_d8hyHlZGBas_0x20oM_600x450.jpg",
-        "https://images.craigslist.org/00Y0Y_bDkJzFn7lK3_0x20oM_600x450.jpg",
-        "https://images.craigslist.org/00c0c_huQQhPRQJDd_0x20oM_600x450.jpg"
       ],
       "categoryKey": "real-estate"
     },
@@ -11916,18 +11883,6 @@
         "https://images.craigslist.org/00303_3Cw34sf6xev_0t20CI_600x450.jpg"
       ],
       "categoryKey": "services"
-    },
-    {
-      "id": "craigslist-x5cDqoVHN2j5DoMuALvNW2",
-      "slug": "2017-nissan-sentra-sv-backup-camera-clean-title-nice-domualvnw2",
-      "url": "https://6ixo.com/listing/2017-nissan-sentra-sv-backup-camera-clean-title-nice-domualvnw2/",
-      "images": [
-        "https://images.craigslist.org/00K0K_2D44JNneY8T_0C60t2_600x450.jpg",
-        "https://images.craigslist.org/00D0D_lW58x1xCcp5_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/00P0P_3dRWvB8FOzK_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/00j0j_fwvYxSYh8pF_0CI0t2_600x450.jpg"
-      ],
-      "categoryKey": "vehicles"
     },
     {
       "id": "craigslist-2j7Jr9pGHo6k9qYyNyJaZN",
@@ -18981,18 +18936,6 @@
         "https://images.craigslist.org/00y0y_amdyXXTKrMK_0ak07K_600x450.jpg",
         "https://images.craigslist.org/00202_6quWojiFxqq_0ak07K_600x450.jpg",
         "https://images.craigslist.org/00w0w_hXl0mfPaurj_0ak07K_600x450.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "craigslist-8CtLhU5VYgwx8Xv7do4zWZ",
-      "slug": "2016-dodge-journey-se-3rd-row-seating-with-111-540-miles-8xv7do4zwz",
-      "url": "https://6ixo.com/listing/2016-dodge-journey-se-3rd-row-seating-with-111-540-miles-8xv7do4zwz/",
-      "images": [
-        "https://images.craigslist.org/01414_8enpVO4Ix6m_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/00o0o_7qDNBlsHdG3_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/00I0I_jv2tiG5Bpln_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/00i0i_26wNrs7gbAQ_0CI0t2_600x450.jpg"
       ],
       "categoryKey": "vehicles"
     },
@@ -28166,15 +28109,6 @@
       "categoryKey": "buy-and-sell"
     },
     {
-      "id": "alba-dubai-2107",
-      "slug": "2026-toyota-innova-hev-adubai2107",
-      "url": "https://6ixo.com/listing/2026-toyota-innova-hev-adubai2107/",
-      "images": [
-        "https://storage.albacars.ae/vehicles/drafts/2107/1.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
       "id": "craigslist-nCS15TZdAGZtbQo5VkhEpm",
       "slug": "oldsmobile-delta-88-1970-clean-call-make-offer-bqo5vkhepm",
       "url": "https://6ixo.com/listing/oldsmobile-delta-88-1970-clean-call-make-offer-bqo5vkhepm/",
@@ -31451,15 +31385,6 @@
         "https://oxglow.com.gh/uploads/medium/auusda-laptop-21712-1791719003-3-medium.jpeg"
       ],
       "categoryKey": "electronics"
-    },
-    {
-      "id": "allsopp-dubai-l-311495",
-      "slug": "1-bedroom-apartment-for-rent-bliss-homes-dubai-land-reside-bail311495",
-      "url": "https://6ixo.com/listing/1-bedroom-apartment-for-rent-bliss-homes-dubai-land-reside-bail311495/",
-      "images": [
-        "https://images.allsoppandallsopp.com/public/temp/a0OdK000003d4mnUAA_s_1-bedroom-apartment-in-bliss-homes-dubai-land-residence-complex-aed-63k-allsopp-and-allsopp-minimalist-apartment-kitchen-and-living-space.jpg"
-      ],
-      "categoryKey": "real-estate"
     },
     {
       "id": "allsopp-dubai-l-311498",
@@ -52357,9 +52282,6 @@
       "url": "https://6ixo.com/listings/vehicles/page/47/"
     },
     {
-      "url": "https://6ixo.com/listings/vehicles/page/48/"
-    },
-    {
       "url": "https://6ixo.com/listings/auto-parts/"
     },
     {
@@ -62531,6 +62453,41 @@
       "id": "craigslist-51r9VXE8y5MuKRacakrWgJ",
       "slug": "hafler-200-220-amp-kracakrwgj",
       "url": "https://6ixo.com/listing/hafler-200-220-amp-kracakrwgj/"
+    },
+    {
+      "id": "alba-dubai-2245",
+      "slug": "2024-volkswagen-golf-gti-p2-adubai2245",
+      "url": "https://6ixo.com/listing/2024-volkswagen-golf-gti-p2-adubai2245/"
+    },
+    {
+      "id": "craigslist-2EUP1InR8RGkANdBwx4Wqg",
+      "slug": "2023-kia-telluride-financing-786-419-9215-andbwx4wqg",
+      "url": "https://6ixo.com/listing/2023-kia-telluride-financing-786-419-9215-andbwx4wqg/"
+    },
+    {
+      "id": "craigslist-vZNX86VPJMT6My63dG7zoZ",
+      "slug": "cozy-1000sqft-2-1-2nd-floor-apt-in-downtownnpr-1st-sec-mov-my63dg7zoz",
+      "url": "https://6ixo.com/listing/cozy-1000sqft-2-1-2nd-floor-apt-in-downtownnpr-1st-sec-mov-my63dg7zoz/"
+    },
+    {
+      "id": "craigslist-x5cDqoVHN2j5DoMuALvNW2",
+      "slug": "2017-nissan-sentra-sv-backup-camera-clean-title-nice-domualvnw2",
+      "url": "https://6ixo.com/listing/2017-nissan-sentra-sv-backup-camera-clean-title-nice-domualvnw2/"
+    },
+    {
+      "id": "craigslist-8CtLhU5VYgwx8Xv7do4zWZ",
+      "slug": "2016-dodge-journey-se-3rd-row-seating-with-111-540-miles-8xv7do4zwz",
+      "url": "https://6ixo.com/listing/2016-dodge-journey-se-3rd-row-seating-with-111-540-miles-8xv7do4zwz/"
+    },
+    {
+      "id": "alba-dubai-2107",
+      "slug": "2026-toyota-innova-hev-adubai2107",
+      "url": "https://6ixo.com/listing/2026-toyota-innova-hev-adubai2107/"
+    },
+    {
+      "id": "allsopp-dubai-l-311495",
+      "slug": "1-bedroom-apartment-for-rent-bliss-homes-dubai-land-reside-bail311495",
+      "url": "https://6ixo.com/listing/1-bedroom-apartment-for-rent-bliss-homes-dubai-land-reside-bail311495/"
     }
   ]
 }

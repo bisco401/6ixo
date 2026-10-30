@@ -1,5 +1,5 @@
 {
-  "count": 4373,
+  "count": 4372,
   "listings": [
     {
       "id": "import-67ff0ce3b61030a75c",
@@ -948,7 +948,9 @@
       "url": "https://6ixo.com/listing/2003-international-school-bus-rust-free-diesel-plt3bbyckl/",
       "images": [
         "https://images.craigslist.org/01212_aRHqJ0e1uje_0x20oM_600x450.jpg",
-        "https://images.craigslist.org/00M0M_6lAgmIeYq8B_0x20oM_600x450.jpg"
+        "https://images.craigslist.org/00909_7lhtqkiyzes_0x20oM_600x450.jpg",
+        "https://images.craigslist.org/00M0M_6lAgmIeYq8B_0x20oM_600x450.jpg",
+        "https://images.craigslist.org/00606_heEGOXXJ3PS_0x20oM_600x450.jpg"
       ],
       "categoryKey": "vehicles"
     },
@@ -1026,6 +1028,7 @@
       "slug": "vulcan-hart-vacb36n-21-char-broiler-countertop-grill-36-na-upweqdhxdd",
       "url": "https://6ixo.com/listing/vulcan-hart-vacb36n-21-char-broiler-countertop-grill-36-na-upweqdhxdd/",
       "images": [
+        "https://images.craigslist.org/00000_8TYsNfYolVa_0g80g8_600x450.jpg",
         "https://images.craigslist.org/00F0F_lU5YOltZwBV_0g80g8_600x450.jpg",
         "https://images.craigslist.org/00v0v_fEQWx9qhoy0_0g80g8_600x450.jpg",
         "https://images.craigslist.org/00d0d_5M2PV3F8X0G_0g80g8_600x450.jpg"
@@ -1039,6 +1042,7 @@
       "images": [
         "https://images.craigslist.org/01717_cJR4xMXTqIn_0nm0hw_600x450.jpg",
         "https://images.craigslist.org/00V0V_44Lfok41t3B_0hw0nm_600x450.jpg",
+        "https://images.craigslist.org/01313_k6MTTnBGRXR_0nm0hw_600x450.jpg",
         "https://images.craigslist.org/00U0U_bUkiebAS8k6_0cU0cU_600x450.jpg"
       ],
       "categoryKey": "services"
@@ -2455,15 +2459,6 @@
       "categoryKey": "auto-parts"
     },
     {
-      "id": "dealer-7dd04fafedf489df19",
-      "slug": "new-mg-zs-1-5t-automatic-luxury-mexican-edition-gasoline-c-edf489df19",
-      "url": "https://6ixo.com/listing/new-mg-zs-1-5t-automatic-luxury-mexican-edition-gasoline-c-edf489df19/",
-      "images": [
-        "https://www.sinovcleglobal.com/storage/uploads/images/202610/29/1793243049_uc79FFOw7t.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
       "id": "apify-b9b18084f762",
       "slug": "yamaha-malta-6k5-2-b18084f762",
       "url": "https://6ixo.com/listing/yamaha-malta-6k5-2-b18084f762/",
@@ -3089,6 +3084,7 @@
       "images": [
         "https://images.craigslist.org/00l0l_2qc4Fp8p3Xy_0kE0fu_600x450.jpg",
         "https://images.craigslist.org/00P0P_bWJkfr8wqw6_0kE0fu_600x450.jpg",
+        "https://images.craigslist.org/01414_dcmRATc5Iyp_0kE0fu_600x450.jpg",
         "https://images.craigslist.org/00b0b_3YQbQzWoTOv_0kE0fu_600x450.jpg"
       ],
       "categoryKey": "vehicles"
@@ -3196,7 +3192,8 @@
       "images": [
         "https://images.craigslist.org/00y0y_26YrsgY8yRh_0g80c6_600x450.jpg",
         "https://images.craigslist.org/00g0g_2v1qucioBHZ_0g80c6_600x450.jpg",
-        "https://images.craigslist.org/00L0L_jOqdpYaRMNW_0g80c6_600x450.jpg"
+        "https://images.craigslist.org/00L0L_jOqdpYaRMNW_0g80c6_600x450.jpg",
+        "https://images.craigslist.org/00q0q_df6YXFMYvZ9_0g80c6_600x450.jpg"
       ],
       "categoryKey": "vehicles"
     },
@@ -3292,6 +3289,7 @@
       "slug": "2018-ram-2500-crew-cab-big-horn-pickup-4d-6-1-3-ft-if-you--5ryndchieg",
       "url": "https://6ixo.com/listing/2018-ram-2500-crew-cab-big-horn-pickup-4d-6-1-3-ft-if-you--5ryndchieg/",
       "images": [
+        "https://images.craigslist.org/00Y0Y_1VV31OxNZPm_0jm0ew_600x450.jpg",
         "https://images.craigslist.org/00606_7xissKPcFRA_0jm0ew_600x450.jpg",
         "https://images.craigslist.org/01414_6IaHwr76wHg_0jm0ew_600x450.jpg",
         "https://images.craigslist.org/00c0c_hyzisPK3LYA_0jm0ew_600x450.jpg"
@@ -3305,6 +3303,7 @@
       "images": [
         "https://images.craigslist.org/01515_g36FHYrXPDw_0CI0t2_600x450.jpg",
         "https://images.craigslist.org/00Q0Q_kD6x4s4wbo5_0CI0t2_600x450.jpg",
+        "https://images.craigslist.org/01212_hrvXOjeNjP3_0CI0t2_600x450.jpg",
         "https://images.craigslist.org/00505_8cjB7izqh34_0t20CI_600x450.jpg"
       ],
       "categoryKey": "vehicles"
@@ -3460,7 +3459,8 @@
       "images": [
         "https://images.craigslist.org/00K0K_2D44JNneY8T_0C60t2_600x450.jpg",
         "https://images.craigslist.org/00D0D_lW58x1xCcp5_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/00P0P_3dRWvB8FOzK_0CI0t2_600x450.jpg"
+        "https://images.craigslist.org/00P0P_3dRWvB8FOzK_0CI0t2_600x450.jpg",
+        "https://images.craigslist.org/00j0j_fwvYxSYh8pF_0CI0t2_600x450.jpg"
       ],
       "categoryKey": "vehicles"
     },
@@ -3837,6 +3837,7 @@
       "images": [
         "https://images.craigslist.org/00T0T_iNy7HIy6hWB_0CI0t2_600x450.jpg",
         "https://images.craigslist.org/00G0G_jVKq2iHtxsT_0CI0t2_600x450.jpg",
+        "https://images.craigslist.org/00I0I_l9CRXhwKGdw_0CI0t2_600x450.jpg",
         "https://images.craigslist.org/00X0X_2lACKQPJzt7_0CI0t2_600x450.jpg"
       ],
       "categoryKey": "vehicles"
@@ -35177,6 +35178,7 @@
       "url": "https://6ixo.com/listing/modern-brooklyn-apartments-w-gym-rooftop-central-a-c-priva-sy9go9gcqz/",
       "images": [
         "https://images.craigslist.org/00v0v_1QW3ABmY3fM_0uY0hq_600x450.jpg",
+        "https://images.craigslist.org/00l0l_6stmR4j6RVK_0uY0hq_600x450.jpg",
         "https://images.craigslist.org/00m0m_kmZWUF2DIhA_0uY0hq_600x450.jpg",
         "https://images.craigslist.org/00j0j_29OjkD3a0qu_0uY0hq_600x450.jpg"
       ],
@@ -64465,6 +64467,11 @@
       "id": "kijiji-1739013669",
       "slug": "2023-ford-f-150-xlt-5-0l-v8-remote-start-navigation-1739013669",
       "url": "https://6ixo.com/listing/2023-ford-f-150-xlt-5-0l-v8-remote-start-navigation-1739013669/"
+    },
+    {
+      "id": "dealer-7dd04fafedf489df19",
+      "slug": "new-mg-zs-1-5t-automatic-luxury-mexican-edition-gasoline-c-edf489df19",
+      "url": "https://6ixo.com/listing/new-mg-zs-1-5t-automatic-luxury-mexican-edition-gasoline-c-edf489df19/"
     }
   ]
 }

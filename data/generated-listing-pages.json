@@ -1,5 +1,5 @@
 {
-  "count": 4205,
+  "count": 4189,
   "listings": [
     {
       "id": "apify-b9b18084f762",
@@ -9397,24 +9397,6 @@
       "categoryKey": "real-estate"
     },
     {
-      "id": "kijiji-1745351909",
-      "slug": "2026-crv-18-oem-rims-brand-new-firestone-all-season-tire-1745351909",
-      "url": "https://6ixo.com/listing/2026-crv-18-oem-rims-brand-new-firestone-all-season-tire-1745351909/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/51/51d106cc-f673-4ca1-b4db-3fed714f6334?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/dc/dcdb1a2b-025a-4c1a-8fbd-c1ee15530656?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/95/95be77fa-7753-45d3-a0e4-86d140c5f732?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/a8/a8cab5d9-6fed-4b3c-822a-a49306cff540?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/43/43256b02-e700-431a-86d0-c093212069db?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/90/90887f81-c02d-45ca-8778-15930d6ed0ef?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/be/be295104-7a2b-4cb3-aeed-4bd21ff12047?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/4d/4d227832-a825-4939-90d0-e466a269d097?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/3f/3f624ad1-de1c-44df-9e40-4e6d70821ddf?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/04/04964bb4-1f52-42d0-adb3-2a45c2af2ddb?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "auto-parts"
-    },
-    {
       "id": "kijiji-1745350802",
       "slug": "lululemon-headbands-and-u-shaped-headband-1745350802",
       "url": "https://6ixo.com/listing/lululemon-headbands-and-u-shaped-headband-1745350802/",
@@ -9526,33 +9508,6 @@
         "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/94/94da9b3c-d21d-4287-aa10-df8cf8ba3129?rule=kijijica-1600-webp"
       ],
       "categoryKey": "jobs"
-    },
-    {
-      "id": "kijiji-1745346016",
-      "slug": "nissan-infiniti-lexus-jdm-engine-low-km-1745346016",
-      "url": "https://6ixo.com/listing/nissan-infiniti-lexus-jdm-engine-low-km-1745346016/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/c9/c98a2920-3073-48a3-8dda-b4d24f99c7b0?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "services"
-    },
-    {
-      "id": "kijiji-1745345998",
-      "slug": "subaru-legacy-impreza-forester-engine-low-km-low-prices-1745345998",
-      "url": "https://6ixo.com/listing/subaru-legacy-impreza-forester-engine-low-km-low-prices-1745345998/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/98/98cdb993-ab19-453c-bff4-c1a1d27f499b?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "services"
-    },
-    {
-      "id": "kijiji-1745346003",
-      "slug": "dodge-ford-chrysler-chevrolet-jeep-brake-1745346003",
-      "url": "https://6ixo.com/listing/dodge-ford-chrysler-chevrolet-jeep-brake-1745346003/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/ab/ab88c6bd-ae1c-4044-9ad8-7700a5b33515?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "services"
     },
     {
       "id": "kijiji-1745345974",
@@ -10979,42 +10934,6 @@
         "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/e3/e318bfad-8b21-478b-ad95-7fea63dc621b?rule=kijijica-1600-webp"
       ],
       "categoryKey": "services"
-    },
-    {
-      "id": "craigslist-sf3G5sz1Z3NHvtU6fCTWah",
-      "slug": "5ft-x-330ft-x-14ga-sheep-and-goat-fence-285-ea-vtu6fctwah",
-      "url": "https://6ixo.com/listing/5ft-x-330ft-x-14ga-sheep-and-goat-fence-285-ea-vtu6fctwah/",
-      "images": [
-        "https://images.craigslist.org/00L0L_ln1CXZpnoHJ_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/00000_gaK3G7ffNcU_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/00u0u_fPLMJEhiiCi_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/00w0w_emMMISx95Pc_0CI0t2_600x450.jpg"
-      ],
-      "categoryKey": "services"
-    },
-    {
-      "id": "craigslist-iZaSikGr4ANYpatFQtAp5U",
-      "slug": "6ft-x-50ft-x-12ga-chainlink-fence-rolls-95-dollars-each-patfqtap5u",
-      "url": "https://6ixo.com/listing/6ft-x-50ft-x-12ga-chainlink-fence-rolls-95-dollars-each-patfqtap5u/",
-      "images": [
-        "https://images.craigslist.org/00F0F_af4cudEfeV5_0t20CI_600x450.jpg",
-        "https://images.craigslist.org/00m0m_bVr8oy3YP4K_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/01717_ca26cgUNesH_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/01414_jBv8yyJNxgX_0CI0t2_600x450.jpg"
-      ],
-      "categoryKey": "services"
-    },
-    {
-      "id": "craigslist-sT6qZRtjk5ax8U789u6mpj",
-      "slug": "eagle-1-automatic-gate-openers-drive-way-gates-fence-panel-8u789u6mpj",
-      "url": "https://6ixo.com/listing/eagle-1-automatic-gate-openers-drive-way-gates-fence-panel-8u789u6mpj/",
-      "images": [
-        "https://images.craigslist.org/01313_29t20PBnM9P_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/00E0E_3pjwq9XBRWn_0CI0lN_600x450.jpg",
-        "https://images.craigslist.org/00l0l_6RuuwxOvtic_0CI0lN_600x450.jpg",
-        "https://images.craigslist.org/00e0e_22SUxKiR7gM_0CI0lN_600x450.jpg"
-      ],
-      "categoryKey": "buy-and-sell"
     },
     {
       "id": "craigslist-2s2TgZkVfgecjfhbr86fGe",
@@ -14095,18 +14014,6 @@
       "categoryKey": "vehicles"
     },
     {
-      "id": "craigslist-k1zSpYpiHj8AAbDJxZuv3U",
-      "slug": "2013-chrysler-200-touring-sunroof-low-69k-miles-1-owner-ni-abdjxzuv3u",
-      "url": "https://6ixo.com/listing/2013-chrysler-200-touring-sunroof-low-69k-miles-1-owner-ni-abdjxzuv3u/",
-      "images": [
-        "https://images.craigslist.org/00909_aNmYIzWpuwB_0C20t2_600x450.jpg",
-        "https://images.craigslist.org/00d0d_lRh8nRS6q5M_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/00I0I_lxzbJh1u9uy_0Ca0t2_600x450.jpg",
-        "https://images.craigslist.org/00k0k_l876R3zUd1L_0C60t2_600x450.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
       "id": "craigslist-eZVGfMtrFpL3c41jHrfgVR",
       "slug": "1bd-1ba-mobile-check-in-accessible-car-self-park-c41jhrfgvr",
       "url": "https://6ixo.com/listing/1bd-1ba-mobile-check-in-accessible-car-self-park-c41jhrfgvr/",
@@ -15907,30 +15814,6 @@
         "https://images.craigslist.org/00D0D_1Py9UtxpiSd_0CI0t2_600x450.jpg",
         "https://images.craigslist.org/00g0g_kSdVtQSFDNF_0CI0t2_600x450.jpg",
         "https://images.craigslist.org/00C0C_fFrkhFGFHJc_0CI0t2_600x450.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "craigslist-doe8zRJFTnvHqUiXWJ7VCL",
-      "slug": "2015-nissan-versa-note-sl-tech-nav-backup-camera-95k-1-own-quixwj7vcl",
-      "url": "https://6ixo.com/listing/2015-nissan-versa-note-sl-tech-nav-backup-camera-95k-1-own-quixwj7vcl/",
-      "images": [
-        "https://images.craigslist.org/00T0T_3g6YpSvkOY4_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/00j0j_f9dTQQNRC4R_0Cf0t2_600x450.jpg",
-        "https://images.craigslist.org/00K0K_fsf4DPji6kk_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/01212_e7Kpzp6jnPA_0Cr0t2_600x450.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "craigslist-bRKMHr8LLuiYBAHaeBfBx3",
-      "slug": "2017-kia-forte-5-sx-turbo-leather-sunroof-low-88k-miles-bahaebfbx3",
-      "url": "https://6ixo.com/listing/2017-kia-forte-5-sx-turbo-leather-sunroof-low-88k-miles-bahaebfbx3/",
-      "images": [
-        "https://images.craigslist.org/00G0G_8bycxAZiBv2_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/00P0P_knPPtSeKSbm_0Cd0t2_600x450.jpg",
-        "https://images.craigslist.org/00q0q_djwYEpvuWvX_0BN0t2_600x450.jpg",
-        "https://images.craigslist.org/00s0s_b7TKFEozKkp_0Cc0t2_600x450.jpg"
       ],
       "categoryKey": "vehicles"
     },
@@ -22148,30 +22031,6 @@
         "https://images.craigslist.org/00l0l_43HYxddkX9h_0ew0aT_600x450.jpg"
       ],
       "categoryKey": "vehicles"
-    },
-    {
-      "id": "craigslist-kopJfAyQAVZDxrFAVfaNb3",
-      "slug": "2018-vibe-33ft-2-slide-outs-2-a-c-units-xrfavfanb3",
-      "url": "https://6ixo.com/listing/2018-vibe-33ft-2-slide-outs-2-a-c-units-xrfavfanb3/",
-      "images": [
-        "https://images.craigslist.org/00Q0Q_kmcpD2h5pYE_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/00u0u_1jpP2NPoiB1_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/00a0a_bVdwLXU83x6_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/00U0U_jsK3KQLZF1D_0CI0t2_600x450.jpg"
-      ],
-      "categoryKey": "services"
-    },
-    {
-      "id": "craigslist-iyhSHeu3wCxV94NtuPsMfm",
-      "slug": "2004-jayco-talon-39ft-toy-hauler-1-slide-out-2-a-c-94ntupsmfm",
-      "url": "https://6ixo.com/listing/2004-jayco-talon-39ft-toy-hauler-1-slide-out-2-a-c-94ntupsmfm/",
-      "images": [
-        "https://images.craigslist.org/00W0W_eaI2n6lxGKq_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/00w0w_gU7x3yMlGkZ_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/00w0w_2uQtt06MtNS_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/00404_5araVHr9wgO_0CI0t2_600x450.jpg"
-      ],
-      "categoryKey": "services"
     },
     {
       "id": "craigslist-iYu1kGfhZ7VLevtpzD5qga",
@@ -30000,30 +29859,6 @@
         "https://cdn2.jacars.net/media/cache/2d/dc/2ddc6528d751edc89ff4fefac8ae16d8.webp"
       ],
       "categoryKey": "electronics"
-    },
-    {
-      "id": "craigslist-c7djb1YuakBjsHeNhvXeKi",
-      "slug": "2023-ford-e350-7-3l-gas-with-refrigerated-box-truck-30k-mi-shenhvxeki",
-      "url": "https://6ixo.com/listing/2023-ford-e350-7-3l-gas-with-refrigerated-box-truck-30k-mi-shenhvxeki/",
-      "images": [
-        "https://images.craigslist.org/00303_8fTG6cgtObg_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/00808_j5QMRlpVgMZ_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/00P0P_9cVP0Eirrri_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/00303_8jgAwwlwLo2_0CI0t2_600x450.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "craigslist-oAsBPMF4SyuR8GNvJAKhV5",
-      "slug": "2021-gmc-sierra-k1500-crew-cab-at4-carbon-pro-diesel-4wd-6-8gnvjakhv5",
-      "url": "https://6ixo.com/listing/2021-gmc-sierra-k1500-crew-cab-at4-carbon-pro-diesel-4wd-6-8gnvjakhv5/",
-      "images": [
-        "https://images.craigslist.org/01414_9h8KaukdxAP_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/00303_86nOhkoSydo_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/00H0H_97R1YA3gDhz_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/00S0S_9Vghpt21Oh3_0CI0t2_600x450.jpg"
-      ],
-      "categoryKey": "vehicles"
     },
     {
       "id": "craigslist-aRroMsdRMXExEapZUKeh4x",
@@ -40233,17 +40068,6 @@
       "categoryKey": "electronics"
     },
     {
-      "id": "craigslist-cHDMXbVoXdfRVbKQKDSbew",
-      "slug": "2022-chevrolet-k1500-crew-cab-5-3l-4wd-83k-miles-vbkqkdsbew",
-      "url": "https://6ixo.com/listing/2022-chevrolet-k1500-crew-cab-5-3l-4wd-83k-miles-vbkqkdsbew/",
-      "images": [
-        "https://images.craigslist.org/00707_cshJL8DmH9s_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/00303_5hot37HKtj_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/00R0R_25Ruv5BK4B7_0CI0t2_600x450.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
       "id": "craigslist-m3mWTMYb3wXFr1PxSq6h9f",
       "slug": "2021-gmc-sierra-slt-texas-edition-r1pxsq6h9f",
       "url": "https://6ixo.com/listing/2021-gmc-sierra-slt-texas-edition-r1pxsq6h9f/",
@@ -40934,18 +40758,6 @@
       "images": [
         "https://images.craigslist.org/00t0t_68bMMmtGukV_0CI0ik_600x450.jpg",
         "https://images.craigslist.org/00u0u_fxZhMBbuQLr_0CI0ik_600x450.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "craigslist-2JsJfe1ZxiDWWcG2beFqiE",
-      "slug": "2015-chevrolet-2500hd-reg-cab-gas-w-utility-bed-wcg2befqie",
-      "url": "https://6ixo.com/listing/2015-chevrolet-2500hd-reg-cab-gas-w-utility-bed-wcg2befqie/",
-      "images": [
-        "https://images.craigslist.org/00c0c_cudBrErwu1g_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/00s0s_1Tu0HvM13EA_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/00u0u_h64eYAft5Uj_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/00E0E_9GOu0ou1TIf_0CI0t2_600x450.jpg"
       ],
       "categoryKey": "vehicles"
     },
@@ -52116,9 +51928,6 @@
       "url": "https://6ixo.com/listings/services/page/6/"
     },
     {
-      "url": "https://6ixo.com/listings/services/page/7/"
-    },
-    {
       "url": "https://6ixo.com/listings/jobs/"
     },
     {
@@ -52180,9 +51989,6 @@
     },
     {
       "url": "https://6ixo.com/listings/buy-and-sell/page/12/"
-    },
-    {
-      "url": "https://6ixo.com/listings/buy-and-sell/page/13/"
     },
     {
       "url": "https://6ixo.com/listings/country/canada/electronics/"
@@ -53077,9 +52883,6 @@
     },
     {
       "url": "https://6ixo.com/cars-for-sale/united-states/page/27/"
-    },
-    {
-      "url": "https://6ixo.com/cars-for-sale/united-states/page/28/"
     }
   ],
   "retired": [
@@ -61732,6 +61535,86 @@
       "id": "samtronix-gy-15863643799712",
       "slug": "cubot-kingkong-x-16gb-256gb-storage-3643799712",
       "url": "https://6ixo.com/listing/cubot-kingkong-x-16gb-256gb-storage-3643799712/"
+    },
+    {
+      "id": "kijiji-1745351909",
+      "slug": "2026-crv-18-oem-rims-brand-new-firestone-all-season-tire-1745351909",
+      "url": "https://6ixo.com/listing/2026-crv-18-oem-rims-brand-new-firestone-all-season-tire-1745351909/"
+    },
+    {
+      "id": "kijiji-1745346016",
+      "slug": "nissan-infiniti-lexus-jdm-engine-low-km-1745346016",
+      "url": "https://6ixo.com/listing/nissan-infiniti-lexus-jdm-engine-low-km-1745346016/"
+    },
+    {
+      "id": "kijiji-1745345998",
+      "slug": "subaru-legacy-impreza-forester-engine-low-km-low-prices-1745345998",
+      "url": "https://6ixo.com/listing/subaru-legacy-impreza-forester-engine-low-km-low-prices-1745345998/"
+    },
+    {
+      "id": "kijiji-1745346003",
+      "slug": "dodge-ford-chrysler-chevrolet-jeep-brake-1745346003",
+      "url": "https://6ixo.com/listing/dodge-ford-chrysler-chevrolet-jeep-brake-1745346003/"
+    },
+    {
+      "id": "craigslist-sf3G5sz1Z3NHvtU6fCTWah",
+      "slug": "5ft-x-330ft-x-14ga-sheep-and-goat-fence-285-ea-vtu6fctwah",
+      "url": "https://6ixo.com/listing/5ft-x-330ft-x-14ga-sheep-and-goat-fence-285-ea-vtu6fctwah/"
+    },
+    {
+      "id": "craigslist-iZaSikGr4ANYpatFQtAp5U",
+      "slug": "6ft-x-50ft-x-12ga-chainlink-fence-rolls-95-dollars-each-patfqtap5u",
+      "url": "https://6ixo.com/listing/6ft-x-50ft-x-12ga-chainlink-fence-rolls-95-dollars-each-patfqtap5u/"
+    },
+    {
+      "id": "craigslist-sT6qZRtjk5ax8U789u6mpj",
+      "slug": "eagle-1-automatic-gate-openers-drive-way-gates-fence-panel-8u789u6mpj",
+      "url": "https://6ixo.com/listing/eagle-1-automatic-gate-openers-drive-way-gates-fence-panel-8u789u6mpj/"
+    },
+    {
+      "id": "craigslist-k1zSpYpiHj8AAbDJxZuv3U",
+      "slug": "2013-chrysler-200-touring-sunroof-low-69k-miles-1-owner-ni-abdjxzuv3u",
+      "url": "https://6ixo.com/listing/2013-chrysler-200-touring-sunroof-low-69k-miles-1-owner-ni-abdjxzuv3u/"
+    },
+    {
+      "id": "craigslist-doe8zRJFTnvHqUiXWJ7VCL",
+      "slug": "2015-nissan-versa-note-sl-tech-nav-backup-camera-95k-1-own-quixwj7vcl",
+      "url": "https://6ixo.com/listing/2015-nissan-versa-note-sl-tech-nav-backup-camera-95k-1-own-quixwj7vcl/"
+    },
+    {
+      "id": "craigslist-bRKMHr8LLuiYBAHaeBfBx3",
+      "slug": "2017-kia-forte-5-sx-turbo-leather-sunroof-low-88k-miles-bahaebfbx3",
+      "url": "https://6ixo.com/listing/2017-kia-forte-5-sx-turbo-leather-sunroof-low-88k-miles-bahaebfbx3/"
+    },
+    {
+      "id": "craigslist-kopJfAyQAVZDxrFAVfaNb3",
+      "slug": "2018-vibe-33ft-2-slide-outs-2-a-c-units-xrfavfanb3",
+      "url": "https://6ixo.com/listing/2018-vibe-33ft-2-slide-outs-2-a-c-units-xrfavfanb3/"
+    },
+    {
+      "id": "craigslist-iyhSHeu3wCxV94NtuPsMfm",
+      "slug": "2004-jayco-talon-39ft-toy-hauler-1-slide-out-2-a-c-94ntupsmfm",
+      "url": "https://6ixo.com/listing/2004-jayco-talon-39ft-toy-hauler-1-slide-out-2-a-c-94ntupsmfm/"
+    },
+    {
+      "id": "craigslist-c7djb1YuakBjsHeNhvXeKi",
+      "slug": "2023-ford-e350-7-3l-gas-with-refrigerated-box-truck-30k-mi-shenhvxeki",
+      "url": "https://6ixo.com/listing/2023-ford-e350-7-3l-gas-with-refrigerated-box-truck-30k-mi-shenhvxeki/"
+    },
+    {
+      "id": "craigslist-oAsBPMF4SyuR8GNvJAKhV5",
+      "slug": "2021-gmc-sierra-k1500-crew-cab-at4-carbon-pro-diesel-4wd-6-8gnvjakhv5",
+      "url": "https://6ixo.com/listing/2021-gmc-sierra-k1500-crew-cab-at4-carbon-pro-diesel-4wd-6-8gnvjakhv5/"
+    },
+    {
+      "id": "craigslist-cHDMXbVoXdfRVbKQKDSbew",
+      "slug": "2022-chevrolet-k1500-crew-cab-5-3l-4wd-83k-miles-vbkqkdsbew",
+      "url": "https://6ixo.com/listing/2022-chevrolet-k1500-crew-cab-5-3l-4wd-83k-miles-vbkqkdsbew/"
+    },
+    {
+      "id": "craigslist-2JsJfe1ZxiDWWcG2beFqiE",
+      "slug": "2015-chevrolet-2500hd-reg-cab-gas-w-utility-bed-wcg2befqie",
+      "url": "https://6ixo.com/listing/2015-chevrolet-2500hd-reg-cab-gas-w-utility-bed-wcg2befqie/"
     }
   ]
 }

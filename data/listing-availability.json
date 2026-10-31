@@ -1,5 +1,5 @@
 {
-  "checkedAt": "2026-10-31T18:22:37Z",
+  "checkedAt": "2026-10-31T18:42:29.093Z",
   "listings": {
     "craigslist.org/view/d/bastrop-used-2025-cadillac-xt4-fwd-4d/fuqr_3uo8rgowpq1ctwx-a": {
       "availability": "sold",
@@ -15918,15 +15918,19 @@
       "id": "kijiji-1745544751",
       "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/eurodib-20-qt-commercial-spiral-mixer/1745544751",
       "availability": "gone",
-      "checkedAt": "2026-10-31T12:42:07.438Z",
+      "checkedAt": "2026-10-31T18:42:29.093Z",
       "httpStatus": 200,
       "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1745544751",
       "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-buy-sell-other/city-of-toronto/sagetra-professional-french-fry-cutter/1745544744": {
-      "availability": "unavailable",
-      "checkedAt": "2026-10-31T18:22:37Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1745544744",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/sagetra-professional-french-fry-cutter/1745544744",
+      "availability": "gone",
+      "checkedAt": "2026-10-31T18:42:29.093Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1745544744",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-buy-sell-other/city-of-toronto/waring-four-slice-commercial-toaster-without-box/1745544728": {
       "id": "kijiji-1745544728",
@@ -16152,9 +16156,13 @@
       "reason": "Exact source URL returned HTTP 410"
     },
     "kijiji.ca/v-buy-sell-other/city-of-toronto/sagetra-triple-commercial-sink-dents/1745544731": {
-      "availability": "unavailable",
-      "checkedAt": "2026-10-31T18:22:37Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1745544731",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/sagetra-triple-commercial-sink-dents/1745544731",
+      "availability": "gone",
+      "checkedAt": "2026-10-31T18:42:29.093Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1745544731",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "craigslist.org/view/d/south-richmond-hill-nissan-altima-2013/usnhl9pdpzgcj87kraaptp": {
       "id": "craigslist-usNHL9PDPzGcJ87KRaaptp",
@@ -16214,9 +16222,13 @@
       "reason": "Exact source URL returned HTTP 410"
     },
     "kijiji.ca/v-buy-sell-other/city-of-toronto/vitamix-36019-commercial-bar-blender-48-oz-vm0145/1745552441": {
-      "availability": "unavailable",
-      "checkedAt": "2026-10-31T18:22:37Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1745552441",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/vitamix-36019-commercial-bar-blender-48-oz-vm0145/1745552441",
+      "availability": "gone",
+      "checkedAt": "2026-10-31T18:42:29.093Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1745552441",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-bed-mattress/city-of-toronto/no-tax-solid-bunk-bed-with-stairs-bunk-bed-kids-bed-bed/1745530798": {
       "availability": "unavailable",
@@ -16317,6 +16329,24 @@
       "availability": "gone",
       "checkedAt": "2026-10-31T18:22:37Z",
       "reason": "Exact source URL returned HTTP 410"
+    },
+    "craigslist.org/view/d/spring-nissan-sentra-sv-backup-camera/gdhntwrk5fhvdyk7xpqzhk": {
+      "id": "craigslist-gDhntwrk5FHVdYK7xpQZHK",
+      "sourceUrl": "https://www.craigslist.org/view/d/spring-nissan-sentra-sv-backup-camera/gDhntwrk5FHVdYK7xpQZHK",
+      "availability": "gone",
+      "checkedAt": "2026-10-31T18:42:29.093Z",
+      "httpStatus": 410,
+      "resolvedUrl": "https://www.craigslist.org/view/d/spring-nissan-sentra-sv-backup-camera/gDhntwrk5FHVdYK7xpQZHK",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "craigslist.org/view/d/austin-2012-toyota-sienna-van-v6-le/gj4_l2pu8rgiim0ggctwlq": {
+      "id": "craigslist-gj4_L2PU8RGiiM0ggCtwlQ",
+      "sourceUrl": "https://www.craigslist.org/view/d/austin-2012-toyota-sienna-van-v6-le/gj4_L2PU8RGiiM0ggCtwlQ",
+      "availability": "gone",
+      "checkedAt": "2026-10-31T18:42:29.093Z",
+      "httpStatus": 410,
+      "resolvedUrl": "https://www.craigslist.org/view/d/austin-2012-toyota-sienna-van-v6-le/gj4_L2PU8RGiiM0ggCtwlQ",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     }
   }
 }

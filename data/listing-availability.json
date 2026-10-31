@@ -1,5 +1,5 @@
 {
-  "checkedAt": "2026-10-31T12:24:29Z",
+  "checkedAt": "2026-10-31T12:42:07.438Z",
   "listings": {
     "craigslist.org/view/d/bastrop-used-2025-cadillac-xt4-fwd-4d/fuqr_3uo8rgowpq1ctwx-a": {
       "availability": "sold",
@@ -15969,59 +15969,103 @@
       "reason": "Kijiji redirected the exact ad to a confirmed removal"
     },
     "kijiji.ca/v-buy-sell-other/city-of-toronto/eurodib-20-qt-commercial-spiral-mixer/1745544751": {
-      "availability": "unavailable",
-      "checkedAt": "2026-10-31T12:24:29Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1745544751",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/eurodib-20-qt-commercial-spiral-mixer/1745544751",
+      "availability": "gone",
+      "checkedAt": "2026-10-31T12:42:07.438Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1745544751",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-buy-sell-other/city-of-toronto/sagetra-professional-french-fry-cutter/1745544744": {
-      "availability": "unavailable",
-      "checkedAt": "2026-10-31T12:24:29Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1745544744",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/sagetra-professional-french-fry-cutter/1745544744",
+      "availability": "gone",
+      "checkedAt": "2026-10-31T12:42:07.438Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1745544744",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-buy-sell-other/city-of-toronto/waring-four-slice-commercial-toaster-without-box/1745544728": {
-      "availability": "unavailable",
-      "checkedAt": "2026-10-31T12:24:29Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1745544728",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/waring-four-slice-commercial-toaster-without-box/1745544728",
+      "availability": "gone",
+      "checkedAt": "2026-10-31T12:42:07.438Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1745544728",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-buy-sell-other/city-of-toronto/rosko-countertop-4-burner-commercial-gas-stovetop/1745544696": {
-      "availability": "unavailable",
-      "checkedAt": "2026-10-31T12:24:29Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1745544696",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/rosko-countertop-4-burner-commercial-gas-stovetop/1745544696",
+      "availability": "gone",
+      "checkedAt": "2026-10-31T12:42:07.438Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1745544696",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-buy-sell-other/city-of-toronto/panasonic-30-in-built-in-induction-cooktop-ky-b84ax/1745544693": {
-      "availability": "unavailable",
-      "checkedAt": "2026-10-31T12:24:29Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1745544693",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/panasonic-30-in-built-in-induction-cooktop-ky-b84ax/1745544693",
+      "availability": "gone",
+      "checkedAt": "2026-10-31T12:42:07.438Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1745544693",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-buy-sell-other/city-of-toronto/eurodib-10-commercial-manual-meat-slicer/1745544677": {
-      "availability": "unavailable",
-      "checkedAt": "2026-10-31T12:24:29Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1745544677",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/eurodib-10-commercial-manual-meat-slicer/1745544677",
+      "availability": "gone",
+      "checkedAt": "2026-10-31T12:42:07.438Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1745544677",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-buy-sell-other/city-of-toronto/omcan-two-bulb-commercial-portable-heat-lamp-display-warmer/1745544668": {
-      "availability": "unavailable",
-      "checkedAt": "2026-10-31T12:24:29Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1745544668",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/omcan-two-bulb-commercial-portable-heat-lamp-display-warmer/1745544668",
+      "availability": "gone",
+      "checkedAt": "2026-10-31T12:42:07.438Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1745544668",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-buy-sell-other/city-of-toronto/medsup-universal-size-white-polypropylene-beard-cover-1000pcs/1745544654": {
-      "availability": "unavailable",
-      "checkedAt": "2026-10-31T12:24:29Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1745544654",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/medsup-universal-size-white-polypropylene-beard-cover-1000pcs/1745544654",
+      "availability": "gone",
+      "checkedAt": "2026-10-31T12:42:07.438Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1745544654",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-buy-sell-other/city-of-toronto/vitamix-36019-commercial-bar-blender-48-oz-vm0145/1745544642": {
-      "availability": "unavailable",
-      "checkedAt": "2026-10-31T12:24:29Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1745544642",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/vitamix-36019-commercial-bar-blender-48-oz-vm0145/1745544642",
+      "availability": "gone",
+      "checkedAt": "2026-10-31T12:42:07.438Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1745544642",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-buy-sell-other/city-of-toronto/bosch-800-series-built-in-coffee-machine-bcm8450uc-stainless-ste/1745544664": {
-      "availability": "unavailable",
-      "checkedAt": "2026-10-31T12:24:29Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1745544664",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/bosch-800-series-built-in-coffee-machine-bcm8450uc-stainless-ste/1745544664",
+      "availability": "gone",
+      "checkedAt": "2026-10-31T12:42:07.438Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1745544664",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-buy-sell-other/city-of-toronto/wall-shelf-18-gauge-430-stainless-steel-12-x-60-saws1260/1745544707": {
-      "availability": "unavailable",
-      "checkedAt": "2026-10-31T12:24:29Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1745544707",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/wall-shelf-18-gauge-430-stainless-steel-12-x-60-saws1260/1745544707",
+      "availability": "gone",
+      "checkedAt": "2026-10-31T12:42:07.438Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1745544707",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "albacars.ae/buy-used-cars/vehicle/2076-bmw-3-series-318i": {
       "availability": "sold",
@@ -16192,6 +16236,96 @@
       "availability": "gone",
       "checkedAt": "2026-10-31T12:24:29Z",
       "reason": "Exact source URL returned HTTP 410"
+    },
+    "kijiji.ca/v-buy-sell-other/city-of-toronto/sagetra-triple-commercial-sink-dents/1745544731": {
+      "id": "kijiji-1745544731",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/sagetra-triple-commercial-sink-dents/1745544731",
+      "availability": "gone",
+      "checkedAt": "2026-10-31T12:42:07.438Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1745544731",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "craigslist.org/view/d/south-richmond-hill-nissan-altima-2013/usnhl9pdpzgcj87kraaptp": {
+      "id": "craigslist-usNHL9PDPzGcJ87KRaaptp",
+      "sourceUrl": "https://www.craigslist.org/view/d/south-richmond-hill-nissan-altima-2013/usNHL9PDPzGcJ87KRaaptp",
+      "availability": "gone",
+      "checkedAt": "2026-10-31T12:42:07.438Z",
+      "httpStatus": 410,
+      "resolvedUrl": "https://www.craigslist.org/view/d/south-richmond-hill-nissan-altima-2013/usNHL9PDPzGcJ87KRaaptp",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "craigslist.org/view/d/largo-2000-plymouth-prowler/mjirkwm98rghctz9pgxs0g": {
+      "id": "craigslist-MjirKwm98RGhCtz9PGXS0g",
+      "sourceUrl": "https://www.craigslist.org/view/d/largo-2000-plymouth-prowler/MjirKwm98RGhCtz9PGXS0g",
+      "availability": "gone",
+      "checkedAt": "2026-10-31T12:42:07.438Z",
+      "httpStatus": 410,
+      "resolvedUrl": "https://www.craigslist.org/view/d/largo-2000-plymouth-prowler/MjirKwm98RGhCtz9PGXS0g",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "craigslist.org/view/d/largo-1982-chevrolet-corvette/yu_jxwi98rgepcrzz1fyxa": {
+      "id": "craigslist-yu_Jxwi98RGEPcrZz1fyXA",
+      "sourceUrl": "https://www.craigslist.org/view/d/largo-1982-chevrolet-corvette/yu_Jxwi98RGEPcrZz1fyXA",
+      "availability": "gone",
+      "checkedAt": "2026-10-31T12:42:07.438Z",
+      "httpStatus": 410,
+      "resolvedUrl": "https://www.craigslist.org/view/d/largo-1982-chevrolet-corvette/yu_Jxwi98RGEPcrZz1fyXA",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "craigslist.org/view/d/arlington-whats-credit-score-dont-know/oz1u4qrnkuj7waxxudxkyp": {
+      "id": "craigslist-oZ1u4QRnKUj7waxXudxkyP",
+      "sourceUrl": "https://www.craigslist.org/view/d/arlington-whats-credit-score-dont-know/oZ1u4QRnKUj7waxXudxkyP",
+      "availability": "gone",
+      "checkedAt": "2026-10-31T12:42:07.438Z",
+      "httpStatus": 410,
+      "resolvedUrl": "https://www.craigslist.org/view/d/arlington-whats-credit-score-dont-know/oZ1u4QRnKUj7waxXudxkyP",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "craigslist.org/view/d/georgetown-2020-ford-250-xlt-premium/qa4jesthvsrmx3iquus79l": {
+      "id": "craigslist-qa4JesThvSRmx3iQuUS79L",
+      "sourceUrl": "https://www.craigslist.org/view/d/georgetown-2020-ford-250-xlt-premium/qa4JesThvSRmx3iQuUS79L",
+      "availability": "gone",
+      "checkedAt": "2026-10-31T12:42:07.438Z",
+      "httpStatus": 410,
+      "resolvedUrl": "https://www.craigslist.org/view/d/georgetown-2020-ford-250-xlt-premium/qa4JesThvSRmx3iQuUS79L",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "craigslist.org/view/d/kyle-ford-f250-super-duty-crew-cab-bad/cnkmwvg88rgl-zbrutfvwa": {
+      "id": "craigslist-CnKMWvG88RGL-ZBRutfvWA",
+      "sourceUrl": "https://www.craigslist.org/view/d/kyle-ford-f250-super-duty-crew-cab-bad/CnKMWvG88RGL-ZBRutfvWA",
+      "availability": "gone",
+      "checkedAt": "2026-10-31T12:42:07.438Z",
+      "httpStatus": 410,
+      "resolvedUrl": "https://www.craigslist.org/view/d/kyle-ford-f250-super-duty-crew-cab-bad/CnKMWvG88RGL-ZBRutfvWA",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "craigslist.org/view/d/largo-1982-chevrolet-corvette/zkei9qi98rgoq71rbjxlla": {
+      "id": "craigslist-ZkEi9Qi98RGOQ71RBjXLlA",
+      "sourceUrl": "https://www.craigslist.org/view/d/largo-1982-chevrolet-corvette/ZkEi9Qi98RGOQ71RBjXLlA",
+      "availability": "gone",
+      "checkedAt": "2026-10-31T12:42:07.438Z",
+      "httpStatus": 410,
+      "resolvedUrl": "https://www.craigslist.org/view/d/largo-1982-chevrolet-corvette/ZkEi9Qi98RGOQ71RBjXLlA",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "craigslist.org/view/d/georgetown-2020-ford-250-xlt-premium/ekafbvkmch3r7bud8fje77": {
+      "id": "craigslist-ekAfBVkMcH3r7Bud8fje77",
+      "sourceUrl": "https://www.craigslist.org/view/d/georgetown-2020-ford-250-xlt-premium/ekAfBVkMcH3r7Bud8fje77",
+      "availability": "gone",
+      "checkedAt": "2026-10-31T12:42:07.438Z",
+      "httpStatus": 410,
+      "resolvedUrl": "https://www.craigslist.org/view/d/georgetown-2020-ford-250-xlt-premium/ekAfBVkMcH3r7Bud8fje77",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "craigslist.org/view/d/locust-grove-2000-gmc-sierra-4x4/52dlkv9h8ebadebzrx27kp": {
+      "id": "craigslist-52dLKv9H8EBADEbzrx27kp",
+      "sourceUrl": "https://www.craigslist.org/view/d/locust-grove-2000-gmc-sierra-4x4/52dLKv9H8EBADEbzrx27kp",
+      "availability": "gone",
+      "checkedAt": "2026-10-31T12:42:07.438Z",
+      "httpStatus": 410,
+      "resolvedUrl": "https://www.craigslist.org/view/d/locust-grove-2000-gmc-sierra-4x4/52dLKv9H8EBADEbzrx27kp",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     }
   }
 }

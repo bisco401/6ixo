@@ -1,5 +1,5 @@
 {
-  "count": 4443,
+  "count": 4420,
   "listings": [
     {
       "id": "apify-b9b18084f762",
@@ -39219,15 +39219,6 @@
       "categoryKey": "real-estate"
     },
     {
-      "id": "alba-dubai-2043",
-      "slug": "2023-jeep-wrangler-sport-adubai2043",
-      "url": "https://6ixo.com/listing/2023-jeep-wrangler-sport-adubai2043/",
-      "images": [
-        "https://storage.albacars.ae/vehicles/drafts/2043/1.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
       "id": "alba-dubai-2039",
       "slug": "2026-used-jetour-dashing-1-6t-luxury-adubai2039",
       "url": "https://6ixo.com/listing/2026-used-jetour-dashing-1-6t-luxury-adubai2039/",
@@ -42910,30 +42901,6 @@
       "categoryKey": "auto-parts"
     },
     {
-      "id": "craigslist-CtBr9xG98RGJBMiNpMxgkA",
-      "slug": "2012-subaru-forester-2-5x-premium-awd-4dr-wagon-4a-bminpmxgka",
-      "url": "https://6ixo.com/listing/2012-subaru-forester-2-5x-premium-awd-4dr-wagon-4a-bminpmxgka/",
-      "images": [
-        "https://images.craigslist.org/00J0J_gqBOQzyu5La_0dI0ah_600x450.jpg",
-        "https://images.craigslist.org/01717_kCOYrMhxDAq_0dI0ah_600x450.jpg",
-        "https://images.craigslist.org/00x0x_foqUYbuKU03_0dI0ah_600x450.jpg",
-        "https://images.craigslist.org/00u0u_f2Iqu1Ii6dE_0dI0ah_600x450.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "craigslist-7Lw08RG98RGqjbZ_i35ZtA",
-      "slug": "2015-nissan-altima-2-5-s-4dr-sedan-qjbzi35zta",
-      "url": "https://6ixo.com/listing/2015-nissan-altima-2-5-s-4dr-sedan-qjbzi35zta/",
-      "images": [
-        "https://images.craigslist.org/01111_lkPo9dyCUaJ_0dI0ah_600x450.jpg",
-        "https://images.craigslist.org/00f0f_1jzaSBZygvd_0dI0ah_600x450.jpg",
-        "https://images.craigslist.org/00z0z_brasYQ4zLoe_0dI0ah_600x450.jpg",
-        "https://images.craigslist.org/00H0H_kcsiWyRrsOP_0dI0ah_600x450.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
       "id": "craigslist-usNHL9PDPzGcJ87KRaaptp",
       "slug": "nissan-altima-2013-for-sale-by-owner-j87kraaptp",
       "url": "https://6ixo.com/listing/nissan-altima-2013-for-sale-by-owner-j87kraaptp/",
@@ -43018,18 +42985,6 @@
       "categoryKey": "vehicles"
     },
     {
-      "id": "craigslist--D39-Qi98RGUfM_lPzGtbg",
-      "slug": "2017-chevrolet-corvette-ufmlpzgtbg",
-      "url": "https://6ixo.com/listing/2017-chevrolet-corvette-ufmlpzgtbg/",
-      "images": [
-        "https://images.craigslist.org/00S0S_kuq6lkVMF17_0gw0co_600x450.jpg",
-        "https://images.craigslist.org/00H0H_eLu9fFRLVUZ_0gw0co_600x450.jpg",
-        "https://images.craigslist.org/00404_fbArLrZwnY6_0gw0co_600x450.jpg",
-        "https://images.craigslist.org/01111_bqiitj3hrfw_0gw0co_600x450.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
       "id": "craigslist-yu_Jxwi98RGEPcrZz1fyXA",
       "slug": "1982-chevrolet-corvette-pcrzz1fyxa",
       "url": "https://6ixo.com/listing/1982-chevrolet-corvette-pcrzz1fyxa/",
@@ -43039,41 +42994,6 @@
         "https://images.craigslist.org/00j0j_g2XuJ3FcNhl_0gw0co_600x450.jpg"
       ],
       "categoryKey": "vehicles"
-    },
-    {
-      "id": "craigslist-ANkNugi98RGJn-RabNT7mw",
-      "slug": "1992-chevrolet-corvette-jnrabnt7mw",
-      "url": "https://6ixo.com/listing/1992-chevrolet-corvette-jnrabnt7mw/",
-      "images": [
-        "https://images.craigslist.org/00Q0Q_jKkSGDxfGlb_0gw0co_600x450.jpg",
-        "https://images.craigslist.org/00v0v_7aF3mplNFEN_0gw0co_600x450.jpg",
-        "https://images.craigslist.org/00B0B_g2DdPhygGm0_0gw0co_600x450.jpg",
-        "https://images.craigslist.org/00L0L_c5RzD8eHhNi_0gw0co_600x450.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "craigslist-SiupkQi98RG8Y8ZK0xrTZg",
-      "slug": "2005-chevrolet-corvette-y8zk0xrtzg",
-      "url": "https://6ixo.com/listing/2005-chevrolet-corvette-y8zk0xrtzg/",
-      "images": [
-        "https://images.craigslist.org/00o0o_lmDl5grnaWh_0gw0co_600x450.jpg",
-        "https://images.craigslist.org/00T0T_heYbV5eKo7B_0gw0cn_600x450.jpg",
-        "https://images.craigslist.org/00O0O_6l4qpvMjtVI_0gw0cn_600x450.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "craigslist-2G8RmtZZGeXsmTw3hMG4RB",
-      "slug": "sony-soundbar-with-wireless-subwoofer-mtw3hmg4rb",
-      "url": "https://6ixo.com/listing/sony-soundbar-with-wireless-subwoofer-mtw3hmg4rb/",
-      "images": [
-        "https://images.craigslist.org/01515_fx2aZJeYkUY_0t20CI_600x450.jpg",
-        "https://images.craigslist.org/00t0t_4VWjP4GCBJ7_0t20CI_600x450.jpg",
-        "https://images.craigslist.org/01616_fJigyVz1qMD_0t20CI_600x450.jpg",
-        "https://images.craigslist.org/00g0g_2F60aWcR4CO_0CI0t2_600x450.jpg"
-      ],
-      "categoryKey": "electronics"
     },
     {
       "id": "craigslist-1Vp7kjBH9xdaGMusnJz1DV",
@@ -43100,30 +43020,6 @@
       "categoryKey": "electronics"
     },
     {
-      "id": "craigslist-VIg3vw298RGP0tka-dYLsg",
-      "slug": "2022-kia-soul-lx-ivt-p0tkadylsg",
-      "url": "https://6ixo.com/listing/2022-kia-soul-lx-ivt-p0tkadylsg/",
-      "images": [
-        "https://images.craigslist.org/00q0q_53oyn7HNP4Q_0ak07K_600x450.jpg",
-        "https://images.craigslist.org/00C0C_9jDefQ13NnS_0ak07K_600x450.jpg",
-        "https://images.craigslist.org/00j0j_fBdbmv3gcgl_0ak07K_600x450.jpg",
-        "https://images.craigslist.org/00g0g_13TxXhpYP8B_0ak07K_600x450.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "craigslist-bEd81-O88RGSiP1jVUiBbw",
-      "slug": "2018-jeep-grand-cherokee-limited-4x2-ip1jvuibbw",
-      "url": "https://6ixo.com/listing/2018-jeep-grand-cherokee-limited-4x2-ip1jvuibbw/",
-      "images": [
-        "https://images.craigslist.org/00P0P_dLUlgiqi95I_0ak07K_600x450.jpg",
-        "https://images.craigslist.org/00909_9P4yoKoMrBK_0ak07K_600x450.jpg",
-        "https://images.craigslist.org/00v0v_7O5m1LN36az_0ak07K_600x450.jpg",
-        "https://images.craigslist.org/00T0T_4WwpUwaQBvS_0ak07K_600x450.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
       "id": "craigslist-9FhQrhg47mPJEfgvviQVnM",
       "slug": "yamaha-rx-v565-av-receiver-efgvviqvnm",
       "url": "https://6ixo.com/listing/yamaha-rx-v565-av-receiver-efgvviqvnm/",
@@ -43133,54 +43029,6 @@
         "https://images.craigslist.org/00h0h_2imEreAyPB8_0CI0t2_600x450.jpg"
       ],
       "categoryKey": "electronics"
-    },
-    {
-      "id": "craigslist-m3mWTMYb3wXFr1PxSq6h9f",
-      "slug": "2021-gmc-sierra-slt-texas-edition-r1pxsq6h9f",
-      "url": "https://6ixo.com/listing/2021-gmc-sierra-slt-texas-edition-r1pxsq6h9f/",
-      "images": [
-        "https://images.craigslist.org/00707_gJTGyMOozf4_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/00z0z_7qaTgNVNfgN_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/00j0j_cPC09VAUCrn_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/00W0W_bxYEMPE9HHa_0CI0t2_600x450.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "craigslist-hVnhtr32x2B2nA7w7XhSEj",
-      "slug": "2021-chevrolet-colorado-lt-na7w7xhsej",
-      "url": "https://6ixo.com/listing/2021-chevrolet-colorado-lt-na7w7xhsej/",
-      "images": [
-        "https://images.craigslist.org/00N0N_3B47mXUk2T9_0vR0t2_600x450.jpg",
-        "https://images.craigslist.org/00j0j_bcXUFo4RRpY_0x20r1_600x450.jpg",
-        "https://images.craigslist.org/00d0d_kgEcdZVZaAh_0x20qK_600x450.jpg",
-        "https://images.craigslist.org/00E0E_dne7DWYnp6k_0kp0jx_600x450.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "craigslist-vCbieEBgxkFHKpwS6WtBZC",
-      "slug": "2022-dodge-challenger-sxt-kpws6wtbzc",
-      "url": "https://6ixo.com/listing/2022-dodge-challenger-sxt-kpws6wtbzc/",
-      "images": [
-        "https://images.craigslist.org/00q0q_hGHw2pS4oFf_0x20qq_600x450.jpg",
-        "https://images.craigslist.org/00i0i_4FTYUtbCk4S_0x20sN_600x450.jpg",
-        "https://images.craigslist.org/00d0d_kXN9T7Bz0ho_0x20nv_600x450.jpg",
-        "https://images.craigslist.org/00l0l_kkVtZpSHcuq_0x20rY_600x450.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "craigslist-udEn7co7yonDEpujEa5SDT",
-      "slug": "2024-nissan-kicks-epujea5sdt",
-      "url": "https://6ixo.com/listing/2024-nissan-kicks-epujea5sdt/",
-      "images": [
-        "https://images.craigslist.org/00a0a_4IzyroPE8NA_0mq0jV_600x450.jpg",
-        "https://images.craigslist.org/00e0e_lOkVzBcFiI8_0oF0jJ_600x450.jpg",
-        "https://images.craigslist.org/00000_eqAxG08eg6f_0pO0kz_600x450.jpg",
-        "https://images.craigslist.org/01111_lzein16jiUP_0pO0mu_600x450.jpg"
-      ],
-      "categoryKey": "vehicles"
     },
     {
       "id": "craigslist-gFv4c1Kw6eoYNCnQf8fL6Q",
@@ -43259,18 +43107,6 @@
       "categoryKey": "electronics"
     },
     {
-      "id": "craigslist-swuh6YsdZeskWM4xM9aAVP",
-      "slug": "chevrolet-camaro-wm4xm9aavp",
-      "url": "https://6ixo.com/listing/chevrolet-camaro-wm4xm9aavp/",
-      "images": [
-        "https://images.craigslist.org/01212_7AJA0Fji7oV_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/00q0q_gcikX7qKLq7_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/00909_4glBgDS0RGP_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/00C0C_lEpAjiXvNUF_0CI0t2_600x450.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
       "id": "craigslist-m2cSnwQ6XfGncx8rTDhBXb",
       "slug": "solar-panel-cx8rtdhbxb",
       "url": "https://6ixo.com/listing/solar-panel-cx8rtdhbxb/",
@@ -43281,18 +43117,6 @@
         "https://images.craigslist.org/00z0z_dl59rkzmO6n_0t20CI_600x450.jpg"
       ],
       "categoryKey": "electronics"
-    },
-    {
-      "id": "craigslist-4URWHajQ91YLZnEDiEcS3d",
-      "slug": "jaguar-znediecs3d",
-      "url": "https://6ixo.com/listing/jaguar-znediecs3d/",
-      "images": [
-        "https://images.craigslist.org/00g0g_98xqy05aDr_0CI0r6_600x450.jpg",
-        "https://images.craigslist.org/00U0U_1Ms978b9huR_0CI0cr_600x450.jpg",
-        "https://images.craigslist.org/01616_aj2AtSVm2l9_0CI0jN_600x450.jpg",
-        "https://images.craigslist.org/01717_7zQsFxlSADO_0CI0my_600x450.jpg"
-      ],
-      "categoryKey": "vehicles"
     },
     {
       "id": "craigslist-hwHX6xmDPn8zyQCFcFjgTF",
@@ -43337,18 +43161,6 @@
       "categoryKey": "vehicles"
     },
     {
-      "id": "craigslist-9HS4ehK98RG5Z9nA-3JipQ",
-      "slug": "2015-gmc-acadia-financing-available-5z9na3jipq",
-      "url": "https://6ixo.com/listing/2015-gmc-acadia-financing-available-5z9na3jipq/",
-      "images": [
-        "https://images.craigslist.org/00Q0Q_jvzCVAMnEGN_0jm0ew_600x450.jpg",
-        "https://images.craigslist.org/00C0C_8lRqPa3iGpt_0jm0ew_600x450.jpg",
-        "https://images.craigslist.org/00y0y_lrYSBhDm15g_0jm0ew_600x450.jpg",
-        "https://images.craigslist.org/00202_19ZY0X5Yk5V_0jm0ew_600x450.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
       "id": "craigslist-wwQ6miSNVnZJXhYerFhJH6",
       "slug": "chevrolet-1958-59-apache-fleetside-chrome-grill-black-bump-xhyerfhjh6",
       "url": "https://6ixo.com/listing/chevrolet-1958-59-apache-fleetside-chrome-grill-black-bump-xhyerfhjh6/",
@@ -43357,17 +43169,6 @@
         "https://images.craigslist.org/00x0x_ajFx3GMRWUu_0lM0t2_600x450.jpg",
         "https://images.craigslist.org/00q0q_d2KbcW4SkEe_0lM0t2_600x450.jpg",
         "https://images.craigslist.org/00e0e_6OSkR3tEtF6_0lM0t2_600x450.jpg"
-      ],
-      "categoryKey": "auto-parts"
-    },
-    {
-      "id": "craigslist-dDFs5gqZrDhn3nsNoNHX2b",
-      "slug": "2007-2008-hyundai-santa-fe-automatic-transmission-f35594-3nsnonhx2b",
-      "url": "https://6ixo.com/listing/2007-2008-hyundai-santa-fe-automatic-transmission-f35594-3nsnonhx2b/",
-      "images": [
-        "https://images.craigslist.org/00w0w_cK0k6ytvihp_0t20CI_600x450.jpg",
-        "https://images.craigslist.org/00k0k_k0VOwykk5aO_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/01717_kIsRYLDN1fS_0CI0t2_600x450.jpg"
       ],
       "categoryKey": "auto-parts"
     },
@@ -43524,17 +43325,6 @@
       "categoryKey": "electronics"
     },
     {
-      "id": "craigslist-GMfhkwm98RGJG_O8oZagVw",
-      "slug": "2023-ford-f150-f-150-f-150-xlsupercab-65-ft-box-for-only-3-jgo8ozagvw",
-      "url": "https://6ixo.com/listing/2023-ford-f150-f-150-f-150-xlsupercab-65-ft-box-for-only-3-jgo8ozagvw/",
-      "images": [
-        "https://images.craigslist.org/01313_aNFChLebkoO_0fe0bq_600x450.jpg",
-        "https://images.craigslist.org/01717_6tbsq4Ia8v8_0fe0bq_600x450.jpg",
-        "https://images.craigslist.org/01010_kUAqCLzVvVK_0fe0bq_600x450.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
       "id": "craigslist-qa4JesThvSRmx3iQuUS79L",
       "slug": "2020-ford-f-250-xlt-premium-fx4-7-3l-godzilla-v8-b-w-hitch-x3iquus79l",
       "url": "https://6ixo.com/listing/2020-ford-f-250-xlt-premium-fx4-7-3l-godzilla-v8-b-w-hitch-x3iquus79l/",
@@ -43588,17 +43378,6 @@
         "https://images.craigslist.org/00P0P_dAjLa8lkXEN_0pO0jm_600x450.jpg",
         "https://images.craigslist.org/00q0q_bSYNaRX6zMO_0pO0jm_600x450.jpg",
         "https://images.craigslist.org/00a0a_lxZfH6XErO8_0pO0jm_600x450.jpg"
-      ],
-      "categoryKey": "auto-parts"
-    },
-    {
-      "id": "craigslist-nym7vPF3SeCLsZsYzV3BPx",
-      "slug": "14-inch-toyota-wheel-cover-szsyzv3bpx",
-      "url": "https://6ixo.com/listing/14-inch-toyota-wheel-cover-szsyzv3bpx/",
-      "images": [
-        "https://images.craigslist.org/00L0L_axPGIZnWPe3_0pO0jm_600x450.jpg",
-        "https://images.craigslist.org/00o0o_3rkblyxrfeQ_0pO0jm_600x450.jpg",
-        "https://images.craigslist.org/00N0N_1MpV8sL8m41_0pO0jm_600x450.jpg"
       ],
       "categoryKey": "auto-parts"
     },
@@ -43691,53 +43470,6 @@
         "https://images.craigslist.org/00p0p_jAtSjn1zDVI_0t20CI_600x450.jpg"
       ],
       "categoryKey": "auto-parts"
-    },
-    {
-      "id": "craigslist-jgixKnWc38kUBvgCs8g4Hb",
-      "slug": "2007-gmc-sierra-2500-4x4-bvgcs8g4hb",
-      "url": "https://6ixo.com/listing/2007-gmc-sierra-2500-4x4-bvgcs8g4hb/",
-      "images": [
-        "https://images.craigslist.org/00X0X_7kWHoTwH8uw_0t20CI_600x450.jpg",
-        "https://images.craigslist.org/01111_91mdTZevLa0_0t20CI_600x450.jpg",
-        "https://images.craigslist.org/00L0L_d6hExd08zlb_0gl0t2_600x450.jpg",
-        "https://images.craigslist.org/00m0m_2IK3XeFAdWq_0gl0t2_600x450.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "craigslist-3Z4fePpKozoQSJwQCYRin9",
-      "slug": "2009-acura-tsx-sjwqcyrin9",
-      "url": "https://6ixo.com/listing/2009-acura-tsx-sjwqcyrin9/",
-      "images": [
-        "https://images.craigslist.org/00F0F_gTpPIArubnn_12w0Mo_600x450.jpg",
-        "https://images.craigslist.org/00h0h_23wwf4xE6XO_12w0Mo_600x450.jpg",
-        "https://images.craigslist.org/00R0R_jVlxBUZ8Whi_12w0Mo_600x450.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "craigslist-niwed4mSP83Q3WoUKhjfBb",
-      "slug": "2012-honda-accord-ex-3woukhjfbb",
-      "url": "https://6ixo.com/listing/2012-honda-accord-ex-3woukhjfbb/",
-      "images": [
-        "https://images.craigslist.org/00C0C_egD9BEK7lDr_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/00N0N_66e7h6a2bUp_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/00m0m_6E3tk4lPUUC_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/00606_4Gi5m3gemSO_0CI0t2_600x450.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "craigslist-fAqbWsDxJQsZHmwGqZtj31",
-      "slug": "2017-nissan-titan-hmwgqztj31",
-      "url": "https://6ixo.com/listing/2017-nissan-titan-hmwgqztj31/",
-      "images": [
-        "https://images.craigslist.org/00c0c_iCteVv5Y5IJ_12w0Mo_600x450.jpg",
-        "https://images.craigslist.org/00303_i73owImQAn3_12w0Mo_600x450.jpg",
-        "https://images.craigslist.org/00000_jokebXZdZvc_12w0Mo_600x450.jpg",
-        "https://images.craigslist.org/00C0C_ccVYE6Dw9nX_12w0Mo_600x450.jpg"
-      ],
-      "categoryKey": "vehicles"
     },
     {
       "id": "craigslist-uRXWbmw85Ccyzt57PQnFmU",
@@ -54552,9 +54284,6 @@
       "url": "https://6ixo.com/listings/page/123/"
     },
     {
-      "url": "https://6ixo.com/listings/page/124/"
-    },
-    {
       "url": "https://6ixo.com/listings/electronics/"
     },
     {
@@ -54730,9 +54459,6 @@
     },
     {
       "url": "https://6ixo.com/listings/vehicles/page/50/"
-    },
-    {
-      "url": "https://6ixo.com/listings/vehicles/page/51/"
     },
     {
       "url": "https://6ixo.com/listings/auto-parts/"
@@ -55629,9 +55355,6 @@
       "url": "https://6ixo.com/listings/country/united-states/page/44/"
     },
     {
-      "url": "https://6ixo.com/listings/country/united-states/page/45/"
-    },
-    {
       "url": "https://6ixo.com/apartments-for-rent/"
     },
     {
@@ -55900,9 +55623,6 @@
     },
     {
       "url": "https://6ixo.com/cars-for-sale/united-states/page/31/"
-    },
-    {
-      "url": "https://6ixo.com/cars-for-sale/united-states/page/32/"
     }
   ],
   "retired": [
@@ -65455,6 +65175,121 @@
       "id": "apify-81f145a7fb65",
       "slug": "10-zig-desktop-f145a7fb65",
       "url": "https://6ixo.com/listing/10-zig-desktop-f145a7fb65/"
+    },
+    {
+      "id": "alba-dubai-2043",
+      "slug": "2023-jeep-wrangler-sport-adubai2043",
+      "url": "https://6ixo.com/listing/2023-jeep-wrangler-sport-adubai2043/"
+    },
+    {
+      "id": "craigslist-CtBr9xG98RGJBMiNpMxgkA",
+      "slug": "2012-subaru-forester-2-5x-premium-awd-4dr-wagon-4a-bminpmxgka",
+      "url": "https://6ixo.com/listing/2012-subaru-forester-2-5x-premium-awd-4dr-wagon-4a-bminpmxgka/"
+    },
+    {
+      "id": "craigslist-7Lw08RG98RGqjbZ_i35ZtA",
+      "slug": "2015-nissan-altima-2-5-s-4dr-sedan-qjbzi35zta",
+      "url": "https://6ixo.com/listing/2015-nissan-altima-2-5-s-4dr-sedan-qjbzi35zta/"
+    },
+    {
+      "id": "craigslist--D39-Qi98RGUfM_lPzGtbg",
+      "slug": "2017-chevrolet-corvette-ufmlpzgtbg",
+      "url": "https://6ixo.com/listing/2017-chevrolet-corvette-ufmlpzgtbg/"
+    },
+    {
+      "id": "craigslist-ANkNugi98RGJn-RabNT7mw",
+      "slug": "1992-chevrolet-corvette-jnrabnt7mw",
+      "url": "https://6ixo.com/listing/1992-chevrolet-corvette-jnrabnt7mw/"
+    },
+    {
+      "id": "craigslist-SiupkQi98RG8Y8ZK0xrTZg",
+      "slug": "2005-chevrolet-corvette-y8zk0xrtzg",
+      "url": "https://6ixo.com/listing/2005-chevrolet-corvette-y8zk0xrtzg/"
+    },
+    {
+      "id": "craigslist-2G8RmtZZGeXsmTw3hMG4RB",
+      "slug": "sony-soundbar-with-wireless-subwoofer-mtw3hmg4rb",
+      "url": "https://6ixo.com/listing/sony-soundbar-with-wireless-subwoofer-mtw3hmg4rb/"
+    },
+    {
+      "id": "craigslist-VIg3vw298RGP0tka-dYLsg",
+      "slug": "2022-kia-soul-lx-ivt-p0tkadylsg",
+      "url": "https://6ixo.com/listing/2022-kia-soul-lx-ivt-p0tkadylsg/"
+    },
+    {
+      "id": "craigslist-bEd81-O88RGSiP1jVUiBbw",
+      "slug": "2018-jeep-grand-cherokee-limited-4x2-ip1jvuibbw",
+      "url": "https://6ixo.com/listing/2018-jeep-grand-cherokee-limited-4x2-ip1jvuibbw/"
+    },
+    {
+      "id": "craigslist-m3mWTMYb3wXFr1PxSq6h9f",
+      "slug": "2021-gmc-sierra-slt-texas-edition-r1pxsq6h9f",
+      "url": "https://6ixo.com/listing/2021-gmc-sierra-slt-texas-edition-r1pxsq6h9f/"
+    },
+    {
+      "id": "craigslist-hVnhtr32x2B2nA7w7XhSEj",
+      "slug": "2021-chevrolet-colorado-lt-na7w7xhsej",
+      "url": "https://6ixo.com/listing/2021-chevrolet-colorado-lt-na7w7xhsej/"
+    },
+    {
+      "id": "craigslist-vCbieEBgxkFHKpwS6WtBZC",
+      "slug": "2022-dodge-challenger-sxt-kpws6wtbzc",
+      "url": "https://6ixo.com/listing/2022-dodge-challenger-sxt-kpws6wtbzc/"
+    },
+    {
+      "id": "craigslist-udEn7co7yonDEpujEa5SDT",
+      "slug": "2024-nissan-kicks-epujea5sdt",
+      "url": "https://6ixo.com/listing/2024-nissan-kicks-epujea5sdt/"
+    },
+    {
+      "id": "craigslist-swuh6YsdZeskWM4xM9aAVP",
+      "slug": "chevrolet-camaro-wm4xm9aavp",
+      "url": "https://6ixo.com/listing/chevrolet-camaro-wm4xm9aavp/"
+    },
+    {
+      "id": "craigslist-4URWHajQ91YLZnEDiEcS3d",
+      "slug": "jaguar-znediecs3d",
+      "url": "https://6ixo.com/listing/jaguar-znediecs3d/"
+    },
+    {
+      "id": "craigslist-9HS4ehK98RG5Z9nA-3JipQ",
+      "slug": "2015-gmc-acadia-financing-available-5z9na3jipq",
+      "url": "https://6ixo.com/listing/2015-gmc-acadia-financing-available-5z9na3jipq/"
+    },
+    {
+      "id": "craigslist-dDFs5gqZrDhn3nsNoNHX2b",
+      "slug": "2007-2008-hyundai-santa-fe-automatic-transmission-f35594-3nsnonhx2b",
+      "url": "https://6ixo.com/listing/2007-2008-hyundai-santa-fe-automatic-transmission-f35594-3nsnonhx2b/"
+    },
+    {
+      "id": "craigslist-GMfhkwm98RGJG_O8oZagVw",
+      "slug": "2023-ford-f150-f-150-f-150-xlsupercab-65-ft-box-for-only-3-jgo8ozagvw",
+      "url": "https://6ixo.com/listing/2023-ford-f150-f-150-f-150-xlsupercab-65-ft-box-for-only-3-jgo8ozagvw/"
+    },
+    {
+      "id": "craigslist-nym7vPF3SeCLsZsYzV3BPx",
+      "slug": "14-inch-toyota-wheel-cover-szsyzv3bpx",
+      "url": "https://6ixo.com/listing/14-inch-toyota-wheel-cover-szsyzv3bpx/"
+    },
+    {
+      "id": "craigslist-jgixKnWc38kUBvgCs8g4Hb",
+      "slug": "2007-gmc-sierra-2500-4x4-bvgcs8g4hb",
+      "url": "https://6ixo.com/listing/2007-gmc-sierra-2500-4x4-bvgcs8g4hb/"
+    },
+    {
+      "id": "craigslist-3Z4fePpKozoQSJwQCYRin9",
+      "slug": "2009-acura-tsx-sjwqcyrin9",
+      "url": "https://6ixo.com/listing/2009-acura-tsx-sjwqcyrin9/"
+    },
+    {
+      "id": "craigslist-niwed4mSP83Q3WoUKhjfBb",
+      "slug": "2012-honda-accord-ex-3woukhjfbb",
+      "url": "https://6ixo.com/listing/2012-honda-accord-ex-3woukhjfbb/"
+    },
+    {
+      "id": "craigslist-fAqbWsDxJQsZHmwGqZtj31",
+      "slug": "2017-nissan-titan-hmwgqztj31",
+      "url": "https://6ixo.com/listing/2017-nissan-titan-hmwgqztj31/"
     }
   ]
 }

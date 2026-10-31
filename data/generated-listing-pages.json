@@ -1,5 +1,5 @@
 {
-  "count": 4413,
+  "count": 4394,
   "listings": [
     {
       "id": "apify-b9b18084f762",
@@ -3665,15 +3665,6 @@
       "categoryKey": "services"
     },
     {
-      "id": "kijiji-1745530798",
-      "slug": "no-tax-solid-bunk-bed-with-stairs-bunk-bed-kids-bed-bed-1745530798",
-      "url": "https://6ixo.com/listing/no-tax-solid-bunk-bed-with-stairs-bunk-bed-kids-bed-bed-1745530798/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/47/470575fb-90c1-4b53-9bc0-42292638155c?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "buy-and-sell"
-    },
-    {
       "id": "dealer-c42fad1c63a18b906a",
       "slug": "grille-bumper-fr-hiace-11-13-low-rf-63a18b906a",
       "url": "https://6ixo.com/listing/grille-bumper-fr-hiace-11-13-low-rf-63a18b906a/",
@@ -4037,18 +4028,6 @@
         "https://bmsoat.com/wp-content/uploads/2025/09/WhatsApp-Image-2025-09-19-at-1.44.05-PM-1.jpeg",
         "https://bmsoat.com/wp-content/uploads/2025/09/WhatsApp-Image-2025-09-19-at-1.44.07-PM.jpeg",
         "https://bmsoat.com/wp-content/uploads/2025/09/WhatsApp-Image-2025-09-19-at-1.44.06-PM-2.jpeg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "dealer-cb5f9f1820ebe62d3c",
-      "slug": "2019-mercedes-benz-a-180-20ebe62d3c",
-      "url": "https://6ixo.com/listing/2019-mercedes-benz-a-180-20ebe62d3c/",
-      "images": [
-        "https://bmsoat.com/wp-content/uploads/2025/09/WhatsApp-Image-2025-08-07-at-9.15.24-AM.jpeg",
-        "https://bmsoat.com/wp-content/uploads/2025/09/WhatsApp-Image-2025-08-07-at-9.15.24-AM-1.jpeg",
-        "https://bmsoat.com/wp-content/uploads/2025/09/WhatsApp-Image-2025-08-07-at-9.15.24-AM-2.jpeg",
-        "https://bmsoat.com/wp-content/uploads/2025/09/WhatsApp-Image-2025-08-07-at-9.15.25-AM-1.jpeg"
       ],
       "categoryKey": "vehicles"
     },
@@ -6375,15 +6354,6 @@
       "categoryKey": "buy-and-sell"
     },
     {
-      "id": "kijiji-1745527952",
-      "slug": "hiring-delivery-drivers-in-north-york-1745527952",
-      "url": "https://6ixo.com/listing/hiring-delivery-drivers-in-north-york-1745527952/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/4d/4d7ef592-21ed-4196-92e0-6084daf3b64e?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "jobs"
-    },
-    {
       "id": "kijiji-1745527603",
       "slug": "set-of-4-winter-tires-for-sale-1745527603",
       "url": "https://6ixo.com/listing/set-of-4-winter-tires-for-sale-1745527603/",
@@ -6453,33 +6423,6 @@
         "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/8f/8fbd8480-c6d7-4a5c-b5bb-3bf69753d4f1?rule=kijijica-1600-webp"
       ],
       "categoryKey": "community"
-    },
-    {
-      "id": "kijiji-1745525421",
-      "slug": "water-heater-tankless-water-heater-tankless-water-heater-1745525421",
-      "url": "https://6ixo.com/listing/water-heater-tankless-water-heater-tankless-water-heater-1745525421/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/94/942c8cea-4785-42ed-815c-e7aa7728729e?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "buy-and-sell"
-    },
-    {
-      "id": "kijiji-1745523665",
-      "slug": "water-heater-tankless-water-heater-tankless-water-heater-1745523665",
-      "url": "https://6ixo.com/listing/water-heater-tankless-water-heater-tankless-water-heater-1745523665/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/d8/d83392e4-6827-40e5-a1e0-81af7dc55d25?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "buy-and-sell"
-    },
-    {
-      "id": "kijiji-1745523395",
-      "slug": "water-heater-tankless-water-heater-tankless-water-heater-1745523395",
-      "url": "https://6ixo.com/listing/water-heater-tankless-water-heater-tankless-water-heater-1745523395/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/38/389be443-1af2-4c14-85af-f9c5186be18e?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "buy-and-sell"
     },
     {
       "id": "kijiji-1745523242",
@@ -7325,18 +7268,6 @@
         "https://images.craigslist.org/00K0K_3LVcxGr7ib5_0CI0t2_600x450.jpg",
         "https://images.craigslist.org/00l0l_7IaJKcvQAnI_0Cd0t2_600x450.jpg",
         "https://images.craigslist.org/00s0s_46KOJppESYr_0CI0t2_600x450.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "craigslist-7ZwEeoHbw3pNUeaefyN3ie",
-      "slug": "2014-acura-rdx-ueaefyn3ie",
-      "url": "https://6ixo.com/listing/2014-acura-rdx-ueaefyn3ie/",
-      "images": [
-        "https://images.craigslist.org/00606_90GexCbRGuZ_0pO0jm_600x450.jpg",
-        "https://images.craigslist.org/00G0G_7LbmkQhJOef_0pO0jm_600x450.jpg",
-        "https://images.craigslist.org/00c0c_g9ZiG4T508J_0pO0jm_600x450.jpg",
-        "https://images.craigslist.org/00x0x_lmsXv11y5qQ_0pO0jm_600x450.jpg"
       ],
       "categoryKey": "vehicles"
     },
@@ -8468,18 +8399,6 @@
         "https://images.craigslist.org/00D0D_lOhENsBN5Jq_0CI0t2_600x450.jpg",
         "https://images.craigslist.org/00606_h8u21LtLfiE_0CI0t2_600x450.jpg",
         "https://images.craigslist.org/00H0H_8jOTzSeXzI2_0CI0t2_600x450.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "craigslist-siMFT273hDyTrYGXev2tzE",
-      "slug": "2013-honda-civic-hybrid-leather-navigation-low-84k-miles-1-rygxev2tze",
-      "url": "https://6ixo.com/listing/2013-honda-civic-hybrid-leather-navigation-low-84k-miles-1-rygxev2tze/",
-      "images": [
-        "https://images.craigslist.org/00707_30ZdYJrgHXv_0C20t2_600x450.jpg",
-        "https://images.craigslist.org/00I0I_hydm9b1WZli_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/00l0l_gfX6jYlLYqS_0Cj0t2_600x450.jpg",
-        "https://images.craigslist.org/00C0C_1s3fkATDJNU_0CI0t2_600x450.jpg"
       ],
       "categoryKey": "vehicles"
     },
@@ -10027,24 +9946,6 @@
       "categoryKey": "real-estate"
     },
     {
-      "id": "kijiji-1745442195",
-      "slug": "free-delivery-antique-vintage-wooden-armoire-with-mirror-1745442195",
-      "url": "https://6ixo.com/listing/free-delivery-antique-vintage-wooden-armoire-with-mirror-1745442195/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/83/831ffe21-7712-4fc3-8e62-7872c29894a4?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/14/14063479-0216-413f-a650-27cbea53170b?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/f4/f49182bb-798a-4e5c-bd79-4eb0486d9a7b?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/fe/fe2ee9c0-51a8-4d52-b051-4001731d1953?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/05/0564e4bf-d955-4f97-984d-267f749d18ae?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/a0/a04c86e1-c41d-4caa-961d-7ada58d687bf?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/7a/7a777260-47ea-4b84-91cd-a3b2a003dde9?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/a0/a0ddc9f9-14ee-4391-b75d-dbe888a0d231?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/41/4143d5e8-baec-4695-bdaf-ca6fd598ed54?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/33/3313e19a-774a-4f7e-8893-90008863d435?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "buy-and-sell"
-    },
-    {
       "id": "kijiji-1745442032",
       "slug": "are-you-an-uber-or-lyft-driver-who-needs-more-business-1745442032",
       "url": "https://6ixo.com/listing/are-you-an-uber-or-lyft-driver-who-needs-more-business-1745442032/",
@@ -10279,24 +10180,6 @@
       "categoryKey": "buy-and-sell"
     },
     {
-      "id": "kijiji-1745433456",
-      "slug": "honda-vehicle-brakes-low-prices-1745433456",
-      "url": "https://6ixo.com/listing/honda-vehicle-brakes-low-prices-1745433456/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/b8/b88b6f86-1a9e-48ee-8212-bd58f57f8bc3?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "services"
-    },
-    {
-      "id": "kijiji-1745433457",
-      "slug": "mazda-subaru-suzuki-brake-rotor-pad-1745433457",
-      "url": "https://6ixo.com/listing/mazda-subaru-suzuki-brake-rotor-pad-1745433457/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/93/93850512-c44c-4c32-b0d2-b93c452f123e?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "services"
-    },
-    {
       "id": "kijiji-1745432516",
       "slug": "forex-trading-classes-1745432516",
       "url": "https://6ixo.com/listing/forex-trading-classes-1745432516/",
@@ -10392,30 +10275,6 @@
         "https://images.craigslist.org/00U0U_lRKb6EXg0uD_0ak07K_600x450.jpg",
         "https://images.craigslist.org/00p0p_6uxvZBaYqME_0ak07K_600x450.jpg",
         "https://images.craigslist.org/00M0M_4K6xkhX8DD5_0ak07K_600x450.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "craigslist-iTco6UFtxktcjxLMid93cq",
-      "slug": "2022-volkswagon-taos-82-mil-millas-jxlmid93cq",
-      "url": "https://6ixo.com/listing/2022-volkswagon-taos-82-mil-millas-jxlmid93cq/",
-      "images": [
-        "https://images.craigslist.org/00W0W_b4zaWhILrAS_0qs0jQ_600x450.jpg",
-        "https://images.craigslist.org/00K0K_emEoMcMXlY9_0qs0jQ_600x450.jpg",
-        "https://images.craigslist.org/00c0c_5FinJEC8XV_0qs0jQ_600x450.jpg",
-        "https://images.craigslist.org/00M0M_4XFigit5Ci8_0jQ0qs_600x450.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "craigslist-nA7oJSFJpsfczxHx3ypH6w",
-      "slug": "2024-volkswagon-jetta-17-mil-millas-zxhx3yph6w",
-      "url": "https://6ixo.com/listing/2024-volkswagon-jetta-17-mil-millas-zxhx3yph6w/",
-      "images": [
-        "https://images.craigslist.org/01010_2yM1A6vSMUy_13O0Nm_600x450.jpg",
-        "https://images.craigslist.org/01414_7Sugmay3Xv2_13O0Nm_600x450.jpg",
-        "https://images.craigslist.org/00W0W_6106ilowXeb_0Du0QE_600x450.jpg",
-        "https://images.craigslist.org/00D0D_6cuLuS2Tb54_0Du0QE_600x450.jpg"
       ],
       "categoryKey": "vehicles"
     },
@@ -11618,18 +11477,6 @@
       "categoryKey": "vehicles"
     },
     {
-      "id": "craigslist-7d7SUMDXTjGMiTPRztsc61",
-      "slug": "basement-apartment-for-rent-950-itprztsc61",
-      "url": "https://6ixo.com/listing/basement-apartment-for-rent-950-itprztsc61/",
-      "images": [
-        "https://images.craigslist.org/00y0y_8iPLsSfg1aM_0t20CI_600x450.jpg",
-        "https://images.craigslist.org/00606_kmg88S7UacT_0t20CI_600x450.jpg",
-        "https://images.craigslist.org/00D0D_eymRBD8MOBo_0t20CI_600x450.jpg",
-        "https://images.craigslist.org/00909_8nKEAwjZT36_0t20CI_600x450.jpg"
-      ],
-      "categoryKey": "real-estate"
-    },
-    {
       "id": "craigslist-8DmTMKGvZvnBJeZ8Hc612G",
       "slug": "jeep-wrangler-cj-cj7-parts-warehouse-jez8hc612g",
       "url": "https://6ixo.com/listing/jeep-wrangler-cj-cj7-parts-warehouse-jez8hc612g/",
@@ -11818,18 +11665,6 @@
         "https://images.craigslist.org/00202_kCrPWdmKHCe_0cU09H_600x450.jpg",
         "https://images.craigslist.org/00X0X_5JnYwKp3DP5_0cU09H_600x450.jpg",
         "https://images.craigslist.org/00808_bpW10zPFOem_0cU09H_600x450.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "craigslist-98iTQa6LP7HKbPg787gZam",
-      "slug": "2020-chrysler-voyager-limited-bpg787gzam",
-      "url": "https://6ixo.com/listing/2020-chrysler-voyager-limited-bpg787gzam/",
-      "images": [
-        "https://images.craigslist.org/00U0U_a6QB6KkFBnj_13O0Nm_600x450.jpg",
-        "https://images.craigslist.org/01313_3B7F2ohTOi5_0Nm13O_600x450.jpg",
-        "https://images.craigslist.org/00000_98ZzsDnF6au_0Nm13O_600x450.jpg",
-        "https://images.craigslist.org/00t0t_8g4MfaKUuJQ_13O0Nm_600x450.jpg"
       ],
       "categoryKey": "vehicles"
     },
@@ -13455,18 +13290,6 @@
       "categoryKey": "vehicles"
     },
     {
-      "id": "craigslist-r3KA7KX45UvU4VeGw5QmNc",
-      "slug": "2012-nissan-frontier-crew-cab-sv-4vegw5qmnc",
-      "url": "https://6ixo.com/listing/2012-nissan-frontier-crew-cab-sv-4vegw5qmnc/",
-      "images": [
-        "https://images.craigslist.org/00n0n_cc9mkmLQik_0t20CI_600x450.jpg",
-        "https://images.craigslist.org/00O0O_jnAhpNKSdVo_0t20CI_600x450.jpg",
-        "https://images.craigslist.org/00G0G_38qEpemU8vk_0t20CI_600x450.jpg",
-        "https://images.craigslist.org/00505_1oA6gu5M2Bb_0t20CI_600x450.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
       "id": "craigslist-jw3zRY8NPETQWFWtXhJ1WR",
       "slug": "2018-buick-enclave-avenir-only-90k-miles-wfwtxhj1wr",
       "url": "https://6ixo.com/listing/2018-buick-enclave-avenir-only-90k-miles-wfwtxhj1wr/",
@@ -13901,15 +13724,6 @@
         "https://samtronixguyana.com/cdn/shop/files/DISCPS5CallofDutyModernWarfare3New_17_1024x.png?v=1789212355"
       ],
       "categoryKey": "electronics"
-    },
-    {
-      "id": "alba-dubai-2213",
-      "slug": "2024-porsche-carrera-911-gt3-rs-adubai2213",
-      "url": "https://6ixo.com/listing/2024-porsche-carrera-911-gt3-rs-adubai2213/",
-      "images": [
-        "https://storage.albacars.ae/vehicles/ead539c9-bc24-4944-8da1-993d953bb293/bef1afb6-b6c7-430a-9539-a24bfb6a819e.jpeg"
-      ],
-      "categoryKey": "vehicles"
     },
     {
       "id": "alba-dubai-2212",
@@ -20411,26 +20225,6 @@
       "categoryKey": "vehicles"
     },
     {
-      "id": "kijiji-1743256733",
-      "slug": "2024-honda-cr-v-sport-1-owner-no-accidents-sunroof-1743256733",
-      "url": "https://6ixo.com/listing/2024-honda-cr-v-sport-1-owner-no-accidents-sunroof-1743256733/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/2e/2e8b540c-64b2-499c-913e-703f76efece2?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/c3/c3d95a73-423c-4183-9465-8c9e32a78cd7?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/22/22130c77-5326-4b8c-be58-1e0546623225?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/dd/dd45f071-37a8-4aea-9729-30dd52bbabf1?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/2f/2fc6905c-b05b-4ed6-bebc-dac939d122c1?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/09/09c44bc2-a349-4326-b21a-5456d84b6344?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/af/af82931d-073d-445e-81ac-cfc3010d6507?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/cb/cb0d1b6f-77ad-4fee-926d-62ee27589406?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/60/6046488c-a470-44dc-8078-cfbed72733ae?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/ca/cae0240b-31ef-4872-9dab-0c451b50d6d5?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/a3/a3cde083-6304-431d-b735-3f07861590ac?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/3a/3a83675a-159d-4479-9668-a803317c8cfe?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
       "id": "kijiji-1744798582",
       "slug": "2024-chevrolet-equinox-ev-rs-winter-wheels-1-owner-no-1744798582",
       "url": "https://6ixo.com/listing/2024-chevrolet-equinox-ev-rs-winter-wheels-1-owner-no-1744798582/",
@@ -25596,18 +25390,6 @@
         "https://images.craigslist.org/00606_5EbC18FNaCE_07K0ak_600x450.jpg",
         "https://images.craigslist.org/00f0f_4mTxI2sF0La_07K0ak_600x450.jpg",
         "https://images.craigslist.org/00G0G_kC4lhvLknYp_07K0ak_600x450.jpg"
-      ],
-      "categoryKey": "real-estate"
-    },
-    {
-      "id": "craigslist-1vX9DAxQvA17secHmcuQjU",
-      "slug": "massive-sun-lit-west-facing-1-bedroom-w-balcony-sechmcuqju",
-      "url": "https://6ixo.com/listing/massive-sun-lit-west-facing-1-bedroom-w-balcony-sechmcuqju/",
-      "images": [
-        "https://images.craigslist.org/00t0t_4XqIjboLo14_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/00k0k_2Ds2jMTpPbY_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/00505_4epmrAM9fgZ_0t20CI_600x450.jpg",
-        "https://images.craigslist.org/00S0S_2TuaJV6tMYZ_0t20CI_600x450.jpg"
       ],
       "categoryKey": "real-estate"
     },
@@ -54823,9 +54605,6 @@
       "url": "https://6ixo.com/listings/country/canada/page/40/"
     },
     {
-      "url": "https://6ixo.com/listings/country/canada/page/41/"
-    },
-    {
       "url": "https://6ixo.com/listings/country/china/electronics/"
     },
     {
@@ -65243,6 +65022,101 @@
       "id": "craigslist-52dLKv9H8EBADEbzrx27kp",
       "slug": "2000-gmc-sierra-4x4-extended-cab-four-wheel-drive-shortbed-debzrx27kp",
       "url": "https://6ixo.com/listing/2000-gmc-sierra-4x4-extended-cab-four-wheel-drive-shortbed-debzrx27kp/"
+    },
+    {
+      "id": "kijiji-1745530798",
+      "slug": "no-tax-solid-bunk-bed-with-stairs-bunk-bed-kids-bed-bed-1745530798",
+      "url": "https://6ixo.com/listing/no-tax-solid-bunk-bed-with-stairs-bunk-bed-kids-bed-bed-1745530798/"
+    },
+    {
+      "id": "dealer-cb5f9f1820ebe62d3c",
+      "slug": "2019-mercedes-benz-a-180-20ebe62d3c",
+      "url": "https://6ixo.com/listing/2019-mercedes-benz-a-180-20ebe62d3c/"
+    },
+    {
+      "id": "kijiji-1745527952",
+      "slug": "hiring-delivery-drivers-in-north-york-1745527952",
+      "url": "https://6ixo.com/listing/hiring-delivery-drivers-in-north-york-1745527952/"
+    },
+    {
+      "id": "kijiji-1745525421",
+      "slug": "water-heater-tankless-water-heater-tankless-water-heater-1745525421",
+      "url": "https://6ixo.com/listing/water-heater-tankless-water-heater-tankless-water-heater-1745525421/"
+    },
+    {
+      "id": "kijiji-1745523665",
+      "slug": "water-heater-tankless-water-heater-tankless-water-heater-1745523665",
+      "url": "https://6ixo.com/listing/water-heater-tankless-water-heater-tankless-water-heater-1745523665/"
+    },
+    {
+      "id": "kijiji-1745523395",
+      "slug": "water-heater-tankless-water-heater-tankless-water-heater-1745523395",
+      "url": "https://6ixo.com/listing/water-heater-tankless-water-heater-tankless-water-heater-1745523395/"
+    },
+    {
+      "id": "craigslist-7ZwEeoHbw3pNUeaefyN3ie",
+      "slug": "2014-acura-rdx-ueaefyn3ie",
+      "url": "https://6ixo.com/listing/2014-acura-rdx-ueaefyn3ie/"
+    },
+    {
+      "id": "craigslist-siMFT273hDyTrYGXev2tzE",
+      "slug": "2013-honda-civic-hybrid-leather-navigation-low-84k-miles-1-rygxev2tze",
+      "url": "https://6ixo.com/listing/2013-honda-civic-hybrid-leather-navigation-low-84k-miles-1-rygxev2tze/"
+    },
+    {
+      "id": "kijiji-1745442195",
+      "slug": "free-delivery-antique-vintage-wooden-armoire-with-mirror-1745442195",
+      "url": "https://6ixo.com/listing/free-delivery-antique-vintage-wooden-armoire-with-mirror-1745442195/"
+    },
+    {
+      "id": "kijiji-1745433456",
+      "slug": "honda-vehicle-brakes-low-prices-1745433456",
+      "url": "https://6ixo.com/listing/honda-vehicle-brakes-low-prices-1745433456/"
+    },
+    {
+      "id": "kijiji-1745433457",
+      "slug": "mazda-subaru-suzuki-brake-rotor-pad-1745433457",
+      "url": "https://6ixo.com/listing/mazda-subaru-suzuki-brake-rotor-pad-1745433457/"
+    },
+    {
+      "id": "craigslist-iTco6UFtxktcjxLMid93cq",
+      "slug": "2022-volkswagon-taos-82-mil-millas-jxlmid93cq",
+      "url": "https://6ixo.com/listing/2022-volkswagon-taos-82-mil-millas-jxlmid93cq/"
+    },
+    {
+      "id": "craigslist-nA7oJSFJpsfczxHx3ypH6w",
+      "slug": "2024-volkswagon-jetta-17-mil-millas-zxhx3yph6w",
+      "url": "https://6ixo.com/listing/2024-volkswagon-jetta-17-mil-millas-zxhx3yph6w/"
+    },
+    {
+      "id": "craigslist-7d7SUMDXTjGMiTPRztsc61",
+      "slug": "basement-apartment-for-rent-950-itprztsc61",
+      "url": "https://6ixo.com/listing/basement-apartment-for-rent-950-itprztsc61/"
+    },
+    {
+      "id": "craigslist-98iTQa6LP7HKbPg787gZam",
+      "slug": "2020-chrysler-voyager-limited-bpg787gzam",
+      "url": "https://6ixo.com/listing/2020-chrysler-voyager-limited-bpg787gzam/"
+    },
+    {
+      "id": "craigslist-r3KA7KX45UvU4VeGw5QmNc",
+      "slug": "2012-nissan-frontier-crew-cab-sv-4vegw5qmnc",
+      "url": "https://6ixo.com/listing/2012-nissan-frontier-crew-cab-sv-4vegw5qmnc/"
+    },
+    {
+      "id": "alba-dubai-2213",
+      "slug": "2024-porsche-carrera-911-gt3-rs-adubai2213",
+      "url": "https://6ixo.com/listing/2024-porsche-carrera-911-gt3-rs-adubai2213/"
+    },
+    {
+      "id": "kijiji-1743256733",
+      "slug": "2024-honda-cr-v-sport-1-owner-no-accidents-sunroof-1743256733",
+      "url": "https://6ixo.com/listing/2024-honda-cr-v-sport-1-owner-no-accidents-sunroof-1743256733/"
+    },
+    {
+      "id": "craigslist-1vX9DAxQvA17secHmcuQjU",
+      "slug": "massive-sun-lit-west-facing-1-bedroom-w-balcony-sechmcuqju",
+      "url": "https://6ixo.com/listing/massive-sun-lit-west-facing-1-bedroom-w-balcony-sechmcuqju/"
     }
   ]
 }

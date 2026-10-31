@@ -1,5 +1,5 @@
 {
-  "count": 4373,
+  "count": 4365,
   "listings": [
     {
       "id": "import-67ff0ce3b61030a75c",
@@ -9264,30 +9264,6 @@
       "categoryKey": "community"
     },
     {
-      "id": "kijiji-1745429602",
-      "slug": "road-test-asap-g2-g-booking-driving-lessons-1745429602",
-      "url": "https://6ixo.com/listing/road-test-asap-g2-g-booking-driving-lessons-1745429602/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/a7/a74a2d7f-640a-4e12-aede-69fdd6ee8f43?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/62/62c0b37b-6865-4973-a92b-23a6ecf4340a?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/46/46766e57-3cd1-49d6-b121-7b91976226fc?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/d3/d32662b2-fef1-4daa-9a29-fe03c12410b5?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "community"
-    },
-    {
-      "id": "kijiji-1745429375",
-      "slug": "early-drivers-licence-g2-g-road-test-asap-booking-drive-cl-1745429375",
-      "url": "https://6ixo.com/listing/early-drivers-licence-g2-g-road-test-asap-booking-drive-cl-1745429375/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/d5/d58440c7-6fbd-40a3-8048-6a47f0885ce4?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/39/390a6304-6052-43ce-abb9-2c0d8232d41c?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/cc/cc6a2d99-910e-45f6-93ce-683c00fbf976?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/26/26034e05-cd80-492d-aaca-135eaef1ef04?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "community"
-    },
-    {
       "id": "apify-dbcac7f05a2a",
       "slug": "honda-civic-sport-cac7f05a2a",
       "url": "https://6ixo.com/listing/honda-civic-sport-cac7f05a2a/",
@@ -13470,17 +13446,6 @@
       "categoryKey": "auto-parts"
     },
     {
-      "id": "craigslist-91oyWFNrgkTT1SyZB3bwNM",
-      "slug": "2005-2007-nissan-pathfinder-automatic-transmission-m17859-1syzb3bwnm",
-      "url": "https://6ixo.com/listing/2005-2007-nissan-pathfinder-automatic-transmission-m17859-1syzb3bwnm/",
-      "images": [
-        "https://images.craigslist.org/00X0X_f7K4X4MTgwQ_0i50CI_600x450.jpg",
-        "https://images.craigslist.org/00Z0Z_1yDnLH3k3pe_0CI0i5_600x450.jpg",
-        "https://images.craigslist.org/00V0V_iK9AqaEvWnq_0CI0i5_600x450.jpg"
-      ],
-      "categoryKey": "auto-parts"
-    },
-    {
       "id": "craigslist-gsybegE6zjFpka8u3r173X",
       "slug": "2015-2018-ford-focus-automatic-transmission-ms3411-ka8u3r173x",
       "url": "https://6ixo.com/listing/2015-2018-ford-focus-automatic-transmission-ms3411-ka8u3r173x/",
@@ -14885,18 +14850,6 @@
       "categoryKey": "real-estate"
     },
     {
-      "id": "craigslist-h1dKsaQZU6Puaqx8vzuYHQ",
-      "slug": "no-fee-rent-stabl-mint-spac-3br-spac-liv-rm-gran-ctr-qn-br-aqx8vzuyhq",
-      "url": "https://6ixo.com/listing/no-fee-rent-stabl-mint-spac-3br-spac-liv-rm-gran-ctr-qn-br-aqx8vzuyhq/",
-      "images": [
-        "https://images.craigslist.org/00808_jrRCLD8WhEz_0jm0pO_600x450.jpg",
-        "https://images.craigslist.org/00k0k_eTOc7zz5V8K_0jm0pO_600x450.jpg",
-        "https://images.craigslist.org/00A0A_8miI0PwRKIR_0jm0pO_600x450.jpg",
-        "https://images.craigslist.org/00000_53DQW8nSFr7_0jm0pO_600x450.jpg"
-      ],
-      "categoryKey": "real-estate"
-    },
-    {
       "id": "kijiji-1745235932",
       "slug": "rent-room-1745235932",
       "url": "https://6ixo.com/listing/rent-room-1745235932/",
@@ -14990,30 +14943,6 @@
         "https://images.craigslist.org/00Q0Q_9EMpt7rfCvL_0CI0pK_600x450.jpg",
         "https://images.craigslist.org/00G0G_4P3JAi9rsh0_0CI0pO_600x450.jpg",
         "https://images.craigslist.org/00808_gZnX3n7jFow_0CI0pO_600x450.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "craigslist-6fwzbrQZWEV1PUg9nCZ7xC",
-      "slug": "2010-ford-focus-ses-low-100k-miles-1-owner-clean-title-nic-pug9ncz7xc",
-      "url": "https://6ixo.com/listing/2010-ford-focus-ses-low-100k-miles-1-owner-clean-title-nic-pug9ncz7xc/",
-      "images": [
-        "https://images.craigslist.org/01313_135KOHQICUo_0Cj0t2_600x450.jpg",
-        "https://images.craigslist.org/00x0x_jhS7sjNFH8y_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/00P0P_jwl9vTLfEJ_0CI0sK_600x450.jpg",
-        "https://images.craigslist.org/01515_3AtW83Jaa2r_0CI0t2_600x450.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "craigslist-8y5y5zspstLXqvAr9nYkxQ",
-      "slug": "2017-kia-optima-hybrid-ex-leather-navigation-clean-title-n-qvar9nykxq",
-      "url": "https://6ixo.com/listing/2017-kia-optima-hybrid-ex-leather-navigation-clean-title-n-qvar9nykxq/",
-      "images": [
-        "https://images.craigslist.org/00F0F_1aTAXxz8IbJ_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/01313_938CRXRbKuB_0CI0sY_600x450.jpg",
-        "https://images.craigslist.org/00p0p_b0gBAggMPvH_0C80t2_600x450.jpg",
-        "https://images.craigslist.org/00H0H_5QqQ583ni2n_0BE0t2_600x450.jpg"
       ],
       "categoryKey": "vehicles"
     },
@@ -18403,18 +18332,6 @@
         "https://images.craigslist.org/00E0E_1YB4VAm0I8U_0BY0t2_600x450.jpg",
         "https://images.craigslist.org/00W0W_215f1OWXUQ_0Cd0t2_600x450.jpg",
         "https://images.craigslist.org/00U0U_ej2qDz1DvaR_0CI0t2_600x450.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "craigslist-o67ySb1wHdnvQKjGoEGsTm",
-      "slug": "2010-lexus-hs-250-hybrid-premium-new-hybrid-battery-2-owne-qkjgoegstm",
-      "url": "https://6ixo.com/listing/2010-lexus-hs-250-hybrid-premium-new-hybrid-battery-2-owne-qkjgoegstm/",
-      "images": [
-        "https://images.craigslist.org/01616_jXYdoGBM3B_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/00D0D_1Py9UtxpiSd_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/00g0g_kSdVtQSFDNF_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/00C0C_fFrkhFGFHJc_0CI0t2_600x450.jpg"
       ],
       "categoryKey": "vehicles"
     },
@@ -39468,18 +39385,6 @@
         "https://images.craigslist.org/00J0J_eu0q0tgKUn5_0jm0ew_600x450.jpg",
         "https://images.craigslist.org/00K0K_jTQIQLPtexY_0jm0ew_600x450.jpg",
         "https://images.craigslist.org/00W0W_86t2CR4Y8hz_0jm0ew_600x450.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "craigslist-dMxnH2ai7iCmmgBrwaB1nn",
-      "slug": "2007-toyota-camry-le-mgbrwab1nn",
-      "url": "https://6ixo.com/listing/2007-toyota-camry-le-mgbrwab1nn/",
-      "images": [
-        "https://images.craigslist.org/00101_7kEUs0U3z7J_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/00x0x_40fppsWwnYN_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/00P0P_bDesQUUMDLI_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/00b0b_5p12WvTITga_0CI0t2_600x450.jpg"
       ],
       "categoryKey": "vehicles"
     },
@@ -64470,6 +64375,46 @@
       "id": "kijiji-1739013669",
       "slug": "2023-ford-f-150-xlt-5-0l-v8-remote-start-navigation-1739013669",
       "url": "https://6ixo.com/listing/2023-ford-f-150-xlt-5-0l-v8-remote-start-navigation-1739013669/"
+    },
+    {
+      "id": "kijiji-1745429602",
+      "slug": "road-test-asap-g2-g-booking-driving-lessons-1745429602",
+      "url": "https://6ixo.com/listing/road-test-asap-g2-g-booking-driving-lessons-1745429602/"
+    },
+    {
+      "id": "kijiji-1745429375",
+      "slug": "early-drivers-licence-g2-g-road-test-asap-booking-drive-cl-1745429375",
+      "url": "https://6ixo.com/listing/early-drivers-licence-g2-g-road-test-asap-booking-drive-cl-1745429375/"
+    },
+    {
+      "id": "craigslist-91oyWFNrgkTT1SyZB3bwNM",
+      "slug": "2005-2007-nissan-pathfinder-automatic-transmission-m17859-1syzb3bwnm",
+      "url": "https://6ixo.com/listing/2005-2007-nissan-pathfinder-automatic-transmission-m17859-1syzb3bwnm/"
+    },
+    {
+      "id": "craigslist-h1dKsaQZU6Puaqx8vzuYHQ",
+      "slug": "no-fee-rent-stabl-mint-spac-3br-spac-liv-rm-gran-ctr-qn-br-aqx8vzuyhq",
+      "url": "https://6ixo.com/listing/no-fee-rent-stabl-mint-spac-3br-spac-liv-rm-gran-ctr-qn-br-aqx8vzuyhq/"
+    },
+    {
+      "id": "craigslist-6fwzbrQZWEV1PUg9nCZ7xC",
+      "slug": "2010-ford-focus-ses-low-100k-miles-1-owner-clean-title-nic-pug9ncz7xc",
+      "url": "https://6ixo.com/listing/2010-ford-focus-ses-low-100k-miles-1-owner-clean-title-nic-pug9ncz7xc/"
+    },
+    {
+      "id": "craigslist-8y5y5zspstLXqvAr9nYkxQ",
+      "slug": "2017-kia-optima-hybrid-ex-leather-navigation-clean-title-n-qvar9nykxq",
+      "url": "https://6ixo.com/listing/2017-kia-optima-hybrid-ex-leather-navigation-clean-title-n-qvar9nykxq/"
+    },
+    {
+      "id": "craigslist-o67ySb1wHdnvQKjGoEGsTm",
+      "slug": "2010-lexus-hs-250-hybrid-premium-new-hybrid-battery-2-owne-qkjgoegstm",
+      "url": "https://6ixo.com/listing/2010-lexus-hs-250-hybrid-premium-new-hybrid-battery-2-owne-qkjgoegstm/"
+    },
+    {
+      "id": "craigslist-dMxnH2ai7iCmmgBrwaB1nn",
+      "slug": "2007-toyota-camry-le-mgbrwab1nn",
+      "url": "https://6ixo.com/listing/2007-toyota-camry-le-mgbrwab1nn/"
     }
   ]
 }

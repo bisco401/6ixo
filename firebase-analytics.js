@@ -1,7 +1,7 @@
 (function initializeFirebaseAnalytics(window, document) {
     'use strict';
 
-    const measurementId = 'G-S7TXHGY6RB';
+    const measurementId = 'G-2S7V7S7QSC';
     const storageKey = 'sixo_analytics_consent_v1';
     const allowedChoices = new Set(['granted', 'denied']);
     let analyticsLoaded = false;

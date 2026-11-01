@@ -1,132 +1,6 @@
 {
-  "count": 4406,
+  "count": 4405,
   "listings": [
-    {
-      "id": "apify-b9b18084f762",
-      "slug": "yamaha-malta-6k5-2-b18084f762",
-      "url": "https://6ixo.com/listing/yamaha-malta-6k5-2-b18084f762/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/1-yamaha-malta-6k5-2--53485227246297.jpg"
-      ],
-      "categoryKey": "auto-parts"
-    },
-    {
-      "id": "apify-5d4adaa6bb7c",
-      "slug": "vega-dx-crux-4adaa6bb7c",
-      "url": "https://6ixo.com/listing/vega-dx-crux-4adaa6bb7c/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/1-vega-dx-crux-58339326233200.jpg"
-      ],
-      "categoryKey": "auto-parts"
-    },
-    {
-      "id": "apify-b50341363f69",
-      "slug": "vega-bolt-kakie-0341363f69",
-      "url": "https://6ixo.com/listing/vega-bolt-kakie-0341363f69/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/1-vega-bolt-kakie-722579056731987.jpg"
-      ],
-      "categoryKey": "auto-parts"
-    },
-    {
-      "id": "apify-5b934b6e6ba3",
-      "slug": "original-car-parts-934b6e6ba3",
-      "url": "https://6ixo.com/listing/original-car-parts-934b6e6ba3/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/1-original-car-parts-928277685333515.jpg"
-      ],
-      "categoryKey": "auto-parts"
-    },
-    {
-      "id": "apify-c267566b98f2",
-      "slug": "navigation-tape-for-elantra-67566b98f2",
-      "url": "https://6ixo.com/listing/navigation-tape-for-elantra-67566b98f2/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/1-navigation-tape-for-elantra-279124955734242.jpg"
-      ],
-      "categoryKey": "auto-parts"
-    },
-    {
-      "id": "apify-be46b3301ece",
-      "slug": "multimedia-player-46b3301ece",
-      "url": "https://6ixo.com/listing/multimedia-player-46b3301ece/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/1-multimedia-player-92344730632325.jpg"
-      ],
-      "categoryKey": "auto-parts"
-    },
-    {
-      "id": "apify-b0963b928b3e",
-      "slug": "motor-engine-963b928b3e",
-      "url": "https://6ixo.com/listing/motor-engine-963b928b3e/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/1-motor-engine-361667831651549.jpg"
-      ],
-      "categoryKey": "auto-parts"
-    },
-    {
-      "id": "apify-84afbc2f8da5",
-      "slug": "dent-puller-at-car-deco-afbc2f8da5",
-      "url": "https://6ixo.com/listing/dent-puller-at-car-deco-afbc2f8da5/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/1-dent-puller-at-car-deco--601645294846220.jpg"
-      ],
-      "categoryKey": "auto-parts"
-    },
-    {
-      "id": "apify-740e667e1e48",
-      "slug": "dashboards-0e667e1e48",
-      "url": "https://6ixo.com/listing/dashboards-0e667e1e48/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/1-dashboards-261358927351944.jpg"
-      ],
-      "categoryKey": "auto-parts"
-    },
-    {
-      "id": "apify-449a30723f26",
-      "slug": "car-lights-led-and-normal-9a30723f26",
-      "url": "https://6ixo.com/listing/car-lights-led-and-normal-9a30723f26/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/1-car-lights-led-and-normal--672069178233647.jpg"
-      ],
-      "categoryKey": "auto-parts"
-    },
-    {
-      "id": "apify-9471a08ff4cb",
-      "slug": "car-door-seal-71a08ff4cb",
-      "url": "https://6ixo.com/listing/car-door-seal-71a08ff4cb/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/1-car-door-seal-52189704445468.jpg"
-      ],
-      "categoryKey": "auto-parts"
-    },
-    {
-      "id": "apify-6e5b4f355678",
-      "slug": "brand-new-5-112-20inch-rims-45-offset-nb-tyres-not-include-5b4f355678",
-      "url": "https://6ixo.com/listing/brand-new-5-112-20inch-rims-45-offset-nb-tyres-not-include-5b4f355678/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/1-brand-new-5-112-20inch-rims-45-offset-nb-tyres-not-included--5959919936542.jpg"
-      ],
-      "categoryKey": "auto-parts"
-    },
-    {
-      "id": "apify-283b123b0194",
-      "slug": "ac-compressors-3b123b0194",
-      "url": "https://6ixo.com/listing/ac-compressors-3b123b0194/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/1-ac-compressors-562277390352968.jpg"
-      ],
-      "categoryKey": "auto-parts"
-    },
-    {
-      "id": "apify-63134fd7eb6c",
-      "slug": "car-multimedia-players-134fd7eb6c",
-      "url": "https://6ixo.com/listing/car-multimedia-players-134fd7eb6c/",
-      "images": [
-        "https://oxglow.com.gh/uploads/medium/1-car-multimedia-players-571249764531945.jpg"
-      ],
-      "categoryKey": "auto-parts"
-    },
     {
       "id": "hgc-dubai-5d752f9d2d998011",
       "slug": "hp-omnibook-3-16-bu0305dx-u5-9d2d998011",
@@ -41714,18 +41588,18 @@
       "slug": "2025-hyundai-elantra-hybrid-luxury-hybrid-leather-low-km-1742616114",
       "url": "https://6ixo.com/listing/2025-hyundai-elantra-hybrid-luxury-hybrid-leather-low-km-1742616114/",
       "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/0d/0d78cd76-9695-4916-9cf4-d6a971593743?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/dd/dd45f1d2-bf80-4dc4-86b7-9b28dbede5ac?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/73/73f5ef2c-fb88-46c9-8c78-20457eedd687?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/ea/eab3f894-37b7-4acd-ba01-e9cc6c0fb747?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/39/39e5af1c-29ac-404d-bd65-a6aa8fdecbec?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/9d/9d81dd3a-718e-4b40-a356-d0812d796788?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/ff/ff9a1a68-dbd4-490f-b47c-faca0d9687f3?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/b8/b873a799-1505-47c9-bc7f-aa196c4f3deb?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/ba/bad05037-93c0-49dd-b2fa-ce8deac5aabc?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/62/62f5de46-eeec-43df-b4ce-9615011922a8?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/5d/5d539edf-c741-4599-813f-67cb3016ccf9?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/0e/0edf279f-ea34-4672-8e0f-f4c34cfaf599?rule=kijijica-1600-webp"
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/d2/d2bb9225-a369-4e77-aecc-94bfde2390a0?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/6b/6b27b058-d3d1-4345-8847-03eb4234783b?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/de/de0151a7-8e48-4c92-9f88-d08976e470fc?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/6d/6d7a869c-c739-4fb4-9aae-3a8c16d310cb?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/92/92037579-a46d-4c4e-a60c-21a5018082fc?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/33/33a4d3e6-4a7b-4f24-8c73-73cf4f22a958?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/05/055fcf3c-14b2-402f-9bee-a2ea66ecd516?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/22/22e587e3-68e8-4f9c-8f9d-f8dc4281df22?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/cf/cf5068e0-83c1-44a1-b625-c822c10e5c1a?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/03/032bc22e-2a7e-427b-b64b-bb97222d8793?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/1b/1b71187a-36b8-4e85-8d5e-49e2217573db?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/82/82159b98-d950-4e5e-b959-0097008071cd?rule=kijijica-1600-webp"
       ],
       "categoryKey": "vehicles"
     },
@@ -42356,22 +42230,6 @@
         "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/b4/b4f0b340-6fd6-4ecc-9f98-32cd12069390?rule=kijijica-1600-webp",
         "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/88/88482f7a-5e36-4c4a-8149-a8b8295ce342?rule=kijijica-1600-webp",
         "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/d2/d2040070-b2f9-40a6-8248-86d9ffa051ec?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "kijiji-1744213043",
-      "slug": "2012-honda-civic-cpe-ex-low-price-1-owner-no-accidents-1744213043",
-      "url": "https://6ixo.com/listing/2012-honda-civic-cpe-ex-low-price-1-owner-no-accidents-1744213043/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/70/70bc4319-2ee0-4dc5-ba2d-67bfdc80126b?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/7f/7fcd016f-123a-4e33-9f00-4923086bb81b?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/ac/ac7edbc0-b565-4c45-87d6-f3838c2c2e67?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/30/305602ae-a9dd-4eb5-ad26-315750c4f658?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/1a/1aeb90f7-4b57-4916-bf1b-86298ee31357?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/73/73c8967f-9c55-4e99-9d8b-06b3f7ade9e4?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/e8/e8d5b08c-e825-404d-87bd-82faf1a8ed11?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/f4/f4684169-321a-4b27-8404-fa72419abca0?rule=kijijica-1600-webp"
       ],
       "categoryKey": "vehicles"
     },
@@ -51372,6 +51230,132 @@
         "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/4b/4bcef46a-0ebe-4e29-9531-0259283beb56?rule=kijijica-1600-webp",
         "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/11/11f5ece5-2b74-4309-94b5-13d31cc88cd7?rule=kijijica-1600-webp",
         "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/4f/4fa2a765-4538-46cc-b7b1-f90b21b9bea5?rule=kijijica-1600-webp"
+      ],
+      "categoryKey": "auto-parts"
+    },
+    {
+      "id": "apify-b9b18084f762",
+      "slug": "yamaha-malta-6k5-2-b18084f762",
+      "url": "https://6ixo.com/listing/yamaha-malta-6k5-2-b18084f762/",
+      "images": [
+        "https://oxglow.com.gh/uploads/medium/1-yamaha-malta-6k5-2--53485227246297.jpg"
+      ],
+      "categoryKey": "auto-parts"
+    },
+    {
+      "id": "apify-5d4adaa6bb7c",
+      "slug": "vega-dx-crux-4adaa6bb7c",
+      "url": "https://6ixo.com/listing/vega-dx-crux-4adaa6bb7c/",
+      "images": [
+        "https://oxglow.com.gh/uploads/medium/1-vega-dx-crux-58339326233200.jpg"
+      ],
+      "categoryKey": "auto-parts"
+    },
+    {
+      "id": "apify-b50341363f69",
+      "slug": "vega-bolt-kakie-0341363f69",
+      "url": "https://6ixo.com/listing/vega-bolt-kakie-0341363f69/",
+      "images": [
+        "https://oxglow.com.gh/uploads/medium/1-vega-bolt-kakie-722579056731987.jpg"
+      ],
+      "categoryKey": "auto-parts"
+    },
+    {
+      "id": "apify-5b934b6e6ba3",
+      "slug": "original-car-parts-934b6e6ba3",
+      "url": "https://6ixo.com/listing/original-car-parts-934b6e6ba3/",
+      "images": [
+        "https://oxglow.com.gh/uploads/medium/1-original-car-parts-928277685333515.jpg"
+      ],
+      "categoryKey": "auto-parts"
+    },
+    {
+      "id": "apify-c267566b98f2",
+      "slug": "navigation-tape-for-elantra-67566b98f2",
+      "url": "https://6ixo.com/listing/navigation-tape-for-elantra-67566b98f2/",
+      "images": [
+        "https://oxglow.com.gh/uploads/medium/1-navigation-tape-for-elantra-279124955734242.jpg"
+      ],
+      "categoryKey": "auto-parts"
+    },
+    {
+      "id": "apify-be46b3301ece",
+      "slug": "multimedia-player-46b3301ece",
+      "url": "https://6ixo.com/listing/multimedia-player-46b3301ece/",
+      "images": [
+        "https://oxglow.com.gh/uploads/medium/1-multimedia-player-92344730632325.jpg"
+      ],
+      "categoryKey": "auto-parts"
+    },
+    {
+      "id": "apify-b0963b928b3e",
+      "slug": "motor-engine-963b928b3e",
+      "url": "https://6ixo.com/listing/motor-engine-963b928b3e/",
+      "images": [
+        "https://oxglow.com.gh/uploads/medium/1-motor-engine-361667831651549.jpg"
+      ],
+      "categoryKey": "auto-parts"
+    },
+    {
+      "id": "apify-84afbc2f8da5",
+      "slug": "dent-puller-at-car-deco-afbc2f8da5",
+      "url": "https://6ixo.com/listing/dent-puller-at-car-deco-afbc2f8da5/",
+      "images": [
+        "https://oxglow.com.gh/uploads/medium/1-dent-puller-at-car-deco--601645294846220.jpg"
+      ],
+      "categoryKey": "auto-parts"
+    },
+    {
+      "id": "apify-740e667e1e48",
+      "slug": "dashboards-0e667e1e48",
+      "url": "https://6ixo.com/listing/dashboards-0e667e1e48/",
+      "images": [
+        "https://oxglow.com.gh/uploads/medium/1-dashboards-261358927351944.jpg"
+      ],
+      "categoryKey": "auto-parts"
+    },
+    {
+      "id": "apify-449a30723f26",
+      "slug": "car-lights-led-and-normal-9a30723f26",
+      "url": "https://6ixo.com/listing/car-lights-led-and-normal-9a30723f26/",
+      "images": [
+        "https://oxglow.com.gh/uploads/medium/1-car-lights-led-and-normal--672069178233647.jpg"
+      ],
+      "categoryKey": "auto-parts"
+    },
+    {
+      "id": "apify-9471a08ff4cb",
+      "slug": "car-door-seal-71a08ff4cb",
+      "url": "https://6ixo.com/listing/car-door-seal-71a08ff4cb/",
+      "images": [
+        "https://oxglow.com.gh/uploads/medium/1-car-door-seal-52189704445468.jpg"
+      ],
+      "categoryKey": "auto-parts"
+    },
+    {
+      "id": "apify-6e5b4f355678",
+      "slug": "brand-new-5-112-20inch-rims-45-offset-nb-tyres-not-include-5b4f355678",
+      "url": "https://6ixo.com/listing/brand-new-5-112-20inch-rims-45-offset-nb-tyres-not-include-5b4f355678/",
+      "images": [
+        "https://oxglow.com.gh/uploads/medium/1-brand-new-5-112-20inch-rims-45-offset-nb-tyres-not-included--5959919936542.jpg"
+      ],
+      "categoryKey": "auto-parts"
+    },
+    {
+      "id": "apify-283b123b0194",
+      "slug": "ac-compressors-3b123b0194",
+      "url": "https://6ixo.com/listing/ac-compressors-3b123b0194/",
+      "images": [
+        "https://oxglow.com.gh/uploads/medium/1-ac-compressors-562277390352968.jpg"
+      ],
+      "categoryKey": "auto-parts"
+    },
+    {
+      "id": "apify-63134fd7eb6c",
+      "slug": "car-multimedia-players-134fd7eb6c",
+      "url": "https://6ixo.com/listing/car-multimedia-players-134fd7eb6c/",
+      "images": [
+        "https://oxglow.com.gh/uploads/medium/1-car-multimedia-players-571249764531945.jpg"
       ],
       "categoryKey": "auto-parts"
     },
@@ -65621,6 +65605,11 @@
       "id": "kijiji-1745002764",
       "slug": "2011-volkswagen-touareg-1745002764",
       "url": "https://6ixo.com/listing/2011-volkswagen-touareg-1745002764/"
+    },
+    {
+      "id": "kijiji-1744213043",
+      "slug": "2012-honda-civic-cpe-ex-low-price-1-owner-no-accidents-1744213043",
+      "url": "https://6ixo.com/listing/2012-honda-civic-cpe-ex-low-price-1-owner-no-accidents-1744213043/"
     }
   ]
 }

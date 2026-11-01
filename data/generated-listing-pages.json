@@ -1,5 +1,5 @@
 {
-  "count": 4392,
+  "count": 4383,
   "listings": [
     {
       "id": "apify-b9b18084f762",
@@ -3312,18 +3312,6 @@
       "categoryKey": "vehicles"
     },
     {
-      "id": "import-49b257a13c9451a46a",
-      "slug": "2020-ford-escape-se-w-co-pilot-assist-3c9451a46a",
-      "url": "https://6ixo.com/listing/2020-ford-escape-se-w-co-pilot-assist-3c9451a46a/",
-      "images": [
-        "https://static.overfuel.com/photos/2200/2090374/ZkVJ9gX41600x01790977796ueclqCRvR042u1Y9IvH5KJGF5A.webp",
-        "https://static.overfuel.com/photos/2200/2090374/ABHXlbHB1600x01790977800ueclEFgJnPvNgKIIl9c5nNt6iw.webp",
-        "https://static.overfuel.com/photos/2200/2090374/yep6l-Fu1600x01790978217ueclJaZiw4WwUW4LILMpacpj4Q.webp",
-        "https://static.overfuel.com/photos/2200/2090374/H-z48y8s1600x01790978052uecl4CmXQ2fJJOziTkXOGfOEEA.webp"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
       "id": "import-a38d16727a3e1585e5",
       "slug": "2024-ford-escape-st-line-w-tech-package-7a3e1585e5",
       "url": "https://6ixo.com/listing/2024-ford-escape-st-line-w-tech-package-7a3e1585e5/",
@@ -6049,19 +6037,6 @@
       "categoryKey": "jobs"
     },
     {
-      "id": "kijiji-1745530689",
-      "slug": "downtown-toronto-1-bedroom-1745530689",
-      "url": "https://6ixo.com/listing/downtown-toronto-1-bedroom-1745530689/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/06/0612d2cf-471b-43fe-905c-bf048059b77a?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/d1/d1233602-90e6-473e-86ed-597a943e2819?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/5e/5e686447-411b-497a-aa2d-8a804ba99fcd?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/8c/8c95bf08-3072-4fdb-8bf1-765a95c7f2c9?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/86/86580e40-bb6f-4f48-8f36-2175144683d8?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "real-estate"
-    },
-    {
       "id": "kijiji-1745530681",
       "slug": "hillsburgh-furnace-furnace-furnace-furnace-furnace-furnace-1745530681",
       "url": "https://6ixo.com/listing/hillsburgh-furnace-furnace-furnace-furnace-furnace-furnace-1745530681/",
@@ -6074,24 +6049,6 @@
         "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/ff/ff56791b-4fa5-4dd0-8ace-2d58dd1511f8?rule=kijijica-1600-webp"
       ],
       "categoryKey": "buy-and-sell"
-    },
-    {
-      "id": "kijiji-1745530645",
-      "slug": "logo-design-toronto-graphic-design-illustration-1745530645",
-      "url": "https://6ixo.com/listing/logo-design-toronto-graphic-design-illustration-1745530645/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/70/70ca2cb0-b741-43a1-b7f9-4c24a3ce1f03?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/5d/5d666e5f-e2df-44c6-b36e-607dc18bd230?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/ec/ec8765af-21b7-4f82-a639-8a73f7b59c32?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/27/273dbfb0-62a4-4fc0-90fd-61faa8307821?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/88/8801a0ce-5ced-46d1-afd3-1b827b8c9dad?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/a7/a7cbfecd-b792-4bf8-a591-d804a130e7d6?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/68/6843d184-310e-4424-8f1d-34409cf9586d?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/54/54171c22-6a77-4584-8192-4746be24589d?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/2c/2cb225e0-cacc-496d-a756-c3d41e10fc78?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/31/3126acb5-c3a1-40eb-9d55-3dda7de4aa85?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "community"
     },
     {
       "id": "kijiji-1745530624",
@@ -6533,16 +6490,6 @@
       "categoryKey": "electronics"
     },
     {
-      "id": "kijiji-1745502925",
-      "slug": "all-season-car-mats-for-sale-1745502925",
-      "url": "https://6ixo.com/listing/all-season-car-mats-for-sale-1745502925/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/e1/e1308847-21bb-4074-bf65-829119116332?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/64/6452060c-acfe-4a62-bcca-42536e72ba8b?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "auto-parts"
-    },
-    {
       "id": "allsopp-dubai-l-307351",
       "slug": "1-bedroom-apartment-for-rent-rabdan-building-motor-city-bail307351",
       "url": "https://6ixo.com/listing/1-bedroom-apartment-for-rent-rabdan-building-motor-city-bail307351/",
@@ -6914,18 +6861,6 @@
       "categoryKey": "vehicles"
     },
     {
-      "id": "craigslist-uv2cnztiuTi3oaKn9MG8PX",
-      "slug": "2019-ford-transit-t350-xlt-15-passenger-low-miles-real-ful-oakn9mg8px",
-      "url": "https://6ixo.com/listing/2019-ford-transit-t350-xlt-15-passenger-low-miles-real-ful-oakn9mg8px/",
-      "images": [
-        "https://images.craigslist.org/00n0n_f9RZcpaCJaG_0jm0ew_600x450.jpg",
-        "https://images.craigslist.org/00K0K_ieI3O2vDGQK_0jm0ew_600x450.jpg",
-        "https://images.craigslist.org/00U0U_3p7LjTeQ4Ev_0jm0ew_600x450.jpg",
-        "https://images.craigslist.org/00L0L_cEm73JFBE3Y_0jm0ew_600x450.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
       "id": "craigslist-pDxaDmEhrdHQYfbVksNLtT",
       "slug": "2020-bmw-x5-sdrive-40i-clean-title-low-miles-yfbvksnltt",
       "url": "https://6ixo.com/listing/2020-bmw-x5-sdrive-40i-clean-title-low-miles-yfbvksnltt/",
@@ -7208,18 +7143,6 @@
         "https://images.craigslist.org/00V0V_5EHP3HnAa7a_0CI0pO_600x450.jpg",
         "https://images.craigslist.org/00e0e_kPqk9QoVAri_0CI0pO_600x450.jpg",
         "https://images.craigslist.org/00Y0Y_fYEHa28oKsY_0CI0pO_600x450.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "craigslist-9nq73nEPFgZUV3CdzRo7xM",
-      "slug": "2017-hyundai-sonata-sport-sunroof-low-60k-miles-1-owner-v3cdzro7xm",
-      "url": "https://6ixo.com/listing/2017-hyundai-sonata-sport-sunroof-low-60k-miles-1-owner-v3cdzro7xm/",
-      "images": [
-        "https://images.craigslist.org/00k0k_1Qg93TUSFy0_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/00V0V_8LK6K7vls2_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/00u0u_jRbkdeGYPfN_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/00j0j_lmaJXjaK4i_0CI0t2_600x450.jpg"
       ],
       "categoryKey": "vehicles"
     },
@@ -10808,18 +10731,6 @@
       "categoryKey": "vehicles"
     },
     {
-      "id": "craigslist-7tBnRwumTJzDnr1KVHTPRq",
-      "slug": "2015-mazda-mazda-6-sport-nr1kvhtprq",
-      "url": "https://6ixo.com/listing/2015-mazda-mazda-6-sport-nr1kvhtprq/",
-      "images": [
-        "https://images.craigslist.org/00N0N_aLVd65o46j5_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/01414_if6JaK9E0iD_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/00C0C_fJgcpJCbAP9_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/00I0I_khl9kRU1jbP_0CI0t2_600x450.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
       "id": "craigslist-26S4n8uBfVT6SyK2o7RpQx",
       "slug": "2019-lincoln-nautilus-select-premium-down-start-999-syk2o7rpqx",
       "url": "https://6ixo.com/listing/2019-lincoln-nautilus-select-premium-down-start-999-syk2o7rpqx/",
@@ -11964,18 +11875,6 @@
         "https://images.craigslist.org/01313_g6NRVv1DGgi_0jm0cU_600x450.jpg",
         "https://images.craigslist.org/00X0X_5hroMxlc0Lf_0jm0cU_600x450.jpg",
         "https://images.craigslist.org/00J0J_4ZlCDgeaCVy_0jm0cU_600x450.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "craigslist-eXeSqvTd7iMwu5A4jazHtE",
-      "slug": "2016-ford-focus-se-hatchback-backup-camera-low-70k-miles-2-u5a4jazhte",
-      "url": "https://6ixo.com/listing/2016-ford-focus-se-hatchback-backup-camera-low-70k-miles-2-u5a4jazhte/",
-      "images": [
-        "https://images.craigslist.org/00C0C_h2uw7SBXh4J_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/01212_hXYu7VirqSk_0Cr0t2_600x450.jpg",
-        "https://images.craigslist.org/00T0T_i74mmMgxpCS_0Cn0t2_600x450.jpg",
-        "https://images.craigslist.org/00t0t_1D0ZEq6xA3c_0Cz0t2_600x450.jpg"
       ],
       "categoryKey": "vehicles"
     },
@@ -14711,18 +14610,6 @@
         "https://images.craigslist.org/00l0l_NS6LpiIHL_0CI0t2_600x450.jpg",
         "https://images.craigslist.org/00n0n_jeCiGA7otHc_0CI0t2_600x450.jpg",
         "https://images.craigslist.org/00J0J_aFEXPsT6H59_0CI0t2_600x450.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "craigslist-wTm2tTJNz5s1qb4mDsjou2",
-      "slug": "2016-honda-hr-v-ex-qb4mdsjou2",
-      "url": "https://6ixo.com/listing/2016-honda-hr-v-ex-qb4mdsjou2/",
-      "images": [
-        "https://images.craigslist.org/00505_a04oGjvA8Nb_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/00q0q_94NR2VHDtOn_0t20CI_600x450.jpg",
-        "https://images.craigslist.org/00v0v_7YrGVoIAdb6_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/00u0u_bHWYVAvUYPe_0CI0t2_600x450.jpg"
       ],
       "categoryKey": "vehicles"
     },
@@ -55022,9 +54909,6 @@
       "url": "https://6ixo.com/listings/country/united-states/page/43/"
     },
     {
-      "url": "https://6ixo.com/listings/country/united-states/page/44/"
-    },
-    {
       "url": "https://6ixo.com/apartments-for-rent/"
     },
     {
@@ -65100,6 +64984,51 @@
       "id": "craigslist-gj4_L2PU8RGiiM0ggCtwlQ",
       "slug": "2012-toyota-sienna-van-v6-le-auto-access-seat-mobility-1-o-im0ggctwlq",
       "url": "https://6ixo.com/listing/2012-toyota-sienna-van-v6-le-auto-access-seat-mobility-1-o-im0ggctwlq/"
+    },
+    {
+      "id": "import-49b257a13c9451a46a",
+      "slug": "2020-ford-escape-se-w-co-pilot-assist-3c9451a46a",
+      "url": "https://6ixo.com/listing/2020-ford-escape-se-w-co-pilot-assist-3c9451a46a/"
+    },
+    {
+      "id": "kijiji-1745530689",
+      "slug": "downtown-toronto-1-bedroom-1745530689",
+      "url": "https://6ixo.com/listing/downtown-toronto-1-bedroom-1745530689/"
+    },
+    {
+      "id": "kijiji-1745530645",
+      "slug": "logo-design-toronto-graphic-design-illustration-1745530645",
+      "url": "https://6ixo.com/listing/logo-design-toronto-graphic-design-illustration-1745530645/"
+    },
+    {
+      "id": "kijiji-1745502925",
+      "slug": "all-season-car-mats-for-sale-1745502925",
+      "url": "https://6ixo.com/listing/all-season-car-mats-for-sale-1745502925/"
+    },
+    {
+      "id": "craigslist-uv2cnztiuTi3oaKn9MG8PX",
+      "slug": "2019-ford-transit-t350-xlt-15-passenger-low-miles-real-ful-oakn9mg8px",
+      "url": "https://6ixo.com/listing/2019-ford-transit-t350-xlt-15-passenger-low-miles-real-ful-oakn9mg8px/"
+    },
+    {
+      "id": "craigslist-9nq73nEPFgZUV3CdzRo7xM",
+      "slug": "2017-hyundai-sonata-sport-sunroof-low-60k-miles-1-owner-v3cdzro7xm",
+      "url": "https://6ixo.com/listing/2017-hyundai-sonata-sport-sunroof-low-60k-miles-1-owner-v3cdzro7xm/"
+    },
+    {
+      "id": "craigslist-7tBnRwumTJzDnr1KVHTPRq",
+      "slug": "2015-mazda-mazda-6-sport-nr1kvhtprq",
+      "url": "https://6ixo.com/listing/2015-mazda-mazda-6-sport-nr1kvhtprq/"
+    },
+    {
+      "id": "craigslist-eXeSqvTd7iMwu5A4jazHtE",
+      "slug": "2016-ford-focus-se-hatchback-backup-camera-low-70k-miles-2-u5a4jazhte",
+      "url": "https://6ixo.com/listing/2016-ford-focus-se-hatchback-backup-camera-low-70k-miles-2-u5a4jazhte/"
+    },
+    {
+      "id": "craigslist-wTm2tTJNz5s1qb4mDsjou2",
+      "slug": "2016-honda-hr-v-ex-qb4mdsjou2",
+      "url": "https://6ixo.com/listing/2016-honda-hr-v-ex-qb4mdsjou2/"
     }
   ]
 }

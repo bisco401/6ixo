@@ -1,5 +1,5 @@
 {
-  "count": 4422,
+  "count": 4417,
   "listings": [
     {
       "id": "apify-b9b18084f762",
@@ -7100,21 +7100,6 @@
       "categoryKey": "real-estate"
     },
     {
-      "id": "kijiji-1745530246",
-      "slug": "1-bedroom-for-rent-in-a-beautiful-2-bedroom-apartment-1745530246",
-      "url": "https://6ixo.com/listing/1-bedroom-for-rent-in-a-beautiful-2-bedroom-apartment-1745530246/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/4c/4c5ee7e2-0073-4931-9417-1a13d0311eec?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/b5/b5e95a58-8c36-4725-956b-37f245403b18?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/46/4607a8c9-c80f-4c09-8a5e-c96234c0ca0b?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/89/89b1edbc-baec-4897-8d4c-eac830c72d04?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/0e/0ef39edf-bdab-4852-85da-f225b2258adf?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/af/afc93fb6-c241-4667-a19d-d85429fdad6d?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/26/265a9fd1-607e-484b-a9f1-e80fd66172c3?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "real-estate"
-    },
-    {
       "id": "kijiji-1745530135",
       "slug": "movers-and-drivers-needed-1745530135",
       "url": "https://6ixo.com/listing/movers-and-drivers-needed-1745530135/",
@@ -7236,18 +7221,6 @@
         "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/eb/ebf4dbb6-cc6e-4c04-855e-5848c0dbe65a?rule=kijijica-1600-webp",
         "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/89/8941607e-6408-4af7-892f-cf51b573e39c?rule=kijijica-1600-webp",
         "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/a3/a31a5667-a2d5-4aba-a8c9-85a6e914fa93?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "buy-and-sell"
-    },
-    {
-      "id": "kijiji-1745529156",
-      "slug": "brand-new-neiko-professional-1-2-torque-wrench-set-1745529156",
-      "url": "https://6ixo.com/listing/brand-new-neiko-professional-1-2-torque-wrench-set-1745529156/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/95/958bfdee-cdcb-412e-bde5-6badd3d10c31?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/e1/e1e89602-4097-4783-8281-3e9c19ec993b?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/89/89ab132c-2683-46a9-ac1f-8430e3adc60b?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/69/69640fa6-8660-47eb-b77f-6b0c9e8000d1?rule=kijijica-1600-webp"
       ],
       "categoryKey": "buy-and-sell"
     },
@@ -13487,18 +13460,6 @@
       "categoryKey": "vehicles"
     },
     {
-      "id": "craigslist-mPVSkimtwHmJdLaqS7CQAH",
-      "slug": "2015-infiniti-qx-60-all-wheel-drive-seven-passenger-dlaqs7cqah",
-      "url": "https://6ixo.com/listing/2015-infiniti-qx-60-all-wheel-drive-seven-passenger-dlaqs7cqah/",
-      "images": [
-        "https://images.craigslist.org/00g0g_9aInh7TSAnB_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/00k0k_eda9pdU5l9k_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/00a0a_hSjksKhBSYO_0CI0t2_600x450.jpg",
-        "https://images.craigslist.org/01515_1LM3pyFHDdi_0CI0t2_600x450.jpg"
-      ],
-      "categoryKey": "auto-parts"
-    },
-    {
       "id": "craigslist-43oJDpf6piXPxoeiJu6bq4",
       "slug": "large-1-bed-loft-big-windows-high-ceiling-laundry-roof-l-t-xoeiju6bq4",
       "url": "https://6ixo.com/listing/large-1-bed-loft-big-windows-high-ceiling-laundry-roof-l-t-xoeiju6bq4/",
@@ -15615,18 +15576,6 @@
       "categoryKey": "real-estate"
     },
     {
-      "id": "craigslist-pinTPqZNEn6H4tPGUM5Sk9",
-      "slug": "remodeled-priv-entrance-large-rooms-wood-fl-heat-incl-habl-4tpgum5sk9",
-      "url": "https://6ixo.com/listing/remodeled-priv-entrance-large-rooms-wood-fl-heat-incl-habl-4tpgum5sk9/",
-      "images": [
-        "https://images.craigslist.org/00303_7xTBq8M0jrB_0CI0lM_600x450.jpg",
-        "https://images.craigslist.org/00e0e_8WG0KcoT1G9_0gl0t2_600x450.jpg",
-        "https://images.craigslist.org/01313_kfREPFsM0O5_0gl0t2_600x450.jpg",
-        "https://images.craigslist.org/00606_7NHCaB81qlB_0gl0t2_600x450.jpg"
-      ],
-      "categoryKey": "real-estate"
-    },
-    {
       "id": "craigslist-njPsXTRw8AWWkBEXrcLStn",
       "slug": "updated-3br-1ba-open-kitchen-big-bathroom-near-a-c-l-train-kbexrclstn",
       "url": "https://6ixo.com/listing/updated-3br-1ba-open-kitchen-big-bathroom-near-a-c-l-train-kbexrclstn/",
@@ -16085,20 +16034,6 @@
         "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/a2/a260e1e3-8979-4d4e-95c2-59d92f37c6a2?rule=kijijica-1600-webp"
       ],
       "categoryKey": "vehicles"
-    },
-    {
-      "id": "kijiji-1745267852",
-      "slug": "ground-fl-room-for-rent-near-utsc-centennial-morningside-1745267852",
-      "url": "https://6ixo.com/listing/ground-fl-room-for-rent-near-utsc-centennial-morningside-1745267852/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/44/44d2d3f1-69e2-4229-a812-38e56f2581a1?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/ce/ceba58cd-769d-4f88-9839-62b7478a2081?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/2e/2e163323-4a4e-45aa-9c68-f7207ee2a976?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/48/486b163e-1766-475c-96c9-ac176249a22b?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/60/60adace8-bfc3-4f92-99c4-22980ea2c69c?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/a0/a0643e2b-82d9-4c5a-8ad7-9ac1a3224c21?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "real-estate"
     },
     {
       "id": "kijiji-1745265696",
@@ -65758,6 +65693,31 @@
       "id": "craigslist-8Y3Zaoqyk2SH1QdwAFrFyK",
       "slug": "mazda-6-2009-2013-hood-1qdwafrfyk",
       "url": "https://6ixo.com/listing/mazda-6-2009-2013-hood-1qdwafrfyk/"
+    },
+    {
+      "id": "kijiji-1745530246",
+      "slug": "1-bedroom-for-rent-in-a-beautiful-2-bedroom-apartment-1745530246",
+      "url": "https://6ixo.com/listing/1-bedroom-for-rent-in-a-beautiful-2-bedroom-apartment-1745530246/"
+    },
+    {
+      "id": "kijiji-1745529156",
+      "slug": "brand-new-neiko-professional-1-2-torque-wrench-set-1745529156",
+      "url": "https://6ixo.com/listing/brand-new-neiko-professional-1-2-torque-wrench-set-1745529156/"
+    },
+    {
+      "id": "craigslist-mPVSkimtwHmJdLaqS7CQAH",
+      "slug": "2015-infiniti-qx-60-all-wheel-drive-seven-passenger-dlaqs7cqah",
+      "url": "https://6ixo.com/listing/2015-infiniti-qx-60-all-wheel-drive-seven-passenger-dlaqs7cqah/"
+    },
+    {
+      "id": "craigslist-pinTPqZNEn6H4tPGUM5Sk9",
+      "slug": "remodeled-priv-entrance-large-rooms-wood-fl-heat-incl-habl-4tpgum5sk9",
+      "url": "https://6ixo.com/listing/remodeled-priv-entrance-large-rooms-wood-fl-heat-incl-habl-4tpgum5sk9/"
+    },
+    {
+      "id": "kijiji-1745267852",
+      "slug": "ground-fl-room-for-rent-near-utsc-centennial-morningside-1745267852",
+      "url": "https://6ixo.com/listing/ground-fl-room-for-rent-near-utsc-centennial-morningside-1745267852/"
     }
   ]
 }

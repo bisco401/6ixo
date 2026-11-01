@@ -1,5 +1,5 @@
 {
-  "checkedAt": "2026-11-01T18:22:29Z",
+  "checkedAt": "2026-11-01T18:42:29.660Z",
   "listings": {
     "craigslist.org/view/d/bastrop-used-2025-cadillac-xt4-fwd-4d/fuqr_3uo8rgowpq1ctwx-a": {
       "availability": "sold",
@@ -15158,19 +15158,31 @@
       "reason": "Kijiji redirected the exact ad to a confirmed removal"
     },
     "kijiji.ca/v-buy-sell-other/city-of-toronto/wall-shelf-18-gauge-430-stainless-steel-12-x-60-saws1260/1745509284": {
-      "availability": "unavailable",
-      "checkedAt": "2026-11-01T06:29:13Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1745509284",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/wall-shelf-18-gauge-430-stainless-steel-12-x-60-saws1260/1745509284",
+      "availability": "gone",
+      "checkedAt": "2026-11-01T18:42:29.660Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1745509284",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-buy-sell-other/city-of-toronto/panasonic-30-in-built-in-induction-cooktop-ky-b84ax/1745509271": {
-      "availability": "unavailable",
-      "checkedAt": "2026-11-01T06:29:13Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1745509271",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/panasonic-30-in-built-in-induction-cooktop-ky-b84ax/1745509271",
+      "availability": "gone",
+      "checkedAt": "2026-11-01T18:42:29.660Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1745509271",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-buy-sell-other/city-of-toronto/rosko-countertop-4-burner-commercial-gas-stovetop/1745509212": {
-      "availability": "unavailable",
-      "checkedAt": "2026-11-01T06:29:13Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1745509212",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/rosko-countertop-4-burner-commercial-gas-stovetop/1745509212",
+      "availability": "gone",
+      "checkedAt": "2026-11-01T18:42:29.660Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1745509212",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-room-rental-roommate/mississauga-peel-region/female-furnish-room-in-the-upper-house-brampton/1745500387": {
       "availability": "unavailable",
@@ -15576,9 +15588,13 @@
       "resolvedUrl": "https://www.kijiji.ca/b-cars-trucks/hamilton/c174l80014?adRemoved=1739409211&ll=42.9325931%2C-79.80726109999999&radius=150.0&rb=50"
     },
     "kijiji.ca/v-bed-mattress/city-of-toronto/deal-luxury-contemporary-bed-queen-bed-bed-bed-frame/1745509285": {
-      "availability": "unavailable",
-      "checkedAt": "2026-10-31T06:28:03Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1745509285",
+      "sourceUrl": "https://www.kijiji.ca/v-bed-mattress/city-of-toronto/deal-luxury-contemporary-bed-queen-bed-bed-bed-frame/1745509285",
+      "availability": "gone",
+      "checkedAt": "2026-11-01T18:42:29.660Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-bed-mattress/city-of-toronto/c246l1700273?radius=50.0&ll=43.76%2C-79.22&adRemoved=1745509285",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "craigslist.org/view/d/loganville-2004-nissan-350z/22ubabfbszgbq4rit69lud": {
       "availability": "gone",
@@ -15651,15 +15667,19 @@
       "reason": "Kijiji redirected the exact ad to a confirmed removal"
     },
     "kijiji.ca/v-buy-sell-other/city-of-toronto/eurodib-20-qt-commercial-spiral-mixer/1745544751": {
-      "availability": "unavailable",
-      "checkedAt": "2026-11-01T12:25:03Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1745544751",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/eurodib-20-qt-commercial-spiral-mixer/1745544751",
+      "availability": "gone",
+      "checkedAt": "2026-11-01T18:42:29.660Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1745544751",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-buy-sell-other/city-of-toronto/sagetra-professional-french-fry-cutter/1745544744": {
       "id": "kijiji-1745544744",
       "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/sagetra-professional-french-fry-cutter/1745544744",
       "availability": "gone",
-      "checkedAt": "2026-11-01T06:42:42.847Z",
+      "checkedAt": "2026-11-01T18:42:29.660Z",
       "httpStatus": 200,
       "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1745544744",
       "reason": "Source returned a removed-ad redirect or HTTP 404/410."
@@ -15668,54 +15688,82 @@
       "id": "kijiji-1745544728",
       "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/waring-four-slice-commercial-toaster-without-box/1745544728",
       "availability": "gone",
-      "checkedAt": "2026-10-31T12:42:07.438Z",
+      "checkedAt": "2026-11-01T18:42:29.660Z",
       "httpStatus": 200,
       "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1745544728",
       "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-buy-sell-other/city-of-toronto/rosko-countertop-4-burner-commercial-gas-stovetop/1745544696": {
-      "availability": "unavailable",
-      "checkedAt": "2026-10-31T18:22:37Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1745544696",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/rosko-countertop-4-burner-commercial-gas-stovetop/1745544696",
+      "availability": "gone",
+      "checkedAt": "2026-11-01T18:42:29.660Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1745544696",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-buy-sell-other/city-of-toronto/panasonic-30-in-built-in-induction-cooktop-ky-b84ax/1745544693": {
       "id": "kijiji-1745544693",
       "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/panasonic-30-in-built-in-induction-cooktop-ky-b84ax/1745544693",
       "availability": "gone",
-      "checkedAt": "2026-10-31T12:42:07.438Z",
+      "checkedAt": "2026-11-01T18:42:29.660Z",
       "httpStatus": 200,
       "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1745544693",
       "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-buy-sell-other/city-of-toronto/eurodib-10-commercial-manual-meat-slicer/1745544677": {
-      "availability": "unavailable",
-      "checkedAt": "2026-10-31T18:22:37Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1745544677",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/eurodib-10-commercial-manual-meat-slicer/1745544677",
+      "availability": "gone",
+      "checkedAt": "2026-11-01T18:42:29.660Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1745544677",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-buy-sell-other/city-of-toronto/omcan-two-bulb-commercial-portable-heat-lamp-display-warmer/1745544668": {
-      "availability": "unavailable",
-      "checkedAt": "2026-11-01T12:25:03Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1745544668",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/omcan-two-bulb-commercial-portable-heat-lamp-display-warmer/1745544668",
+      "availability": "gone",
+      "checkedAt": "2026-11-01T18:42:29.660Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1745544668",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-buy-sell-other/city-of-toronto/medsup-universal-size-white-polypropylene-beard-cover-1000pcs/1745544654": {
-      "availability": "unavailable",
-      "checkedAt": "2026-10-31T18:22:37Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1745544654",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/medsup-universal-size-white-polypropylene-beard-cover-1000pcs/1745544654",
+      "availability": "gone",
+      "checkedAt": "2026-11-01T18:42:29.660Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1745544654",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-buy-sell-other/city-of-toronto/vitamix-36019-commercial-bar-blender-48-oz-vm0145/1745544642": {
-      "availability": "unavailable",
-      "checkedAt": "2026-10-31T18:22:37Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1745544642",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/vitamix-36019-commercial-bar-blender-48-oz-vm0145/1745544642",
+      "availability": "gone",
+      "checkedAt": "2026-11-01T18:42:29.660Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1745544642",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-buy-sell-other/city-of-toronto/bosch-800-series-built-in-coffee-machine-bcm8450uc-stainless-ste/1745544664": {
-      "availability": "unavailable",
-      "checkedAt": "2026-11-01T03:58:59Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1745544664",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/bosch-800-series-built-in-coffee-machine-bcm8450uc-stainless-ste/1745544664",
+      "availability": "gone",
+      "checkedAt": "2026-11-01T18:42:29.660Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1745544664",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-buy-sell-other/city-of-toronto/wall-shelf-18-gauge-430-stainless-steel-12-x-60-saws1260/1745544707": {
-      "availability": "unavailable",
-      "checkedAt": "2026-11-01T12:25:03Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1745544707",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/wall-shelf-18-gauge-430-stainless-steel-12-x-60-saws1260/1745544707",
+      "availability": "gone",
+      "checkedAt": "2026-11-01T18:42:29.660Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1745544707",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "albacars.ae/buy-used-cars/vehicle/2076-bmw-3-series-318i": {
       "availability": "sold",
@@ -15888,9 +15936,13 @@
       "reason": "Exact source URL returned HTTP 410"
     },
     "kijiji.ca/v-buy-sell-other/city-of-toronto/sagetra-triple-commercial-sink-dents/1745544731": {
-      "availability": "unavailable",
-      "checkedAt": "2026-11-01T03:58:59Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1745544731",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/sagetra-triple-commercial-sink-dents/1745544731",
+      "availability": "gone",
+      "checkedAt": "2026-11-01T18:42:29.660Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1745544731",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "craigslist.org/view/d/south-richmond-hill-nissan-altima-2013/usnhl9pdpzgcj87kraaptp": {
       "availability": "gone",
@@ -15938,9 +15990,13 @@
       "reason": "Exact source URL returned HTTP 410"
     },
     "kijiji.ca/v-buy-sell-other/city-of-toronto/vitamix-36019-commercial-bar-blender-48-oz-vm0145/1745552441": {
-      "availability": "unavailable",
-      "checkedAt": "2026-11-01T12:25:03Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1745552441",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/vitamix-36019-commercial-bar-blender-48-oz-vm0145/1745552441",
+      "availability": "gone",
+      "checkedAt": "2026-11-01T18:42:29.660Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1745552441",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-bed-mattress/city-of-toronto/no-tax-solid-bunk-bed-with-stairs-bunk-bed-kids-bed-bed/1745530798": {
       "availability": "unavailable",
@@ -16056,7 +16112,7 @@
       "id": "kijiji-1745568847",
       "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/rosko-countertop-4-burner-commercial-gas-stovetop/1745568847",
       "availability": "gone",
-      "checkedAt": "2026-11-01T12:42:22.586Z",
+      "checkedAt": "2026-11-01T18:42:29.660Z",
       "httpStatus": 200,
       "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1745568847",
       "reason": "Source returned a removed-ad redirect or HTTP 404/410."
@@ -16065,7 +16121,7 @@
       "id": "kijiji-1745568742",
       "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/eurodib-10-commercial-manual-meat-slicer/1745568742",
       "availability": "gone",
-      "checkedAt": "2026-11-01T12:42:22.586Z",
+      "checkedAt": "2026-11-01T18:42:29.660Z",
       "httpStatus": 200,
       "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1745568742",
       "reason": "Source returned a removed-ad redirect or HTTP 404/410."
@@ -16161,19 +16217,31 @@
       "reason": "Exact source URL returned HTTP 404"
     },
     "kijiji.ca/v-industrial-shelving-racking/mississauga-peel-region/pallet-racking/1745507325": {
-      "availability": "unavailable",
-      "checkedAt": "2026-11-01T06:29:13Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1745507325",
+      "sourceUrl": "https://www.kijiji.ca/v-industrial-shelving-racking/mississauga-peel-region/pallet-racking/1745507325",
+      "availability": "gone",
+      "checkedAt": "2026-11-01T18:42:29.660Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-industrial-shelving-racking/mississauga-peel-region/c29659005l1700276?radius=50.0&ll=43.63%2C-79.63&adRemoved=1745507325",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-bed-mattress/city-of-toronto/no-tax-liftup-hydrolic-storage-bed-bed-queen-bed/1745509224": {
-      "availability": "unavailable",
-      "checkedAt": "2026-11-01T06:29:13Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1745509224",
+      "sourceUrl": "https://www.kijiji.ca/v-bed-mattress/city-of-toronto/no-tax-liftup-hydrolic-storage-bed-bed-queen-bed/1745509224",
+      "availability": "gone",
+      "checkedAt": "2026-11-01T18:42:29.660Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-bed-mattress/city-of-toronto/c246l1700273?radius=50.0&ll=43.76%2C-79.22&adRemoved=1745509224",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-buy-sell-other/city-of-toronto/medsup-21-white-polypropylene-bouffant-cap-1000pcs/1745586546": {
-      "availability": "unavailable",
-      "checkedAt": "2026-11-01T18:22:29Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1745586546",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/medsup-21-white-polypropylene-bouffant-cap-1000pcs/1745586546",
+      "availability": "gone",
+      "checkedAt": "2026-11-01T18:42:29.660Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1745586546",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-engines-and-engine-parts/hamilton/jdm-engine-subaru-legacy-outback-impreza-forester-2000-2005-sohc/1745184387": {
       "availability": "unavailable",
@@ -16321,29 +16389,49 @@
       "reason": "Exact source URL returned HTTP 410"
     },
     "kijiji.ca/v-buy-sell-other/city-of-toronto/vitamix-36019-commercial-bar-blender-48-oz-vm0145/1745592901": {
-      "availability": "unavailable",
-      "checkedAt": "2026-11-01T18:22:29Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1745592901",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/vitamix-36019-commercial-bar-blender-48-oz-vm0145/1745592901",
+      "availability": "gone",
+      "checkedAt": "2026-11-01T18:42:29.660Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1745592901",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-buy-sell-other/city-of-toronto/sagetra-professional-french-fry-cutter/1745592953": {
-      "availability": "unavailable",
-      "checkedAt": "2026-11-01T18:22:29Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1745592953",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/sagetra-professional-french-fry-cutter/1745592953",
+      "availability": "gone",
+      "checkedAt": "2026-11-01T18:42:29.660Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1745592953",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-pet-services/mississauga-peel-region/bird-sitting-in-mississauga/1745592893": {
-      "availability": "unavailable",
-      "checkedAt": "2026-11-01T18:22:29Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1745592893",
+      "sourceUrl": "https://www.kijiji.ca/v-pet-services/mississauga-peel-region/bird-sitting-in-mississauga/1745592893",
+      "availability": "gone",
+      "checkedAt": "2026-11-01T18:42:29.660Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-pet-services/mississauga-peel-region/c143l1700276?radius=50.0&ll=43.61%2C-79.64&adRemoved=1745592893",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-buy-sell-other/city-of-toronto/eurodib-10-commercial-manual-meat-slicer/1745592889": {
-      "availability": "unavailable",
-      "checkedAt": "2026-11-01T18:22:29Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1745592889",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/eurodib-10-commercial-manual-meat-slicer/1745592889",
+      "availability": "gone",
+      "checkedAt": "2026-11-01T18:42:29.660Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1745592889",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-buy-sell-other/mississauga-peel-region/demolition-for-sale/1745592887": {
-      "availability": "unavailable",
-      "checkedAt": "2026-11-01T18:22:29Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1745592887",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/mississauga-peel-region/demolition-for-sale/1745592887",
+      "availability": "gone",
+      "checkedAt": "2026-11-01T18:42:29.660Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/mississauga-peel-region/c26l1700276?radius=50.0&ll=43.58%2C-79.63&adRemoved=1745592887",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-apartments-condos/city-of-toronto/1-bedroom-for-rent-in-a-beautiful-2-bedroom-apartment/1745530246": {
       "availability": "unavailable",
@@ -16374,6 +16462,105 @@
       "availability": "sold",
       "checkedAt": "2026-11-01T18:22:29Z",
       "reason": "All offers for this exact listing are unavailable"
+    },
+    "kijiji.ca/v-industrial-shelving-racking/city-of-toronto/used-wire-mesh-deck-for-pallet-rack-30-each/1745507302": {
+      "id": "kijiji-1745507302",
+      "sourceUrl": "https://www.kijiji.ca/v-industrial-shelving-racking/city-of-toronto/used-wire-mesh-deck-for-pallet-rack-30-each/1745507302",
+      "availability": "gone",
+      "checkedAt": "2026-11-01T18:42:29.660Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-industrial-shelving-racking/city-of-toronto/c29659005l1700273?radius=50.0&ll=43.78%2C-79.26&adRemoved=1745507302",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "kijiji.ca/v-tires-rims/city-of-toronto/oem-2026-civic-18-sport-rims-new-pirelli-tires/1745437853": {
+      "id": "kijiji-1745437853",
+      "sourceUrl": "https://www.kijiji.ca/v-tires-rims/city-of-toronto/oem-2026-civic-18-sport-rims-new-pirelli-tires/1745437853",
+      "availability": "gone",
+      "checkedAt": "2026-11-01T18:42:29.660Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-tires-rims/city-of-toronto/c320l1700273?adRemoved=1745437853&ll=43.81%2C-79.19&radius=150.0&rb=50",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "kijiji.ca/v-apartments-condos/city-of-toronto/avenue-eglinton-2-bedroom/1745353057": {
+      "id": "kijiji-1745353057",
+      "sourceUrl": "https://www.kijiji.ca/v-apartments-condos/city-of-toronto/avenue-eglinton-2-bedroom/1745353057",
+      "availability": "gone",
+      "checkedAt": "2026-11-01T18:42:29.660Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-apartments-condos/city-of-toronto/c37l1700273?radius=50.0&ll=43.72%2C-79.41&adRemoved=1745353057",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "kijiji.ca/v-room-rental-roommate/ottawa/furnished-room-for-rent-near-blair-o-train-station/1745092278": {
+      "id": "kijiji-1745092278",
+      "sourceUrl": "https://www.kijiji.ca/v-room-rental-roommate/ottawa/furnished-room-for-rent-near-blair-o-train-station/1745092278",
+      "availability": "gone",
+      "checkedAt": "2026-11-01T18:42:29.660Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-room-rental-roommate/ottawa/c36l1700185?radius=50.0&ll=45.42262%2C-75.59951&adRemoved=1745092278",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "kijiji.ca/v-room-rental-roommate/mississauga-peel-region/one-master-room-for-rent-with-attached-bathroom/1745091698": {
+      "id": "kijiji-1745091698",
+      "sourceUrl": "https://www.kijiji.ca/v-room-rental-roommate/mississauga-peel-region/one-master-room-for-rent-with-attached-bathroom/1745091698",
+      "availability": "gone",
+      "checkedAt": "2026-11-01T18:42:29.660Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-room-rental-roommate/mississauga-peel-region/c36l1700276?radius=50.0&ll=43.58905%2C-79.6667&adRemoved=1745091698",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "kijiji.ca/v-cars-trucks/hamilton/2019-honda-civic-hatchback-sport-adaptive-cruise-control/1742711142": {
+      "id": "kijiji-1742711142",
+      "sourceUrl": "https://www.kijiji.ca/v-cars-trucks/hamilton/2019-honda-civic-hatchback-sport-adaptive-cruise-control/1742711142",
+      "availability": "gone",
+      "checkedAt": "2026-11-01T18:42:29.660Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-cars-trucks/hamilton/c174l80014?adRemoved=1742711142&ll=43.2070027%2C-79.8902315&radius=150.0&rb=50",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "kijiji.ca/v-cars-trucks/hamilton/2026-kia-sportage-hybrid-ex-premium-executive-demo-rates-as/1743897879": {
+      "id": "kijiji-1743897879",
+      "sourceUrl": "https://www.kijiji.ca/v-cars-trucks/hamilton/2026-kia-sportage-hybrid-ex-premium-executive-demo-rates-as/1743897879",
+      "availability": "gone",
+      "checkedAt": "2026-11-01T18:42:29.660Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-cars-trucks/hamilton/c174l80014?adRemoved=1743897879&ll=43.1937818%2C-79.89652989999999&radius=150.0&rb=50",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "kijiji.ca/v-art-collectibles/hamilton/pencil-sharpener/1745018695": {
+      "id": "kijiji-1745018695",
+      "sourceUrl": "https://www.kijiji.ca/v-art-collectibles/hamilton/pencil-sharpener/1745018695",
+      "availability": "gone",
+      "checkedAt": "2026-11-01T18:42:29.660Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-art-collectibles/hamilton/c12l80014?radius=50.0&ll=43.26%2C-79.85&adRemoved=1745018695",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "kijiji.ca/v-heater-humidifier-dehumidifier/hamilton/electric-fire-place/1745018166": {
+      "id": "kijiji-1745018166",
+      "sourceUrl": "https://www.kijiji.ca/v-heater-humidifier-dehumidifier/hamilton/electric-fire-place/1745018166",
+      "availability": "gone",
+      "checkedAt": "2026-11-01T18:42:29.660Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-heater-humidifier-dehumidifier/hamilton/c692l80014?radius=50.0&ll=43.26%2C-79.85&adRemoved=1745018166",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "kijiji.ca/v-construction-trades-jobs/ottawa/roofing-laborer-needed/1745005213": {
+      "id": "kijiji-1745005213",
+      "sourceUrl": "https://www.kijiji.ca/v-construction-trades-jobs/ottawa/roofing-laborer-needed/1745005213",
+      "availability": "gone",
+      "checkedAt": "2026-11-01T18:42:29.660Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-construction-trades-jobs/ottawa/c50l1700185?radius=50.0&ll=45.26%2C-75.73&adRemoved=1745005213",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "kijiji.ca/v-cars-trucks/mississauga-peel-region/2011-volkswagen-touareg/1745002764": {
+      "id": "kijiji-1745002764",
+      "sourceUrl": "https://www.kijiji.ca/v-cars-trucks/mississauga-peel-region/2011-volkswagen-touareg/1745002764",
+      "availability": "gone",
+      "checkedAt": "2026-11-01T18:42:29.660Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-cars-trucks/mississauga-peel-region/c174l1700276?adRemoved=1745002764&ll=43.61%2C-79.56&radius=150.0&rb=50",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     }
   }
 }

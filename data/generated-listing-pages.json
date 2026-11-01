@@ -1,5 +1,5 @@
 {
-  "count": 4417,
+  "count": 4406,
   "listings": [
     {
       "id": "apify-b9b18084f762",
@@ -3217,6 +3217,25 @@
         "https://cdn05.carsforsale.com/00fbef10f8ea3399a21552962534041767/800x600/2011-volkswagen-jetta-sel-4dr-sedan-6a-w-sport-package.jpg"
       ],
       "categoryKey": "vehicles"
+    },
+    {
+      "id": "kijiji-1745582914",
+      "slug": "newly-renovated-1250-1bedroomt-on-1bdr-apt-1745582914",
+      "url": "https://6ixo.com/listing/newly-renovated-1250-1bedroomt-on-1bdr-apt-1745582914/",
+      "images": [
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/dd/ddd4b95a-ca2b-4e4d-afe4-abe179eb8b33?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/be/be4b7439-6978-46fb-bb01-eb02c28cc588?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/4c/4c828f71-200c-4943-b86e-f9e7ee3b5e26?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/04/046bd9b4-a1a4-4ba8-8934-50d641de96ac?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/eb/ebc52f58-4cf2-4246-9da8-f09a14fd1354?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/12/12cd452d-88c4-4d80-b542-c55639bd7cbf?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/df/dffb31fa-41d3-42fc-84d2-43f6d43b28d5?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/3c/3c7caa71-12b8-4c43-9004-3e85bcbc3888?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/46/466cf16b-39d1-4d45-aa30-36c6943eb80c?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/08/08944d22-ad6f-4201-90b3-da568847c7a8?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/d9/d92214b8-49cd-4259-a889-3d656d8174a7?rule=kijijica-1600-webp"
+      ],
+      "categoryKey": "real-estate"
     },
     {
       "id": "apify-7914e64d8589",
@@ -8534,6 +8553,23 @@
       "categoryKey": "vehicles"
     },
     {
+      "id": "kijiji-1745496075",
+      "slug": "first-floor-in-a-duplex-apartment-for-rent-1745496075",
+      "url": "https://6ixo.com/listing/first-floor-in-a-duplex-apartment-for-rent-1745496075/",
+      "images": [
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/d0/d05cdc41-61dc-407f-90a6-b273d755825c?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/a7/a7a682d9-e004-4430-a091-ef11caa38cde?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/71/71abf4eb-2cec-4975-954a-5d0224f81ac4?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/e5/e5812ed7-f840-4b59-8449-8131ac939047?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/60/603cd356-699b-4a69-a258-e80bf0258054?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/8e/8e161b94-440e-43a7-8ca5-6b757b173f7c?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/0c/0c53ebb1-3a75-43b4-8358-2e9973bcdbbd?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/55/55f97448-0d88-4678-80ca-1c6d5b9ed01b?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/b9/b9a3e3a8-0f12-479d-a0b6-7d73befbdb90?rule=kijijica-1600-webp"
+      ],
+      "categoryKey": "real-estate"
+    },
+    {
       "id": "kijiji-1745493965",
       "slug": "fiber-revivers-deep-steam-carpet-and-upholstery-cleaning-1745493965",
       "url": "https://6ixo.com/listing/fiber-revivers-deep-steam-carpet-and-upholstery-cleaning-1745493965/",
@@ -10890,24 +10926,6 @@
       "categoryKey": "auto-parts"
     },
     {
-      "id": "kijiji-1745437853",
-      "slug": "oem-2026-civic-18-sport-rims-new-pirelli-tires-1745437853",
-      "url": "https://6ixo.com/listing/oem-2026-civic-18-sport-rims-new-pirelli-tires-1745437853/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/96/96493eb9-4124-4120-a4cc-265c9ea21f73?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/93/93573bc1-4822-4a22-92a4-b09c6fa0647f?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/11/110140d9-0fa2-4a7d-9ac5-74262193b4f3?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/1e/1e181e35-6a08-4403-8a67-33bf4c658b06?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/25/259439a1-aaaf-43d6-a91c-cb3afcca4242?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/ec/ec57c80d-030a-431a-bf37-aeffa751e6c2?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/14/14330569-13a4-4224-b027-f5ba9ecdd42a?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/5c/5c732da0-bcb4-4103-bdf5-ffe04730cac7?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/89/89899325-0133-4936-aa02-857afbca3a4b?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/73/73e110ed-dcac-4056-bcad-78ca134289df?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "auto-parts"
-    },
-    {
       "id": "kijiji-1745437763",
       "slug": "full-time-line-cook-bbq-restaurant-1745437763",
       "url": "https://6ixo.com/listing/full-time-line-cook-bbq-restaurant-1745437763/",
@@ -10973,7 +10991,8 @@
         "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/a1/a1ae7cb7-621f-4ad3-9c6c-be49c2a5fa81?rule=kijijica-1600-webp",
         "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/a3/a3607992-6c28-431f-8e5f-480f655fac82?rule=kijijica-1600-webp",
         "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/e4/e429d5fa-d326-4c96-b502-219fcb76b6de?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/d2/d20bf190-323a-47c9-800c-edd5be982ed0?rule=kijijica-1600-webp"
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/d2/d20bf190-323a-47c9-800c-edd5be982ed0?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/be/bed3a653-2093-4650-9e23-caad29429ae8?rule=kijijica-1600-webp"
       ],
       "categoryKey": "buy-and-sell"
     },
@@ -14208,24 +14227,6 @@
       "categoryKey": "auto-parts"
     },
     {
-      "id": "kijiji-1745353057",
-      "slug": "avenue-eglinton-2-bedroom-1745353057",
-      "url": "https://6ixo.com/listing/avenue-eglinton-2-bedroom-1745353057/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/88/8858adb1-36b7-4b8f-87dd-9310b9487174?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/86/863acd03-68b8-45c7-a6d6-cd19f3bb27e5?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/6a/6a479893-10c7-4116-96f9-f08236d51b0f?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/f8/f880a0b0-16f0-4d8f-8f63-b547c80d2e7b?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/ff/ff1318d1-2ac2-4efa-a48a-6fa1bcee7178?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/b3/b3db5d9b-064e-4ec1-9210-9b037e57202c?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/ea/ea80783a-f55b-445c-aee4-b1933bc92fc0?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/d3/d38ae39c-09cd-4c37-9785-7d904ad1236d?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/c3/c38104ca-3fb4-4a91-956f-ab7d7c5f8fec?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/33/33a636bd-17a5-4205-9941-5dedc2569607?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "real-estate"
-    },
-    {
       "id": "kijiji-1745350802",
       "slug": "lululemon-headbands-and-u-shaped-headband-1745350802",
       "url": "https://6ixo.com/listing/lululemon-headbands-and-u-shaped-headband-1745350802/",
@@ -15991,7 +15992,10 @@
         "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/f0/f0564b44-cb38-4b4b-9a12-5459c6b0e225?rule=kijijica-1600-webp",
         "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/35/3551025c-623b-43ab-9a5b-02979192604a?rule=kijijica-1600-webp",
         "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/ac/ace326c8-3ff6-4a55-9b8e-51e7d30b36de?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/81/81a4078f-1e6d-40a3-a496-273eb6805349?rule=kijijica-1600-webp"
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/81/81a4078f-1e6d-40a3-a496-273eb6805349?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/1d/1d62c762-3e72-4da7-b895-8bb0e395b118?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/c3/c3a776e9-c5e3-4f1d-b3e6-86bfd3c4fa18?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/23/23f76018-6197-420c-9725-2319ea6b8e03?rule=kijijica-1600-webp"
       ],
       "categoryKey": "real-estate"
     },
@@ -16066,22 +16070,6 @@
       "categoryKey": "jobs"
     },
     {
-      "id": "kijiji-1745257981",
-      "slug": "shared-basement-room-for-400-girls-only-1745257981",
-      "url": "https://6ixo.com/listing/shared-basement-room-for-400-girls-only-1745257981/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/32/3212dd49-916e-4dac-9a34-fb501e0c71c6?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/b7/b788eeef-f795-46bc-9756-d9c4e574f84f?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/2e/2ef260cd-5920-436a-bf31-4b0d2d3aa1c1?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/e2/e278a484-b740-401b-915d-6f45d09fc82d?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/f8/f80df600-a492-41dd-90d9-c3ff88884510?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/2f/2f48c16c-9845-472f-9bb6-34e0fd543b44?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/35/35fe96d6-cfe1-4fdd-befc-49af68687144?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/fd/fd1b2f83-5c17-45f1-a0f6-deaddf9b5adb?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "real-estate"
-    },
-    {
       "id": "kijiji-1745253929",
       "slug": "klein-tools-cl120-digital-clamp-meter-1745253929",
       "url": "https://6ixo.com/listing/klein-tools-cl120-digital-clamp-meter-1745253929/",
@@ -16123,9 +16111,9 @@
       "slug": "handyman-in-service-1745247629",
       "url": "https://6ixo.com/listing/handyman-in-service-1745247629/",
       "images": [
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/2d/2d76cc40-16ac-4234-aa84-0ebb7f600e2b?rule=kijijica-1600-webp",
         "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/af/af320c55-ca9a-4b65-9631-7d59e3d2eb86?rule=kijijica-1600-webp",
         "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/6a/6ae69c36-ecad-4449-abf8-b8e04f9f4989?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/2d/2d76cc40-16ac-4234-aa84-0ebb7f600e2b?rule=kijijica-1600-webp",
         "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/87/8730e1c1-619e-40a9-88fd-702924f5e832?rule=kijijica-1600-webp",
         "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/02/024803b7-22d6-43f1-b504-a4e0b617708c?rule=kijijica-1600-webp",
         "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/c3/c301dc59-acfe-4031-8758-94a80e7e1d3f?rule=kijijica-1600-webp",
@@ -18685,18 +18673,18 @@
       "slug": "1-bedroom-apartment-for-rent-350-the-east-mall-1745177394",
       "url": "https://6ixo.com/listing/1-bedroom-apartment-for-rent-350-the-east-mall-1745177394/",
       "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/b8/b8493f70-530e-4554-87c8-ad0c8c177dea?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/74/74adb6f6-90f9-49a2-b35d-1a112e03d17e?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/af/af3b8eab-87be-4c16-a3ff-0f77a2da174c?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/42/4289427e-3557-431b-a0ab-1f4f3e9864ec?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/60/60efcbe6-13a7-43a6-a3a3-f5a3a5b7a627?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/3b/3bef975c-e08c-48ab-b85a-bec6cbe8b88e?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/3e/3e67a7ad-a870-460e-89c7-c1f9f848b718?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/cd/cd2580b2-2c14-4e15-94a2-eadafac06018?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/a0/a0a72d9b-5c54-45f3-b3ed-d5f4066e659c?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/2c/2c9e1653-ab54-4400-9881-fa91dbe376da?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/8f/8f2fa95a-33ca-4541-9a58-dc082ed334e5?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/0e/0e343734-238f-476b-8ef6-d5fb7f111037?rule=kijijica-1600-webp"
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/48/48855854-caf3-4c21-8b30-b8d160029204?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/11/117ad0cf-1063-4bfa-9724-6933d9541176?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/6f/6fb15fe3-297d-4ed9-b2e5-e4e2a886df58?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/09/09038182-ad48-43f6-89f5-52ab80492ab8?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/a0/a0a0612b-7681-4a7a-ac28-0e140ebb4093?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/5f/5f4689ad-1859-4779-a1f1-95e96292a48e?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/7e/7efa22d5-f611-487e-b24a-db946baa399a?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/4f/4fca56b1-dda5-48e4-a354-f1db7eb59559?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/ef/ef25029d-d74e-45ad-b810-75cb08d35d3c?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/a8/a86f89ae-4876-4577-854e-c6fe7bb97a9b?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/d2/d25cfee4-761a-4421-abd6-01e16623c61f?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/2c/2c5dc003-5d8e-443b-9204-e0110f0edc39?rule=kijijica-1600-webp"
       ],
       "categoryKey": "real-estate"
     },
@@ -19175,13 +19163,14 @@
         "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/0c/0cd6b3b2-b171-4390-b1d7-3335122d235e?rule=kijijica-1600-webp",
         "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/f6/f624dd44-60e5-4c61-8991-c4b84be2a46f?rule=kijijica-1600-webp",
         "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/2a/2a6bde56-038b-42ea-8550-9be513ab3435?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/c5/c53f0f4f-6f8c-4739-a1ed-ea0101700ce0?rule=kijijica-1600-webp",
         "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/b0/b019b5de-f3a6-484e-a617-c03a3dfea0f4?rule=kijijica-1600-webp",
         "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/59/59084a19-34eb-42db-bcf4-23bb0d0ae000?rule=kijijica-1600-webp",
         "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/86/8627f0d1-353a-422f-a758-0a2a5f677827?rule=kijijica-1600-webp",
         "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/3b/3bb82366-1d61-472d-a275-050cceb68255?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/b4/b4952d80-0720-43b0-9609-69197bcb9cf0?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/46/461e38b7-be7d-4ef7-8ae9-4ff48a26979b?rule=kijijica-1600-webp"
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/46/461e38b7-be7d-4ef7-8ae9-4ff48a26979b?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/22/2219cdc9-add1-4728-b9bd-6d2f233c8c3a?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/56/566b25e3-9069-466e-ba5a-03b2fad0ae65?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/2a/2a8a89a5-d477-4eee-ae3e-6db3fbcf2594?rule=kijijica-1600-webp"
       ],
       "categoryKey": "real-estate"
     },
@@ -20808,18 +20797,18 @@
       "slug": "2024-hyundai-santa-fe-ultimate-calligraphy-heads-up-displa-1740646550",
       "url": "https://6ixo.com/listing/2024-hyundai-santa-fe-ultimate-calligraphy-heads-up-displa-1740646550/",
       "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/b5/b5ab6e7e-beaa-4b5d-ab2f-367a7a88fdcc?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/f3/f33cda0d-bebf-41df-9297-6b8d0425d99e?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/26/26d1ee0b-4835-4eb4-a96e-9763d16c2dab?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/9c/9c73c686-b040-43b8-8de0-9f18f42ae66a?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/e7/e7f7903f-234b-4937-8478-317c5aae560a?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/ff/ff546df2-ddab-4e2f-85e6-6a4bf4613939?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/ce/ceecb478-5b92-4654-9175-60c42863730e?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/25/2570843a-4299-47ff-8af3-061107d85bfc?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/20/20b357bb-785b-4962-8152-234a58a90c36?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/89/89712b9c-5f67-47ca-8313-a7983fb07324?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/c9/c9709665-6c15-48f0-a003-78e30d04e1ca?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/19/19ebd977-c85a-436a-9477-66179491c9f1?rule=kijijica-1600-webp"
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/35/35b4534d-7e86-43bc-9b40-20c87e366781?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/a8/a88d0168-b223-4f0b-97bf-32e5ecd26d15?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/c3/c33689b3-7de7-43eb-9607-89259860e9cb?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/7f/7f73cc98-abce-4833-af83-af305856c676?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/04/0442f0d2-636e-41a6-af0b-bb12bc2be703?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/c8/c82ea415-91a2-4c84-b237-e299c969d667?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/bc/bcaf6ab3-b905-409f-bc8e-62a90dd223ef?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/1d/1d0edbc7-1871-4ac4-95fa-ebb9843dbd04?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/d9/d9fbc9be-689f-4d69-973f-00425de4defc?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/fe/fe1bc214-63a4-4cba-a8bf-96abfc4c9b0d?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/58/58bfd8fe-354f-4ffb-be91-8eff4358d4cc?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/52/52fe054d-ed0a-420e-b79b-c200c08a2bc8?rule=kijijica-1600-webp"
       ],
       "categoryKey": "vehicles"
     },
@@ -20910,7 +20899,6 @@
       "images": [
         "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/37/370ff70e-ef75-4637-a739-6b9bda5da2f5?rule=kijijica-1600-webp",
         "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/1d/1dd3d8d3-331e-440d-94c0-458c39baddd2?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/9a/9ac8c78b-c9ee-43be-bed3-8a0fdee18f15?rule=kijijica-1600-webp",
         "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/ac/acd99fe7-4659-4412-bc5a-7d503444ce4a?rule=kijijica-1600-webp",
         "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/8e/8ea23f1a-c7da-4e16-9db9-b92440f04d7f?rule=kijijica-1600-webp",
         "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/88/883a3083-475c-4c57-a293-06d963925ec0?rule=kijijica-1600-webp",
@@ -20919,7 +20907,8 @@
         "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/cf/cfaaaf27-80f2-439e-870f-edc8e220b29c?rule=kijijica-1600-webp",
         "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/fa/faed5f40-0477-4a67-a08f-cfd7ba858467?rule=kijijica-1600-webp",
         "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/8d/8daf244a-9bb5-49f7-b726-8f855b445b26?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/a3/a311c3d6-7403-46bc-ba87-19455295712a?rule=kijijica-1600-webp"
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/a3/a311c3d6-7403-46bc-ba87-19455295712a?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/93/93c86c51-aaf3-4905-ae2c-873df972fc7c?rule=kijijica-1600-webp"
       ],
       "categoryKey": "vehicles"
     },
@@ -21827,15 +21816,6 @@
       "categoryKey": "vehicles"
     },
     {
-      "id": "kijiji-1745092278",
-      "slug": "furnished-room-for-rent-near-blair-o-train-station-1745092278",
-      "url": "https://6ixo.com/listing/furnished-room-for-rent-near-blair-o-train-station-1745092278/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/66/6655b7f6-0c27-495c-bb92-eb3c99527fd2?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "real-estate"
-    },
-    {
       "id": "jacars-2523212",
       "slug": "external-drive-ars2523212",
       "url": "https://6ixo.com/listing/external-drive-ars2523212/",
@@ -22345,23 +22325,6 @@
       "categoryKey": "jobs"
     },
     {
-      "id": "kijiji-1745091698",
-      "slug": "one-master-room-for-rent-with-attached-bathroom-1745091698",
-      "url": "https://6ixo.com/listing/one-master-room-for-rent-with-attached-bathroom-1745091698/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/5e/5ed4f057-a44b-45b1-8ad4-af7082140104?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/d3/d3b9982b-26bc-4671-949c-0ca28a0e73e0?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/ac/ac1d9069-4004-4221-a3b1-f90e9b7ad3e0?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/48/48d4657a-c925-4028-ac90-9167b01bb753?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/2d/2d492405-943a-4177-b4f1-f2b74d58b8e7?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/4f/4ff48697-b510-4fe8-9c59-c36d9a35b466?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/d1/d146c3f2-af0f-43a4-ace8-724439b10718?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/d8/d892dde0-025c-4b34-a299-0a7da9753b52?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/08/0807e67e-f175-48ce-b097-308292687b96?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "real-estate"
-    },
-    {
       "id": "kijiji-1745091616",
       "slug": "ecoflow-river-2-generator-1745091616",
       "url": "https://6ixo.com/listing/ecoflow-river-2-generator-1745091616/",
@@ -22442,15 +22405,14 @@
       "slug": "2-bedroom-apartment-for-rent-2757-kipling-avenue-1745090880",
       "url": "https://6ixo.com/listing/2-bedroom-apartment-for-rent-2757-kipling-avenue-1745090880/",
       "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/73/73813d6d-3062-4409-92ff-e424f8168e28?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/4c/4ca3be72-82db-46d2-a99b-8ae3714a1fbb?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/58/583d2882-ed21-4b3c-b713-ce0e174535dd?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/cd/cdab72d2-c0c8-4c30-a36e-5f95e5f3f108?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/ad/adb048ca-f15d-44f2-9b9b-5b5dcfc4f624?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/c9/c99d0baf-a6c3-4659-839b-24cbb328bbd1?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/c1/c1b3a852-e499-45e0-85c4-5e1ec05ce53d?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/51/5130708f-d542-4224-b885-e3d7131c508e?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/a6/a62f32b2-3513-4c16-a751-c3a3f6bdaa1d?rule=kijijica-1600-webp"
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/00/00533377-b480-47f4-879d-0222c87698ce?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/00/0015465a-0eea-4428-be28-94bad34fe4ef?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/6a/6a1a182b-8636-409f-92e2-11c1374205aa?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/67/67bc46d9-33a3-4851-b9a1-bf34d915f800?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/9c/9c9681e2-c1c4-4e8c-99fd-86949768830d?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/44/4411769c-dcc9-4972-b726-c812162c3124?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/80/806b4463-2d06-4720-9bd8-2b31873ac44f?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/3b/3b1fb112-a24a-4a58-a7ec-fe8495399272?rule=kijijica-1600-webp"
       ],
       "categoryKey": "real-estate"
     },
@@ -23049,26 +23011,6 @@
       "categoryKey": "vehicles"
     },
     {
-      "id": "kijiji-1742711142",
-      "slug": "2019-honda-civic-hatchback-sport-adaptive-cruise-control-1742711142",
-      "url": "https://6ixo.com/listing/2019-honda-civic-hatchback-sport-adaptive-cruise-control-1742711142/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/23/238e333a-8f6c-4cb8-8b14-4d49072f2a60?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/73/734d52a4-24cd-4387-8e2d-32dae71239ba?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/93/93f13fac-790b-408a-9194-ac93efcb2ee1?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/6f/6f140f7a-7e5c-485a-a693-78ea8f488334?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/7a/7acc042d-1133-43bf-a59e-b42e18605618?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/81/81ea4ab5-3411-4132-89b4-5a98be7a36a7?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/29/29fb8fdb-f485-4b93-986a-3302f0444be0?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/95/952affa7-8f0a-44e8-a4e8-85a1197c8b3c?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/06/0644079e-7f80-4846-b958-6b9afbfa317a?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/8a/8ae87d0e-89bc-45ba-9f24-4bc72cf0389c?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/29/29366237-d0c3-450d-a3a2-e73579a64dec?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/80/80b19c30-0508-4ee2-b8e3-833d0f033bb2?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
       "id": "kijiji-1744122293",
       "slug": "2025-honda-civic-sedan-hybrid-sport-tint-all-weather-mats-1744122293",
       "url": "https://6ixo.com/listing/2025-honda-civic-sedan-hybrid-sport-tint-all-weather-mats-1744122293/",
@@ -23228,26 +23170,6 @@
       "categoryKey": "vehicles"
     },
     {
-      "id": "kijiji-1743897879",
-      "slug": "2026-kia-sportage-hybrid-ex-premium-executive-demo-rates-a-1743897879",
-      "url": "https://6ixo.com/listing/2026-kia-sportage-hybrid-ex-premium-executive-demo-rates-a-1743897879/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/27/270a354d-d1b9-4b97-8176-abda531340e4?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/aa/aacb54d5-0f56-433d-9e73-9520799e8b7a?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/76/76557bc5-51be-4c6e-bc65-88ed01429ab4?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/04/0447a4d0-316d-4a24-a08e-cc16ee115fa3?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/d9/d9e47ada-5978-45a3-b22f-aa3d6a288bfd?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/e0/e0a6e84b-3ad9-4828-8172-fc423930d6d0?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/54/542eb1a0-7097-4e46-9899-b435237d967b?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/e8/e8c46f9a-ecdc-4e80-bbad-b79553887709?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/f6/f6258719-f227-4c95-951a-999ce2127c22?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/c6/c61fd202-6ff1-4de3-8509-41da720df838?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/d4/d463855a-73a2-422c-af85-5380757545ac?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/52/52c989ca-835c-4288-bd79-690ed973aa04?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
       "id": "kijiji-1745085883",
       "slug": "hiring-az-driver-local-work-1745085883",
       "url": "https://6ixo.com/listing/hiring-az-driver-local-work-1745085883/",
@@ -23318,8 +23240,6 @@
       "url": "https://6ixo.com/listing/lovely-collection-of-vintage-tables-1745084573/",
       "images": [
         "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/bc/bc942a37-2566-4e7a-99c2-6addb3f17e5d?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/c3/c384ed37-628e-496f-865c-884c3ae1b1b0?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/f0/f0d97d33-f7b2-4043-9b21-997f9a4ec982?rule=kijijica-1600-webp",
         "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/03/0384ee23-2682-4cb7-ae34-09847f431643?rule=kijijica-1600-webp",
         "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/ff/ff149472-a8db-4402-b6ed-02deb5572302?rule=kijijica-1600-webp",
         "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/99/99abf992-5551-4a63-b396-1a66868175a5?rule=kijijica-1600-webp",
@@ -24520,18 +24440,18 @@
       "slug": "2023-bmw-x3-xdrive30i-x-drive-alloys-sunroof-1741078365",
       "url": "https://6ixo.com/listing/2023-bmw-x3-xdrive30i-x-drive-alloys-sunroof-1741078365/",
       "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/db/dbd93207-f97b-4966-88e7-fa62db67c2bc?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/16/166155f1-8113-4377-93bb-6ee115838742?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/13/134eb499-1d1b-4087-bb0c-f8bfceed21c8?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/e4/e46e4d9d-140d-4a4a-95d1-42cd2378fdec?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/a2/a220f9e9-fb93-4fbc-910a-146b5c81f04c?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/16/16ef2e66-6954-4b77-a59e-a4105c66d612?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/d4/d4d190f2-ca85-4692-b7bc-1ee944c10ae0?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/d4/d454adc5-e5ce-486b-9960-9ccccb3eb3aa?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/ae/ae6dce6c-8cff-4122-abf4-e02d9034e3e0?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/70/70cf8221-a602-49db-ad37-b94f82dc2193?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/e4/e4a13760-30c6-4914-b3b3-df5827d5f4f0?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/76/76500516-b79c-48ed-b21f-6c33941e7f9b?rule=kijijica-1600-webp"
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/c6/c67d817a-1a77-4675-95d9-15cbe67f5d83?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/4a/4af164a9-3331-4792-bf23-e4fa32675e85?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/5b/5bdcff77-d272-4dda-b099-7bd1ff870d11?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/1c/1c9068a2-c00e-49e5-93b1-eba30627cd7e?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/66/66909aba-c3e1-46fd-ab25-a3bf95fcf032?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/58/588203db-ce57-4d9a-80f4-eaac9a636445?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/7a/7a1034fa-1c79-40f3-b57e-ebe2ea95bcc6?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/64/64dc4e9a-c175-4ab5-bd33-4affbc32450d?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/52/5290500d-91f9-42bd-8641-c5c5a389c173?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/62/62ff94a3-0255-4eab-9606-720c44213c1c?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/6e/6e5aa8c5-74a1-49ee-a899-4472869117d3?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/a9/a91d04da-dc72-4976-bac5-e530c1136ae7?rule=kijijica-1600-webp"
       ],
       "categoryKey": "vehicles"
     },
@@ -24659,22 +24579,6 @@
       "url": "https://6ixo.com/listing/new-cael-single-double-truss-shelters-container-shelters-1745024088/",
       "images": [
         "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/a1/a14c8547-832b-4e42-bb65-dcad33be94e0?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "buy-and-sell"
-    },
-    {
-      "id": "kijiji-1745024063",
-      "slug": "adorable-pomchi-puppies-1745024063",
-      "url": "https://6ixo.com/listing/adorable-pomchi-puppies-1745024063/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/35/35e011c1-3c8e-4979-b88a-c720cc30fdb5?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/af/afd95177-aeac-4a1d-8f91-584c3f764806?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/4e/4e426ce1-0a78-4d54-a9d2-fcc3a3306f50?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/8d/8d2f488c-0051-48fc-96cc-9df54f02db67?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/98/9882d6b4-efe3-4b13-b11b-e5dea575d02c?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/cf/cf9068d1-2081-4c95-a381-b5beb10b14cf?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/34/349e5d68-166a-41c4-9df8-0ebbdb5f4f9e?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/20/20e48965-3b65-4e16-94df-80f101967e34?rule=kijijica-1600-webp"
       ],
       "categoryKey": "buy-and-sell"
     },
@@ -24899,33 +24803,6 @@
         "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/31/31beedbd-4938-4c7f-86a3-b19d216c4f21?rule=kijijica-1600-webp",
         "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/7d/7dfded17-8611-440a-ace4-231b98049b55?rule=kijijica-1600-webp",
         "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/ab/ab3402fb-6579-49be-902f-2f63a12c5637?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "buy-and-sell"
-    },
-    {
-      "id": "kijiji-1745018695",
-      "slug": "pencil-sharpener-1745018695",
-      "url": "https://6ixo.com/listing/pencil-sharpener-1745018695/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/c7/c7870c94-1f3c-407b-8cf6-d5568088b987?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/ec/ec53a8cb-8f16-42a9-bb71-319d3183be2c?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/90/90384160-9c2d-4a94-b6fb-32943fec767f?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/28/28314ee3-614d-468f-aba9-3b6ee7f60936?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "buy-and-sell"
-    },
-    {
-      "id": "kijiji-1745018166",
-      "slug": "electric-fire-place-1745018166",
-      "url": "https://6ixo.com/listing/electric-fire-place-1745018166/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/76/7645c601-59cd-451a-a1ba-53030fefeec7?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/00/00d25df4-0efd-4986-9796-1f1538017e87?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/7d/7dd905a1-ee1d-4822-95df-3ac63fc11029?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/cf/cf2ee3d6-1681-47f4-9ad6-32ec6abc1891?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/76/76020fbd-a729-4ca4-8382-805b1fdf3378?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/9c/9cb7f5e1-ddcd-4374-9104-ff7e0a2e3b9a?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/ba/bad25575-ef80-451a-a7f9-ee593632ecb2?rule=kijijica-1600-webp"
       ],
       "categoryKey": "buy-and-sell"
     },
@@ -26386,18 +26263,6 @@
       "categoryKey": "electronics"
     },
     {
-      "id": "kijiji-1745005659",
-      "slug": "luggage-carrier-attachable-to-2in-trailer-hitch-150-1745005659",
-      "url": "https://6ixo.com/listing/luggage-carrier-attachable-to-2in-trailer-hitch-150-1745005659/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/c7/c7777b59-621a-49ca-9737-f6f232d92d81?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/c0/c05989ca-a5cb-4737-a505-5f50690c95bb?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/8f/8f5d0362-6d8f-466b-be86-8de2fd5074d2?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/8c/8c3e1a61-1b73-4aac-9d4a-41e5d03cd2ee?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "auto-parts"
-    },
-    {
       "id": "kijiji-1745005301",
       "slug": "beko-36-counter-depth-4-door-french-door-refrigerator-1745005301",
       "url": "https://6ixo.com/listing/beko-36-counter-depth-4-door-french-door-refrigerator-1745005301/",
@@ -26406,15 +26271,6 @@
         "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/2f/2f4d1cb3-9a1a-4284-83d4-667a9aecc3d4?rule=kijijica-1600-webp"
       ],
       "categoryKey": "buy-and-sell"
-    },
-    {
-      "id": "kijiji-1745005213",
-      "slug": "roofing-laborer-needed-1745005213",
-      "url": "https://6ixo.com/listing/roofing-laborer-needed-1745005213/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/70/70d91569-8ab9-4e68-9309-d01b8f5a6c38?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "jobs"
     },
     {
       "id": "kijiji-1745004946",
@@ -26544,24 +26400,6 @@
         "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/4c/4c4c7611-5204-43a2-82be-b1258b4eb927?rule=kijijica-1600-webp"
       ],
       "categoryKey": "services"
-    },
-    {
-      "id": "kijiji-1745002764",
-      "slug": "2011-volkswagen-touareg-1745002764",
-      "url": "https://6ixo.com/listing/2011-volkswagen-touareg-1745002764/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/0b/0ba714d5-f662-4a27-ad47-f42c723f5431?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/ea/ea7999d1-6186-4e27-8816-44133a626ac9?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/78/784b9423-96be-4bb2-9637-fee7111587f8?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/59/59d3561a-a9cb-4343-8985-b2b99d3dfaef?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/ae/ae3cded0-96a5-416a-92ff-33b4e28d1679?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/db/db10b1c8-3577-424b-a1a7-bf57eca973e5?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/c7/c70e070a-10bf-4bc3-96c7-5340b69ed8ce?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/03/0334c3bf-2516-41da-9d8c-55b20a2e9720?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/53/53865978-3895-4d53-b19e-c1e57fd37b84?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/c3/c3c39ea2-45a1-456d-bec6-fd90fa6e8a84?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "vehicles"
     },
     {
       "id": "kijiji-1745002381",
@@ -65718,6 +65556,71 @@
       "id": "kijiji-1745267852",
       "slug": "ground-fl-room-for-rent-near-utsc-centennial-morningside-1745267852",
       "url": "https://6ixo.com/listing/ground-fl-room-for-rent-near-utsc-centennial-morningside-1745267852/"
+    },
+    {
+      "id": "kijiji-1745437853",
+      "slug": "oem-2026-civic-18-sport-rims-new-pirelli-tires-1745437853",
+      "url": "https://6ixo.com/listing/oem-2026-civic-18-sport-rims-new-pirelli-tires-1745437853/"
+    },
+    {
+      "id": "kijiji-1745353057",
+      "slug": "avenue-eglinton-2-bedroom-1745353057",
+      "url": "https://6ixo.com/listing/avenue-eglinton-2-bedroom-1745353057/"
+    },
+    {
+      "id": "kijiji-1745257981",
+      "slug": "shared-basement-room-for-400-girls-only-1745257981",
+      "url": "https://6ixo.com/listing/shared-basement-room-for-400-girls-only-1745257981/"
+    },
+    {
+      "id": "kijiji-1745092278",
+      "slug": "furnished-room-for-rent-near-blair-o-train-station-1745092278",
+      "url": "https://6ixo.com/listing/furnished-room-for-rent-near-blair-o-train-station-1745092278/"
+    },
+    {
+      "id": "kijiji-1745091698",
+      "slug": "one-master-room-for-rent-with-attached-bathroom-1745091698",
+      "url": "https://6ixo.com/listing/one-master-room-for-rent-with-attached-bathroom-1745091698/"
+    },
+    {
+      "id": "kijiji-1742711142",
+      "slug": "2019-honda-civic-hatchback-sport-adaptive-cruise-control-1742711142",
+      "url": "https://6ixo.com/listing/2019-honda-civic-hatchback-sport-adaptive-cruise-control-1742711142/"
+    },
+    {
+      "id": "kijiji-1743897879",
+      "slug": "2026-kia-sportage-hybrid-ex-premium-executive-demo-rates-a-1743897879",
+      "url": "https://6ixo.com/listing/2026-kia-sportage-hybrid-ex-premium-executive-demo-rates-a-1743897879/"
+    },
+    {
+      "id": "kijiji-1745024063",
+      "slug": "adorable-pomchi-puppies-1745024063",
+      "url": "https://6ixo.com/listing/adorable-pomchi-puppies-1745024063/"
+    },
+    {
+      "id": "kijiji-1745018695",
+      "slug": "pencil-sharpener-1745018695",
+      "url": "https://6ixo.com/listing/pencil-sharpener-1745018695/"
+    },
+    {
+      "id": "kijiji-1745018166",
+      "slug": "electric-fire-place-1745018166",
+      "url": "https://6ixo.com/listing/electric-fire-place-1745018166/"
+    },
+    {
+      "id": "kijiji-1745005659",
+      "slug": "luggage-carrier-attachable-to-2in-trailer-hitch-150-1745005659",
+      "url": "https://6ixo.com/listing/luggage-carrier-attachable-to-2in-trailer-hitch-150-1745005659/"
+    },
+    {
+      "id": "kijiji-1745005213",
+      "slug": "roofing-laborer-needed-1745005213",
+      "url": "https://6ixo.com/listing/roofing-laborer-needed-1745005213/"
+    },
+    {
+      "id": "kijiji-1745002764",
+      "slug": "2011-volkswagen-touareg-1745002764",
+      "url": "https://6ixo.com/listing/2011-volkswagen-touareg-1745002764/"
     }
   ]
 }

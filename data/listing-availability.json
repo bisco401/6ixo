@@ -1,5 +1,5 @@
 {
-  "checkedAt": "2026-11-01T18:42:29.660Z",
+  "checkedAt": "2026-11-01T20:39:25.239Z",
   "listings": {
     "craigslist.org/view/d/bastrop-used-2025-cadillac-xt4-fwd-4d/fuqr_3uo8rgowpq1ctwx-a": {
       "availability": "sold",
@@ -16560,6 +16560,15 @@
       "checkedAt": "2026-11-01T18:42:29.660Z",
       "httpStatus": 200,
       "resolvedUrl": "https://www.kijiji.ca/b-cars-trucks/mississauga-peel-region/c174l1700276?adRemoved=1745002764&ll=43.61%2C-79.56&radius=150.0&rb=50",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "kijiji.ca/v-cars-trucks/hamilton/2012-honda-civic-cpe-ex-low-price-1-owner-no-accidents/1744213043": {
+      "id": "kijiji-1744213043",
+      "sourceUrl": "https://www.kijiji.ca/v-cars-trucks/hamilton/2012-honda-civic-cpe-ex-low-price-1-owner-no-accidents/1744213043",
+      "availability": "gone",
+      "checkedAt": "2026-11-01T20:39:25.239Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-cars-trucks/hamilton/c174l80014?adRemoved=1744213043&ll=43.2070027%2C-79.8902315&radius=150.0&rb=50",
       "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     }
   }

@@ -2256,6 +2256,7 @@ class DatingApp {
 	    }
 
     syncTopbarAuthUi() {
+        window.SIXO_ARRIVE_DISCOVERY?.refreshIdentity(this);
         const signedIn = Boolean(this.isSignedIn);
         const loggingOut = Boolean(this.authLogoutInFlight);
         const homeAuth = document.querySelector('#home-content .home-auth');
@@ -3015,6 +3016,7 @@ class DatingApp {
         this.setSignedIn(true, { email: user.email || '' });
         this.setDatingSignedIn(true, { email: user.email || '' });
         this.syncCurrentUserFromSupabaseUser(user);
+        window.SIXO_ARRIVE_DISCOVERY?.refreshIdentity(this);
         if (sameAccount) return;
         void this.subscribeMarketplaceUserRealtime();
         void this.loadMarketplaceConversations({ force: true });
@@ -37326,8 +37328,9 @@ class DatingApp {
             this.renderDatingScheduleList();
             this.renderTripAlerts();
         };
+        const savedPlans = new Set(this.loadArrivePlusChecklist());
         inputs.forEach((input) => {
-            input.checked = false;
+            input.checked = savedPlans.has(input.value);
             input.indeterminate = false;
             toggleClass(input);
             input.addEventListener('change', () => {
@@ -37340,7 +37343,6 @@ class DatingApp {
                 persistChecklist();
             });
         });
-        this.saveArrivePlusChecklist([]);
         syncVehicleGroup();
         this.updateArrivePlusChecklistSummary(inputs);
         list.dataset.bound = '1';
@@ -38919,6 +38921,7 @@ class DatingApp {
     }
 
     renderArrivePlusPreview() {
+        if (window.SIXO_ARRIVE_DISCOVERY?.refresh(this)) return;
         const list = document.getElementById('arrive-plus-preview-list');
         if (!list) return;
         const lockedPreview = this.isDatingPreviewBlurActive('arrive_plus');
@@ -39682,6 +39685,7 @@ class DatingApp {
         bindPreviewRefresh(notesInput);
         form.addEventListener('submit', async (event) => {
             event.preventDefault();
+            if (event.submitter?.id !== 'dating-schedule-submit' && window.SIXO_ARRIVE_DISCOVERY) return;
             const destination = (destinationInput?.value || '').trim();
             const hasStructuredDestination = this.isCityCountryDestination(destination);
             const startDate = startInput?.value || '';
@@ -39761,6 +39765,7 @@ class DatingApp {
                 }
                 const loaded = await this.loadSupabaseArrivePlusData();
                 form.reset();
+                window.SIXO_ARRIVE_DISCOVERY?.restore(this);
                 updateEndMin();
                 const entry = (this.datingSchedule || []).find((item) => String(item?.id || '') === createdId);
                 const count = Number(entry?.alertCount || 0);

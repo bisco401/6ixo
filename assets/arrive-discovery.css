@@ -1,0 +1,79 @@
+#arrive-content .arrive-discovery-screen { padding: 22px; }
+#arrive-content .arrive-discovery-layout { display: grid; grid-template-columns: 280px minmax(0, 1fr); align-items: start; gap: 24px; }
+#arrive-content .arrive-discovery-preferences { min-width: 0; padding: 20px; border: 1px solid #dce4ee; border-radius: 16px; background: #fff; color: #20344d; }
+#arrive-content .arrive-discovery-preferences > h3 { margin: 0 0 18px; font-size: 18px; font-weight: 600; }
+#arrive-content .arrive-trip-form { display: grid; grid-template-columns: minmax(0, 1fr); gap: 14px; margin: 0; padding: 0; border: 0; background: transparent; box-shadow: none; }
+#arrive-content .arrive-discovery-field { display: grid; min-width: 0; gap: 6px; margin: 0; font-size: 12px; font-weight: 500; color: #61738a; text-transform: none; letter-spacing: normal; }
+#arrive-content .arrive-discovery-field :is(input, select, textarea) { width: 100%; min-width: 0; min-height: 44px; padding: 11px 10px; border: 1px solid #dce4ee; border-radius: 9px; color: #20344d; background: #fff; font: inherit; font-size: 16px; }
+#arrive-content .arrive-discovery-field textarea { resize: vertical; }
+#arrive-content .arrive-discovery-dates { display: grid; grid-template-columns: minmax(0, 1fr); gap: 14px; }
+#arrive-content #arrive-discovery-date-error { color: #a43338; margin: 0; font-size: 12px; }
+#arrive-content .arrive-discovery-offers { padding: 12px 0 0; border-top: 1px solid #dce4ee; }
+#arrive-content .arrive-discovery-offers summary { color: #365e91; font-size: 12px; font-weight: 600; cursor: pointer; }
+#arrive-content .arrive-discovery-offers .arrive-discovery-field { margin-top: 14px; }
+#arrive-content .arrive-discovery-offers button { width: 100%; margin-top: 14px; min-height: 44px; }
+#arrive-content .arrive-discovery-offers p { margin: 10px 0 0; font-size: 12px; color: #61738a; line-height: 1.6; }
+#arrive-content .arrive-discovery-interests { padding: 0; border: 0; margin: 22px 0 0; min-width: 0; }
+#arrive-content .arrive-discovery-interests legend { padding: 0; margin: 0 0 12px; font-size: 14px; font-weight: 600; color: #20344d; }
+#arrive-content .arrive-discovery-checks { display: grid; grid-template-columns: minmax(0, 1fr); gap: 7px; }
+#arrive-content .arrive-discovery-checks .arrive-plus-check { min-width: 0; display: flex; align-items: center; justify-content: flex-start; gap: 10px; padding: 10px 12px; margin: 0; min-height: 43px; border: 1px solid #dce4ee; border-radius: 9px; background: #fff; color: #20344d; box-shadow: none; font-size: 13px; font-weight: 400; cursor: pointer; }
+#arrive-content .arrive-discovery-checks .arrive-plus-check.checked { background: #eaf1fc; border-color: #365e91; }
+#arrive-content .arrive-discovery-checks input { accent-color: #365e91; width: 16px; height: 16px; margin: 0; flex: none; }
+#arrive-content .arrive-discovery-hint { font-size: 12px; color: #61738a; line-height: 1.6; margin: 12px 0 0; }
+#arrive-content .arrive-discovery-feed { min-width: 0; color: #20344d; }
+#arrive-content .arrive-discovery-heading h3 { margin: 0 0 7px; font-size: 24px; font-weight: 600; overflow-wrap: anywhere; }
+#arrive-content .arrive-discovery-heading p { margin: 0; color: #61738a; font-size: 13px; line-height: 1.6; }
+#arrive-content .arrive-discovery-tabs { display: flex; flex-wrap: wrap; gap: 6px; margin: 18px 0 12px; padding-bottom: 11px; border-bottom: 1px solid #dce4ee; }
+#arrive-content .arrive-discovery-tabs button { display: flex; align-items: center; justify-content: center; gap: 8px; border: 0; border-radius: 9px; background: transparent; color: #20344d; min-height: 44px; padding: 10px 15px; font: inherit; font-size: 14px; font-weight: 600; cursor: pointer; }
+#arrive-content .arrive-discovery-tabs button[aria-selected="true"] { background: #365e91; color: #fff; }
+#arrive-content #arrive-discovery-count { min-width: 20px; text-align: center; font-variant-numeric: tabular-nums; }
+#arrive-content .arrive-discovery-feed-meta { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 6px 16px; margin-bottom: 12px; }
+#arrive-content .arrive-discovery-feed-meta p { margin: 0; color: #61738a; font-size: 12px; line-height: 1.6; }
+#arrive-content .arrive-discovery-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 15px; }
+#arrive-content .arrive-discovery-card { min-width: 0; border: 1px solid #dce4ee; border-radius: 14px; overflow: hidden; background: #fff; color: #20344d; display: flex; flex-direction: column; }
+#arrive-content .arrive-discovery-photo { height: 170px; position: relative; background: #edf3fb; }
+#arrive-content .arrive-discovery-photo img { display: block; width: 100%; height: 100%; object-fit: cover; }
+#arrive-content .arrive-discovery-photo > span { position: absolute; bottom: 10px; left: 10px; max-width: calc(100% - 20px); padding: 5px 8px; border-radius: 6px; background: #fff; color: #20344d; font-size: 11px; overflow-wrap: anywhere; }
+#arrive-content .arrive-discovery-copy { display: flex; flex-direction: column; padding: 15px; flex: 1; }
+#arrive-content .arrive-discovery-category { margin: 0 0 6px; font-size: 11px; color: #61738a; }
+#arrive-content .arrive-discovery-copy h4 { margin: 0 0 8px; font-size: 16px; font-weight: 600; line-height: 1.5; overflow-wrap: anywhere; }
+#arrive-content .arrive-discovery-location { margin: 0 0 10px; font-size: 12px; color: #61738a; line-height: 1.5; overflow-wrap: anywhere; }
+#arrive-content .arrive-discovery-event { margin: 0 0 10px; color: #61738a; font-size: 12px; }
+#arrive-content .arrive-discovery-price { margin: auto 0 14px; padding-top: 2px; font-size: 14px; font-weight: 500; }
+#arrive-content .arrive-discovery-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+#arrive-content .arrive-discovery-actions button { min-width: 0; min-height: 42px; padding: 10px 8px; border: 1px solid #dce4ee; border-radius: 9px; background: #fff; color: #20344d; font: inherit; font-size: 12px; font-weight: 600; cursor: pointer; }
+#arrive-content .arrive-discovery-actions button[aria-pressed="true"] { border-color: #365e91; background: #eaf1fc; }
+#arrive-content .arrive-discovery-actions button:disabled { opacity: .55; cursor: default; }
+#arrive-content .arrive-discovery-empty { grid-column: 1 / -1; padding: 48px 24px; text-align: center; border: 1px dashed #ccd8e8; border-radius: 14px; background: #fff; }
+#arrive-content .arrive-discovery-empty > i { color: #61738a; font-size: 28px; }
+#arrive-content .arrive-discovery-empty h4 { margin: 14px 0 8px; font-size: 18px; font-weight: 500; }
+#arrive-content .arrive-discovery-empty p { margin: 0; color: #61738a; line-height: 1.6; font-size: 13px; }
+#arrive-content #arrive-discovery-status { min-height: 20px; margin: 12px 0 0; font-size: 12px; color: #61738a; }
+#arrive-content #arrive-discovery-more { display: block; margin: 18px auto 0; min-height: 44px; }
+#arrive-content .arrive-discovery-requests { margin-top: 20px; padding: 18px 0; border-top: 1px solid #dce4ee; }
+#arrive-content .arrive-discovery-requests > summary { color: #365e91; font-weight: 600; cursor: pointer; }
+#arrive-content [hidden] { display: none !important; }
+@media (max-width: 900px) {
+    #arrive-content .arrive-discovery-layout { grid-template-columns: minmax(0, 1fr); gap: 20px; }
+    #arrive-content .arrive-discovery-screen { padding: 16px; }
+    #arrive-content .arrive-trip-form { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    #arrive-content .arrive-discovery-dates { grid-column: 1 / -1; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    #arrive-content .arrive-discovery-offers, #arrive-content #arrive-discovery-date-error { grid-column: 1 / -1; }
+    #arrive-content .arrive-discovery-checks { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+@media (max-width: 560px) {
+    #arrive-content .arrive-discovery-list { grid-template-columns: minmax(0, 1fr); }
+    #arrive-content .arrive-discovery-checks { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    #arrive-content .arrive-discovery-preferences { padding: 16px; }
+    #arrive-content .arrive-discovery-photo { height: 190px; }
+    #arrive-content .arrive-discovery-heading h3 { font-size: 21px; }
+}
+@media (max-width: 380px) {
+    #arrive-content .arrive-trip-form, #arrive-content .arrive-discovery-dates { grid-template-columns: minmax(0, 1fr); }
+}
+
+#arrive-content .arrive-discovery-more-interests { grid-column: 1 / -1; }
+#arrive-content .arrive-discovery-more-interests summary { padding: 9px 0; color: #365e91; font-size: 12px; font-weight: 600; cursor: pointer; }
+#arrive-content .arrive-discovery-extra-checks { display: grid; grid-template-columns: minmax(0, 1fr); gap: 7px; }
+@media(max-width: 900px) { #arrive-content .arrive-discovery-extra-checks { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media(max-width: 560px) { #arrive-content .arrive-discovery-extra-checks { grid-template-columns: repeat(2, minmax(0, 1fr)); } }

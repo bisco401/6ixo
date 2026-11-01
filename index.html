@@ -11,7 +11,7 @@
     <meta http-equiv="Expires" content="0">
     <script>
         (function forceFreshMobileBuild() {
-                var BUILD = '20261025205217';
+                var BUILD = '20261101183615';
             var KEY = 'sixo_head_build_version';
             var CHECK_KEY = 'sixo_head_build_last_check';
             var RELOAD_KEY = 'sixo_head_build_reload_target';
@@ -130,6 +130,7 @@
     <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
     <link rel="preload" href="assets/fonts/sora-latin.3902474d3ece.woff2" as="font" type="font/woff2" crossorigin>
     <link rel="stylesheet" href="styles.css?v=20261025-arrive-discovery-1">
+    <link rel="stylesheet" href="assets/arrive-discovery.css?v=20261101-arrive-discovery-1">
     <link rel="stylesheet" href="assets/shortstay-signature.css?v=20261018-signature-1">
     <link rel="stylesheet" href="assets/stay-host-application.css?v=20261019-host-proof-checks-1">
     <link rel="stylesheet" href="assets/policy-links.css?v=20260930-site-policies-1">
@@ -4175,148 +4176,79 @@
                     <h2>Arrive+</h2>
                 </div>
             </header>
-                <section id="arrive-plus-schedule" class="dating-section dating-schedule" aria-label="Arrive+ scheduling">
-                    <div class="arrive-plus-intro">
-                        <h3>Make a little room for discovery.</h3>
-                        <p>Choose your destination and travel dates, check your interests, and explore local listings for your trip.</p>
-                        <div class="arrive-plus-visual">
-                            <img loading="lazy" class="arrive-plus-visual-image" src="assets/arrive-plus-hero-original.png" alt="Arrive+ illustration of people connecting between South Africa and London" width="1024" height="1024" decoding="async">
-                        </div>
-                    </div>
-                    <div class="arrive-plus-grid">
-                        <div class="arrive-plus-card arrive-plus-form-card arrive-plus-plan-checklist-card">
-                            <div class="arrive-plus-form-shell">
-                                <div class="arrive-plus-checklist-pane">
-                                    <div class="arrive-plus-panel-header">
-                                        <div>
-                                            <h4>Vacation checklist</h4>
-                                            <p>Check the activities you want to do while traveling.</p>
-                                        </div>
-                                    </div>
-                                    <div id="arrive-plus-checklist" class="arrive-plus-checklist" aria-label="Vacation checklist">
-                                        <div class="arrive-plus-check-dropdown">
-                                            <label class="arrive-plus-check arrive-plus-check-parent">
-                                                <input type="checkbox" value="Vehicles" data-meta-only="1" data-parent-group="vehicles">
-                                                <span>Vehicles</span>
-                                                <i class="fas fa-chevron-down arrive-plus-check-caret" aria-hidden="true"></i>
-                                            </label>
-                                            <div class="arrive-plus-check-submenu hidden" data-submenu-group="vehicles">
-                                                <label class="arrive-plus-check arrive-plus-subcheck">
-                                                    <input type="checkbox" value="Airport pickup" data-group="vehicles">
-                                                    <span>Airport pickup</span>
-                                                </label>
-                                                <label class="arrive-plus-check arrive-plus-subcheck">
-                                                    <input type="checkbox" value="Car rental" data-group="vehicles">
-                                                    <span>Car rental</span>
-                                                </label>
-                                                <label class="arrive-plus-check arrive-plus-subcheck">
-                                                    <input type="checkbox" value="Private driver" data-group="vehicles">
-                                                    <span>Driver</span>
-                                                </label>
-                                            </div>
-                                        </div>
-                                        <label class="arrive-plus-check">
-                                            <input type="checkbox" value="Events">
-                                            <span>Events</span>
-                                        </label>
-                                        <label class="arrive-plus-check">
-                                            <input type="checkbox" value="Restaurants">
-                                            <span>Restaurants</span>
-                                        </label>
-                                        <label class="arrive-plus-check">
-                                            <input type="checkbox" value="Gym">
-                                            <span>Gym</span>
-                                        </label>
-                                        <label class="arrive-plus-check">
-                                            <input type="checkbox" value="Short stays">
-                                            <span>Short stays</span>
-                                        </label>
-                                        <label class="arrive-plus-check">
-                                            <input type="checkbox" value="Nightlife">
-                                            <span>Nightlife</span>
-                                        </label>
-                                        <label class="arrive-plus-check">
-                                            <input type="checkbox" value="City tours">
-                                            <span>City tours</span>
-                                        </label>
-                                        <label class="arrive-plus-check">
-                                            <input type="checkbox" value="Beach day">
-                                            <span>Beach day</span>
-                                        </label>
-                                        <label class="arrive-plus-check">
-                                            <input type="checkbox" value="Shopping">
-                                            <span>Shopping</span>
-                                        </label>
-                                        <label class="arrive-plus-check">
-                                            <input type="checkbox" value="Spa & Beauty">
-                                            <span>Spa &amp; Beauty</span>
-                                        </label>
-                                        <label class="arrive-plus-check">
-                                            <input type="checkbox" value="Excursions">
-                                            <span>Excursions</span>
-                                        </label>
-                                    </div>
-                                    <p id="arrive-plus-checklist-summary" class="arrive-plus-checklist-summary">Select activities you want to do.</p>
+                <section id="arrive-plus-schedule" class="dating-section dating-schedule arrive-discovery-screen" aria-label="Arrive+ trip discovery">
+                    <div class="arrive-discovery-layout">
+                        <aside class="arrive-discovery-preferences" aria-label="Trip preferences">
+                            <h3>Your trip</h3>
+                            <form id="dating-schedule-form" class="dating-schedule-form arrive-trip-form">
+                                <label class="arrive-discovery-field" for="arrive-discovery-country">Country
+                                    <select id="arrive-discovery-country" required><option value="">Choose country</option></select>
+                                </label>
+                                <label class="arrive-discovery-field" for="arrive-discovery-city">City
+                                    <input id="arrive-discovery-city" type="text" placeholder="Choose or type a city" list="arrive-discovery-cities" autocomplete="off">
+                                </label>
+                                <datalist id="arrive-discovery-cities"></datalist>
+                                <input type="hidden" id="dating-schedule-destination">
+                                <div class="arrive-discovery-dates">
+                                    <label class="arrive-discovery-field" for="dating-schedule-start">Arrival
+                                        <input type="date" id="dating-schedule-start">
+                                    </label>
+                                    <label class="arrive-discovery-field" for="dating-schedule-end">Departure
+                                        <input type="date" id="dating-schedule-end">
+                                    </label>
                                 </div>
-                                <div class="arrive-plus-plan-pane">
-                                    <div class="dating-schedule-header">
-                                        <div>
-                                            <h3>Plan your arrival</h3>
-                                            <p>Destination and travel dates.</p>
-                                        </div>
-                                        <button id="dating-schedule-clear" class="btn-secondary small" type="button">Clear</button>
-                                    </div>
-                                    <form id="dating-schedule-form" class="dating-schedule-form">
-                                        <div class="filter-group">
-                                            <label for="dating-schedule-destination">Destination</label>
-                                            <input type="text" id="dating-schedule-destination" class="filter-input" placeholder="City, country" required>
-                                        </div>
-                                        <div class="filter-group">
-                                            <label for="dating-schedule-start">Arrival date</label>
-                                            <input type="date" id="dating-schedule-start" class="filter-input" required>
-                                        </div>
-                                        <div class="filter-group">
-                                            <label for="dating-schedule-end">Departure date</label>
-                                            <input type="date" id="dating-schedule-end" class="filter-input" required>
-                                        </div>
-                                        <div class="filter-group" style="grid-column:1/-1;">
-                                            <label for="dating-schedule-wants">What are you looking for on this stay?</label>
-                                            <textarea id="dating-schedule-wants" class="filter-input" rows="3" placeholder="Briefly share what you are looking forward to doing (e.g., restaurants, gym, airport pickup)."></textarea>
-                                        </div>
-                                        <div class="filter-group" style="grid-column:1/-1;">
-                                            <label for="dating-schedule-notes">Extra notes (optional)</label>
-                                            <textarea id="dating-schedule-notes" class="filter-input" rows="2" placeholder="Anything else locals should know."></textarea>
-                                        </div>
-                                        <div class="filter-group schedule-action">
-                                            <label style="visibility:hidden;">Schedule</label>
-                                            <button id="dating-schedule-submit" class="btn-primary" type="submit">Request local offers</button>
-                                        </div>
-                                        <p class="arrive-plus-request-note">Explore listings as you choose your destination and interests. Local-offer requests are optional; pricing is shown before payment.</p>
-                                    </form>
+                                <p id="arrive-discovery-date-error" role="alert" hidden></p>
+                                <details class="arrive-discovery-offers">
+                                    <summary>Request local offers</summary>
+                                    <label class="arrive-discovery-field" for="dating-schedule-wants">What are you looking for?
+                                        <textarea id="dating-schedule-wants" rows="2" placeholder="Share a little about your stay."></textarea>
+                                    </label>
+                                    <label class="arrive-discovery-field" for="dating-schedule-notes">Extra notes (optional)
+                                        <textarea id="dating-schedule-notes" rows="2"></textarea>
+                                    </label>
+                                    <button id="dating-schedule-submit" class="btn-primary" type="submit">Request local offers</button>
+                                    <p>Optional. Pricing is shown before payment. No hotel or exact address is shared.</p>
+                                </details>
+                            </form>
+                            <fieldset class="arrive-discovery-interests">
+                                <legend>What would you like to explore?</legend>
+                                <div id="arrive-plus-checklist" class="arrive-discovery-checks" aria-label="Vacation checklist">
+                                    <label class="arrive-plus-check"><input type="checkbox" value="Restaurants"><span>Restaurants</span></label>
+                                    <label class="arrive-plus-check"><input type="checkbox" value="Car rental"><span>Car rental</span></label>
+                                    <label class="arrive-plus-check"><input type="checkbox" value="Airport pickup"><span>Airport pickup</span></label>
+                                    <label class="arrive-plus-check"><input type="checkbox" value="Events"><span>Events</span></label>
+                                    <label class="arrive-plus-check"><input type="checkbox" value="Short stays"><span>Short stays</span></label>
+                                    <label class="arrive-plus-check"><input type="checkbox" value="City tours"><span>City tours</span></label>
+                                    <details class="arrive-discovery-more-interests"><summary>More interests</summary><div class="arrive-discovery-extra-checks">
+                                    <label class="arrive-plus-check"><input type="checkbox" value="Gym"><span>Gym</span></label>
+                                    <label class="arrive-plus-check"><input type="checkbox" value="Nightlife"><span>Nightlife</span></label>
+                                    <label class="arrive-plus-check"><input type="checkbox" value="Beach day"><span>Beach day</span></label>
+                                    <label class="arrive-plus-check"><input type="checkbox" value="Shopping"><span>Shopping</span></label>
+                                    <label class="arrive-plus-check"><input type="checkbox" value="Spa &amp; Beauty"><span>Spa &amp; Beauty</span></label>
+                                    <label class="arrive-plus-check"><input type="checkbox" value="Excursions"><span>Excursions</span></label>
+                                    <label class="arrive-plus-check"><input type="checkbox" value="Private driver"><span>Private driver</span></label>
+                                    </div></details>
                                 </div>
+                                <p id="arrive-plus-checklist-summary" class="arrive-discovery-hint">Select activities you want to do.</p>
+                            </fieldset>
+                        </aside>
+                        <section class="arrive-discovery-feed" aria-label="Trip listings">
+                            <header class="arrive-discovery-heading">
+                                <h3 id="arrive-discovery-title">Discover your destination</h3>
+                                <p id="arrive-plus-preview-subtitle">Choose a country and check your interests to see matching listings.</p>
+                            </header>
+                            <div id="arrive-discovery-tabs" class="arrive-discovery-tabs" role="tablist" aria-label="Trip listings">
+                                <button id="arrive-tab-discover" type="button" role="tab" data-arrive-tab="discover" aria-selected="true" aria-controls="arrive-plus-preview-list"><i class="fas fa-compass" aria-hidden="true"></i> Discover</button>
+                                <button id="arrive-tab-saved" type="button" role="tab" data-arrive-tab="saved" aria-selected="false" aria-controls="arrive-plus-preview-list"><i class="far fa-bookmark" aria-hidden="true"></i> Saved <span id="arrive-discovery-count">0</span></button>
                             </div>
-                        </div>
-                        <div class="arrive-plus-card arrive-plus-info-card">
-                            <h4>What locals see</h4>
-                            <ul class="arrive-plus-info-list">
-                                <li><i class="fas fa-location-dot"></i> Destination and dates only</li>
-                                <li><i class="fas fa-shield"></i> Verification badges and shared interests</li>
-                                <li><i class="fas fa-bell"></i> Alerts when you post a trip</li>
-                            </ul>
-                            <div class="arrive-plus-info-note">
-                                <strong>Privacy first:</strong> no exact address or hotel is shared.
+                            <div class="arrive-discovery-feed-meta">
+                                <p id="arrive-plus-preview-summary" aria-live="polite"></p>
+                                <p id="arrive-discovery-storage"></p>
                             </div>
-                        </div>
-                        <div class="arrive-plus-card arrive-plus-preview-card">
-                            <div class="arrive-plus-panel-header">
-                                <div>
-                                    <h4>Listings for your trip</h4>
-                                    <p id="arrive-plus-preview-subtitle">Add a trip to see locals in your destination.</p>
-                                    <p id="arrive-plus-preview-summary" class="arrive-plus-preview-summary is-empty" aria-live="polite"></p>
-                                </div>
-                            </div>
-                            <div id="arrive-plus-preview-list" class="arrive-plus-preview-list" aria-live="polite"></div>
-                        </div>
+                            <div id="arrive-plus-preview-list" class="arrive-discovery-list" role="tabpanel" aria-labelledby="arrive-tab-discover"></div>
+                            <button id="arrive-discovery-more" class="btn-secondary" type="button" hidden>Show more listings</button>
+                            <p id="arrive-discovery-status" role="status" aria-live="polite"></p>
+                        </section>
                     </div>
                     <section id="arrive-plus-ad-slot" class="home-bottom-ad home-bottom-ad-image-only is-placeholder arrive-plus-ad-slot" aria-label="Sponsored ad">
                         <div class="home-bottom-ad-media">
@@ -4328,12 +4260,13 @@
                             <button id="arrive-plus-ad-cta" class="home-bottom-ad-click" type="button" aria-label="Open ad"></button>
                         </div>
                     </section>
+                    <details class="arrive-discovery-requests"><summary>Local requests and responses</summary>
                     <div class="arrive-plus-stream">
                         <div class="arrive-plus-card">
                             <div class="arrive-plus-panel-header">
                                 <div>
                                     <h4>Upcoming trips</h4>
-                                    <p>Auto alerts go out as soon as you save.</p>
+                                    <p>Local alerts are sent when you publish a request.</p>
                                 </div>
                             </div>
                             <div id="dating-schedule-list" class="dating-schedule-list" aria-live="polite"></div>
@@ -4372,6 +4305,7 @@
                             <div id="trip-alerts-list" class="trip-alerts-list" aria-live="polite"></div>
                         </div>
 	                    </div>
+                    </details>
 	                </section>
 
 	        </div>
@@ -7269,7 +7203,8 @@
     <script src="assets/profile-card-ui.00a6745f6675.js"></script>
         <link rel="stylesheet" href="assets/posting-accordion.css?v=20261012-property-categories-1">
     <script src="assets/posting-accordion.js?v=20261018-signature-1"></script>
-    <script src="app.js?v=20261026-listing-refresh-1"></script>
+    <script src="assets/arrive-discovery.js?v=20261101-arrive-discovery-1"></script>
+    <script src="app.js?v=20261101-arrive-discovery-1"></script>
         <script src="rental-finance-ui.js?v=20260930-stay-booking-ready-1"></script>
         <script src="vehicle-rental-flow.js?v=20260914-host-insurance-1"></script>
 			</body>

@@ -1,5 +1,5 @@
 {
-  "checkedAt": "2026-11-01T06:29:13Z",
+  "checkedAt": "2026-11-01T06:42:42.847Z",
   "listings": {
     "craigslist.org/view/d/bastrop-used-2025-cadillac-xt4-fwd-4d/fuqr_3uo8rgowpq1ctwx-a": {
       "availability": "sold",
@@ -15705,14 +15705,22 @@
       "reason": "Kijiji redirected the exact ad to a confirmed removal"
     },
     "kijiji.ca/v-buy-sell-other/city-of-toronto/eurodib-20-qt-commercial-spiral-mixer/1745544751": {
-      "availability": "unavailable",
-      "checkedAt": "2026-11-01T03:58:59Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1745544751",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/eurodib-20-qt-commercial-spiral-mixer/1745544751",
+      "availability": "gone",
+      "checkedAt": "2026-11-01T06:42:42.847Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1745544751",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-buy-sell-other/city-of-toronto/sagetra-professional-french-fry-cutter/1745544744": {
-      "availability": "unavailable",
-      "checkedAt": "2026-11-01T03:58:59Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1745544744",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/sagetra-professional-french-fry-cutter/1745544744",
+      "availability": "gone",
+      "checkedAt": "2026-11-01T06:42:42.847Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1745544744",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-buy-sell-other/city-of-toronto/waring-four-slice-commercial-toaster-without-box/1745544728": {
       "id": "kijiji-1745544728",
@@ -15988,9 +15996,13 @@
       "reason": "Exact source URL returned HTTP 410"
     },
     "kijiji.ca/v-buy-sell-other/city-of-toronto/vitamix-36019-commercial-bar-blender-48-oz-vm0145/1745552441": {
-      "availability": "unavailable",
-      "checkedAt": "2026-11-01T03:58:59Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1745552441",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/vitamix-36019-commercial-bar-blender-48-oz-vm0145/1745552441",
+      "availability": "gone",
+      "checkedAt": "2026-11-01T06:42:42.847Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1745552441",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-bed-mattress/city-of-toronto/no-tax-solid-bunk-bed-with-stairs-bunk-bed-kids-bed-bed/1745530798": {
       "availability": "unavailable",
@@ -16103,14 +16115,22 @@
       "reason": "Exact source URL returned HTTP 410"
     },
     "kijiji.ca/v-buy-sell-other/city-of-toronto/rosko-countertop-4-burner-commercial-gas-stovetop/1745568847": {
-      "availability": "unavailable",
-      "checkedAt": "2026-11-01T03:58:59Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1745568847",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/rosko-countertop-4-burner-commercial-gas-stovetop/1745568847",
+      "availability": "gone",
+      "checkedAt": "2026-11-01T06:42:42.847Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1745568847",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-buy-sell-other/city-of-toronto/eurodib-10-commercial-manual-meat-slicer/1745568742": {
-      "availability": "unavailable",
-      "checkedAt": "2026-11-01T03:58:59Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1745568742",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/eurodib-10-commercial-manual-meat-slicer/1745568742",
+      "availability": "gone",
+      "checkedAt": "2026-11-01T06:42:42.847Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1745568742",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "atlantabestusedcars.com/inventory/used-2020-ford-escape-se-w-co-pilot-assist-1fmcu0g69luc75533-in-peachtree-corners-ga": {
       "availability": "unavailable",
@@ -16211,6 +16231,15 @@
       "availability": "unavailable",
       "checkedAt": "2026-11-01T06:29:13Z",
       "reason": "Kijiji redirected the exact ad to a confirmed removal"
+    },
+    "kijiji.ca/v-buy-sell-other/city-of-toronto/medsup-21-white-polypropylene-bouffant-cap-1000pcs/1745586546": {
+      "id": "kijiji-1745586546",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/medsup-21-white-polypropylene-bouffant-cap-1000pcs/1745586546",
+      "availability": "gone",
+      "checkedAt": "2026-11-01T06:42:42.847Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1745586546",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     }
   }
 }

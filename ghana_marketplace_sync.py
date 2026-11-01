@@ -57,23 +57,47 @@ def parse_timestamp(value: str) -> float:
         return 0.0
 
 
-def row_timestamp(row: dict[str, str]) -> float:
-    attributes: dict = {}
+def row_attributes(row: dict[str, str]) -> dict:
     try:
-        attributes = json.loads(row.get("attributes") or "{}") or {}
+        attributes = json.loads(row.get("attributes") or "{}")
     except (TypeError, json.JSONDecodeError):
-        pass
+        return {}
+    return attributes if isinstance(attributes, dict) else {}
+
+
+def source_posted_at(row: dict[str, str]) -> str:
     for value in (
         row.get("source_posted_at"),
         row.get("posted_at"),
         row.get("published_at"),
-        attributes.get("sourcePostedAt"),
-        row.get("scraped_at"),
+        row_attributes(row).get("sourcePostedAt"),
     ):
-        timestamp = parse_timestamp(clean(value))
-        if timestamp:
-            return timestamp
-    return 0.0
+        if parse_timestamp(clean(value)):
+            return clean(value)
+    return ""
+
+
+def row_timestamp(row: dict[str, str]) -> float:
+    return parse_timestamp(source_posted_at(row) or clean(row.get("scraped_at")))
+
+
+def preserve_listing_date(row: dict[str, str], current: dict[str, str]) -> dict[str, str]:
+    """Keep checks from promoting an existing ad above genuinely new listings.
+
+    The site uses scraped_at as its posting/sort date. Without a source date,
+    its existing value is the first known import date, not the latest check.
+    Availability and source_last_seen_at remain free to advance on every run.
+    """
+    posted_at = source_posted_at(row) or source_posted_at(current)
+    first_seen_at = clean(current.get("scraped_at"))
+    date = posted_at or (first_seen_at if parse_timestamp(first_seen_at) else "")
+    if not date:
+        return row
+    row = {**row, "scraped_at": date}
+    if posted_at and not source_posted_at(row):
+        attributes = {**row_attributes(row), "sourcePostedAt": posted_at}
+        row["attributes"] = json.dumps(attributes, ensure_ascii=False, separators=(",", ":"))
+    return row
 
 
 def vehicle_source_specifications(title: str, source_attributes: dict[str, str]) -> list[dict[str, str]]:
@@ -129,7 +153,7 @@ def normalize_listing(listing: Listing, source: GhanaSource, checked_at: str) ->
         if clean(image)
     )
 
-    source_posted_at = clean(listing.published_at)
+    source_posted_at = clean(listing.published_at) if parse_timestamp(clean(listing.published_at)) else ""
     attributes = json.loads(row.get("attributes") or "{}")
     attributes.update(
         {
@@ -208,6 +232,7 @@ def merge_ghana_listings(
     prepared = []
     for row in incoming:
         current = existing_by_url.get(clean(row.get("source_url")))
+        row = preserve_listing_date(row, current or {})
         if current and has_managed_local_images(current, repository_root):
             row = {**row, "image_urls": current["image_urls"]}
         prepared.append(row)

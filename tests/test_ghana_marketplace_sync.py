@@ -10,6 +10,65 @@ from oxglow_scrape import Listing, image_download_candidates, extract_listing_at
 
 
 class GhanaMarketplaceSyncTests(unittest.TestCase):
+    def undated_listing(self):
+        return Listing(
+            title="Existing car part", price="GHS 100", url="https://oxglow.com.gh/listing/part",
+            image_url="https://oxglow.com.gh/uploads/part.jpg", image_urls="", image_files="",
+            description="Car part", location="Accra", published_at="", phone_numbers="0240000000",
+        )
+
+    def test_rechecks_keep_first_import_date_but_update_content_and_availability(self):
+        source = GhanaSource("auto-parts", "https://oxglow.com.gh/auto-parts-accessories", "vehicles", "vehicles", "auto_parts")
+        listing = self.undated_listing()
+        first = "2026-05-12T10:00:00Z"
+        existing = [normalize_listing(listing, source, first)]
+        for checked in ["2026-10-28T20:00:00Z", "2026-11-01T07:00:00Z"]:
+            listing.price = "GHS 90"
+            incoming = normalize_listing(listing, source, checked)
+            merged, _ = merge_ghana_listings(existing, [incoming], Path("."))
+            self.assertEqual(merged[0]["scraped_at"], first)
+            self.assertEqual(merged[0]["price_text"], "GHS 90")
+            self.assertEqual(merged[0]["source_last_seen_at"], checked)
+            self.assertEqual(merged[0]["source_availability_checked_at"], checked)
+            self.assertEqual(incoming["scraped_at"], checked, "Do not mutate the source candidate")
+            existing = merged
+
+        newer = {**incoming, "id": "newer", "source_url": "https://oxglow.com.gh/listing/newer",
+                 "scraped_at": "2026-10-31T12:00:00Z", "attributes": '{"sourcePostedAt":"2026-10-31T12:00:00Z"}'}
+        merged, _ = merge_ghana_listings(existing, [incoming, newer], Path("."), maximum=1)
+        self.assertEqual([r["id"] for r in merged if r["status"] == "published"], ["newer"])
+
+    def test_missing_or_invalid_source_date_does_not_erase_known_posting_date(self):
+        source = GhanaSource("auto-parts", "https://oxglow.com.gh/auto-parts-accessories", "vehicles", "vehicles", "auto_parts")
+        listing = self.undated_listing()
+        listing.published_at = "2026-05-01T10:00:00Z"
+        existing = normalize_listing(listing, source, "2026-05-12T10:00:00Z")
+        for missing in ["", "not a date"]:
+            listing.published_at = missing
+            incoming = normalize_listing(listing, source, "2026-11-01T07:00:00Z")
+            merged, _ = merge_ghana_listings([existing], [incoming], Path("."))
+            self.assertEqual(merged[0]["scraped_at"], "2026-05-01T10:00:00Z")
+            self.assertEqual(json.loads(merged[0]["attributes"])["sourcePostedAt"], "2026-05-01T10:00:00Z")
+
+    def test_new_ad_uses_first_import_until_source_supplies_a_date(self):
+        source = GhanaSource("auto-parts", "https://oxglow.com.gh/auto-parts-accessories", "vehicles", "vehicles", "auto_parts")
+        listing = self.undated_listing()
+        incoming = normalize_listing(listing, source, "2026-11-01T07:00:00Z")
+        existing, _ = merge_ghana_listings([], [incoming], Path("."))
+        self.assertEqual(existing[0]["scraped_at"], "2026-11-01T07:00:00Z")
+        listing.published_at = "2026-10-30T10:00:00Z"
+        incoming = normalize_listing(listing, source, "2026-11-02T07:00:00Z")
+        merged, _ = merge_ghana_listings(existing, [incoming], Path("."))
+        self.assertEqual(merged[0]["scraped_at"], listing.published_at)
+
+    def test_legacy_attributes_do_not_prevent_preserving_import_date(self):
+        for attributes in ["", "{broken", "null", "[]"]:
+            existing = {"source_url": "https://oxglow.com.gh/listing/legacy", "country": "Ghana",
+                        "status": "published", "scraped_at": "2026-05-12T10:00:00Z", "attributes": attributes}
+            incoming = {**existing, "scraped_at": "2026-11-01T07:00:00Z", "attributes": "{}"}
+            merged, _ = merge_ghana_listings([existing], [incoming], Path("."))
+            self.assertEqual(merged[0]["scraped_at"], existing["scraped_at"])
+
     def test_normalizes_current_listing_with_absolute_images_and_source_date(self):
         source = GhanaSource("vehicles", "https://oxglow.com.gh/vehicles", "vehicles", "vehicles", "vehicles")
         listing = Listing(

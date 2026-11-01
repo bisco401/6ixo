@@ -59,6 +59,8 @@ n8n schedule/manual trigger
 
 The dedicated Ghana GitHub Actions workflow runs every day. The generic n8n scraper and availability workflows run every 36 hours when they are imported and activated. All CSV-writing workflows fall back to GitHub's blob API when the listing file is too large for inline Contents API data, and refuse to write if the existing CSV cannot be decoded. This prevents a single-country sync from erasing Ghana or any other country.
 
+Ghana's `scraped_at` is the website's posting/sort date: use the source posting date when available, otherwise retain the existing first-import date. Rechecks update `source_last_seen_at` and `source_availability_checked_at` separately, so an undated older ad does not jump ahead of new inventory. The November 1, 2026 repair recovered first-seen dates for legacy auto-parts ads from their original import commit `9233d834553de57bffda94716c991cf1d72b4245`.
+
 Import and activate `automations/n8n/6ixo-enforce-listing-policy.json` after the source-specific workflows. It runs every six hours and can also be run manually after a large import.
 
 Default limits:

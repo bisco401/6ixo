@@ -1,5 +1,5 @@
 {
-  "checkedAt": "2026-11-01T12:25:03Z",
+  "checkedAt": "2026-11-01T12:42:22.586Z",
   "listings": {
     "craigslist.org/view/d/bastrop-used-2025-cadillac-xt4-fwd-4d/fuqr_3uo8rgowpq1ctwx-a": {
       "availability": "sold",
@@ -16053,14 +16053,22 @@
       "reason": "Exact source URL returned HTTP 410"
     },
     "kijiji.ca/v-buy-sell-other/city-of-toronto/rosko-countertop-4-burner-commercial-gas-stovetop/1745568847": {
-      "availability": "unavailable",
-      "checkedAt": "2026-11-01T12:25:03Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1745568847",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/rosko-countertop-4-burner-commercial-gas-stovetop/1745568847",
+      "availability": "gone",
+      "checkedAt": "2026-11-01T12:42:22.586Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1745568847",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-buy-sell-other/city-of-toronto/eurodib-10-commercial-manual-meat-slicer/1745568742": {
-      "availability": "unavailable",
-      "checkedAt": "2026-11-01T12:25:03Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1745568742",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/eurodib-10-commercial-manual-meat-slicer/1745568742",
+      "availability": "gone",
+      "checkedAt": "2026-11-01T12:42:22.586Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1745568742",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "atlantabestusedcars.com/inventory/used-2020-ford-escape-se-w-co-pilot-assist-1fmcu0g69luc75533-in-peachtree-corners-ga": {
       "availability": "unavailable",
@@ -16163,9 +16171,13 @@
       "reason": "Kijiji redirected the exact ad to a confirmed removal"
     },
     "kijiji.ca/v-buy-sell-other/city-of-toronto/medsup-21-white-polypropylene-bouffant-cap-1000pcs/1745586546": {
-      "availability": "unavailable",
-      "checkedAt": "2026-11-01T12:25:03Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1745586546",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/medsup-21-white-polypropylene-bouffant-cap-1000pcs/1745586546",
+      "availability": "gone",
+      "checkedAt": "2026-11-01T12:42:22.586Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1745586546",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-engines-and-engine-parts/hamilton/jdm-engine-subaru-legacy-outback-impreza-forester-2000-2005-sohc/1745184387": {
       "availability": "unavailable",
@@ -16256,6 +16268,105 @@
       "availability": "gone",
       "checkedAt": "2026-11-01T12:25:03Z",
       "reason": "Exact source URL returned HTTP 410"
+    },
+    "kijiji.ca/v-heavy-equipment-machinery/hamilton/1997-skyjack-sjiii3220-scissor-lift-20-ft-electric-low-spend/1744544691": {
+      "id": "kijiji-1744544691",
+      "sourceUrl": "https://www.kijiji.ca/v-heavy-equipment-machinery/hamilton/1997-skyjack-sjiii3220-scissor-lift-20-ft-electric-low-spend/1744544691",
+      "availability": "gone",
+      "checkedAt": "2026-11-01T12:42:22.586Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-heavy-equipment-machinery/hamilton/c340l80014?adRemoved=1744544691&ll=43.27473029999999%2C-80.0367259&radius=150.0&rb=50",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "kijiji.ca/v-heavy-equipment-machinery/hamilton/2012-skyjack-sj-iii-3219-scissor-lift-19-ft-550-lb-267-hrs-low/1744544652": {
+      "id": "kijiji-1744544652",
+      "sourceUrl": "https://www.kijiji.ca/v-heavy-equipment-machinery/hamilton/2012-skyjack-sj-iii-3219-scissor-lift-19-ft-550-lb-267-hrs-low/1744544652",
+      "availability": "gone",
+      "checkedAt": "2026-11-01T12:42:22.586Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-heavy-equipment-machinery/hamilton/c340l80014?adRemoved=1744544652&ll=43.27473029999999%2C-80.0367259&radius=150.0&rb=50",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "kijiji.ca/v-heavy-equipment-machinery/hamilton/2014-skyjack-sj3219-electric-scissor-lift-24v-2wd-low-hour-slab/1744544541": {
+      "id": "kijiji-1744544541",
+      "sourceUrl": "https://www.kijiji.ca/v-heavy-equipment-machinery/hamilton/2014-skyjack-sj3219-electric-scissor-lift-24v-2wd-low-hour-slab/1744544541",
+      "availability": "gone",
+      "checkedAt": "2026-11-01T12:42:22.586Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-heavy-equipment-machinery/hamilton/c340l80014?adRemoved=1744544541&ll=43.27473029999999%2C-80.0367259&radius=150.0&rb=50",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "kijiji.ca/v-heavy-equipment-machinery/hamilton/2017-skyjack-sj4740-electric-scissor-lift-40-ft-ndt-certified/1744544267": {
+      "id": "kijiji-1744544267",
+      "sourceUrl": "https://www.kijiji.ca/v-heavy-equipment-machinery/hamilton/2017-skyjack-sj4740-electric-scissor-lift-40-ft-ndt-certified/1744544267",
+      "availability": "gone",
+      "checkedAt": "2026-11-01T12:42:22.586Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-heavy-equipment-machinery/hamilton/c340l80014?adRemoved=1744544267&ll=43.27473029999999%2C-80.0367259&radius=150.0&rb=50",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "kijiji.ca/v-heavy-equipment-machinery/hamilton/2013-skyjack-sj8841-41ft-rt-scissor-lift-1700lb-ndt-certified/1744544173": {
+      "id": "kijiji-1744544173",
+      "sourceUrl": "https://www.kijiji.ca/v-heavy-equipment-machinery/hamilton/2013-skyjack-sj8841-41ft-rt-scissor-lift-1700lb-ndt-certified/1744544173",
+      "availability": "gone",
+      "checkedAt": "2026-11-01T12:42:22.586Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-heavy-equipment-machinery/hamilton/c340l80014?adRemoved=1744544173&ll=43.27473029999999%2C-80.0367259&radius=150.0&rb=50",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "craigslist.org/view/d/houston-2014-linclon-mkz-hybrid-down-in/gcsccdwv6nwduympccvjou": {
+      "id": "craigslist-gCSCcdwV6nWDUYmPcCVJou",
+      "sourceUrl": "https://www.craigslist.org/view/d/houston-2014-linclon-mkz-hybrid-down-in/gCSCcdwV6nWDUYmPcCVJou",
+      "availability": "gone",
+      "checkedAt": "2026-11-01T12:42:22.586Z",
+      "httpStatus": 410,
+      "resolvedUrl": "https://www.craigslist.org/view/d/houston-2014-linclon-mkz-hybrid-down-in/gCSCcdwV6nWDUYmPcCVJou",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "craigslist.org/view/d/grayson-2019-dodge-challenger-financing/nkx7ue298rgjiirlcx71na": {
+      "id": "craigslist-nKx7Ue298RGjiIRLcx71nA",
+      "sourceUrl": "https://www.craigslist.org/view/d/grayson-2019-dodge-challenger-financing/nKx7Ue298RGjiIRLcx71nA",
+      "availability": "gone",
+      "checkedAt": "2026-11-01T12:42:22.586Z",
+      "httpStatus": 410,
+      "resolvedUrl": "https://www.craigslist.org/view/d/grayson-2019-dodge-challenger-financing/nKx7Ue298RGjiIRLcx71nA",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "craigslist.org/view/d/maspeth-2013-hyundai-tucson-great-deal/0krkhdu98rgkxe47itampw": {
+      "id": "craigslist-0KRKHdu98RGkXe47ItAMpw",
+      "sourceUrl": "https://www.craigslist.org/view/d/maspeth-2013-hyundai-tucson-great-deal/0KRKHdu98RGkXe47ItAMpw",
+      "availability": "gone",
+      "checkedAt": "2026-11-01T12:42:22.586Z",
+      "httpStatus": 410,
+      "resolvedUrl": "https://www.craigslist.org/view/d/maspeth-2013-hyundai-tucson-great-deal/0KRKHdu98RGkXe47ItAMpw",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "craigslist.org/view/d/brooklyn-great-walk-in-all-utilities/qrdyoj7zpzvsurihgxfhkj": {
+      "id": "craigslist-qRDYoj7zPZvsUriHGxFhkj",
+      "sourceUrl": "https://www.craigslist.org/view/d/brooklyn-great-walk-in-all-utilities/qRDYoj7zPZvsUriHGxFhkj",
+      "availability": "gone",
+      "checkedAt": "2026-11-01T12:42:22.586Z",
+      "httpStatus": 410,
+      "resolvedUrl": "https://www.craigslist.org/view/d/brooklyn-great-walk-in-all-utilities/qRDYoj7zPZvsUriHGxFhkj",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "craigslist.org/view/d/brooklyn-quiet-east-flatbush-room-for/4vjx5jb3yz81mkgphi7rhu": {
+      "id": "craigslist-4vJX5JB3Yz81MKGPHi7Rhu",
+      "sourceUrl": "https://www.craigslist.org/view/d/brooklyn-quiet-east-flatbush-room-for/4vJX5JB3Yz81MKGPHi7Rhu",
+      "availability": "gone",
+      "checkedAt": "2026-11-01T12:42:22.586Z",
+      "httpStatus": 410,
+      "resolvedUrl": "https://www.craigslist.org/view/d/brooklyn-quiet-east-flatbush-room-for/4vJX5JB3Yz81MKGPHi7Rhu",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "craigslist.org/view/d/dallas-mazda-hood/8y3zaoqyk2sh1qdwafrfyk": {
+      "id": "craigslist-8Y3Zaoqyk2SH1QdwAFrFyK",
+      "sourceUrl": "https://www.craigslist.org/view/d/dallas-mazda-hood/8Y3Zaoqyk2SH1QdwAFrFyK",
+      "availability": "gone",
+      "checkedAt": "2026-11-01T12:42:22.586Z",
+      "httpStatus": 410,
+      "resolvedUrl": "https://www.craigslist.org/view/d/dallas-mazda-hood/8Y3Zaoqyk2SH1QdwAFrFyK",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     }
   }
 }

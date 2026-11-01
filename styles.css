@@ -15407,6 +15407,33 @@ button.host-property-photo-card:focus-visible {
     font-weight: 700;
     line-height: 1.25;
 }
+@media (max-width: 768px) {
+    #home-content .home-search-query-field .home-search-field-icon {
+        top: 26px !important;
+    }
+    .home-smart-suggestions {
+        position: static;
+        z-index: auto;
+        max-height: min(168px, 30vh);
+        max-height: min(168px, 30dvh);
+        margin-top: 0.4rem;
+        overscroll-behavior-y: contain;
+        background: #ffffff;
+        box-shadow: none;
+    }
+    .home-smart-suggestion {
+        min-height: 44px;
+        padding: 0.5rem;
+    }
+    .home-smart-suggestion-label {
+        overflow-wrap: anywhere;
+    }
+}
+@media (max-width: 640px) {
+    #home-content .home-search-query-field .home-search-field-icon {
+        top: 24px !important;
+    }
+}
 .home-search-actions #home-search-btn {
     min-height: 44px;
 }

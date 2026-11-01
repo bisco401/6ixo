@@ -21073,6 +21073,10 @@ class DatingApp {
             }
 	        if (searchWhat && !searchWhat.dataset.boundEnter) {
 	            searchWhat.addEventListener('keydown', (e) => {
+                        if (e.key === 'Escape') {
+                            this.hideHomeSmartSuggestions();
+                            return;
+                        }
                         if (e.key === 'ArrowDown' && this.homeSmartSuggestions?.length) {
                             e.preventDefault();
                             document.querySelector('#home-smart-suggestions .home-smart-suggestion')?.focus();
@@ -41283,11 +41287,15 @@ class DatingApp {
     renderHomeSmartSuggestions(rawQuery = '') {
         const panel = document.getElementById('home-smart-suggestions');
         if (!panel) return;
+        // Focusing an empty search must not cover the location/category controls with history.
+        if (String(rawQuery || '').trim().length < 2) {
+            this.hideHomeSmartSuggestions();
+            return;
+        }
         const suggestions = this.getHomeSmartSuggestions(rawQuery);
         this.homeSmartSuggestions = suggestions;
         if (!suggestions.length) {
-            panel.classList.add('hidden');
-            panel.innerHTML = '';
+            this.hideHomeSmartSuggestions();
             return;
         }
         panel.innerHTML = suggestions.map((suggestion, index) => `
@@ -41304,7 +41312,11 @@ class DatingApp {
 
     hideHomeSmartSuggestions() {
         const panel = document.getElementById('home-smart-suggestions');
-        if (panel) panel.classList.add('hidden');
+        if (panel) {
+            panel.classList.add('hidden');
+            panel.innerHTML = '';
+        }
+        this.homeSmartSuggestions = [];
     }
 
     applyHomeSmartSuggestion(index) {
@@ -41347,9 +41359,15 @@ class DatingApp {
                 const next = buttons[(currentIndex + offset + buttons.length) % buttons.length];
                 next?.focus();
             } else if (event.key === 'Escape') {
-                this.hideHomeSmartSuggestions();
                 document.getElementById('home-search-what')?.focus();
+                this.hideHomeSmartSuggestions();
             }
+        });
+        // Close after keyboard navigation; pointer clicks must finish before the mobile layout collapses.
+        document.addEventListener('keyup', (event) => {
+            if (event.key !== 'Tab') return;
+            if (event.target.closest('#home-smart-suggestions') || event.target.closest('#home-search-what')) return;
+            this.hideHomeSmartSuggestions();
         });
         document.addEventListener('click', (event) => {
             if (event.target.closest('#home-smart-suggestions') || event.target.closest('#home-search-what')) return;

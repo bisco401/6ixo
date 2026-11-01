@@ -41,7 +41,7 @@
 #arrive-content .arrive-discovery-event { margin: 0 0 10px; color: #61738a; font-size: 12px; }
 #arrive-content .arrive-discovery-price { margin: auto 0 14px; padding-top: 2px; font-size: 14px; font-weight: 500; }
 #arrive-content .arrive-discovery-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-#arrive-content .arrive-discovery-actions button { min-width: 0; min-height: 42px; padding: 10px 8px; border: 1px solid #dce4ee; border-radius: 9px; background: #fff; color: #20344d; font: inherit; font-size: 12px; font-weight: 600; cursor: pointer; }
+#arrive-content .arrive-discovery-actions button { min-width: 0; min-height: 44px; padding: 10px 8px; border: 1px solid #dce4ee; border-radius: 9px; background: #fff; color: #20344d; font: inherit; font-size: 12px; font-weight: 600; cursor: pointer; }
 #arrive-content .arrive-discovery-actions button[aria-pressed="true"] { border-color: #365e91; background: #eaf1fc; }
 #arrive-content .arrive-discovery-actions button:disabled { opacity: .55; cursor: default; }
 #arrive-content .arrive-discovery-empty { grid-column: 1 / -1; padding: 48px 24px; text-align: center; border: 1px dashed #ccd8e8; border-radius: 14px; background: #fff; }

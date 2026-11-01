@@ -95,8 +95,8 @@
             return this.localOk;
         }
         status() {
-            if (this.loading) return 'Loading saved listings…';
-            if (this.pending) return 'Syncing your saved listings…';
+            if (this.loading) return 'Loading saved itinerary…';
+            if (this.pending) return 'Syncing your saved itinerary…';
             if (this.cloudOk) return 'Saved to your account';
             if (!this.localOk) return 'Saving is unavailable on this device. Keep this page open and try again.';
             return this.owner === 'guest' ? 'Saved on this device' : 'Saved on this device · Account sync unavailable';
@@ -282,14 +282,14 @@
             const entry = { ...(live ? snapshot(live) : existing), updatedAt: this.stamp(), deleted };
             this.store.state.saved = [...this.store.state.saved.filter(x => x.key !== key), entry];
             const ok = this.store.save(); this.signature = ''; this.render();
-            this.announce(ok ? deleted ? 'Listing removed from Saved.' : 'Listing saved. Find it in the Saved tab.' : 'This listing is kept while the page is open. Device storage is unavailable.');
+            this.announce(ok ? deleted ? 'Listing removed from your itinerary.' : 'Saved to your itinerary. Open Saved itinerary to view it.' : 'This listing is kept while the page is open. Device storage is unavailable.');
             const button = [...this.root.querySelectorAll('[data-arrive-save]')].find(x => x.dataset.arriveSave === key);
             if (button) button.focus(); else this.root.querySelector('[data-arrive-tab="saved"]').focus();
         }
         announce(message) { this.root.querySelector('#arrive-discovery-status').textContent = message; }
         open(key) {
             const item = this.records.find(x => x.key === key);
-            if (!item) { this.announce('This listing is no longer available. You can remove it from Saved.'); return; }
+            if (!item) { this.announce('This listing is no longer available. You can remove it from your itinerary.'); return; }
             const raw = item.raw;
             if (item.kind === 'service') this.app.openServiceModal(raw);
             else if (item.kind === 'vehicle') this.app.openVehicleListingModal(raw.id);
@@ -317,13 +317,13 @@
             this.root.querySelector('#arrive-discovery-count').textContent = saved.length;
             this.root.querySelector('#arrive-discovery-storage').textContent = this.store.status();
             const title = this.root.querySelector('#arrive-discovery-title');
-            title.textContent = this.tab === 'saved' ? 'Your saved listings' : prefs.city ? 'Discover ' + prefs.city : prefs.country ? 'Discover ' + prefs.country : 'Discover your destination';
+            title.textContent = this.tab === 'saved' ? 'Your saved itinerary' : prefs.city ? 'Discover ' + prefs.city : prefs.country ? 'Discover ' + prefs.country : 'Discover your destination';
             this.root.querySelectorAll('[data-arrive-tab]').forEach(button => button.setAttribute('aria-selected', String(button.dataset.arriveTab === this.tab)));
             this.root.querySelector('#arrive-plus-preview-list').setAttribute('aria-labelledby', 'arrive-tab-' + this.tab);
             const datesInvalid = prefs.startDate && prefs.endDate && prefs.endDate < prefs.startDate;
             const error = this.root.querySelector('#arrive-discovery-date-error');
             error.hidden = !datesInvalid; error.textContent = datesInvalid ? 'Departure must be on or after arrival.' : '';
-            this.root.querySelector('#arrive-plus-preview-subtitle').textContent = this.tab === 'saved' ? 'Your saved choices stay here when you change the checklist or destination.' : prefs.country ? [prefs.country, prefs.city ? prefs.city + ' first' : '', prefs.startDate && prefs.endDate && !datesInvalid ? this.app.formatScheduleRangeShort(prefs.startDate, prefs.endDate) : ''].filter(Boolean).join(' · ') : 'Choose a country and check your interests to see matching listings.';
+            this.root.querySelector('#arrive-plus-preview-subtitle').textContent = this.tab === 'saved' ? 'Open a saved profile to view its details. Your choices stay here when you change the checklist or destination.' : prefs.country ? [prefs.country, prefs.city ? prefs.city + ' first' : '', prefs.startDate && prefs.endDate && !datesInvalid ? this.app.formatScheduleRangeShort(prefs.startDate, prefs.endDate) : ''].filter(Boolean).join(' · ') : 'Choose a country and check your interests to see matching listings.';
             const summary = this.root.querySelector('#arrive-plus-preview-summary');
             summary.textContent = items.length ? items.length + (items.length === 1 ? ' listing' : ' listings') : '';
             summary.classList.toggle('is-empty', !items.length);
@@ -334,7 +334,7 @@
             const list = this.root.querySelector('#arrive-plus-preview-list');
             if (!items.length) {
                 const heading = this.tab === 'saved' ? 'Keep the listings you like.' : !prefs.country ? 'Where are you heading?' : !prefs.categories.length ? 'What would you like to explore?' : 'No matching listings here yet.';
-                const detail = this.tab === 'saved' ? 'Tap Save on a listing in Discover to find it here later.' : !prefs.country ? 'Choose your destination country to get started.' : !prefs.categories.length ? 'Check a category and matching listings will appear here.' : 'Try another interest or travel window. Saved listings stay in the Saved tab.';
+                const detail = this.tab === 'saved' ? 'Tap Save to itinerary on a profile in Discover to find it here later.' : !prefs.country ? 'Choose your destination country to get started.' : !prefs.categories.length ? 'Check a category and matching listings will appear here.' : 'Try another interest or travel window. Your saved choices stay in Saved itinerary.';
                 list.innerHTML = '<div class="arrive-discovery-empty"><i class="fas fa-' + (this.tab === 'saved' ? 'bookmark' : 'compass') + '" aria-hidden="true"></i><h4>' + heading + '</h4><p>' + detail + '</p></div>';
                 return;
             }
@@ -348,7 +348,7 @@
                     '<p class="arrive-discovery-location"><i class="fas fa-location-dot" aria-hidden="true"></i> ' + escape([item.city, item.country].filter(Boolean).join(', ')) + '</p>' +
                     (item.eventDate ? '<p class="arrive-discovery-event">' + escape(this.app.formatScheduleDate(item.eventDate)) + '</p>' : '') +
                     '<p class="arrive-discovery-price">' + escape(item.unavailable ? 'Listing no longer available' : item.price) + '</p>' +
-                    '<div class="arrive-discovery-actions"><button type="button" data-arrive-save="' + escape(item.key) + '" aria-pressed="' + isSaved + '" aria-label="' + (isSaved ? 'Unsave ' : 'Save ') + escape(item.title) + '"><i class="' + (isSaved ? 'fas' : 'far') + ' fa-bookmark" aria-hidden="true"></i> ' + (isSaved ? 'Saved' : 'Save') + '</button>' +
+                    '<div class="arrive-discovery-actions"><button type="button" data-arrive-save="' + escape(item.key) + '" aria-pressed="' + isSaved + '" aria-label="' + (isSaved ? 'Remove ' : 'Save ') + escape(item.title) + (isSaved ? ' from itinerary' : ' to itinerary') + '"><i class="' + (isSaved ? 'fas' : 'far') + ' fa-bookmark" aria-hidden="true"></i> ' + (isSaved ? 'Saved ✓' : 'Save to itinerary') + '</button>' +
                     '<button type="button" data-arrive-open="' + escape(item.key) + '"' + (item.unavailable ? ' disabled' : '') + '>View listing</button></div></div></article>';
             }).join('');
         }

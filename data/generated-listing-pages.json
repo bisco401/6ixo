@@ -1,5 +1,5 @@
 {
-  "count": 4432,
+  "count": 4422,
   "listings": [
     {
       "id": "apify-b9b18084f762",
@@ -39069,76 +39069,12 @@
       "categoryKey": "real-estate"
     },
     {
-      "id": "kijiji-1744544691",
-      "slug": "1997-skyjack-sjiii3220-scissor-lift-20-ft-electric-low-spe-1744544691",
-      "url": "https://6ixo.com/listing/1997-skyjack-sjiii3220-scissor-lift-20-ft-electric-low-spe-1744544691/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/20/201935e1-6d8d-49fa-9b72-d79857c742f3?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "buy-and-sell"
-    },
-    {
-      "id": "kijiji-1744544652",
-      "slug": "2012-skyjack-sj-iii-3219-scissor-lift-19-ft-550-lb-267-hrs-1744544652",
-      "url": "https://6ixo.com/listing/2012-skyjack-sj-iii-3219-scissor-lift-19-ft-550-lb-267-hrs-1744544652/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/07/07f6737a-14ab-4d95-896c-c02b4d7e1623?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/20/200fdaf2-08e7-4844-9ebb-82d2f026de20?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/01/0198276b-68d2-48a9-a632-2bdf8696e9ba?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/c1/c1fd2f48-725e-47fe-8bd0-220938cb5ddc?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/9d/9dfe40d8-1b72-4bfc-bf40-076df11a90c2?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/6a/6ad2ab55-d03b-4323-aecc-736ff558e5fb?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "buy-and-sell"
-    },
-    {
-      "id": "kijiji-1744544541",
-      "slug": "2014-skyjack-sj3219-electric-scissor-lift-24v-2wd-low-hour-1744544541",
-      "url": "https://6ixo.com/listing/2014-skyjack-sj3219-electric-scissor-lift-24v-2wd-low-hour-1744544541/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/24/24c37909-a827-472f-a55c-dbfb80082138?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/1e/1e299308-4d88-442f-98b6-6fd63027a400?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/0f/0f5a253e-59a8-4a72-9513-20420ce626f2?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/61/61694c2d-8990-4192-9c73-d04f1dca360b?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/bb/bb563947-704f-41ff-9000-da4827169ac8?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/95/951364df-6cf8-4638-9f8a-585ff4cdb005?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "buy-and-sell"
-    },
-    {
       "id": "kijiji-1744544384",
       "slug": "2016-skyjack-sj-iii-3219-electric-scissor-lift-24v-25-ft-l-1744544384",
       "url": "https://6ixo.com/listing/2016-skyjack-sj-iii-3219-electric-scissor-lift-24v-25-ft-l-1744544384/",
       "images": [
         "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/cc/ccb71515-43a9-46b9-8987-2854b75b4a3b?rule=kijijica-1600-webp",
         "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/15/15d2232a-fe73-4d6a-a474-01a38ef086f7?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "buy-and-sell"
-    },
-    {
-      "id": "kijiji-1744544267",
-      "slug": "2017-skyjack-sj4740-electric-scissor-lift-40-ft-ndt-certif-1744544267",
-      "url": "https://6ixo.com/listing/2017-skyjack-sj4740-electric-scissor-lift-40-ft-ndt-certif-1744544267/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/45/45feb039-3a04-4d63-b9bc-97a6c1b23d4a?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/3e/3ec70e5b-ee8a-472a-b2f6-0eb7402fa06e?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/cb/cb658223-faef-4840-a318-a92591bb6d60?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/32/32f834ae-ff66-4a6f-aff8-fdf966cf70ef?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/9a/9a6ca175-28bb-4278-9547-8f2dd2af981b?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/66/66ab78a6-6c9f-4fe2-88f3-909ed50dec21?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "buy-and-sell"
-    },
-    {
-      "id": "kijiji-1744544173",
-      "slug": "2013-skyjack-sj8841-41ft-rt-scissor-lift-1700lb-ndt-certif-1744544173",
-      "url": "https://6ixo.com/listing/2013-skyjack-sj8841-41ft-rt-scissor-lift-1700lb-ndt-certif-1744544173/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/42/42ab117a-2432-4c2e-b6ee-d068f8727061?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/b5/b5492191-962f-4a62-a026-c29ee5419bae?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/b8/b813fc05-791f-4e13-aace-809c1ec65ba0?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/3f/3f9b50e2-26cf-462c-8f8a-4d2871dada6b?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/4c/4c55de3b-7fd9-4e31-b75c-74cfac9b2a30?rule=kijijica-1600-webp"
       ],
       "categoryKey": "buy-and-sell"
     },
@@ -42564,53 +42500,6 @@
       "categoryKey": "vehicles"
     },
     {
-      "id": "craigslist-nKx7Ue298RGjiIRLcx71nA",
-      "slug": "2019-dodge-challenger-financing-available-iirlcx71na",
-      "url": "https://6ixo.com/listing/2019-dodge-challenger-financing-available-iirlcx71na/",
-      "images": [
-        "https://images.craigslist.org/00T0T_nbAwWWGOn4_0jh0ew_600x450.jpg",
-        "https://images.craigslist.org/01111_iSiLQuoBfdg_0jh0ew_600x450.jpg",
-        "https://images.craigslist.org/00j0j_2g6HTZc0HYl_0gP0dr_600x450.jpg",
-        "https://images.craigslist.org/00F0F_arb2nlG1Wgr_0jh0ew_600x450.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "craigslist-0KRKHdu98RGkXe47ItAMpw",
-      "slug": "2013-hyundai-tucson-great-deal-queens-xe47itampw",
-      "url": "https://6ixo.com/listing/2013-hyundai-tucson-great-deal-queens-xe47itampw/",
-      "images": [
-        "https://images.craigslist.org/00404_9Ojoa5mEEvx_0ew0aT_600x450.jpg",
-        "https://images.craigslist.org/00U0U_5JBPM6ooBNj_0ew0aT_600x450.jpg",
-        "https://images.craigslist.org/00U0U_iC4NYb4HCa2_0ew0aT_600x450.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "craigslist-qRDYoj7zPZvsUriHGxFhkj",
-      "slug": "great-walk-in-all-utilities-included-back-yard-access-urihgxfhkj",
-      "url": "https://6ixo.com/listing/great-walk-in-all-utilities-included-back-yard-access-urihgxfhkj/",
-      "images": [
-        "https://images.craigslist.org/00P0P_gQqVzE61wUq_0t20CI_600x450.jpg",
-        "https://images.craigslist.org/00202_h1kp9HUgIO8_0t20CI_600x450.jpg",
-        "https://images.craigslist.org/00t0t_7a85SCaYnVO_0t20CI_600x450.jpg",
-        "https://images.craigslist.org/00101_dzbpA87aYAp_0t20CI_600x450.jpg"
-      ],
-      "categoryKey": "real-estate"
-    },
-    {
-      "id": "craigslist-4vJX5JB3Yz81MKGPHi7Rhu",
-      "slug": "quiet-east-flatbush-3-room-for-2-3-roommates-5-min-walk-to-mkgphi7rhu",
-      "url": "https://6ixo.com/listing/quiet-east-flatbush-3-room-for-2-3-roommates-5-min-walk-to-mkgphi7rhu/",
-      "images": [
-        "https://images.craigslist.org/00I0I_2SKU8uryrBk_0kI0ft_600x450.jpg",
-        "https://images.craigslist.org/00P0P_VYjTDjWM2q_0kI0fl_600x450.jpg",
-        "https://images.craigslist.org/00C0C_csnvIfWQ3G4_0kI0ff_600x450.jpg",
-        "https://images.craigslist.org/00h0h_kvVatyITooF_0kI0fk_600x450.jpg"
-      ],
-      "categoryKey": "real-estate"
-    },
-    {
       "id": "kijiji-1744243303",
       "slug": "51-2-3-chambres-bedrooms-louer-rent-outremont-cdn-1744243303",
       "url": "https://6ixo.com/listing/51-2-3-chambres-bedrooms-louer-rent-outremont-cdn-1744243303/",
@@ -43418,18 +43307,6 @@
         "https://images.craigslist.org/00x0x_ajFx3GMRWUu_0lM0t2_600x450.jpg",
         "https://images.craigslist.org/00q0q_d2KbcW4SkEe_0lM0t2_600x450.jpg",
         "https://images.craigslist.org/00e0e_6OSkR3tEtF6_0lM0t2_600x450.jpg"
-      ],
-      "categoryKey": "auto-parts"
-    },
-    {
-      "id": "craigslist-8Y3Zaoqyk2SH1QdwAFrFyK",
-      "slug": "mazda-6-2009-2013-hood-1qdwafrfyk",
-      "url": "https://6ixo.com/listing/mazda-6-2009-2013-hood-1qdwafrfyk/",
-      "images": [
-        "https://images.craigslist.org/00n0n_hP5R91z3JDx_0CI0lN_600x450.jpg",
-        "https://images.craigslist.org/00n0n_a5hgCINkvX6_0lN0CI_600x450.jpg",
-        "https://images.craigslist.org/01616_awGyy4XpKaO_0lN0CI_600x450.jpg",
-        "https://images.craigslist.org/00707_hrAs9hsDPcp_0lN0CI_600x450.jpg"
       ],
       "categoryKey": "auto-parts"
     },
@@ -54437,9 +54314,6 @@
       "url": "https://6ixo.com/listings/page/123/"
     },
     {
-      "url": "https://6ixo.com/listings/page/124/"
-    },
-    {
       "url": "https://6ixo.com/listings/electronics/"
     },
     {
@@ -54828,9 +54702,6 @@
     },
     {
       "url": "https://6ixo.com/listings/buy-and-sell/page/12/"
-    },
-    {
-      "url": "https://6ixo.com/listings/buy-and-sell/page/13/"
     },
     {
       "url": "https://6ixo.com/listings/country/canada/electronics/"
@@ -65837,6 +65708,56 @@
       "id": "craigslist-jJ6y5fAzMYy3GM4a9rcqHh",
       "slug": "2013-2020-ford-fusion-hood-oem-gm4a9rcqhh",
       "url": "https://6ixo.com/listing/2013-2020-ford-fusion-hood-oem-gm4a9rcqhh/"
+    },
+    {
+      "id": "kijiji-1744544691",
+      "slug": "1997-skyjack-sjiii3220-scissor-lift-20-ft-electric-low-spe-1744544691",
+      "url": "https://6ixo.com/listing/1997-skyjack-sjiii3220-scissor-lift-20-ft-electric-low-spe-1744544691/"
+    },
+    {
+      "id": "kijiji-1744544652",
+      "slug": "2012-skyjack-sj-iii-3219-scissor-lift-19-ft-550-lb-267-hrs-1744544652",
+      "url": "https://6ixo.com/listing/2012-skyjack-sj-iii-3219-scissor-lift-19-ft-550-lb-267-hrs-1744544652/"
+    },
+    {
+      "id": "kijiji-1744544541",
+      "slug": "2014-skyjack-sj3219-electric-scissor-lift-24v-2wd-low-hour-1744544541",
+      "url": "https://6ixo.com/listing/2014-skyjack-sj3219-electric-scissor-lift-24v-2wd-low-hour-1744544541/"
+    },
+    {
+      "id": "kijiji-1744544267",
+      "slug": "2017-skyjack-sj4740-electric-scissor-lift-40-ft-ndt-certif-1744544267",
+      "url": "https://6ixo.com/listing/2017-skyjack-sj4740-electric-scissor-lift-40-ft-ndt-certif-1744544267/"
+    },
+    {
+      "id": "kijiji-1744544173",
+      "slug": "2013-skyjack-sj8841-41ft-rt-scissor-lift-1700lb-ndt-certif-1744544173",
+      "url": "https://6ixo.com/listing/2013-skyjack-sj8841-41ft-rt-scissor-lift-1700lb-ndt-certif-1744544173/"
+    },
+    {
+      "id": "craigslist-nKx7Ue298RGjiIRLcx71nA",
+      "slug": "2019-dodge-challenger-financing-available-iirlcx71na",
+      "url": "https://6ixo.com/listing/2019-dodge-challenger-financing-available-iirlcx71na/"
+    },
+    {
+      "id": "craigslist-0KRKHdu98RGkXe47ItAMpw",
+      "slug": "2013-hyundai-tucson-great-deal-queens-xe47itampw",
+      "url": "https://6ixo.com/listing/2013-hyundai-tucson-great-deal-queens-xe47itampw/"
+    },
+    {
+      "id": "craigslist-qRDYoj7zPZvsUriHGxFhkj",
+      "slug": "great-walk-in-all-utilities-included-back-yard-access-urihgxfhkj",
+      "url": "https://6ixo.com/listing/great-walk-in-all-utilities-included-back-yard-access-urihgxfhkj/"
+    },
+    {
+      "id": "craigslist-4vJX5JB3Yz81MKGPHi7Rhu",
+      "slug": "quiet-east-flatbush-3-room-for-2-3-roommates-5-min-walk-to-mkgphi7rhu",
+      "url": "https://6ixo.com/listing/quiet-east-flatbush-3-room-for-2-3-roommates-5-min-walk-to-mkgphi7rhu/"
+    },
+    {
+      "id": "craigslist-8Y3Zaoqyk2SH1QdwAFrFyK",
+      "slug": "mazda-6-2009-2013-hood-1qdwafrfyk",
+      "url": "https://6ixo.com/listing/mazda-6-2009-2013-hood-1qdwafrfyk/"
     }
   ]
 }

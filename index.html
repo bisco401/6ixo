@@ -11,7 +11,7 @@
     <meta http-equiv="Expires" content="0">
     <script>
         (function forceFreshMobileBuild() {
-                var BUILD = '20261101203754';
+                var BUILD = '20261102043322';
             var KEY = 'sixo_head_build_version';
             var CHECK_KEY = 'sixo_head_build_last_check';
             var RELOAD_KEY = 'sixo_head_build_reload_target';
@@ -331,6 +331,7 @@
     <link rel="stylesheet" href="assets/unified-profile-cards.cf702864a440.css">
 <link rel="stylesheet" href="/assets/seo-navigation.css?v=20261010">
     <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png?v=202603040620">
+    <link rel="stylesheet" href="assets/home-tight-layout.css?v=20261102-1">
 </head>
 <body>
     <!-- Loading Screen -->
@@ -598,7 +599,7 @@
         </section>
 
         <!-- Home (Main App) Screen -->
-	            <div id="home-content" class="content-screen active clean-category-screen">
+	            <div id="home-content" class="content-screen active clean-category-screen home-tight-layout">
 	                <!-- Top Navigation Bar -->
 	                <div class="home-topbar">
                     <div class="home-topbar-left">
@@ -613,10 +614,6 @@
                         </div>
                     </div>
                     <div class="home-topbar-right">
-                    <div class="home-auth">
-                        <button id="home-login" class="btn-primary small" type="button">Log in</button>
-                        <button id="home-signup-btn" class="btn-primary small" type="button">Sign up</button>
-                    </div>
                     <button id="home-post-ad" class="btn-primary small"><i class="fas fa-plus" aria-hidden="true"></i><span>Post an ad</span></button>
                     <div id="notification-center-wrap" class="notification-center-wrap" aria-label="Notification center">
                         <button id="notification-bell" class="notification-bell" type="button" aria-label="Notifications">
@@ -633,60 +630,6 @@
                     </div>
 	                </div>
 	            </div>
-
-	            <section class="home-brand-artwork" aria-label="6ixo worldwide marketplace">
-	                <img loading="eager" src="assets/home/6ixo-marketplace-hero-concept.png?v=20260831" alt="6ixo — One Marketplace. Connecting the World." decoding="async" fetchpriority="high">
-	            </section>
-
-	            <!-- Main Search Section -->
-	            <section class="home-search" aria-label="Search listings">
-                <div class="home-hero-copy">
-                    <h1>6ixo worldwide marketplace</h1>
-                    <p>Find cars for sale, apartments for rent, phones, local events and services on 6ixo.com. Browse worldwide or post an ad for free.</p>
-                </div>
-	                <div class="home-search-row">
-	                    <div class="home-search-field home-search-query-field">
-	                        <label for="home-search-what">What are you looking for?</label>
-	                        <i class="fas fa-search home-search-field-icon" aria-hidden="true"></i>
-	                        <input type="text" id="home-search-what" placeholder="e.g., iPhone 13, bicycle, couch" autocomplete="off">
-	                        <div id="home-smart-suggestions" class="home-smart-suggestions hidden" role="listbox" aria-label="Search suggestions"></div>
-	                    </div>
-	                    <div class="home-search-field">
-	                        <label for="home-search-location">City, country</label>
-	                        <button type="button" id="home-use-location" class="home-search-field-icon" aria-label="Use my location" title="Use my location">
-                                <i class="fas fa-map-marker-alt" aria-hidden="true"></i>
-                            </button>
-	                        <input type="text" id="home-search-location" placeholder="City, Country" autocomplete="off" spellcheck="false" role="combobox" aria-autocomplete="list" aria-haspopup="listbox" aria-controls="area-picker-countries" aria-expanded="false" aria-describedby="area-picker-status home-device-location-status">
-                            <span class="area-picker-chevron" aria-hidden="true">⌄</span>
-                            <div id="area-picker" hidden>
-                                <p id="area-picker-status" role="status"></p>
-                                <div id="area-picker-countries" role="listbox" aria-label="Cities and countries"></div>
-                                <button type="button" id="area-picker-retry" hidden>Try again</button>
-                            </div>
-	                    </div>
-                    <div class="home-search-field">
-                        <label for="home-search-category">Category</label>
-                            <i class="fas fa-th-large home-search-field-icon" aria-hidden="true"></i>
-                            <select id="home-search-category" class="home-select">
-                                <option value="">All Categories</option>
-                                <option value="electronics">Electronics</option>
-                                <option value="clothing">Fashion & Accessories</option>
-                                <option value="real_estate">Real Estate</option>
-                                <option value="jobs">Jobs</option>
-                                <option value="services">Services</option>
-                                <option value="buy_sell">Buy n Sell</option>
-                                <option value="vehicles">Vehicles</option>
-                                <option value="arrive_plus">Arrive+</option>
-                                <option value="community">Community</option>
-                                <option value="other">Other</option>
-                            </select>
-                        </div>
-	                <div class="home-search-actions">
-	                    <button id="home-search-btn" class="btn-primary" type="button"><span>Search</span><i class="fas fa-arrow-right" aria-hidden="true"></i></button>
-	                </div>
-                </div>
-                <small id="home-device-location-status" role="status" aria-live="polite">Finding your device location…</small>
-	            </section>
 
                 <!-- Category Navigation -->
                 <nav id="home-category-nav" class="home-category-nav" aria-label="Browse categories">
@@ -745,6 +688,64 @@
                     <button class="home-other-subcategory-chip clean-category-item" type="button" data-home-other-subcategory="miscellaneous" aria-pressed="false"><span class="clean-category-label">Miscellaneous</span><i class="fas fa-chevron-right clean-category-chevron" aria-hidden="true"></i></button>
                     <button class="home-other-subcategory-chip clean-category-item" type="button" data-home-other-screen="dating"><span class="clean-category-label"><i class="fas fa-heart" aria-hidden="true"></i> Dating · Coming soon</span><i class="fas fa-chevron-right clean-category-chevron" aria-hidden="true"></i></button>
                 </nav>
+
+	            <!-- Main Search Section -->
+	            <section class="home-search" aria-label="Search listings">
+                <div class="home-hero-copy">
+                    <h1>6ixo worldwide marketplace</h1>
+                    <p>Find cars for sale, apartments for rent, phones, local events and services on 6ixo.com. Browse worldwide or post an ad for free.</p>
+                </div>
+	                <div class="home-search-row">
+	                    <div class="home-search-field home-search-query-field">
+	                        <label for="home-search-what">What are you looking for?</label>
+	                        <i class="fas fa-search home-search-field-icon" aria-hidden="true"></i>
+	                        <input type="text" id="home-search-what" placeholder="e.g., iPhone 13, bicycle, couch" autocomplete="off">
+	                        <div id="home-smart-suggestions" class="home-smart-suggestions hidden" role="listbox" aria-label="Search suggestions"></div>
+	                    </div>
+	                    <div class="home-search-field">
+	                        <label for="home-search-location">City, country</label>
+	                        <button type="button" id="home-use-location" class="home-search-field-icon" aria-label="Use my location" title="Use my location">
+                                <i class="fas fa-map-marker-alt" aria-hidden="true"></i>
+                            </button>
+	                        <input type="text" id="home-search-location" placeholder="City, Country" autocomplete="off" spellcheck="false" role="combobox" aria-autocomplete="list" aria-haspopup="listbox" aria-controls="area-picker-countries" aria-expanded="false" aria-describedby="area-picker-status home-device-location-status">
+                            <span class="area-picker-chevron" aria-hidden="true">⌄</span>
+                            <div id="area-picker" hidden>
+                                <p id="area-picker-status" role="status"></p>
+                                <div id="area-picker-countries" role="listbox" aria-label="Cities and countries"></div>
+                                <button type="button" id="area-picker-retry" hidden>Try again</button>
+                            </div>
+	                    </div>
+                    <div class="home-search-field">
+                        <label for="home-search-category">Category</label>
+                            <i class="fas fa-th-large home-search-field-icon" aria-hidden="true"></i>
+                            <select id="home-search-category" class="home-select">
+                                <option value="">All Categories</option>
+                                <option value="electronics">Electronics</option>
+                                <option value="clothing">Fashion & Accessories</option>
+                                <option value="real_estate">Real Estate</option>
+                                <option value="jobs">Jobs</option>
+                                <option value="services">Services</option>
+                                <option value="buy_sell">Buy n Sell</option>
+                                <option value="vehicles">Vehicles</option>
+                                <option value="arrive_plus">Arrive+</option>
+                                <option value="community">Community</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+	                <div class="home-search-actions">
+	                    <button id="home-search-btn" class="btn-primary" type="button"><span>Search</span><i class="fas fa-arrow-right" aria-hidden="true"></i></button>
+	                </div>
+                </div>
+                <small id="home-device-location-status" role="status" aria-live="polite">Finding your device location…</small>
+	            </section>
+
+	            <section class="home-brand-artwork" aria-label="6ixo worldwide marketplace">
+                    <div class="home-banner-caption">
+                        <strong>One Marketplace.</strong>
+                        <span>Connecting the World.</span>
+                    </div>
+	                <img loading="eager" src="assets/home/6ixo-marketplace-hero-concept.png?v=20260831" alt="6ixo — One Marketplace. Connecting the World." decoding="async" fetchpriority="high">
+	            </section>
 
 	            <!-- Featured Ads Strip -->
 	            <section id="home-featured-ads-strip" class="home-featured-ads" aria-label="Featured ads">
@@ -4675,6 +4676,10 @@
                     <i class="fas fa-cog"></i>
                 </button>
             </header>
+            <div class="home-auth profile-auth" role="group" aria-label="Account access">
+                <button id="home-login" class="btn-primary small" type="button" onclick="window.app?.handleTopbarAuthAction ? window.app.handleTopbarAuthAction('global') : window.app?.showLoginScreen('global')">Log in</button>
+                <button id="home-signup-btn" class="btn-primary small" type="button" onclick="window.app?.showSignupScreen()">Sign up</button>
+            </div>
             <div class="profile-container">
                 <div class="profile-photo" id="profile-photo-wrap">
                     <img decoding="async" loading="lazy" src="" alt="Your photo" id="profile-photo">

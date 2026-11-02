@@ -1,5 +1,5 @@
 {
-  "checkedAt": "2026-11-02T18:24:50Z",
+  "checkedAt": "2026-11-02T18:43:00.806Z",
   "listings": {
     "craigslist.org/view/d/bastrop-used-2025-cadillac-xt4-fwd-4d/fuqr_3uo8rgowpq1ctwx-a": {
       "availability": "sold",
@@ -16930,19 +16930,31 @@
       "reason": "Kijiji redirected the exact ad to a confirmed removal"
     },
     "kijiji.ca/v-buy-sell-other/city-of-toronto/medsup-21-white-polypropylene-bouffant-cap-1000pcs/1745630476": {
-      "availability": "unavailable",
-      "checkedAt": "2026-11-02T18:24:50Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1745630476",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/medsup-21-white-polypropylene-bouffant-cap-1000pcs/1745630476",
+      "availability": "gone",
+      "checkedAt": "2026-11-02T18:43:00.806Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1745630476",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-buy-sell-other/city-of-toronto/sage-manufacturing-wall-shelf-12-x-48-stainless-steel-18-gauge/1745630474": {
-      "availability": "unavailable",
-      "checkedAt": "2026-11-02T18:24:50Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1745630474",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/sage-manufacturing-wall-shelf-12-x-48-stainless-steel-18-gauge/1745630474",
+      "availability": "gone",
+      "checkedAt": "2026-11-02T18:43:00.806Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1745630474",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-buy-sell-other/city-of-toronto/sagetra-commercial-tomato-slicer/1745630462": {
-      "availability": "unavailable",
-      "checkedAt": "2026-11-02T18:24:50Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1745630462",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/sagetra-commercial-tomato-slicer/1745630462",
+      "availability": "gone",
+      "checkedAt": "2026-11-02T18:43:00.806Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1745630462",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-pet-services/mississauga-peel-region/bird-sitting-in-mississauga/1745630461": {
       "availability": "unavailable",
@@ -16950,19 +16962,31 @@
       "reason": "Kijiji redirected the exact ad to a confirmed removal"
     },
     "kijiji.ca/v-buy-sell-other/city-of-toronto/panasonic-30-in-built-in-induction-cooktop-ky-b84ax/1745630445": {
-      "availability": "unavailable",
-      "checkedAt": "2026-11-02T18:24:50Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1745630445",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/panasonic-30-in-built-in-induction-cooktop-ky-b84ax/1745630445",
+      "availability": "gone",
+      "checkedAt": "2026-11-02T18:43:00.806Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1745630445",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-buy-sell-other/city-of-toronto/sagetra-professional-french-fry-cutter/1745630423": {
-      "availability": "unavailable",
-      "checkedAt": "2026-11-02T12:28:32Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1745630423",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/sagetra-professional-french-fry-cutter/1745630423",
+      "availability": "gone",
+      "checkedAt": "2026-11-02T18:43:00.806Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1745630423",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-buy-sell-other/city-of-toronto/omcan-two-bulb-commercial-portable-heat-lamp-display-warmer/1745630444": {
-      "availability": "unavailable",
-      "checkedAt": "2026-11-02T18:24:50Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1745630444",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/omcan-two-bulb-commercial-portable-heat-lamp-display-warmer/1745630444",
+      "availability": "gone",
+      "checkedAt": "2026-11-02T18:43:00.806Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1745630444",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "craigslist.org/view/d/lubbock-2023-ford-150-xlt-4wd-supercrew/6oi_xim-8rg30u-4fboqea": {
       "availability": "gone",
@@ -17165,14 +17189,22 @@
       "reason": "Exact source URL returned HTTP 410"
     },
     "kijiji.ca/v-buy-sell-other/city-of-toronto/bosch-800-series-built-in-coffee-machine-bcm8450uc-stainless-ste/1745634739": {
-      "availability": "unavailable",
-      "checkedAt": "2026-11-02T18:24:50Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1745634739",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/bosch-800-series-built-in-coffee-machine-bcm8450uc-stainless-ste/1745634739",
+      "availability": "gone",
+      "checkedAt": "2026-11-02T18:43:00.806Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1745634739",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-buy-sell-other/city-of-toronto/wall-shelf-18-gauge-430-stainless-steel-12-x-60-saws1260/1745634683": {
-      "availability": "unavailable",
-      "checkedAt": "2026-11-02T18:24:50Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1745634683",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/wall-shelf-18-gauge-430-stainless-steel-12-x-60-saws1260/1745634683",
+      "availability": "gone",
+      "checkedAt": "2026-11-02T18:43:00.806Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1745634683",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "turnpikemotorsflorida.com/details/used-2000-dodge-grand-caravan/129895352": {
       "availability": "gone",
@@ -17243,6 +17275,24 @@
       "availability": "unavailable",
       "checkedAt": "2026-11-02T18:24:50Z",
       "reason": "Kijiji redirected the exact ad to a confirmed removal"
+    },
+    "craigslist.org/view/d/brooklyn-bed-bath-bushwick-brooklyn-mo/147dvqg9fggyup8mvmfrev": {
+      "id": "craigslist-147dvqG9fGgyUp8MvmfREv",
+      "sourceUrl": "https://www.craigslist.org/view/d/brooklyn-bed-bath-bushwick-brooklyn-mo/147dvqG9fGgyUp8MvmfREv",
+      "availability": "gone",
+      "checkedAt": "2026-11-02T18:43:00.806Z",
+      "httpStatus": 410,
+      "resolvedUrl": "https://www.craigslist.org/view/d/brooklyn-bed-bath-bushwick-brooklyn-mo/147dvqG9fGgyUp8MvmfREv",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "craigslist.org/view/d/brooklyn-bed-bath-ridgewood-bushwick/kmthgb5iwz8ljqgn58rpr3": {
+      "id": "craigslist-kmTHgb5iWz8LJQgN58rpR3",
+      "sourceUrl": "https://www.craigslist.org/view/d/brooklyn-bed-bath-ridgewood-bushwick/kmTHgb5iWz8LJQgN58rpR3",
+      "availability": "gone",
+      "checkedAt": "2026-11-02T18:43:00.806Z",
+      "httpStatus": 410,
+      "resolvedUrl": "https://www.craigslist.org/view/d/brooklyn-bed-bath-ridgewood-bushwick/kmTHgb5iWz8LJQgN58rpR3",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     }
   }
 }

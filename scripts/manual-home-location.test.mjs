@@ -17,6 +17,7 @@ class Element {
     removeAttribute(name) { delete this.attributes[name]; }
     replaceChildren() { this.children = []; }
     append(...children) { this.children.push(...children); }
+    appendChild(child) { this.children.push(child); }
     scrollIntoView() {}
     contains() { return false; }
     focus() {}
@@ -131,3 +132,34 @@ const floridaScope = state.app.getDeviceListingLocationScope();
 assert.ok(state.app.matchesListingLocationScope({ city: 'Pompano Beach', region: 'Florida', country: 'United States' }, floridaScope));
 assert.equal(state.app.matchesListingLocationScope({ city: 'Houston', region: 'Texas', country: 'United States' }, floridaScope), false);
 console.log('Manual state search passed: Florida selection preserves its region without inventing a city or requesting GPS.');
+
+// Slow listing loads must not lock the keyboard or overwrite a newer edit.
+const loading = fixture();
+let finishListings;
+loading.app.refreshDeviceLocationFeeds = () => new Promise(resolve => { finishListings = resolve; });
+loading.field.value = 'Toronto';
+const pendingSelection = loading.app.resolveHomeLocationAutocomplete();
+await new Promise(setImmediate);
+assert.equal(Boolean(loading.field.readOnly), false, 'City field remains editable during a listing refresh');
+loading.field.value = 'New York, United States ';
+loading.field.events.input();
+finishListings();
+assert.equal(await pendingSelection, false, 'An older selection must not submit or scroll over a newer edit');
+assert.equal(loading.field.value, 'New York, United States ');
+assert.ok(loading.app.homeLocationDraft);
+assert.equal(loading.elements['area-picker'].hidden, false);
+
+const composition = fixture();
+let lookupCount = 0;
+composition.window.SIXO_LOCATION_AUTOCOMPLETE.search = async () => { lookupCount++; return []; };
+composition.field.events.compositionstart();
+composition.field.value = 'New ';
+composition.field.events.input({ isComposing: true });
+await new Promise(resolve => setTimeout(resolve, 180));
+assert.equal(lookupCount, 0, 'Mobile/IME composition must finish before suggestions update');
+assert.equal(await composition.app.resolveHomeLocationAutocomplete(), false);
+composition.field.events.compositionend();
+await new Promise(resolve => setTimeout(resolve, 180));
+assert.equal(lookupCount, 1);
+assert.equal(composition.field.value, 'New ');
+console.log('Manual typing passed: pending listing loads preserve newer edits and composition defers autocomplete.');

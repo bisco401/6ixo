@@ -12,13 +12,29 @@
         // must not search the marketplace for each unfinished prefix.
         field.dataset.boundInput = '1'; field.dataset.boundEnter = '1';
         let matches = [], active = -1, generation = 0, timer, restoringFocus = false;
-        let baseline, baselineValue = '', baselineAuto, applying = null, scrollPending = false, submitting = null;
+        let baseline, baselineValue = '', baselineAuto, applying = null, submitting = null, composing = false;
         const search = query => window.SIXO_LOCATION_AUTOCOMPLETE.search(query, {
             regions: Array.from(new Set(app.getRegionAliasMap?.().values() || []))
         });
         const remember = () => {
             baseline = app.getHomeSearchLocationSelection();
             baselineValue = field.value; baselineAuto = field.dataset.autoLocationDefault;
+        };
+        const position = () => {
+            if (panel.hidden || !field.getBoundingClientRect) return;
+            const rect = field.getBoundingClientRect(), viewport = window.visualViewport;
+            const top = viewport?.offsetTop || 0;
+            let bottom = top + (viewport?.height || window.innerHeight);
+            const nav = document.querySelector('.bottom-nav')?.getBoundingClientRect();
+            if (nav?.height && nav.top > rect.bottom) bottom = Math.min(bottom, nav.top);
+            const below = bottom - rect.bottom - 12;
+            const above = rect.top - top - 12;
+            const useAbove = below < 180 && above > below;
+            const height = Math.max(80, Math.min(420, useAbove ? above : below));
+            panel.style.top = useAbove ? 'auto' : 'calc(100% + 8px)';
+            panel.style.bottom = useAbove ? 'calc(100% + 8px)' : 'auto';
+            panel.style.maxHeight = `${height}px`;
+            list.style.maxHeight = `${Math.max(40, height - 64)}px`;
         };
         const close = ({ cancel = false, focus = false } = {}) => {
             ++generation; clearTimeout(timer);
@@ -38,8 +54,9 @@
         const show = () => {
             if (panel.hidden) {
                 if (!app.homeLocationDraft) remember();
-                panel.hidden = false; field.setAttribute('aria-expanded', 'true'); scrollPending = true;
+                panel.hidden = false; field.setAttribute('aria-expanded', 'true');
             }
+            position();
         };
         const setActive = index => {
             active = index;
@@ -47,33 +64,47 @@
             const option = list.children[index];
             if (option) {
                 field.setAttribute('aria-activedescendant', option.id);
-                option.scrollIntoView({ block: 'nearest' });
+                const top = option.offsetTop - list.offsetTop;
+                if (top < list.scrollTop) list.scrollTop = top;
+                else if (top + option.offsetHeight > list.scrollTop + list.clientHeight) {
+                    list.scrollTop = top + option.offsetHeight - list.clientHeight;
+                }
             }
         };
         const choose = result => {
-            if (applying) return applying;
-            ++generation; clearTimeout(timer);
+            if (applying) {
+                const pending = generation;
+                return applying.then(() => pending === generation ? choose(result) : false);
+            }
+            const token = ++generation; clearTimeout(timer);
             app.homeLocationDraft = null;
             field.value = result.label; field.dataset.autoLocationDefault = '1';
-            field.readOnly = true; field.setAttribute('aria-busy', 'true');
+            field.setAttribute('aria-busy', 'true');
             status.textContent = 'Loading listings…'; retry.hidden = true;
             applying = (async () => {
                 try {
-                    await app.applyManualDiscoveryLocation({ city: result.city, country: result.country,
+                    const loading = app.applyManualDiscoveryLocation({ city: result.city, country: result.country,
                         region: result.type === 'region' ? result.region : '' });
+                    // The confirmed selection is available synchronously. Keep the
+                    // field editable while its listings load in the background.
+                    remember();
+                    await loading;
+                    if (token !== generation || app.homeLocationDraft) return false;
                     remember(); close({ focus: document.activeElement === field || panel.contains(document.activeElement) });
                     return true;
                 } catch {
-                    if (!panel.hidden) { status.textContent = 'Listings could not load. Please try again.'; retry.hidden = false; }
+                    if (token === generation && !panel.hidden) { status.textContent = 'Listings could not load. Please try again.'; retry.hidden = false; }
                     return false;
                 } finally {
-                    field.readOnly = false; field.removeAttribute('aria-busy'); applying = null;
+                    field.removeAttribute('aria-busy'); applying = null;
                 }
             })();
             return applying;
         };
         const render = (results, query) => {
+            const token = generation;
             matches = results; active = -1; list.replaceChildren();
+            list.setAttribute('aria-busy', 'false');
             field.removeAttribute('aria-activedescendant');
             results.forEach((result, index) => {
                 const option = document.createElement('button');
@@ -82,11 +113,10 @@
                 const title = document.createElement('span'); title.textContent = result.label;
                 const detail = document.createElement('small'); detail.textContent = result.type === 'country' ? 'Country' : result.type === 'region' ? 'State / Province' : result.region;
                 option.append(title, detail);
-                option.addEventListener('mousedown', event => event.preventDefault());
-                option.addEventListener('click', () => void choose(result));
+                option.addEventListener('pointerdown', event => event.preventDefault());
+                option.addEventListener('click', () => { if (token === generation) void choose(result); });
                 list.appendChild(option);
             });
-            if (scrollPending) { panel.scrollIntoView({ block: 'nearest' }); scrollPending = false; }
             status.textContent = results.length ? (query ? 'Select a location' : 'Type a city or select a country')
                 : (Array.from(query.trim()).length < 2 ? 'Type at least 2 letters for city suggestions.' : 'No matching locations. Try more letters or add a country.');
         };
@@ -97,23 +127,28 @@
                 render(results, query); retry.hidden = true;
             } catch {
                 if (token !== generation || panel.hidden) return;
+                list.replaceChildren(); list.setAttribute('aria-busy', 'false');
                 status.textContent = 'Location suggestions could not load. Please try again.'; retry.hidden = false;
             }
         };
         const request = (query, delay = 0) => {
             const token = ++generation;
-            clearTimeout(timer); show(); matches = []; active = -1; list.replaceChildren();
+            clearTimeout(timer); show(); matches = []; active = -1;
+            // Retain the menu's height until replacement results are ready.
+            // Stale options cannot be selected while another query is pending.
+            list.setAttribute('aria-busy', 'true');
             field.removeAttribute('aria-activedescendant'); retry.hidden = true;
             status.textContent = 'Finding locations…';
             if (delay) timer = setTimeout(() => void refresh(query, token), delay);
             else void refresh(query, token);
         };
         const open = () => {
-            if (restoringFocus || !panel.hidden || applying) return;
+            if (restoringFocus || !panel.hidden) return;
             request(app.homeLocationDraft ? field.value : '');
         };
         app.resolveHomeLocationAutocomplete = async () => {
-            if (applying) return applying;
+            if (composing) return false;
+            if (applying) await applying;
             const query = field.value;
             const confirmed = app.getCurrentLocationDisplayText?.() || '';
             if (!app.homeLocationDraft && (!query.trim()
@@ -140,13 +175,24 @@
         };
         field.addEventListener('focus', open);
         field.addEventListener('click', open);
-        field.addEventListener('input', () => {
+        const edit = () => {
             if (!baseline) remember();
             if (!app.homeLocationDraft) app.homeLocationDraft = { ...baseline };
-            request(field.value, 160);
+        };
+        field.addEventListener('compositionstart', () => {
+            composing = true; edit(); ++generation; clearTimeout(timer);
+            matches = []; active = -1; field.removeAttribute('aria-activedescendant');
+            list.setAttribute('aria-busy', 'true');
+        });
+        field.addEventListener('compositionend', () => {
+            composing = false; edit(); request(field.value, 160);
+        });
+        field.addEventListener('input', event => {
+            edit();
+            if (!composing && !event?.isComposing) request(field.value, 160);
         });
         field.addEventListener('keydown', event => {
-            if (event.isComposing) return;
+            if (composing || event.isComposing || event.keyCode === 229) return;
             if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
                 event.preventDefault(); open();
                 if (matches.length) setActive(event.key === 'ArrowDown' ? (active + 1) % matches.length : (active <= 0 ? matches.length - 1 : active - 1));
@@ -159,7 +205,7 @@
             }
         });
         document.addEventListener('pointerdown', event => {
-            if (panel.hidden || panel.contains(event.target) || event.target === field) return;
+            if ((panel.hidden && !app.homeLocationDraft) || panel.contains(event.target) || event.target === field) return;
             close({ cancel: !event.target.closest('#home-search-btn') });
         });
         field.addEventListener('blur', event => {
@@ -167,8 +213,14 @@
             // An explicit search already owns this draft until lookup finishes.
             if (submitting !== null || applying) return;
             if (panel.hidden || panel.contains(event.relatedTarget)) return;
-            close({ cancel: event.relatedTarget?.id !== 'home-search-btn' });
+            // Mobile keyboards can blur without a navigation action. Preserve
+            // the draft; Escape and an explicit outside tap still cancel it.
+            close();
         });
         retry.addEventListener('click', () => request(field.value));
+        window.addEventListener?.('resize', position);
+        window.addEventListener?.('scroll', position, true);
+        window.visualViewport?.addEventListener('resize', position);
+        window.visualViewport?.addEventListener('scroll', position);
     } };
 })();

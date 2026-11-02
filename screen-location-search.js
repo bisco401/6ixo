@@ -73,7 +73,7 @@
         list.setAttribute('aria-label', 'Cities and countries');
         popup.append(status, list);
         document.body.append(popup);
-        let active = null, draft = null, results = [], selected = -1, request = 0;
+        let active = null, draft = null, results = [], selected = -1, request = 0, timer;
         const controls = new Map();
 
         function position() {
@@ -90,7 +90,7 @@
             popup.style.top = `${useAbove ? rect.top - Math.min(popup.scrollHeight, above, 340) - 6 : rect.bottom + 6}px`;
         }
         function close() {
-            request++;
+            request++; clearTimeout(timer);
             if (active) {
                 active.input.setAttribute('aria-expanded', 'false');
                 active.input.removeAttribute('aria-activedescendant');
@@ -176,25 +176,38 @@
             const option = list.children[index];
             if (option && active) {
                 active.input.setAttribute('aria-activedescendant', option.id);
-                option.scrollIntoView({ block: 'nearest' });
+                const top = option.offsetTop;
+                if (top < popup.scrollTop) popup.scrollTop = top;
+                else if (top + option.offsetHeight > popup.scrollTop + popup.clientHeight) {
+                    popup.scrollTop = top + option.offsetHeight - popup.clientHeight;
+                }
             }
         }
-        async function show(control) {
+        function show(control, delay = 0) {
             if (draft && draft !== control && draft.group !== control.group) cancelDraft();
+            if (active !== control) list.replaceChildren();
             if (active && active !== control) active.input.setAttribute('aria-expanded', 'false');
             active = control;
             const ticket = ++request;
-            results = []; selected = -1; list.replaceChildren();
+            clearTimeout(timer);
+            results = []; selected = -1;
+            control.input.removeAttribute('aria-activedescendant');
+            list.setAttribute('aria-busy', 'true');
             status.textContent = 'Loading cities and countries…';
             popup.hidden = false;
             if (typeof popup.showPopover === 'function' && !popup.matches(':popover-open')) popup.showPopover();
             control.input.setAttribute('aria-expanded', 'true');
             position();
+            if (delay) timer = setTimeout(() => void refresh(control, ticket), delay);
+            else void refresh(control, ticket);
+        }
+        async function refresh(control, ticket) {
             try {
                 const query = control.input.value;
                 const matches = await search(control, query);
                 if (ticket !== request || active !== control || control.input.value !== query) return;
                 results = matches;
+                list.replaceChildren(); list.setAttribute('aria-busy', 'false');
                 status.textContent = matches.length ? 'Choose a city or country' : 'No matches. Try a city or country name.';
                 for (const [index, result] of matches.entries()) {
                     const option = document.createElement('button');
@@ -208,12 +221,16 @@
                     detail.textContent = result.type === 'country' ? 'Country · all cities' : result.region;
                     option.append(label, detail);
                     option.addEventListener('pointerdown', event => event.preventDefault());
-                    option.addEventListener('click', () => choose(control, result));
+                    option.addEventListener('click', () => { if (ticket === request) choose(control, result); });
                     list.append(option);
                 }
                 position();
             } catch {
-                if (ticket === request) status.textContent = 'Suggestions could not load. Type again to retry.';
+                if (ticket === request) {
+                    list.replaceChildren(); list.setAttribute('aria-busy', 'false');
+                    status.textContent = 'Suggestions could not load. Type again to retry.';
+                    position();
+                }
             }
         }
         function enhance(group, source, field) {
@@ -235,7 +252,7 @@
             source.setAttribute('aria-hidden', 'true');
             source.insertAdjacentElement('afterend', input);
             for (const label of Array.from(source.labels || [])) label.htmlFor = input.id;
-            const control = { source, input, group, field, dirty: false };
+            const control = { source, input, group, field, dirty: false, composing: false };
             controls.set(source.id, control); group.controls.push(control);
             const descriptor = Object.getOwnPropertyDescriptor(source.tagName === 'SELECT' ? HTMLSelectElement.prototype : HTMLInputElement.prototype, 'value');
             Object.defineProperty(source, 'value', {
@@ -249,16 +266,28 @@
             sync(control);
             input.addEventListener('focus', () => show(control));
             input.addEventListener('click', () => { if (active !== control) show(control); });
-            input.addEventListener('input', event => {
-                event.stopImmediatePropagation();
+            const edit = () => {
                 control.dirty = true; draft = control; group.revision++;
                 input.removeAttribute('aria-invalid');
-                if (!input.value.trim()) { choose(control, null); show(control); }
-                else show(control);
+            };
+            input.addEventListener('compositionstart', () => {
+                control.composing = true; edit(); request++; clearTimeout(timer);
+                results = []; selected = -1; input.removeAttribute('aria-activedescendant');
+                list.setAttribute('aria-busy', 'true');
+            });
+            input.addEventListener('compositionend', () => {
+                control.composing = false; edit(); show(control, 160);
+            });
+            input.addEventListener('input', event => {
+                event.stopImmediatePropagation();
+                edit();
+                // Clearing or replacing text is still an edit, not a committed
+                // filter change. Preserve spaces and wait for a complete query.
+                if (!control.composing && !event.isComposing) show(control, 160);
             }, true);
             input.addEventListener('change', event => event.stopImmediatePropagation(), true);
             input.addEventListener('keydown', event => {
-                if (event.isComposing) return;
+                if (control.composing || event.isComposing || event.keyCode === 229) return;
                 if (!['ArrowDown', 'ArrowUp', 'Enter', 'Escape'].includes(event.key)) return;
                 event.stopImmediatePropagation(); event.preventDefault();
                 if (event.key === 'Escape') {

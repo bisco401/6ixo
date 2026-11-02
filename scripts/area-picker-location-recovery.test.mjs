@@ -23,7 +23,8 @@ const app = {
     }
 };
 const window = { SIXO_LOCATION_AUTOCOMPLETE: { search: async () => [] } };
-const document = { getElementById: id => elements[id], addEventListener() {} };
+const documentEvents = {};
+const document = { getElementById: id => elements[id], addEventListener(name, handler) { documentEvents[name] = handler; } };
 vm.runInNewContext(readFileSync(new URL('../area-picker.js', import.meta.url), 'utf8'), { window, document, setTimeout, clearTimeout });
 window.SIXO_AREA_PICKER.setup(app);
 field.events.focus();
@@ -31,6 +32,9 @@ field.value = 'Atla';
 field.events.input();
 assert.ok(app.homeLocationDraft);
 field.events.blur({ relatedTarget: null });
+assert.equal(field.value, 'Atla', 'Keyboard blur must preserve an unfinished draft');
+assert.ok(app.homeLocationDraft);
+documentEvents.pointerdown({ target: { closest: () => null } });
 assert.equal(field.value, 'Oakville, Canada', 'Cancelling a draft opened before GPS resolved must restore the detected city');
 assert.equal(app.homeLocationDraft, null);
 field.value = 'Paris, France';
@@ -39,5 +43,7 @@ field.events.focus();
 field.value = 'Atla';
 field.events.input();
 field.events.blur({ relatedTarget: null });
+assert.equal(field.value, 'Atla', 'Keyboard blur must not restore the previous selection');
+documentEvents.pointerdown({ target: { closest: () => null } });
 assert.equal(field.value, 'Paris, France', 'Cancelling must retain an existing manual selection');
-console.log('Area picker recovery passed: delayed GPS is restored after draft cancellation; manual selections are preserved.');
+console.log('Area picker recovery passed: keyboard blur preserves drafts; explicit cancellation restores GPS or the manual selection.');

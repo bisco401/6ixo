@@ -123,3 +123,39 @@ for (const [nextCountry, nextCity] of [
     assert.equal(elements.get(city).value, nextCity, `${nextCity}: city is committed`);
 }
 console.log(`Screen location runtime passed: all ${groups.length} control groups, eight listing countries, selected-country isolation, explicit country changes and autofilled Search.`);
+
+// Draft edits must not reset filters, normalize spaces, or trigger a lookup for
+// every key. Exercise the real event handlers with a pending older response.
+const autocompleteSearch = window.SIXO_LOCATION_AUTOCOMPLETE.search;
+let searches = [], finishOld;
+window.SIXO_LOCATION_AUTOCOMPLETE.search = query => {
+    searches.push(query);
+    if (query === 'old') return new Promise(resolve => { finishOld = resolve; });
+    return Promise.resolve([{ city: 'New York', country: 'United States', label: 'New York, United States', type: 'city' }]);
+};
+let commits = 0;
+elements.get(city).addEventListener('change', () => commits++);
+cityInput.value = 'old'; cityInput.focus();
+await settle();
+for (const value of ['', ' ', ' N', ' New', ' New York ']) {
+    cityInput.value = value; cityInput.dispatchEvent(new Event('input'));
+    assert.equal(cityInput.value, value, 'Input events preserve the exact text, including spaces');
+}
+assert.equal(commits, 0, 'Replacing a location must not clear or render the committed filters');
+assert.deepEqual(searches, ['old'], 'Typing only queues one debounced lookup');
+finishOld([{ city: 'Old', country: 'Canada', label: 'Old, Canada', type: 'city' }]);
+await new Promise(resolve => setTimeout(resolve, 180));
+assert.equal(cityInput.value, ' New York ');
+const popup = document.body.children[0];
+assert.equal(popup.children[1].children[0].children[0].textContent, 'New York, United States', 'Late responses cannot replace the latest suggestions');
+searches = [];
+cityInput.dispatchEvent(new Event('compositionstart'));
+cityInput.value = 'New '; cityInput.dispatchEvent(new Event('input'));
+await new Promise(resolve => setTimeout(resolve, 180));
+assert.deepEqual(searches, [], 'No lookup during keyboard composition');
+cityInput.dispatchEvent(new Event('compositionend'));
+await new Promise(resolve => setTimeout(resolve, 180));
+assert.ok(searches.length > 0);
+assert.equal(cityInput.value, 'New ');
+window.SIXO_LOCATION_AUTOCOMPLETE.search = autocompleteSearch;
+console.log('Screen typing passed: spaces, deferred lookup, no filter resets, stale responses and keyboard composition.');

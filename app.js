@@ -14639,11 +14639,8 @@ class DatingApp {
                 }
             };
 
-            nearbySearch.addEventListener('input', () => runNearbySearch());
-            nearbySearch.addEventListener('keydown', (e) => {
-                if (e.key !== 'Enter') return;
-                e.preventDefault();
-                runNearbySearch({ fitToResults: true });
+            this.bindSearchInput(nearbySearch, () => runNearbySearch(), {
+                onCommit: () => runNearbySearch({ fitToResults: true })
             });
             if (nearbySearchBtn && !nearbySearchBtn.dataset.bound) {
                 nearbySearchBtn.addEventListener('click', () => runNearbySearch({ fitToResults: true }));
@@ -15292,11 +15289,8 @@ class DatingApp {
 	                    categoryFilter.dataset.boundMarketplaceCategory = '1';
 			        }
                 if (marketSearch && !marketSearch.dataset.boundMarketplaceSearch) {
-                    marketSearch.addEventListener('input', () => this.applyMarketplaceFilters());
-                    marketSearch.addEventListener('keydown', (e) => {
-                        if (e.key !== 'Enter') return;
-                        e.preventDefault();
-                        this.submitMarketplaceSearch();
+                    this.bindSearchInput(marketSearch, () => this.applyMarketplaceFilters(), {
+                        onCommit: (event) => event?.type === 'keydown' ? this.submitMarketplaceSearch() : this.applyMarketplaceFilters()
                     });
                     marketSearch.dataset.boundMarketplaceSearch = '1';
                 }
@@ -21073,7 +21067,9 @@ class DatingApp {
             }
 	        if (searchWhat && !searchWhat.dataset.boundEnter) {
 	            searchWhat.addEventListener('keydown', (e) => {
+                        if (e.isComposing || e.keyCode === 229) return;
                         if (e.key === 'Escape') {
+                            this.cancelPendingSearch(searchWhat);
                             this.hideHomeSmartSuggestions();
                             return;
                         }
@@ -21090,9 +21086,13 @@ class DatingApp {
 	            searchWhat.dataset.boundEnter = '1';
 	        }
 	        if (searchWhat && !searchWhat.dataset.boundInput) {
-	            searchWhat.addEventListener('input', () => {
-                    this.renderHomeSmartSuggestions(searchWhat.value);
-                    scheduleSearch();
+                this.bindSearchInput(searchWhat, () => {
+                    if (document.activeElement === searchWhat) this.renderHomeSmartSuggestions(searchWhat.value);
+                    this.applyHomeFilters({ scrollToResults: false });
+                }, {
+                    submitOnEnter: false,
+                    commitOnChange: false,
+                    onDraft: () => this.hideHomeSmartSuggestions()
                 });
                 searchWhat.addEventListener('focus', () => this.renderHomeSmartSuggestions(searchWhat.value));
 	            searchWhat.dataset.boundInput = '1';
@@ -24351,6 +24351,11 @@ class DatingApp {
 
         [searchInput, locationInput, countryInput, citySelect, minInput, maxInput, checkinInput, checkoutInput].forEach((field) => {
             if (!field || field.dataset.boundRealestateFilter) return;
+            if (field === searchInput) {
+                this.bindSearchInput(field, apply);
+                field.dataset.boundRealestateFilter = '1';
+                return;
+            }
             field.addEventListener('input', () => {
                 if (field === checkinInput && checkoutInput) {
                     checkoutInput.min = String(checkinInput?.value || '').trim();
@@ -24874,9 +24879,9 @@ class DatingApp {
             returnInput.min = String(state.rentalPickupDate || '');
         }
         if (returnTimeInput) returnTimeInput.value = String(state.rentalReturnTime || '10:00');
-        if (rentalCountryInput) rentalCountryInput.value = String(state.country || '');
-        if (rentalCityInput) rentalCityInput.value = String(state.city || '');
-        if (rentalSearchInput) rentalSearchInput.value = String(state.search || '');
+        if (rentalCountryInput && document.activeElement !== rentalCountryInput) rentalCountryInput.value = String(state.country || '');
+        if (rentalCityInput && document.activeElement !== rentalCityInput) rentalCityInput.value = String(state.city || '');
+        if (rentalSearchInput && document.activeElement !== rentalSearchInput) rentalSearchInput.value = String(state.search || '');
         const rentalMarket = this.normalizeVehicleRentalMarketFilter(state.rentalMarket);
         document.querySelectorAll('[data-rental-market]').forEach((btn) => {
             const active = String(btn.dataset.rentalMarket || '') === rentalMarket;
@@ -26286,6 +26291,8 @@ class DatingApp {
         this.syncVehicleFavoritesButton(favsToggleBtn);
 
         const updateFilters = ({ locationSource = '', scrollToResults = false } = {}) => {
+            [searchInput, rentalSearchInput, countryInput, cityInput, rentalCountryInput, rentalCityInput, sellerInput, postalInput, brandInput, specializationInput]
+                .forEach((input) => this.cancelPendingSearch(input));
             const activeCategory = String(document.querySelector('.vehicles-chip.active')?.dataset.category || 'all').trim().toLowerCase();
             const isRentalView = activeCategory === 'rentals';
             const activeSearchInput = isRentalView ? (rentalSearchInput || searchInput) : searchInput;
@@ -26344,12 +26351,16 @@ class DatingApp {
                 this.vehicleFilters.rentalReturnTime = this.vehicleFilters.rentalPickupTime;
                 if (rentalReturnTimeInput) rentalReturnTimeInput.value = this.vehicleFilters.rentalReturnTime;
             }
-            if (searchInput) searchInput.value = this.vehicleFilters.search || '';
-            if (rentalSearchInput) rentalSearchInput.value = this.vehicleFilters.search || '';
-            if (countryInput) countryInput.value = formatCountryDisplay(this.vehicleFilters.country || '');
-            if (rentalCountryInput) rentalCountryInput.value = formatCountryDisplay(this.vehicleFilters.country || '');
-            if (cityInput) cityInput.value = formatCityDisplay(this.vehicleFilters.city || '');
-            if (rentalCityInput) rentalCityInput.value = formatCityDisplay(this.vehicleFilters.city || '');
+            // Normalize filter state, but keep the user's text and caret untouched.
+            const mirrorValue = (input, source) => {
+                if (input && input !== source && input.value !== source?.value) input.value = source?.value || '';
+            };
+            mirrorValue(searchInput, activeSearchInput);
+            mirrorValue(rentalSearchInput, activeSearchInput);
+            mirrorValue(countryInput, activeCountryInput);
+            mirrorValue(rentalCountryInput, activeCountryInput);
+            mirrorValue(cityInput, activeCityInput);
+            mirrorValue(rentalCityInput, activeCityInput);
             if (postedMainSelect) postedMainSelect.value = this.vehicleFilters.posted || 'any';
             if (postedSelect) postedSelect.value = this.vehicleFilters.posted || 'any';
             cityChipButtons.forEach((btn) => {
@@ -26372,13 +26383,15 @@ class DatingApp {
 
         [searchInput, rentalSearchInput, sellerInput, postalInput, brandInput, specializationInput].forEach(input => {
             if (input && !input.dataset.bound) {
-                input.addEventListener('input', updateFilters);
+                this.bindSearchInput(input, updateFilters, {
+                    onCommit: (event) => updateFilters({ scrollToResults: event?.type === 'keydown' })
+                });
                 input.dataset.bound = '1';
             }
         });
         [countryInput, cityInput, rentalCountryInput, rentalCityInput].forEach(input => {
             if (input && !input.dataset.bound) {
-                input.addEventListener('input', () => updateFilters({ locationSource: 'manual' }));
+                this.bindSearchInput(input, () => updateFilters({ locationSource: 'manual' }));
                 input.dataset.bound = '1';
             }
         });
@@ -26432,15 +26445,6 @@ class DatingApp {
             rentalSearchBtn.addEventListener('click', () => updateFilters({ scrollToResults: true }));
             rentalSearchBtn.dataset.bound = '1';
         }
-        if (searchInput && !searchInput.dataset.boundEnter) {
-            searchInput.addEventListener('keydown', (event) => {
-                if (event.key !== 'Enter') return;
-                event.preventDefault();
-                updateFilters({ scrollToResults: true });
-            });
-            searchInput.dataset.boundEnter = '1';
-        }
-
         quickSearchButtons.forEach((btn) => {
             if (!btn || btn.dataset.bound) return;
             btn.addEventListener('click', async () => {
@@ -41337,6 +41341,48 @@ class DatingApp {
         this.submitHomeSearch({ scrollToResults: true });
     }
 
+    cancelPendingSearch(input) {
+        this.searchInputBindings?.get(input)?.cancel();
+    }
+
+    bindSearchInput(input, update, { onDraft = null, onCommit = update, submitOnEnter = true, commitOnChange = true, delay = 200 } = {}) {
+        if (!input) return;
+        if (!this.searchInputBindings) this.searchInputBindings = new WeakMap();
+        if (this.searchInputBindings.has(input)) return;
+        let timer = null;
+        let composing = false;
+        const cancel = () => {
+            if (timer !== null) window.clearTimeout(timer);
+            timer = null;
+        };
+        const schedule = (event) => {
+            cancel();
+            if (onDraft) onDraft();
+            if (composing || event?.isComposing) return;
+            const screen = this.activeScreen;
+            timer = window.setTimeout(() => {
+                timer = null;
+                if (input.isConnected !== false && this.activeScreen === screen) update();
+            }, delay);
+        };
+        const commit = (event) => {
+            cancel();
+            if (composing) return;
+            if (onDraft) onDraft();
+            onCommit(event);
+        };
+        input.addEventListener('input', schedule);
+        input.addEventListener('compositionstart', () => { composing = true; cancel(); });
+        input.addEventListener('compositionend', (event) => { composing = false; schedule(event); });
+        if (commitOnChange) input.addEventListener('change', commit);
+        if (submitOnEnter) input.addEventListener('keydown', (event) => {
+            if (event.key !== 'Enter' || event.isComposing || composing || event.keyCode === 229) return;
+            event.preventDefault();
+            commit(event);
+        });
+        this.searchInputBindings.set(input, { cancel });
+    }
+
     bindHomeSmartSearchSuggestions() {
         const panel = document.getElementById('home-smart-suggestions');
         if (!panel || panel.dataset.boundSmartSuggestions) return;
@@ -41419,6 +41465,7 @@ class DatingApp {
     }
 
     async submitHomeSearch({ scrollToResults = true } = {}) {
+        this.cancelPendingSearch(document.getElementById('home-search-what'));
         // Confirm the visible location even if autofill or early typing did not
         // produce a picker draft. A text value alone cannot unlock local feeds.
         if (this.resolveHomeLocationAutocomplete && !await this.resolveHomeLocationAutocomplete()) return;
@@ -42844,9 +42891,8 @@ class DatingApp {
 
         const searchInput = document.getElementById('rewards-search');
         if (searchInput && !searchInput.dataset.bound) {
-            searchInput.addEventListener('input', () => {
-                this.rewardsFilters.search = (searchInput.value || '').trim().toLowerCase();
-                this.applyRewardsFilters();
+            this.bindSearchInput(searchInput, () => this.applyRewardsFilters(), {
+                onDraft: () => { this.rewardsFilters.search = searchInput.value || ''; }
             });
             searchInput.dataset.bound = '1';
         }
@@ -42968,7 +43014,7 @@ class DatingApp {
     applyRewardsFilters() {
         const filters = this.rewardsFilters || {};
         const caseType = filters.caseType || 'all';
-        const term = (filters.search || '').toLowerCase();
+        const term = (filters.search || '').trim().toLowerCase();
         const sort = filters.sort || 'newest';
 
         let filtered = (this.rewardsPosts || []).filter((post) => {
@@ -45407,7 +45453,7 @@ class DatingApp {
                 this.applyDatingFilters();
             };
         }
-        if (searchInput) searchInput.oninput = () => this.applyDatingFilters();
+        if (searchInput) this.bindSearchInput(searchInput, () => this.applyDatingFilters());
         if (onlineOnly) onlineOnly.onchange = () => this.applyDatingFilters();
         if (searchScope && !searchScope.dataset.bound) {
             searchScope.addEventListener('change', () => this.applyDatingFilters());
@@ -60171,6 +60217,7 @@ class DatingApp {
     }
 
     submitMarketplaceSearch() {
+        this.cancelPendingSearch(document.getElementById('market-search'));
         const input = document.getElementById('market-search');
         if (!input) return;
         const raw = String(input.value || '').trim();
@@ -60723,9 +60770,8 @@ class DatingApp {
             });
         });
 
-        searchInput?.addEventListener('input', () => {
-            this.otherFilters.term = searchInput.value || '';
-            this.applyOtherFilters();
+        this.bindSearchInput(searchInput, () => this.applyOtherFilters(), {
+            onDraft: () => { this.otherFilters.term = searchInput.value || ''; }
         });
 
         conditionSelect?.addEventListener('change', () => {
@@ -60967,9 +61013,8 @@ class DatingApp {
         }
 
         if (searchInput) {
-            searchInput.addEventListener('input', () => {
-                this.electronicsFilters.term = searchInput.value || '';
-                this.applyElectronicsFilters();
+            this.bindSearchInput(searchInput, () => this.applyElectronicsFilters(), {
+                onDraft: () => { this.electronicsFilters.term = searchInput.value || ''; }
             });
         }
 
@@ -61266,10 +61311,10 @@ class DatingApp {
         const searchBtn = root.querySelector('#clothing-search-btn');
 
         const syncSearchInputs = () => {
-            this.clothingFilters.term = (searchInput?.value || '').trim();
-            this.clothingFilters.country = (countryInput?.value || '').trim();
-            this.clothingFilters.region = (regionInput?.value || '').trim();
-            this.clothingFilters.city = (cityInput?.value || '').trim();
+            this.clothingFilters.term = searchInput?.value || '';
+            this.clothingFilters.country = countryInput?.value || '';
+            this.clothingFilters.region = regionInput?.value || '';
+            this.clothingFilters.city = cityInput?.value || '';
         };
 
         categoryCards.forEach((card) => {
@@ -61307,12 +61352,7 @@ class DatingApp {
 
         const bindInput = (el) => {
             if (!el || el.dataset.bound) return;
-            const handler = () => {
-                syncSearchInputs();
-                this.applyClothingFilters();
-            };
-            el.addEventListener('input', handler);
-            el.addEventListener('change', handler);
+            this.bindSearchInput(el, () => this.applyClothingFilters(), { onDraft: syncSearchInputs });
             el.dataset.bound = '1';
         };
 
@@ -61496,7 +61536,7 @@ class DatingApp {
                 cityId: 'jobs-city',
                 hiddenId: 'jobs-location'
             });
-            this.jobsFilters.term = (searchInput?.value || '').trim();
+            this.jobsFilters.term = searchInput?.value || '';
             this.jobsFilters.location = (locationInput?.value || selection.text || '').trim();
             this.jobsFilters.country = selection.country;
             this.jobsFilters.city = selection.city;
@@ -61538,8 +61578,11 @@ class DatingApp {
                 syncFromInputs();
                 this.applyJobsFilters();
             };
-            el.addEventListener('input', handler);
-            el.addEventListener('change', handler);
+            if (el.tagName === 'INPUT' && el.type !== 'checkbox') {
+                this.bindSearchInput(el, () => this.applyJobsFilters(), { onDraft: syncFromInputs });
+            } else {
+                el.addEventListener('change', handler);
+            }
             el.dataset.bound = '1';
         };
 
@@ -61621,7 +61664,7 @@ class DatingApp {
             categoryLabel = this.getJobsCategoryLabel(filter);
         }
         const items = (this.marketplaceItems || []).filter((item) => item.category === 'jobs');
-        const term = (this.jobsFilters?.term || '').toLowerCase();
+        const term = (this.jobsFilters?.term || '').trim().toLowerCase();
         const locationNeedle = (this.jobsFilters?.location || '').toLowerCase();
         const country = this.jobsFilters?.country || '';
         const city = this.jobsFilters?.city || '';

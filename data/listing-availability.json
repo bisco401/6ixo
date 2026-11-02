@@ -1,5 +1,5 @@
 {
-  "checkedAt": "2026-11-02T06:39:35Z",
+  "checkedAt": "2026-11-02T06:50:29.512Z",
   "listings": {
     "craigslist.org/view/d/bastrop-used-2025-cadillac-xt4-fwd-4d/fuqr_3uo8rgowpq1ctwx-a": {
       "availability": "sold",
@@ -16696,32 +16696,49 @@
       "reason": "Exact source URL returned HTTP 410"
     },
     "kijiji.ca/v-buy-sell-other/city-of-toronto/vitamix-36019-commercial-bar-blender-48-oz-vm0145/1745592901": {
-      "availability": "unavailable",
-      "checkedAt": "2026-11-02T00:43:07Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1745592901",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/vitamix-36019-commercial-bar-blender-48-oz-vm0145/1745592901",
+      "availability": "gone",
+      "checkedAt": "2026-11-02T06:50:29.512Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1745592901",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-buy-sell-other/city-of-toronto/sagetra-professional-french-fry-cutter/1745592953": {
-      "availability": "unavailable",
-      "checkedAt": "2026-11-02T00:43:07Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1745592953",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/sagetra-professional-french-fry-cutter/1745592953",
+      "availability": "gone",
+      "checkedAt": "2026-11-02T06:50:29.512Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1745592953",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-pet-services/mississauga-peel-region/bird-sitting-in-mississauga/1745592893": {
-      "availability": "unavailable",
-      "checkedAt": "2026-11-02T00:43:07Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1745592893",
+      "sourceUrl": "https://www.kijiji.ca/v-pet-services/mississauga-peel-region/bird-sitting-in-mississauga/1745592893",
+      "availability": "gone",
+      "checkedAt": "2026-11-02T06:50:29.512Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-pet-services/mississauga-peel-region/c143l1700276?radius=50.0&ll=43.61%2C-79.64&adRemoved=1745592893",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-buy-sell-other/city-of-toronto/eurodib-10-commercial-manual-meat-slicer/1745592889": {
-      "availability": "unavailable",
-      "checkedAt": "2026-11-02T00:43:07Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1745592889",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/eurodib-10-commercial-manual-meat-slicer/1745592889",
+      "availability": "gone",
+      "checkedAt": "2026-11-02T06:50:29.512Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1745592889",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-buy-sell-other/mississauga-peel-region/demolition-for-sale/1745592887": {
-      "availability": "unavailable",
-      "checkedAt": "2026-11-01T21:01:14Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal",
-      "httpStatus": 200,
+      "id": "kijiji-1745592887",
       "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/mississauga-peel-region/demolition-for-sale/1745592887",
-      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/mississauga-peel-region/c26l1700276?radius=50.0&ll=43.58%2C-79.63&adRemoved=1745592887"
+      "availability": "gone",
+      "checkedAt": "2026-11-02T06:50:29.512Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/mississauga-peel-region/c26l1700276?radius=50.0&ll=43.58%2C-79.63&adRemoved=1745592887",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-apartments-condos/city-of-toronto/1-bedroom-for-rent-in-a-beautiful-2-bedroom-apartment/1745530246": {
       "availability": "unavailable",
@@ -16853,9 +16870,13 @@
       "resolvedUrl": "https://www.kijiji.ca/b-cars-trucks/hamilton/c174l80014?adRemoved=1744213043&ll=43.2070027%2C-79.8902315&radius=150.0&rb=50"
     },
     "kijiji.ca/v-women-bags-wallets/hamilton/10-new-v-secret-and-tommy-hilfiger-set-:-all-for-10-set-o/1745606638": {
-      "availability": "unavailable",
-      "checkedAt": "2026-11-02T00:43:07Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1745606638",
+      "sourceUrl": "https://www.kijiji.ca/v-women-bags-wallets/hamilton/10-new-v-secret-and-tommy-hilfiger-set-:-all-for-10-set-o/1745606638",
+      "availability": "gone",
+      "checkedAt": "2026-11-02T06:50:29.512Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-women-bags-wallets/hamilton/c281l80014?radius=50.0&ll=43.2188%2C-79.75597&adRemoved=1745606638",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-toys-games/city-of-toronto/barbie-sports-car/1745524084": {
       "availability": "unavailable",

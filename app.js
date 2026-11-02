@@ -20067,6 +20067,13 @@ class DatingApp {
 			            console.warn('Screen not found:', screenName);
 			            return;
 			        }
+            const destinationScreen = ['realestate', 'shortstays'].includes(screenName);
+            window.SIXO_LOCATION_ENTRY?.setPromptSuppressed?.(destinationScreen);
+            if (destinationScreen && (this.locationRequestInFlight || window.SIXO_LOCATION_ENTRY?.pendingRequest)) {
+                // A delayed Home GPS request must not reopen its dialog over
+                // a destination search after the visitor has left Home.
+                this.stopLocationTracking();
+            }
 	        // Close any overlays/modals when changing screens.
 	        this.applyUiState(null, { source: 'screen' });
 	        // Update navigation
@@ -40008,7 +40015,9 @@ class DatingApp {
                     this.shortstayMap?.remove();
                     this.shortstayMap = null;
                     this.shortstayMapMarkers = new Map();
+                    const pagination = document.getElementById('realestate-pagination');
                     if (isAirbnb) {
+                        if (pagination) { pagination.innerHTML = ''; pagination.onclick = null; }
                         this.shortstayVisibleListings = sorted;
                         container.innerHTML = this.buildShortTermResultsMarkup(sorted);
                         const count = document.getElementById('realestate-count');
@@ -40020,7 +40029,25 @@ class DatingApp {
                         return;
                     }
 
-				        const grouped = sorted.reduce((acc, item) => {
+                    const filterKey = JSON.stringify([categoryKey, uiFilters, effectiveLocationScope]);
+                    if (this.realestateFilterKey !== filterKey) {
+                        this.realestateFilterKey = filterKey;
+                        this.realestateVisibleCount = 12;
+                    }
+                    // Keep the first paint responsive on mobile Safari. The
+                    // full inventory remains searchable and can be expanded.
+                    const visible = sorted.slice(0, this.realestateVisibleCount || 12);
+                    if (pagination) {
+                        pagination.innerHTML = visible.length < sorted.length
+                            ? `<button type="button" class="btn-secondary small" data-realestate-more>Show more properties</button><span>Showing ${visible.length} of ${sorted.length}</span>`
+                            : '';
+                        pagination.onclick = (event) => {
+                            if (!event.target.closest('[data-realestate-more]')) return;
+                            this.realestateVisibleCount += 12;
+                            this.renderRealestateFeed(categoryKey);
+                        };
+                    }
+				        const grouped = visible.reduce((acc, item) => {
 				            const key = String(item?.date || '').trim() || 'unknown';
 				            if (!acc[key]) acc[key] = [];
 				            acc[key].push(item);

@@ -3,10 +3,29 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
+import { spawnSync } from 'node:child_process';
 import { generate, schemaEntity } from './generate-listing-seo-pages.mjs';
 import { generateSitemap } from './generate-sitemap.mjs';
 import { ORIGIN, parseCsv, crawlAllowed, httpUrl, jsonLd, meta, pageFile } from './lib/seo.mjs';
 import { searchTopics, searchGroups, countryGroups } from './lib/marketplace-search.mjs';
+
+test('Home SEO refresh preserves current location asset cache versions', async t => {
+  const root = await fs.mkdtemp(path.join(os.tmpdir(), '6ixo-home-assets-'));
+  t.after(() => fs.rm(root, { recursive: true, force: true }));
+  await fs.mkdir(path.join(root, 'scripts/lib'), { recursive: true });
+  for (const file of ['equip-home-seo.mjs', 'lib/seo.mjs', 'lib/category-chapters.mjs']) {
+    await fs.copyFile(new URL(file, import.meta.url), path.join(root, 'scripts', file));
+  }
+  const assets = ['assets/location-entry.css?v=future-location-fix', 'location-entry.js?v=future-prompt-fix', 'app.js?v=future-app-fix'];
+  await fs.writeFile(path.join(root, 'index.html'), `<html><head><title>Marketplace</title><link rel="stylesheet" href="${assets[0]}"></head><body><footer class="home-footer"></footer><script src="${assets[1]}"></script><script src="${assets[2]}"></script></body></html>`);
+  await fs.writeFile(path.join(root, 'coming-soon-config.js'), 'window.SIXO_COMING_SOON_CONFIG = { enabled: false };');
+  for (let run = 0; run < 2; run++) {
+    const result = spawnSync(process.execPath, [path.join(root, 'scripts/equip-home-seo.mjs')], { encoding: 'utf8' });
+    assert.equal(result.status, 0, result.stderr);
+    const html = await fs.readFile(path.join(root, 'index.html'), 'utf8');
+    for (const asset of assets) assert.ok(html.includes(asset), `SEO refresh must preserve ${asset}`);
+  }
+});
 
 test('specific searches distinguish rental apartments and mobile phones from other ads', () => {
   const apartment = searchTopics.find(t => t.slug === 'apartments-for-rent').matches;

@@ -11,6 +11,7 @@ function field(id, value = '') {
 }
 const grid = field('realestate-grid');
 const count = field('realestate-count');
+const pagination = field('realestate-pagination');
 const city = field('realestate-city', 'Toronto');
 const country = field('realestate-country', 'Canada');
 field('realestate-location');
@@ -78,5 +79,27 @@ assert.equal(count.textContent, '3 results', 'A known location supplies the defa
 country.value = 'United States';
 app.renderRealestateFeed('all');
 assert.equal(count.textContent, '1 result', 'A destination overrides the known device country.');
+
+app.getCurrentLocationDefaultParts = () => ({});
+country.value = '';
+app.realestateListings = Array.from({ length: 40 }, (_, index) => ({
+  ...app.realestateListings[0], id: `property-${index}`, city: index < 20 ? 'Toronto' : 'Ottawa'
+}));
+app.renderRealestateFeed('all');
+const cardCount = () => (grid.innerHTML.match(/class="dating-feed-card vehicle-feed-card realestate-feed-card"/g) || []).length;
+assert.equal(count.textContent, '40 results', 'The count includes the entire matching inventory.');
+assert.equal(cardCount(), 12, 'Opening Real Estate must not create hundreds of cards at once.');
+assert.match(pagination.innerHTML, /Showing 12 of 40/);
+pagination.onclick({ target: { closest: () => ({}) } });
+assert.equal(cardCount(), 24, 'Show more exposes the next batch.');
+app.renderRealestateFeed('all');
+assert.equal(cardCount(), 24, 'A background feed refresh keeps the expanded batch.');
+city.value = 'Ottawa';
+app.renderRealestateFeed('all');
+assert.equal(count.textContent, '20 results');
+assert.equal(cardCount(), 12, 'Changing destination starts a fresh first batch.');
+pagination.onclick({ target: { closest: () => ({}) } });
+assert.equal(cardCount(), 20);
+assert.equal(pagination.innerHTML, '', 'The final batch does not leave a nonfunctional Show more button.');
 
 console.log('Real estate location passed: pending/denied GPS, destination changes, country defaults, city aliases and isolation from other feeds.');

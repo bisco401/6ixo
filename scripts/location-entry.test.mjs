@@ -6,7 +6,7 @@ const entrySource = readFileSync(new URL('../location-entry.js', import.meta.url
 const appSource = readFileSync(new URL('../app.js', import.meta.url), 'utf8');
 const indexSource = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
 
-function createHarness({ startRequest = true, native = false, supported = true, secure = true, desktop = false, storage = new Map(), cookies = { value: '' }, storageUnavailable = false } = {}) {
+function createHarness({ startRequest = true, native = false, supported = true, secure = true, desktop = false, hash = '', storage = new Map(), cookies = { value: '' }, storageUnavailable = false } = {}) {
   const requests = [];
   const watches = [];
   const clearedWatches = [];
@@ -26,7 +26,7 @@ function createHarness({ startRequest = true, native = false, supported = true, 
   });
   const window = {
     isSecureContext: secure,
-    location: { protocol: 'https:' },
+    location: { protocol: 'https:', hash },
     localStorage: {
       getItem(key) { if (storageUnavailable) throw new Error('Storage unavailable'); return storage.get(key) || null; },
       setItem(key, value) { if (storageUnavailable) throw new Error('Storage unavailable'); storage.set(key, value); },
@@ -64,6 +64,26 @@ function createHarness({ startRequest = true, native = false, supported = true, 
 }
 
 const position = { coords: { latitude: 43.65, longitude: -79.38, accuracy: 15 }, timestamp: Date.now() };
+
+for (const hash of ['#realestate', '#shortstays', '#realestate?category=for_sale']) {
+  const visit = createHarness({ startRequest: false, hash });
+  const entry = visit.window.SIXO_LOCATION_ENTRY;
+  assert.equal(visit.panels.length, 0, 'Direct property links must not flash a location popup before app startup.');
+  assert.equal(entry.showPrompt({ code: 1 }), false, 'Background denial must not cover the property page.');
+  assert.equal(entry.canRequestAutomatically('prompt'), false);
+  assert.equal((await entry.request()).skipped, true);
+  assert.equal(visit.requests.length, 0, 'Browsing properties must never open a native location request.');
+  assert.equal(entry.showPrompt(null, { force: true }), true, 'An explicit Near me action can still ask for permission.');
+  entry.setPromptSuppressed(true);
+  assert.equal(visit.panels[0].hidden, true);
+}
+const propertyNavigation = createHarness({ startRequest: false });
+assert.equal(propertyNavigation.panels[0].hidden, false);
+propertyNavigation.window.SIXO_LOCATION_ENTRY.setPromptSuppressed(true);
+assert.equal(propertyNavigation.panels[0].hidden, true, 'Opening Real Estate closes an existing Home location popup without an answer.');
+assert.equal(propertyNavigation.window.SIXO_LOCATION_ENTRY.showPrompt(), false);
+propertyNavigation.window.SIXO_LOCATION_ENTRY.setPromptSuppressed(false);
+assert.equal(propertyNavigation.window.SIXO_LOCATION_ENTRY.showPrompt(), true, 'The other screens retain their location flow.');
 
 const firstVisit = createHarness();
 assert.equal(firstVisit.requests.length, 1, 'Allow must call the browser permission API before the app loads.');

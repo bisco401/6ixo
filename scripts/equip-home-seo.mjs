@@ -28,8 +28,8 @@ if (hub.test(html)) html = html.replace(hub, homeCategoryLinks(countryMarkup));
 else html = html.replace('<footer class="home-footer">', homeCategoryLinks(countryMarkup) + '<footer class="home-footer">');
 if (!html.includes('/assets/seo-navigation.css')) html = html.replace('</head>', '<link rel="stylesheet" href="/assets/seo-navigation.css?v=20261010">\n</head>');
 else html = html.replace(/\/assets\/seo-navigation\.css(?:\?[^"']*)?/, '/assets/seo-navigation.css?v=20261010');
-// Keep country/category navigation available before location access is granted.
-html = html.replace(/(assets\/location-entry\.css\?v=)[^"'\s]+/g, '$120261010-country-navigation');
+// Preserve the shipped location stylesheet version. Reusing an older cache key
+// can restore obsolete GPS gates in returning visitors' browsers.
 // Keep the public headline, search snippet and brand data consistent on every refresh.
 const title = '6ixo.com | Cars, Apartments, Phones & Local Events';
 const description = '6ixo.com is a free worldwide marketplace for cars, apartments, phones, local events, jobs and services. Browse listings or post an ad for free.';

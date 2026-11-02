@@ -47,6 +47,8 @@
     let panel = null;
     let dismissed = false;
     let confirmed = false;
+    // Direct property links must be usable before the main app has loaded.
+    let promptSuppressed = /^#(?:realestate|shortstays)(?:[/?]|$)/i.test(window.location?.hash || '');
 
     // Desktop location services can report POSITION_UNAVAILABLE before their
     // Wi-Fi scan completes. Keep one fresh, low-power subscription alive while
@@ -105,6 +107,7 @@
         hidePrompt();
     };
     const showPrompt = (error = null, { force = false } = {}) => {
+        if (promptSuppressed && !force) return false;
         if (force) dismissed = false;
         if (dismissed || (!error && confirmed) || document.visibilityState === 'hidden') return false;
         if (!panel) {
@@ -176,6 +179,7 @@
     }
 
     function canRequestAutomatically(state = observedPermission) {
+        if (promptSuppressed && state !== 'granted') return false;
         if (pauseAutomaticRequests) return false;
         if (state === 'granted') return true;
         // The browser owns permission, including permission expiry and Settings
@@ -274,6 +278,10 @@
         dismiss,
         hidePrompt,
         showPrompt,
+        setPromptSuppressed(value) {
+            promptSuppressed = Boolean(value);
+            if (promptSuppressed) hidePrompt();
+        },
         watchForDesktopPosition,
         recordPermission,
         canRequestAutomatically,

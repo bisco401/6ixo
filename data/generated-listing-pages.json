@@ -1,5 +1,5 @@
 {
-  "count": 4577,
+  "count": 4574,
   "listings": [
     {
       "id": "hgc-dubai-9f0effbe6756af4c",
@@ -5554,15 +5554,6 @@
       "categoryKey": "real-estate"
     },
     {
-      "id": "kijiji-1745612388",
-      "slug": "hiring-labourers-for-2-day-job-20-hr-cash-1745612388",
-      "url": "https://6ixo.com/listing/hiring-labourers-for-2-day-job-20-hr-cash-1745612388/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/c0/c0df6378-61cc-4774-a0dc-5eb87af27fc5?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "jobs"
-    },
-    {
       "id": "kijiji-1745612029",
       "slug": "sleep-easy-twin-mattress-full-mattress-queen-mattress-king-1745612029",
       "url": "https://6ixo.com/listing/sleep-easy-twin-mattress-full-mattress-queen-mattress-king-1745612029/",
@@ -6642,15 +6633,6 @@
         "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/87/8731f6aa-8aec-4e2c-8f41-6051dd000389?rule=kijijica-1600-webp"
       ],
       "categoryKey": "jobs"
-    },
-    {
-      "id": "kijiji-1745568344",
-      "slug": "fast-8k-iptv-connection-available-1745568344",
-      "url": "https://6ixo.com/listing/fast-8k-iptv-connection-available-1745568344/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/14/14d6ac97-2bf5-499c-ac6a-778f54a0dce4?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "services"
     },
     {
       "id": "apify-7914e64d8589",
@@ -37290,16 +37272,6 @@
       "categoryKey": "buy-and-sell"
     },
     {
-      "id": "kijiji-1744648382",
-      "slug": "one-newly-single-size-mattress-1744648382",
-      "url": "https://6ixo.com/listing/one-newly-single-size-mattress-1744648382/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/62/62ff577e-3f7e-4824-a309-91aa4d8f3f52?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/c2/c2f279b1-ea88-42a3-9337-f688ec77c279?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "buy-and-sell"
-    },
-    {
       "id": "kijiji-1744648236",
       "slug": "mr-handy-man-1744648236",
       "url": "https://6ixo.com/listing/mr-handy-man-1744648236/",
@@ -67855,6 +67827,21 @@
       "id": "kijiji-1745084954",
       "slug": "free-scrap-metal-and-electronics-removal-1745084954",
       "url": "https://6ixo.com/listing/free-scrap-metal-and-electronics-removal-1745084954/"
+    },
+    {
+      "id": "kijiji-1745612388",
+      "slug": "hiring-labourers-for-2-day-job-20-hr-cash-1745612388",
+      "url": "https://6ixo.com/listing/hiring-labourers-for-2-day-job-20-hr-cash-1745612388/"
+    },
+    {
+      "id": "kijiji-1745568344",
+      "slug": "fast-8k-iptv-connection-available-1745568344",
+      "url": "https://6ixo.com/listing/fast-8k-iptv-connection-available-1745568344/"
+    },
+    {
+      "id": "kijiji-1744648382",
+      "slug": "one-newly-single-size-mattress-1744648382",
+      "url": "https://6ixo.com/listing/one-newly-single-size-mattress-1744648382/"
     }
   ]
 }

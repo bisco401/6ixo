@@ -1,5 +1,5 @@
 {
-  "checkedAt": "2026-11-02T12:28:32Z",
+  "checkedAt": "2026-11-02T12:42:20.520Z",
   "listings": {
     "craigslist.org/view/d/bastrop-used-2025-cadillac-xt4-fwd-4d/fuqr_3uo8rgowpq1ctwx-a": {
       "availability": "sold",
@@ -17201,6 +17201,24 @@
       "availability": "gone",
       "checkedAt": "2026-11-02T12:28:32Z",
       "reason": "Exact source URL returned HTTP 410"
+    },
+    "craigslist.org/view/d/atlanta-2018-maserati-levante-granlusso/igqapck-8rgjo6xruyadoq": {
+      "id": "craigslist-igQaPcK-8RGJO6XRuYADOQ",
+      "sourceUrl": "https://www.craigslist.org/view/d/atlanta-2018-maserati-levante-granlusso/igQaPcK-8RGJO6XRuYADOQ",
+      "availability": "gone",
+      "checkedAt": "2026-11-02T12:42:20.520Z",
+      "httpStatus": 410,
+      "resolvedUrl": "https://www.craigslist.org/view/d/atlanta-2018-maserati-levante-granlusso/igQaPcK-8RGJO6XRuYADOQ",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "craigslist.org/view/d/brooklyn-massive-25br2mins2trainw-dd/2ys4zugsgxavv9afgdwbya": {
+      "id": "craigslist-2YS4zUGSgXaVv9AfGDWByA",
+      "sourceUrl": "https://www.craigslist.org/view/d/brooklyn-massive-25br2mins2trainw-dd/2YS4zUGSgXaVv9AfGDWByA",
+      "availability": "gone",
+      "checkedAt": "2026-11-02T12:42:20.520Z",
+      "httpStatus": 410,
+      "resolvedUrl": "https://www.craigslist.org/view/d/brooklyn-massive-25br2mins2trainw-dd/2YS4zUGSgXaVv9AfGDWByA",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     }
   }
 }

@@ -68,21 +68,8 @@
     pointer-events: none !important;
 }
 
-/* Rental visitors can select a destination even when device location is declined.
-   Keep inventory hidden until a browsing area has been resolved. */
-#main-app[data-device-location-ready="false"]:not([data-device-location-initialized="true"]) #realestate-content > :not(.app-header):not(.realestate-hero),
-#main-app[data-device-location-ready="false"]:not([data-device-location-initialized="true"]) #shortstays-results-slot,
-#main-app[data-device-location-ready="false"]:not([data-device-location-initialized="true"]) #shortstays-pagination-slot {
-    display: none !important;
-}
+/* Properties and stays use their destination filters without requiring GPS. */
 .rental-location-help { margin: .65rem 0 0; color: #475569; font-size: .9rem; }
-#main-app[data-device-location-ready="false"][data-device-location-initialized="true"]:not([data-device-location-refreshing="true"]) #realestate-content > :not(.app-header):not(.realestate-hero),
-#main-app[data-device-location-ready="false"][data-device-location-initialized="true"]:not([data-device-location-refreshing="true"]) #shortstays-results-slot,
-#main-app[data-device-location-ready="false"][data-device-location-initialized="true"]:not([data-device-location-refreshing="true"]) #shortstays-pagination-slot {
-    visibility: hidden !important;
-    opacity: 0 !important;
-    pointer-events: none !important;
-}
 
 /* Keep a usable destination chooser outside the location-gated inventory.
    Embedded browsers may suppress GPS or visitors may choose not to share it. */

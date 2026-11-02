@@ -45,4 +45,38 @@ app.renderRealestateFeed('all');
 assert.equal(count.textContent, '1 result');
 assert.match(grid.innerHTML, /Toronto abroad/);
 assert.doesNotMatch(grid.innerHTML, /Toronto apartment|Toronto basement/);
-console.log('Real estate location passed: province labels, City of Toronto alias, other-country isolation and country-wide browsing.');
+
+// A first-time visitor must be able to browse and select a destination while
+// GPS is pending or denied, without relaxing the other feeds' location policy.
+app.strictDeviceLocation = true;
+app.didApplyEntryLocationDefaults = false;
+app.getCurrentLocationDisplayText = () => '';
+app.getCurrentLocationDefaultParts = () => ({});
+city.value = '';
+country.value = '';
+app.renderRealestateFeed('all');
+assert.equal(count.textContent, '4 results', 'Properties load before GPS resolves.');
+assert.equal(app.matchesListingLocationScope(app.realestateListings[0]), false, 'Other feeds still require their browsing location.');
+country.value = 'Canada';
+app.renderRealestateFeed('all');
+assert.equal(count.textContent, '3 results', 'An explicit country works without device permission.');
+assert.doesNotMatch(grid.innerHTML, /Toronto abroad/);
+city.value = 'Toronto';
+app.locationPermissionState = 'denied';
+app.renderRealestateFeed('all');
+assert.equal(count.textContent, '2 results', 'Denying GPS preserves the selected destination.');
+assert.match(grid.innerHTML, /Toronto apartment/);
+assert.doesNotMatch(grid.innerHTML, /Ottawa apartment|Toronto abroad/);
+country.value = 'United States';
+app.renderRealestateFeed('all');
+assert.equal(count.textContent, '1 result', 'Country changes exclude same-named cities abroad.');
+city.value = '';
+country.value = '';
+app.getCurrentLocationDefaultParts = () => ({ city: 'Toronto', country: 'Canada' });
+app.renderRealestateFeed('all');
+assert.equal(count.textContent, '3 results', 'A known location supplies the default country.');
+country.value = 'United States';
+app.renderRealestateFeed('all');
+assert.equal(count.textContent, '1 result', 'A destination overrides the known device country.');
+
+console.log('Real estate location passed: pending/denied GPS, destination changes, country defaults, city aliases and isolation from other feeds.');

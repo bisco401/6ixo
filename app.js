@@ -16336,7 +16336,7 @@ class DatingApp {
             if (ready) main.dataset.deviceLocationInitialized = 'true';
             main.dataset.deviceLocationReady = ready ? 'true' : 'false';
             main.dataset.deviceLocationRefreshing = refreshing ? 'true' : 'false';
-            const sections = main.querySelectorAll?.('.content-screen:not(#home-content):not(#profile-content):not(#premium-content):not(#personal-content):not(#realestate-content):not(#shortstays-content):not(#arrive-content):not(.dating-coming-soon-locked #dating-content), #shortstays-results-slot, #shortstays-pagination-slot, #realestate-content > :not(.app-header):not(.realestate-hero), #home-content > section:not(.home-search):not(.home-brand-artwork)') || [];
+            const sections = main.querySelectorAll?.('.content-screen:not(#home-content):not(#profile-content):not(#premium-content):not(#personal-content):not(#realestate-content):not(#shortstays-content):not(#arrive-content):not(.dating-coming-soon-locked #dating-content), #home-content > section:not(.home-search):not(.home-brand-artwork)') || [];
             sections.forEach((section) => { section.inert = !usablePage; });
         }
         const recovery = document.getElementById('browsing-location-recovery');
@@ -16696,7 +16696,7 @@ class DatingApp {
     }
 
     matchesListingLocationScope({ city = '', region = '', state = '', province = '', country = '', label = '', metro = '' } = {}, scope = null) {
-        if (this.strictDeviceLocation && !this.getCurrentLocationDisplayText()) return false;
+        if (this.strictDeviceLocation && scope?.source !== 'destination' && !this.getCurrentLocationDisplayText()) return false;
         const resolved = scope && typeof scope === 'object'
             ? scope
             : this.getEffectiveListingLocationScope();
@@ -22546,7 +22546,11 @@ class DatingApp {
         }
         const destination = document.getElementById('rental-choose-destination');
         if (destination && !destination.dataset.bound) {
-            destination.addEventListener('click', () => this.chooseShortTermDestination());
+            destination.addEventListener('click', () => {
+                const field = document.getElementById('realestate-country-autocomplete') || document.getElementById('realestate-country');
+                field?.scrollIntoView({ block: 'center', behavior: 'smooth' });
+                field?.focus({ preventScroll: true });
+            });
             destination.dataset.bound = '1';
         }
         this.bindRealestateCategoryChips();
@@ -24412,6 +24416,17 @@ class DatingApp {
     parseRealestatePriceAmount(value = '') {
         const parsed = Number.parseFloat(String(value || '').replace(/[^0-9.]+/g, ''));
         return Number.isFinite(parsed) ? parsed : NaN;
+    }
+
+    getRealestateListingLocationScope(filters = this.getRealestateUiFilterValues()) {
+        // Properties and stays are destination searches; GPS is only a default.
+        // Preserve an explicit destination through pending or denied GPS requests.
+        const hasDestination = Boolean(filters.city || filters.country || filters.location);
+        const defaults = hasDestination ? {} : (this.getCurrentLocationDefaultParts() || {});
+        const city = this.normalizeLocationText(filters.city || '');
+        const country = this.normalizeLocationText(filters.country || defaults.country || '');
+        const text = city || country ? '' : this.normalizeLocationText(filters.location || '');
+        return { active: Boolean(city || country || text), city, country, text, source: 'destination' };
     }
 
     getRealestateUiFilterValues() {
@@ -39963,11 +39978,7 @@ class DatingApp {
                     if (shortstayBar) shortstayBar.classList.toggle('hidden', !isAirbnb);
 
                     const uiFilters = this.getRealestateUiFilterValues();
-                    const effectiveLocationScope = this.getEffectiveListingLocationScope({
-                        city: uiFilters.city,
-                        country: uiFilters.country,
-                        text: uiFilters.city || uiFilters.country ? '' : (uiFilters.location || '')
-                    });
+                    const effectiveLocationScope = this.getRealestateListingLocationScope(uiFilters);
 
 				        const categoryMatched = (this.realestateListings || []).filter((item) => {
 				            if (isAirbnb) return this.isRealestateShortTermListing(item);

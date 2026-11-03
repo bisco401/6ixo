@@ -1,5 +1,5 @@
 {
-  "count": 4600,
+  "count": 4596,
   "listings": [
     {
       "id": "hgc-dubai-9f0effbe6756af4c",
@@ -27635,18 +27635,6 @@
       "categoryKey": "vehicles"
     },
     {
-      "id": "jacars-2529805",
-      "slug": "suzuki-vitara-2-4l-2007-ars2529805",
-      "url": "https://6ixo.com/listing/suzuki-vitara-2-4l-2007-ars2529805/",
-      "images": [
-        "https://cdn2.jacars.net/media/cache/fc/06/fc061efe420e57c1df730c6ef0b5a3be.webp",
-        "https://cdn2.jacars.net/media/cache/f8/d4/f8d4d66664a3c51b0a3c5d0e9526047c.webp",
-        "https://cdn2.jacars.net/media/cache/7a/75/7a756604d62757524666b8d2020f0b6d.webp",
-        "https://cdn2.jacars.net/media/cache/64/52/645290369160c65e816d84f52804fd90.webp"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
       "id": "jacars-2522094",
       "slug": "toyota-voxy-2-0l-2017-ars2522094",
       "url": "https://6ixo.com/listing/toyota-voxy-2-0l-2017-ars2522094/",
@@ -28001,16 +27989,6 @@
         "https://cdn2.jacars.net/media/cache/cc/45/cc45fdebb781fceb2dfe8b54c0c72e02.webp",
         "https://cdn2.jacars.net/media/cache/90/e2/90e29ca7f897ab5b6f7d35ebcaf33f0b.webp",
         "https://cdn2.jacars.net/media/cache/05/33/0533c95292e00c0f4c4d8de6e72c409e.webp"
-      ],
-      "categoryKey": "electronics"
-    },
-    {
-      "id": "jacars-2529828",
-      "slug": "amazon-echo-show-ars2529828",
-      "url": "https://6ixo.com/listing/amazon-echo-show-ars2529828/",
-      "images": [
-        "https://cdn2.jacars.net/media/cache/2c/59/2c59624cfacb632934cb54abd124cf8c.webp",
-        "https://cdn2.jacars.net/media/cache/7f/52/7f52b5fe7d224c4df4d3baa7c1765c13.webp"
       ],
       "categoryKey": "electronics"
     },
@@ -53744,18 +53722,6 @@
       "categoryKey": "vehicles"
     },
     {
-      "id": "jacars-2499585",
-      "slug": "mini-cooper-2-0l-2018-ars2499585",
-      "url": "https://6ixo.com/listing/mini-cooper-2-0l-2018-ars2499585/",
-      "images": [
-        "https://cdn2.jacars.net/media/cache/b5/3d/b53d6e1cc7d91d3aedba9be05dc24652.webp",
-        "https://cdn2.jacars.net/media/cache/21/6e/216e1d688080bfa5124f3bedfe79caf2.webp",
-        "https://cdn2.jacars.net/media/cache/70/57/70570a52143e149a8eaa310cbf6873c5.webp",
-        "https://cdn2.jacars.net/media/cache/b5/92/b592cba363533e9f86039f3b867590ca.webp"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
       "id": "jacars-2499462",
       "slug": "bmw-x1-2-0l-2020-ars2499462",
       "url": "https://6ixo.com/listing/bmw-x1-2-0l-2020-ars2499462/",
@@ -53764,18 +53730,6 @@
         "https://cdn2.jacars.net/media/cache/62/80/6280e1d43f690e7cf07d7c864a4d1f65.webp",
         "https://cdn2.jacars.net/media/cache/11/42/1142dd19a6f72fc7dda690e9b43cd0d0.webp",
         "https://cdn2.jacars.net/media/cache/65/06/6506b8fb835548186fd44cb4d19b88e3.webp"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "jacars-2469641",
-      "slug": "toyota-gt86-2-0l-2019-ars2469641",
-      "url": "https://6ixo.com/listing/toyota-gt86-2-0l-2019-ars2469641/",
-      "images": [
-        "https://cdn2.jacars.net/media/cache/6a/19/6a190813d1edde6169e0a009158057e4.webp",
-        "https://cdn2.jacars.net/media/cache/fb/c3/fbc3ac6272aea5dd1e28b173882105aa.webp",
-        "https://cdn2.jacars.net/media/cache/58/ae/58aeb133c3ca6bc69de970b1f501fc5e.webp",
-        "https://cdn2.jacars.net/media/cache/41/c8/41c83cc4dfacab5d985b773e1458e37e.webp"
       ],
       "categoryKey": "vehicles"
     },
@@ -68509,6 +68463,26 @@
       "id": "craigslist-Tu_lYG6_8RGGuatwCxuhrw",
       "slug": "2022-mercedes-benz-mercedes-eq-eqb-buy-here-pay-here-avail-uatwcxuhrw",
       "url": "https://6ixo.com/listing/2022-mercedes-benz-mercedes-eq-eqb-buy-here-pay-here-avail-uatwcxuhrw/"
+    },
+    {
+      "id": "jacars-2529805",
+      "slug": "suzuki-vitara-2-4l-2007-ars2529805",
+      "url": "https://6ixo.com/listing/suzuki-vitara-2-4l-2007-ars2529805/"
+    },
+    {
+      "id": "jacars-2529828",
+      "slug": "amazon-echo-show-ars2529828",
+      "url": "https://6ixo.com/listing/amazon-echo-show-ars2529828/"
+    },
+    {
+      "id": "jacars-2499585",
+      "slug": "mini-cooper-2-0l-2018-ars2499585",
+      "url": "https://6ixo.com/listing/mini-cooper-2-0l-2018-ars2499585/"
+    },
+    {
+      "id": "jacars-2469641",
+      "slug": "toyota-gt86-2-0l-2019-ars2469641",
+      "url": "https://6ixo.com/listing/toyota-gt86-2-0l-2019-ars2469641/"
     }
   ]
 }

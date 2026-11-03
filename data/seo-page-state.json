@@ -1,6 +1,6 @@
 {
   "https://6ixo.com/": {
-    "hash": "1a5a32146da8b9d77edcd45572f9f063c5740f81e2b0bb158a496cc6a9dcd4fd",
+    "hash": "cfb77097e350c5c48cd6b2c10b5daafa5bd8a5efef2355e0c64632d28bcf8bcb",
     "lastmod": "2026-11-03"
   },
   "https://6ixo.com/about/": {
@@ -24,8 +24,8 @@
     "lastmod": "2026-11-01"
   },
   "https://6ixo.com/apartments-for-rent/canada/hamilton/": {
-    "hash": "571888b5b6fd314177beb39a525e32fdd508e8662241166dec1ebfec886aedd8",
-    "lastmod": "2026-11-01"
+    "hash": "bdf6fd8727c24ddc46ea07976aac5c8bb01320eede27e1bab0fe22436bfe7dd6",
+    "lastmod": "2026-11-03"
   },
   "https://6ixo.com/apartments-for-rent/canada/winnipeg/": {
     "hash": "2db2e0ba73ab5544dda2a8aff1007249372abd67ce3c65b861c76dfe4fdc5e3c",
@@ -4044,7 +4044,7 @@
     "lastmod": "2026-11-03"
   },
   "https://6ixo.com/listing/2015-jeep-wrangler-unlimited-4x4-supercharged-custom-mod-l-5ws9kstb3o/": {
-    "hash": "adbf1cb5e3dad9588e87491fb5e6299ff7e4a0f6eb3df5c7aa8b5f5321220b7a",
+    "hash": "b35434961af4a66205b96075ba3c977ef2a474af51165a0c8824f4f12090b212",
     "lastmod": "2026-11-03"
   },
   "https://6ixo.com/listing/2015-jeep-wrangler-unlimited-sahara-4wd-no-accident-lifted-go8d2bgb6m/": {
@@ -13456,8 +13456,8 @@
     "lastmod": "2026-11-02"
   },
   "https://6ixo.com/listing/junior-1-bedroom-apartment-argyle-senior-discount-availabl-1735619103/": {
-    "hash": "e32cf4b5c8b0cc2579a37bb688e240da72f34cdcf5422dc425404358de02eb0e",
-    "lastmod": "2026-11-01"
+    "hash": "35afd8c56c434e02757cbc1164abf9c6bb96d3e1c0c895acdeb8e8391f24dccb",
+    "lastmod": "2026-11-03"
   },
   "https://6ixo.com/listing/junk-car-removal-cash-for-cars-any-condition-1744191899/": {
     "hash": "5abcc55ffb015d5f94746549b4c76475e661fef4d81a9728fa62ee5a3b0db698",
@@ -14642,10 +14642,6 @@
   "https://6ixo.com/listing/new-1-trip-container-conex-pod-storage-box-shipping-contai-znrqqvqu5e/": {
     "hash": "f615cc3c9e9e2bca6b07bb56a84a0f6308949e5d0e84e2aa5ce7681e146ff02a",
     "lastmod": "2026-11-01"
-  },
-  "https://6ixo.com/listing/new-17-vw-tiguan-audi-q3-rims-5x112-225-65-r17-michelin-sn-1744553910/": {
-    "hash": "bb33a0a65b010192bc2ec13893ecd9c39aad0936c4ce4d6abdee2adb1a3bbac2",
-    "lastmod": "2026-11-03"
   },
   "https://6ixo.com/listing/new-18-inch-armed-off-road-militia-gloss-black-machined-ti-1744152032/": {
     "hash": "fc210ad00313becf7d751da68a3e93783d52f97d78c7d9a22fa45e2ca9434563",
@@ -18396,32 +18392,32 @@
     "lastmod": "2026-11-03"
   },
   "https://6ixo.com/listings/": {
-    "hash": "156082e26593479108dd028c4f07555843059cc4ed39d2e86402edc0342eae2c",
+    "hash": "9ded2222b5d504d95c226e4bd7133ba5e255e83143c5854f06a0c89cce3d5115",
     "lastmod": "2026-11-03"
   },
   "https://6ixo.com/listings/auto-parts/": {
-    "hash": "ed766595263ffea0969dbaf854ec96752ac4e613fe975409127308cb34dacba2",
+    "hash": "3b156c36b91e0aeb324e3177c4294b38bdd71ccdadb2ad3ee847701c71a68c18",
     "lastmod": "2026-11-03"
   },
   "https://6ixo.com/listings/buy-and-sell/": {
-    "hash": "2f14eb44f4ad17ea9702e249d54318be8eee3da8bac3a1c327914f45f0187a0d",
+    "hash": "5bae0d13b37b0c524d18208d31de5929a27b065f0c564a9ef74d5ba9b915168b",
     "lastmod": "2026-11-03"
   },
   "https://6ixo.com/listings/car-rentals/": {
-    "hash": "a123bcabc975973ccc3178b2e20d7d014a706c7be3309cea891d97423af620c9",
+    "hash": "7e8b617843bd84feff93255122eab4df503b7ec66099be2e8585a8253513f6ab",
     "lastmod": "2026-11-03"
   },
   "https://6ixo.com/listings/community/": {
-    "hash": "44c5d54a3aa0c1a726791d60fdd7a567b1bd94cdf971a9fdeb8ddee53d6d6998",
+    "hash": "51bc627f67336436ee451de493f64b17938a52ea61c4f0a6c39c1e17335336f7",
     "lastmod": "2026-11-03"
   },
   "https://6ixo.com/listings/country/canada/": {
-    "hash": "f94a9e3a36b468f4f60a9e6103e45c3ddb1ef25c561beaf6cf34cd26cafe35b9",
+    "hash": "bfe681c045e7b3bb7c69fa7ac817fa3625980e2cbf8cd48e882d2296df07ccb4",
     "lastmod": "2026-11-03"
   },
   "https://6ixo.com/listings/country/canada/auto-parts/": {
-    "hash": "86fd9c3aa5a4279d32f75822d662f369e8922c0e55ac0631a2554e9bf64fac23",
-    "lastmod": "2026-11-02"
+    "hash": "cd4ce90660a4554276b32fe738c62214e1e8eda8855e24d5272be3892088ada1",
+    "lastmod": "2026-11-03"
   },
   "https://6ixo.com/listings/country/canada/buy-and-sell/": {
     "hash": "050e9ed67e8fa8eea771444aa16ccc3bd59351e7b5a01535d0c7ebc3d5653a9d",
@@ -18608,31 +18604,31 @@
     "lastmod": "2026-11-01"
   },
   "https://6ixo.com/listings/electronics/": {
-    "hash": "8f994f0656466e577393111e9a448f2cd3de68bdbb2bab5779ec125cee86d96f",
+    "hash": "5c8081f2266a5651c327cbe183c2277b2de1ee6f111a846c43d56e555b05e2fc",
     "lastmod": "2026-11-03"
   },
   "https://6ixo.com/listings/fashion/": {
-    "hash": "d6c72a7e2404c360f0b13d0dc9f71bdb87d2206b9630ea6167739832c6cff47c",
+    "hash": "975cf6f120f84c532cc0f7a1f4b068b2e63f25413975774ad310571d9b6be22a",
     "lastmod": "2026-11-03"
   },
   "https://6ixo.com/listings/jobs/": {
-    "hash": "db8c314836408c942cde31b8b18961626df87cb7c643b92c009d8598e509dd59",
+    "hash": "571bd9b8422539a3226e3222b7099e9ad010aee412d22e18fc457028f2d127bf",
     "lastmod": "2026-11-03"
   },
   "https://6ixo.com/listings/real-estate/": {
-    "hash": "5fc697c419b65168fab08f0a4dc1d120046e90c9914335a290b49fc230765804",
+    "hash": "ca508136dc39f6910a1370bd231fbd2655426c4f69f2b324f07000f1b8cc0793",
     "lastmod": "2026-11-03"
   },
   "https://6ixo.com/listings/services/": {
-    "hash": "8213affe0a33177b1318116949fce685defe533789a34de91f1226155369c06b",
+    "hash": "1a1ece6e9564d2c4e2ba0c3e5512f6cff059e0af7f924c648300c5ec146baa69",
     "lastmod": "2026-11-03"
   },
   "https://6ixo.com/listings/short-term-rentals/": {
-    "hash": "a29711112f25c6514dc85e3dff55260092e5b7a641a34d0dffae3283c6e1c7ee",
+    "hash": "a9092c6979a454d15db0be498c809480eee83ccb4293ed709f819d0bfb784c72",
     "lastmod": "2026-11-03"
   },
   "https://6ixo.com/listings/vehicles/": {
-    "hash": "3d645792513c4dcb2901a4fbe448e1095bbdaa07e9e8aeebc42363a4e629b402",
+    "hash": "fcf85d8509d61fe86a5a80b1cb29d4fecd682adc0dda4c23f97bc0581500b614",
     "lastmod": "2026-11-03"
   },
   "https://6ixo.com/phones-for-sale/": {

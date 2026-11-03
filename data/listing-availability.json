@@ -1,5 +1,5 @@
 {
-  "checkedAt": "2026-11-03T12:27:57Z",
+  "checkedAt": "2026-11-03T12:42:02.159Z",
   "listings": {
     "craigslist.org/view/d/bastrop-used-2025-cadillac-xt4-fwd-4d/fuqr_3uo8rgowpq1ctwx-a": {
       "availability": "sold",
@@ -17179,24 +17179,40 @@
       "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-buy-sell-other/city-of-toronto/wall-shelf-18-gauge-430-stainless-steel-12-x-60-saws1260/1745672665": {
-      "availability": "unavailable",
-      "checkedAt": "2026-11-03T12:27:57Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1745672665",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/wall-shelf-18-gauge-430-stainless-steel-12-x-60-saws1260/1745672665",
+      "availability": "gone",
+      "checkedAt": "2026-11-03T12:42:02.159Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1745672665",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-buy-sell-other/city-of-toronto/eurodib-10-commercial-manual-meat-slicer/1745672660": {
-      "availability": "unavailable",
-      "checkedAt": "2026-11-03T12:27:57Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1745672660",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/eurodib-10-commercial-manual-meat-slicer/1745672660",
+      "availability": "gone",
+      "checkedAt": "2026-11-03T12:42:02.159Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1745672660",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-buy-sell-other/city-of-toronto/sage-manufacturing-wall-shelf-12-x-48-stainless-steel-18-gauge/1745672596": {
-      "availability": "unavailable",
-      "checkedAt": "2026-11-03T12:27:57Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1745672596",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/sage-manufacturing-wall-shelf-12-x-48-stainless-steel-18-gauge/1745672596",
+      "availability": "gone",
+      "checkedAt": "2026-11-03T12:42:02.159Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1745672596",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-buy-sell-other/city-of-toronto/rosko-countertop-4-burner-commercial-gas-stovetop/1745672599": {
-      "availability": "unavailable",
-      "checkedAt": "2026-11-03T12:27:57Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1745672599",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/rosko-countertop-4-burner-commercial-gas-stovetop/1745672599",
+      "availability": "gone",
+      "checkedAt": "2026-11-03T12:42:02.159Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1745672599",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-room-rental-roommate/city-of-toronto/private-room-with-own-shower-and-fridge/1745529843": {
       "availability": "unavailable",
@@ -17322,6 +17338,78 @@
       "availability": "sold",
       "checkedAt": "2026-11-03T12:27:57Z",
       "reason": "All offers for this exact listing are unavailable"
+    },
+    "kijiji.ca/v-buy-sell-other/city-of-toronto/waring-four-slice-commercial-toaster-without-box/1745672624": {
+      "id": "kijiji-1745672624",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/waring-four-slice-commercial-toaster-without-box/1745672624",
+      "availability": "gone",
+      "checkedAt": "2026-11-03T12:42:02.159Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1745672624",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "kijiji.ca/v-room-rental-roommate/hamilton/girls-house-single-room-for-rent/1744790169": {
+      "id": "kijiji-1744790169",
+      "sourceUrl": "https://www.kijiji.ca/v-room-rental-roommate/hamilton/girls-house-single-room-for-rent/1744790169",
+      "availability": "gone",
+      "checkedAt": "2026-11-03T12:42:02.159Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-room-rental-roommate/hamilton/c36l80014?radius=50.0&ll=43.25925%2C-79.94023&adRemoved=1744790169",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "kijiji.ca/v-stereo-systems-home-theatre/hamilton/rock-ola-bubbler-vinyl-45-jukebox-hamilton/1744742209": {
+      "id": "kijiji-1744742209",
+      "sourceUrl": "https://www.kijiji.ca/v-stereo-systems-home-theatre/hamilton/rock-ola-bubbler-vinyl-45-jukebox-hamilton/1744742209",
+      "availability": "gone",
+      "checkedAt": "2026-11-03T12:42:02.159Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-stereo-systems-home-theatre/hamilton/c14922001l80014?radius=50.0&ll=43.25%2C-79.89&adRemoved=1744742209",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "craigslist.org/view/d/sugar-land-2014-ford-f150-xlt-supercrew/nwyjfceqwva4f8qyxnjtgd": {
+      "id": "craigslist-nwYjfCeQWVA4f8qyXNjtGD",
+      "sourceUrl": "https://www.craigslist.org/view/d/sugar-land-2014-ford-f150-xlt-supercrew/nwYjfCeQWVA4f8qyXNjtGD",
+      "availability": "gone",
+      "checkedAt": "2026-11-03T12:42:02.159Z",
+      "httpStatus": 410,
+      "resolvedUrl": "https://www.craigslist.org/view/d/sugar-land-2014-ford-f150-xlt-supercrew/nwYjfCeQWVA4f8qyXNjtGD",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "craigslist.org/view/d/avondale-estates-2022-mercedes-benz/tu_lyg6_8rgguatwcxuhrw": {
+      "id": "craigslist-Tu_lYG6_8RGGuatwCxuhrw",
+      "sourceUrl": "https://www.craigslist.org/view/d/avondale-estates-2022-mercedes-benz/Tu_lYG6_8RGGuatwCxuhrw",
+      "availability": "gone",
+      "checkedAt": "2026-11-03T12:42:02.159Z",
+      "httpStatus": 410,
+      "resolvedUrl": "https://www.craigslist.org/view/d/avondale-estates-2022-mercedes-benz/Tu_lYG6_8RGGuatwCxuhrw",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "craigslist.org/view/d/woodside-2018-mercedes-benz-gle-great/zqayzmm_8rgovongkzeejq": {
+      "id": "craigslist-Zqayzmm_8RGovonGKZEEJQ",
+      "sourceUrl": "https://www.craigslist.org/view/d/woodside-2018-mercedes-benz-gle-great/Zqayzmm_8RGovonGKZEEJQ",
+      "availability": "gone",
+      "checkedAt": "2026-11-03T12:42:02.159Z",
+      "httpStatus": 410,
+      "resolvedUrl": "https://www.craigslist.org/view/d/woodside-2018-mercedes-benz-gle-great/Zqayzmm_8RGovonGKZEEJQ",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "craigslist.org/view/d/woodside-2021-mercedes-benz-glb-great/wvghu2m_8rgn8k4nfho3gg": {
+      "id": "craigslist-wvghu2m_8RGn8K4nFhO3gg",
+      "sourceUrl": "https://www.craigslist.org/view/d/woodside-2021-mercedes-benz-glb-great/wvghu2m_8RGn8K4nFhO3gg",
+      "availability": "gone",
+      "checkedAt": "2026-11-03T12:42:02.159Z",
+      "httpStatus": 410,
+      "resolvedUrl": "https://www.craigslist.org/view/d/woodside-2021-mercedes-benz-glb-great/wvghu2m_8RGn8K4nFhO3gg",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "craigslist.org/view/d/long-island-city-th-ave-bedrooms-newly/we8zqx7ac13grkv2rtmp5m": {
+      "id": "craigslist-we8ZQX7AC13GRKV2RtMp5M",
+      "sourceUrl": "https://www.craigslist.org/view/d/long-island-city-th-ave-bedrooms-newly/we8ZQX7AC13GRKV2RtMp5M",
+      "availability": "gone",
+      "checkedAt": "2026-11-03T12:42:02.159Z",
+      "httpStatus": 410,
+      "resolvedUrl": "https://www.craigslist.org/view/d/long-island-city-th-ave-bedrooms-newly/we8ZQX7AC13GRKV2RtMp5M",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     }
   }
 }

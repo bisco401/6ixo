@@ -1,5 +1,5 @@
 {
-  "checkedAt": "2026-11-03T06:30:55Z",
+  "checkedAt": "2026-11-03T06:44:03.684Z",
   "listings": {
     "craigslist.org/view/d/bastrop-used-2025-cadillac-xt4-fwd-4d/fuqr_3uo8rgowpq1ctwx-a": {
       "availability": "sold",
@@ -16768,14 +16768,22 @@
       "reason": "Kijiji redirected the exact ad to a confirmed removal"
     },
     "kijiji.ca/v-buy-sell-other/city-of-toronto/medsup-21-white-polypropylene-bouffant-cap-1000pcs/1745630476": {
-      "availability": "unavailable",
-      "checkedAt": "2026-11-03T06:30:55Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1745630476",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/medsup-21-white-polypropylene-bouffant-cap-1000pcs/1745630476",
+      "availability": "gone",
+      "checkedAt": "2026-11-03T06:44:03.684Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1745630476",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-buy-sell-other/city-of-toronto/sage-manufacturing-wall-shelf-12-x-48-stainless-steel-18-gauge/1745630474": {
-      "availability": "unavailable",
-      "checkedAt": "2026-11-03T06:30:55Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1745630474",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/sage-manufacturing-wall-shelf-12-x-48-stainless-steel-18-gauge/1745630474",
+      "availability": "gone",
+      "checkedAt": "2026-11-03T06:44:03.684Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1745630474",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-buy-sell-other/city-of-toronto/sagetra-commercial-tomato-slicer/1745630462": {
       "availability": "unavailable",
@@ -17003,14 +17011,22 @@
       "reason": "Exact source URL returned HTTP 410"
     },
     "kijiji.ca/v-buy-sell-other/city-of-toronto/bosch-800-series-built-in-coffee-machine-bcm8450uc-stainless-ste/1745634739": {
-      "availability": "unavailable",
-      "checkedAt": "2026-11-03T06:30:55Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1745634739",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/bosch-800-series-built-in-coffee-machine-bcm8450uc-stainless-ste/1745634739",
+      "availability": "gone",
+      "checkedAt": "2026-11-03T06:44:03.684Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1745634739",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-buy-sell-other/city-of-toronto/wall-shelf-18-gauge-430-stainless-steel-12-x-60-saws1260/1745634683": {
-      "availability": "unavailable",
-      "checkedAt": "2026-11-03T06:30:55Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1745634683",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/wall-shelf-18-gauge-430-stainless-steel-12-x-60-saws1260/1745634683",
+      "availability": "gone",
+      "checkedAt": "2026-11-03T06:44:03.684Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1745634683",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "turnpikemotorsflorida.com/details/used-2000-dodge-grand-caravan/129895352": {
       "availability": "gone",
@@ -17201,6 +17217,24 @@
       "availability": "gone",
       "checkedAt": "2026-11-03T06:30:55Z",
       "reason": "Exact source URL returned HTTP 404"
+    },
+    "kijiji.ca/v-general-electronics/hamilton/bell-home-internet/1745488039": {
+      "id": "kijiji-1745488039",
+      "sourceUrl": "https://www.kijiji.ca/v-general-electronics/hamilton/bell-home-internet/1745488039",
+      "availability": "gone",
+      "checkedAt": "2026-11-03T06:44:03.684Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-general-electronics/hamilton/c15l80014?radius=50.0&ll=43.26%2C-79.87&adRemoved=1745488039",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "kijiji.ca/v-apartments-condos/hamilton/your-oasis-beautiful-3-bedroom-in-highly-desired-west-mountain/1745451754": {
+      "id": "kijiji-1745451754",
+      "sourceUrl": "https://www.kijiji.ca/v-apartments-condos/hamilton/your-oasis-beautiful-3-bedroom-in-highly-desired-west-mountain/1745451754",
+      "availability": "gone",
+      "checkedAt": "2026-11-03T06:44:03.684Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-apartments-condos/hamilton/c37l80014?radius=50.0&ll=43.22%2C-79.88&adRemoved=1745451754",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     }
   }
 }

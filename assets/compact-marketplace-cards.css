@@ -1,0 +1,94 @@
+/* Approved "Slightly smaller" mobile sizing. Keep the existing card content,
+   horizontal browsing, actions and seller profile intact. */
+@layer home-navy-outline {
+    @media (max-width: 600px) {
+        html #main-app :is(#home-recommended-row, #home-recent-row, #marketplace-recommended, #marketplace-recent) {
+            align-items: flex-start !important;
+        }
+
+        html #main-app :is(#home-recommended-row, #home-recent-row, #marketplace-recommended, #marketplace-recent) .marketplace-item.compact {
+            flex-basis: min(82vw, 318px) !important;
+            min-width: min(82vw, 318px) !important;
+            max-width: min(82vw, 318px) !important;
+        }
+
+        html #main-app :is(#home-recommended-row, #home-recent-row, #marketplace-recommended, #marketplace-recent) .marketplace-item.compact :is(.marketplace-item-media, .item-image) {
+            height: 134px !important;
+            min-height: 0 !important;
+        }
+
+        html #main-app :is(#home-recommended-row, #home-recent-row, #marketplace-recommended, #marketplace-recent) .marketplace-item.compact .item-info {
+            padding: 13px !important;
+        }
+
+        html #main-app :is(#home-recommended-row, #home-recent-row, #marketplace-recommended, #marketplace-recent) .marketplace-title-row {
+            gap: 9px !important;
+        }
+
+        html #main-app :is(#home-recommended-row, #home-recent-row, #marketplace-recommended, #marketplace-recent) .item-title {
+            font-size: 15px !important;
+            line-height: 1.25 !important;
+        }
+
+        html #main-app :is(#home-recommended-row, #home-recent-row, #marketplace-recommended, #marketplace-recent) .marketplace-sub-row {
+            gap: 8px !important;
+            margin-top: 7px !important;
+        }
+
+        html #main-app :is(#home-recommended-row, #home-recent-row, #marketplace-recommended, #marketplace-recent) .item-price {
+            font-size: 18px !important;
+            line-height: 1.25 !important;
+        }
+
+        html #main-app :is(#home-recommended-row, #home-recent-row, #marketplace-recommended, #marketplace-recent) .item-date {
+            font-size: 12px !important;
+        }
+
+        html #main-app :is(#home-recommended-row, #home-recent-row, #marketplace-recommended, #marketplace-recent) .item-desc {
+            margin-top: 6px !important;
+            font-size: 13px !important;
+            line-height: 1.32 !important;
+        }
+
+        html #main-app :is(#home-recommended-row, #home-recent-row, #marketplace-recommended, #marketplace-recent) .marketplace-form-meta {
+            margin-top: 6px !important;
+            gap: 4px !important;
+        }
+
+        html #main-app :is(#home-recommended-row, #home-recent-row, #marketplace-recommended, #marketplace-recent) :is(.marketplace-trust-badges, .marketplace-card-actions) {
+            margin-top: 7px !important;
+        }
+
+        html #main-app :is(#home-recommended-row, #home-recent-row, #marketplace-recommended, #marketplace-recent) .marketplace-trust-badge {
+            min-height: 28px !important;
+            font-size: 12px !important;
+        }
+
+        html #main-app :is(#home-recommended-row, #home-recent-row, #marketplace-recommended, #marketplace-recent) .marketplace-offer-btn {
+            font-size: 12px !important;
+            line-height: 1.25 !important;
+            padding: 6px 10px !important;
+        }
+
+        html #main-app :is(#home-recommended-row, #home-recent-row, #marketplace-recommended, #marketplace-recent) .marketplace-seller-row {
+            gap: 10px !important;
+            margin-top: 9px !important;
+        }
+
+        html #main-app :is(#home-recommended-row, #home-recent-row, #marketplace-recommended, #marketplace-recent) .seller-name {
+            font-size: 14px !important;
+            line-height: 1.25 !important;
+        }
+
+        html #main-app :is(#home-recommended-row, #home-recent-row, #marketplace-recommended, #marketplace-recent) .seller-sub {
+            gap: 6px 8px !important;
+            font-size: 12px !important;
+            line-height: 1.25 !important;
+        }
+
+        html #main-app :is(#home-recommended-row, #home-recent-row, #marketplace-recommended, #marketplace-recent) :is(.seller-sub .item-location, .seller-review-count) {
+            font-size: 12px !important;
+            line-height: 1.25 !important;
+        }
+    }
+}

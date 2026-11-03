@@ -1,5 +1,5 @@
 {
-  "count": 4590,
+  "count": 4589,
   "listings": [
     {
       "id": "hgc-dubai-9f0effbe6756af4c",
@@ -29775,15 +29775,6 @@
         "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/1f/1f3fbc8d-37ea-4966-8c86-230c7cd87ee2?rule=kijijica-1600-webp"
       ],
       "categoryKey": "services"
-    },
-    {
-      "id": "samtronix-gy-15924256932000",
-      "slug": "bts-2496-portable-speaker-4256932000",
-      "url": "https://6ixo.com/listing/bts-2496-portable-speaker-4256932000/",
-      "images": [
-        "https://samtronixguyana.com/cdn/shop/files/CIDEACM10017ULTRASIMTABLET_8GBRAM1TBSTORAGE_-2026-10-17T164406.329_1024x.png?v=1792235659"
-      ],
-      "categoryKey": "electronics"
     },
     {
       "id": "samtronix-gy-15924222066848",
@@ -68441,6 +68432,11 @@
       "id": "apify-889fb8ade664",
       "slug": "hp-pavilion-gaming-notebook-9fb8ade664",
       "url": "https://6ixo.com/listing/hp-pavilion-gaming-notebook-9fb8ade664/"
+    },
+    {
+      "id": "samtronix-gy-15924256932000",
+      "slug": "bts-2496-portable-speaker-4256932000",
+      "url": "https://6ixo.com/listing/bts-2496-portable-speaker-4256932000/"
     }
   ]
 }

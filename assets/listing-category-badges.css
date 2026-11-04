@@ -1,0 +1,62 @@
+/* Keep the category on the photo while the gallery scrolls underneath it. */
+@layer home-navy-outline {
+    html :is(.home-card-media, .marketplace-item-media, .image-carousel, .jobs-feed-image,
+        .jobs-featured-media, .community-feed-media, .vehicle-smart-card-media,
+        .realestate-airbnb-media):has(> .listing-category-badge) {
+        position: relative !important;
+    }
+    html .home-card-media { overflow: hidden; }
+    html .home-card-media > .home-card-img { display: block; width: 100%; }
+    html .listing-category-badge {
+        position: absolute !important;
+        top: 8px !important;
+        left: 8px !important;
+        right: auto !important;
+        bottom: auto !important;
+        z-index: 7 !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        width: max-content !important;
+        max-width: calc(100% - 88px) !important;
+        min-height: 24px !important;
+        margin: 0 !important;
+        padding: 4px 9px !important;
+        border: 1px solid rgba(255, 255, 255, .35) !important;
+        border-radius: 6px !important;
+        background: #173b65 !important;
+        color: #fff !important;
+        box-shadow: 0 1px 4px #0b1b3026 !important;
+        font-family: inherit !important;
+        font-size: 11px !important;
+        font-weight: 700 !important;
+        line-height: 1.2 !important;
+        letter-spacing: .01em !important;
+        text-transform: none !important;
+        white-space: nowrap !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+        pointer-events: none !important;
+    }
+    /* Existing status labels have their own row, below the main category. */
+    html :has(> .listing-category-badge) > :is(.marketplace-media-badges,
+        .community-feed-tag, .shortstay-type-badge, .vehicle-smart-card-type,
+        .featured-unified-badge, .vehicle-featured-trust-badge, .marketplace-badge.cross-border),
+    html .featured-ad-card:has(.listing-category-badge) > .featured-ad-tag,
+    html :has(> .image-carousel > .listing-category-badge) > .cross-border-featured-badge {
+        top: 38px !important;
+    }
+    html .item-category-image-badge:not([hidden]) {
+        display: flex !important;
+        align-items: center !important;
+        flex-wrap: wrap !important;
+        gap: 8px !important;
+        margin-top: 8px !important;
+        color: #53657b !important;
+        font-size: 12px !important;
+    }
+    html .item-category-image-badge[hidden] { display: none !important; }
+    html .item-category-image-badge > .listing-category-badge {
+        position: static !important;
+        max-width: 100% !important;
+    }
+}

@@ -23707,6 +23707,7 @@ class DatingApp {
         return `
             <article class="dating-feed-card vehicle-feed-card service-feed-card" ${dataAttrString} role="button" tabindex="0" aria-label="View ${title}">
                 <div class="image-carousel vehicle-card-carousel" aria-label="${title} photos">
+                    ${this.renderListingCategoryBadge('services')}
                     <button class="carousel-btn prev" type="button" aria-label="Previous photo"><i class="fas fa-chevron-left"></i></button>
                     <div class="carousel-track">
                         ${imagesHtml}
@@ -23823,7 +23824,7 @@ class DatingApp {
         });
         return `
             <article class="featured-ad-card realestate-featured-card" ${attributes} role="button" tabindex="0" aria-label="View ${this.escapeHtml(title)}">
-                ${this.buildFeaturedAdCarouselHtml(images, title)}
+                ${this.buildFeaturedAdCarouselHtml(images, title, 'real_estate')}
                 <div class="featured-ad-body">
                     <h4>${this.escapeHtml(this.truncateText(title, 74))}</h4>
                     <p>${this.escapeHtml(listing.price || 'Contact for price')}</p>
@@ -23969,7 +23970,7 @@ class DatingApp {
         });
         return `
             <article class="featured-ad-card service-featured-card" ${attributes} role="button" tabindex="0" aria-label="View ${this.escapeHtml(title)}">
-                ${this.buildFeaturedAdCarouselHtml(photos, title)}
+                ${this.buildFeaturedAdCarouselHtml(photos, title, 'services')}
                 <div class="featured-ad-body">
                     <h4>${this.escapeHtml(this.truncateText(title, 74))}</h4>
                     <p>${this.escapeHtml(service.price || 'Request a quote')}</p>
@@ -25573,6 +25574,7 @@ class DatingApp {
         return `
             <article class="vehicle-smart-card vehicle-smart-card--${this.escapeHtml(kind)}" data-vehicle-id="${this.escapeHtml(String(item.id || ''))}"${this.buildSwipeImageDataAttributes(item)} role="button" tabindex="0" aria-label="Open ${title}">
                 <div class="vehicle-smart-card-media">
+                    ${this.renderListingCategoryBadge('vehicles')}
                     <img src="${image}" alt="${title}" data-photo-index="0">
                     <span class="vehicle-smart-card-type">${this.escapeHtml(kindLabelMap[kind] || 'Vehicle')}</span>
                     <div class="vehicle-smart-card-price">${this.escapeHtml(String(item.price || ''))}</div>
@@ -26955,6 +26957,7 @@ class DatingApp {
                             return `
                                 <div class="dating-feed-card vehicle-feed-card${hasThumbMedia ? ' has-thumb-media' : ''}" data-vehicle-id="${this.escapeHtml(item.id)}" role="button" tabindex="0" aria-label="Open ${title}">
                                     <div class="image-carousel vehicle-card-carousel" aria-label="Photos for ${title}">
+                                        ${this.renderListingCategoryBadge('vehicles')}
                                         ${nav}
                                         <div class="carousel-track">
                                             ${images}
@@ -26978,6 +26981,7 @@ class DatingApp {
 		                return `
 		                    <div class="dating-feed-card vehicle-feed-card${isRental ? ' is-rental' : ''}${isActiveRental ? ' active' : ''}${hasThumbMedia ? ' has-thumb-media' : ''}" data-vehicle-id="${this.escapeHtml(item.id)}" role="button" tabindex="0" aria-label="Open ${title}">
 		                        <div class="image-carousel vehicle-card-carousel" aria-label="Photos for ${title}">
+		                            ${this.renderListingCategoryBadge('vehicles')}
 		                            ${nav}
 		                            <div class="carousel-track">
 	                                ${images}
@@ -36807,6 +36811,7 @@ class DatingApp {
             <article class="realestate-airbnb-card stay-signature-feed-card${preview ? ' preview-card' : ''}" ${preview ? 'role="presentation"' : `data-realestate-id="${id}" role="button" tabindex="0" aria-label="Open ${title}"`} style="box-shadow:0 22px 50px rgba(15,23,42,0.12);border:1px solid rgba(226,232,240,0.96);overflow:hidden;">
                 <div class="realestate-airbnb-media${preview ? '' : ' image-carousel'}" aria-label="Photos for ${title}" style="position:relative;">
                     ${shortTermBadge}
+                    ${this.renderListingCategoryBadge('real_estate')}
                     ${nav}
                     <div class="carousel-track">
                         ${images}
@@ -40101,6 +40106,7 @@ class DatingApp {
 				                return `
 				                    <div class="dating-feed-card vehicle-feed-card realestate-feed-card" data-realestate-id="${id}" role="button" tabindex="0" aria-label="Open ${title}">
 				                        <div class="image-carousel vehicle-card-carousel" aria-label="Photos for ${title}">
+				                            ${this.renderListingCategoryBadge('real_estate')}
 				                            ${nav}
 				                            <div class="carousel-track">
 				                                ${images}
@@ -42256,21 +42262,24 @@ class DatingApp {
 	                if (type === 'vehicle') return 'Vehicles';
 	                if (type === 'realestate') return 'Real Estate';
 	                if (type === 'service') return 'Services';
-	                if (type === 'discovery') return 'Marketplace';
+	                if (type === 'discovery') return this.marketplaceCategoryLabel(it.raw?.category || 'buy_sell');
 	                if (type === 'community') return 'Community';
 	                const category = String(it.raw?.category || '');
 	                return this.marketplaceCategoryLabel(category);
 	            })();
 	            const cardTitle = this.escapeHtml(String(it.title || 'Listing'));
 	            const priceText = this.escapeHtml(this.formatListingPriceText(it.priceText, it.raw || it));
-	            const locationTextRaw = [typeLabel, it.locationLabel || [it.city, it.country].filter(Boolean).join(', ')].filter(Boolean).join(' • ');
+	            const locationTextRaw = it.locationLabel || [it.city, it.country].filter(Boolean).join(', ');
 	            const locationText = this.escapeHtml(locationTextRaw);
 	            const homeCardImages = this.getSwipeImageSources(it);
 	            const img = this.escapeHtml(String(homeCardImages[0] || it.imageUrl || fallbackImg));
 	            const swipeAttrs = this.buildSwipeImageDataAttributes(it);
 	            return `
 	                <div class="home-card-item" data-type="${this.escapeHtml(String(it.type || 'marketplace'))}" data-id="${this.escapeHtml(String(it.id || ''))}"${swipeAttrs}>
-	                    <img class="home-card-img" src="${img}" alt="${cardTitle}" data-photo-index="0">
+	                    <div class="home-card-media listing-category-media">
+                            <img class="home-card-img" src="${img}" alt="${cardTitle}" data-photo-index="0">
+                            ${this.renderListingCategoryBadge(typeLabel)}
+                        </div>
 	                    <div class="home-card-body">
 	                        <div class="home-card-title">${cardTitle}</div>
 	                        <div class="home-card-price">${priceText}</div>
@@ -43981,6 +43990,7 @@ class DatingApp {
         return `
             <article class="community-feed-card" role="listitem" tabindex="0" data-community-post-id="${this.escapeHtml(String(post?.id || ''))}"${this.buildSwipeImageDataAttributes(post)} aria-label="Open ${title}">
                 <div class="community-feed-media">
+                    ${this.renderListingCategoryBadge('community')}
                     <img src="${image}" alt="${title}" data-photo-index="0" loading="lazy">
                     <span class="community-feed-tag">${categoryLabel}</span>
                 </div>
@@ -44445,6 +44455,9 @@ class DatingApp {
         const dateLabel = this.formatRelativeTime(timestamp);
         const listing = post?.listing || {};
         const listingType = String(post?.listingType || listing?.type || 'sale').toLowerCase();
+        const linkedItem = (this.marketplaceItems || []).find((item) => String(item.id) === String(post?.marketplaceItemId || ''));
+        const mainCategory = linkedItem?.category || post?.category
+            || ({ service: 'services', job: 'jobs', vehicle: 'vehicles', realestate: 'real_estate' })[listingType] || 'buy_sell';
         const badge = this.getListingTypeMeta(listingType);
         const location = this.buildListingLocationLabel(seller.location, post?.location);
         const cityRaw = String(seller?.location?.city || '').trim() || String(post?.city || '').trim();
@@ -44484,6 +44497,7 @@ class DatingApp {
         return `
             <article class="discovery-post listing discovery-marketplace-post dating-feed-card vehicle-feed-card marketplace-feed-card marketplace-item" data-type="${this.escapeHtml(listingType)}" data-images="${imagesAttr}" data-discovery-id="${sellerIdAttr}" role="button" tabindex="0" aria-label="Open ${title}">
                 <div class="vehicle-card-carousel marketplace-item-media listing-media${imageList.length > 1 ? ' image-carousel' : ''}" data-photo-index="0">
+                    ${this.renderListingCategoryBadge(mainCategory)}
                     ${carouselHtml}
                     <div class="marketplace-media-badges" aria-hidden="true">${badgeHtml}</div>
                 </div>
@@ -56452,6 +56466,34 @@ class DatingApp {
         return map[category] || (category ? String(category) : 'Listing');
     }
 
+    getListingCategoryKey(category = '') {
+        // Use the saved main category, never a title or a seller-supplied detail badge.
+        const key = String(category || '').trim().toLowerCase().replace(/[\s-]+/g, '_');
+        const aliases = {
+            vehicle: 'vehicles', realestate: 'real_estate', service: 'services',
+            fashion: 'clothing', 'fashion_&_accessories': 'clothing',
+            'buy_&_sell': 'buy_sell', buy_n_sell: 'buy_sell', marketplace: 'buy_sell'
+        };
+        const resolved = aliases[key] || key;
+        return ['electronics', 'clothing', 'sports', 'home', 'vehicles', 'services',
+            'real_estate', 'jobs', 'buy_sell', 'dating', 'companionship', 'community', 'other'].includes(resolved)
+            ? resolved : '';
+    }
+
+    renderListingCategoryBadge(category = '') {
+        const key = this.getListingCategoryKey(category);
+        if (!key) return '';
+        return `<span class="listing-category-badge" data-listing-category="${key}">${this.escapeHtml(this.marketplaceCategoryLabel(key))}</span>`;
+    }
+
+    syncPostItemCategoryBadge() {
+        const host = document.getElementById('item-category-image-badge');
+        if (!host) return;
+        const badge = this.renderListingCategoryBadge(document.getElementById('item-category')?.value);
+        host.innerHTML = badge ? `${badge}<span>Added automatically to your listing photo.</span>` : '';
+        host.hidden = !badge;
+    }
+
     getMarketplaceListingTypeLabel(key = '') {
         const map = {
             for_rent: 'For Rent',
@@ -57639,7 +57681,7 @@ class DatingApp {
         };
     }
 
-    buildFeaturedAdCarouselHtml(images = [], label = 'Listing') {
+    buildFeaturedAdCarouselHtml(images = [], label = 'Listing', category = '') {
         const safeImages = Array.isArray(images) ? images.filter(Boolean) : [];
         const fallback = safeImages.length
             ? safeImages
@@ -57650,6 +57692,7 @@ class DatingApp {
         `).join('');
         return `
             <div class="image-carousel" data-gallery-photos="${this.escapeHtml(JSON.stringify(fallback))}">
+                ${this.renderListingCategoryBadge(category)}
                 <button class="carousel-btn prev" type="button" aria-label="Previous photo"><i class="fas fa-chevron-left"></i></button>
                 <div class="carousel-track">
                     ${imagesHtml}
@@ -58043,7 +58086,7 @@ class DatingApp {
 	            cardHtml = `
 	                <article class="featured-ad-card" ${attrString} role="button" tabindex="0" aria-label="View ${this.escapeHtml(String(title))}">
 	                    <div class="featured-ad-tag tag-premium">Sponsored</div>
-	                    ${this.buildFeaturedAdCarouselHtml(images, title)}
+	                    ${this.buildFeaturedAdCarouselHtml(images, title, item.category)}
 	                    <div class="featured-ad-body">
 	                        <h4>${this.escapeHtml(String(title))}</h4>
 	                        <p>${this.escapeHtml(String(priceLine))}${location ? ` · ${this.escapeHtml(location)}` : ''}</p>
@@ -58057,7 +58100,7 @@ class DatingApp {
 		            const attrString = this.buildDataAttributesString(dataAttrs);
 		            cardHtml = `
 		                <article class="featured-ad-card" ${attrString} role="button" tabindex="0" aria-label="View ${this.escapeHtml(String(title))}">
-		                    ${this.buildFeaturedAdCarouselHtml(images, title)}
+		                    ${this.buildFeaturedAdCarouselHtml(images, title, item.category)}
 		                    <div class="featured-ad-body">
 		                        <h4>${this.escapeHtml(String(title))}</h4>
 		                        <p>${this.escapeHtml(String(priceLine))}${location ? ` · ${this.escapeHtml(location)}` : ''}</p>
@@ -58075,7 +58118,7 @@ class DatingApp {
 		            cardHtml = `
 		                <article class="featured-ad-card" ${attrString} role="button" tabindex="0" aria-label="View ${this.escapeHtml(String(title))}">
 		                    <div class="featured-ad-tag tag-premium">Sponsored</div>
-		                    ${this.buildFeaturedAdCarouselHtml(images, title)}
+		                    ${this.buildFeaturedAdCarouselHtml(images, title, item.category)}
 		                    <div class="featured-ad-body">
 		                        <h4>${this.escapeHtml(String(title))}</h4>
 		                        <p>${this.escapeHtml(String(priceLine))}${location ? ` · ${this.escapeHtml(location)}` : ''}</p>
@@ -58129,7 +58172,7 @@ class DatingApp {
             cardHtml = `
                 <article class="featured-ad-card service-featured-card" ${attrString} role="button" tabindex="0" aria-label="View ${this.escapeHtml(String(title))}">
                     <div class="featured-ad-tag${tagClass ? ` ${tagClass}` : ''}">${this.escapeHtml(tagText)}</div>
-                    ${this.buildFeaturedAdCarouselHtml(images, title)}
+                    ${this.buildFeaturedAdCarouselHtml(images, title, item.category)}
 	                    <div class="featured-ad-body">
 	                        <h4>${this.escapeHtml(String(serviceFeatured.title || title))}</h4>
 	                        <p>${this.escapeHtml(String(serviceFeatured.priceLine || priceLine))}</p>
@@ -58158,7 +58201,7 @@ class DatingApp {
             });
             cardHtml = `
                 <article class="featured-ad-card" ${attrString} role="button" tabindex="0" aria-label="View ${this.escapeHtml(String(title))}">
-                    ${this.buildFeaturedAdCarouselHtml(images, title)}
+                    ${this.buildFeaturedAdCarouselHtml(images, title, item.category)}
                     <div class="featured-ad-body">
                         <h4>${this.escapeHtml(String(title))}</h4>
                         <p>${this.escapeHtml(String(priceLine))}${location ? ` · ${this.escapeHtml(location)}` : ''}</p>
@@ -58178,7 +58221,7 @@ class DatingApp {
             cardHtml = `
                 <article class="featured-ad-card" ${attrString} role="button" tabindex="0" aria-label="View ${this.escapeHtml(String(title))}">
                     <div class="featured-ad-tag${tagClass ? ` ${tagClass}` : ''}">${this.escapeHtml(tagText)}</div>
-                    ${this.buildFeaturedAdCarouselHtml(images, title)}
+                    ${this.buildFeaturedAdCarouselHtml(images, title, item.category)}
                     <div class="featured-ad-body">
                         <h4>${this.escapeHtml(String(title))}</h4>
                         <p>${this.escapeHtml(String(priceLine))}${location ? ` · ${this.escapeHtml(location)}` : ''}</p>
@@ -58210,7 +58253,7 @@ class DatingApp {
 	            cardHtml = `
 	                <article class="featured-ad-card luxury-profile-card" ${attrString} role="button" tabindex="0" aria-label="View ${this.escapeHtml(String(title))}">
                         <div class="luxury-profile-media">
-	                        ${this.buildFeaturedAdCarouselHtml(images, title)}
+	                        ${this.buildFeaturedAdCarouselHtml(images, title, item.category)}
                             <div class="luxury-profile-status">
                                 <span class="luxury-profile-dot" aria-hidden="true"></span>
                                 ${this.escapeHtml(statusLineRaw)}
@@ -58280,7 +58323,7 @@ class DatingApp {
 	            cardHtml = `
 	                <article class="featured-ad-card service-featured-card" ${attrString} role="button" tabindex="0" aria-label="View ${this.escapeHtml(String(title))}">
 	                    <div class="featured-ad-tag${tagClass ? ` ${tagClass}` : ''}">${this.escapeHtml(tagText)}</div>
-	                    ${this.buildFeaturedAdCarouselHtml(images, title)}
+	                    ${this.buildFeaturedAdCarouselHtml(images, title, item.category)}
 		                    <div class="featured-ad-body">
 		                        <h4>${this.escapeHtml(String(serviceFeatured.title || title))}</h4>
 		                        <p>${this.escapeHtml(String(serviceFeatured.priceLine || priceLine))}</p>
@@ -58309,7 +58352,7 @@ class DatingApp {
 	            });
 	            cardHtml = `
 	                <article class="featured-ad-card" ${attrString} role="button" tabindex="0" aria-label="View ${this.escapeHtml(String(title))}">
-	                    ${this.buildFeaturedAdCarouselHtml(images, title)}
+	                    ${this.buildFeaturedAdCarouselHtml(images, title, item.category)}
 	                    <div class="featured-ad-body">
 	                        <h4>${this.escapeHtml(String(title))}</h4>
 	                        <p>${this.escapeHtml(String(priceLine))}${location ? ` · ${this.escapeHtml(location)}` : ''}</p>
@@ -58329,7 +58372,7 @@ class DatingApp {
 	            cardHtml = `
 	                <article class="featured-ad-card" ${attrString} role="button" tabindex="0" aria-label="View ${this.escapeHtml(String(title))}">
 	                    <div class="featured-ad-tag${tagClass ? ` ${tagClass}` : ''}">${this.escapeHtml(tagText)}</div>
-	                    ${this.buildFeaturedAdCarouselHtml(images, title)}
+	                    ${this.buildFeaturedAdCarouselHtml(images, title, item.category)}
 	                    <div class="featured-ad-body">
 	                        <h4>${this.escapeHtml(String(title))}</h4>
 	                        <p>${this.escapeHtml(String(priceLine))}${location ? ` · ${this.escapeHtml(location)}` : ''}</p>
@@ -58568,7 +58611,6 @@ class DatingApp {
         const rawDescription = this.getMarketplaceDisplayDescription(item);
         const descText = rawDescription ? this.truncateText(rawDescription, compact ? 90 : 120) : '';
         const descHtml = descText ? `<p class="item-desc${compact ? ' compact' : ''}">${this.escapeHtml(descText)}</p>` : '';
-        const categoryLabel = this.escapeHtml(this.getMarketplaceImageCategoryLabel(item));
         const isSold = this.isMarketplaceItemSold(item);
         const isBidListing = this.isClothingBiddingListing(item, {
             stockxMode: this.clothingFilters?.category === 'bidding'
@@ -58635,10 +58677,7 @@ class DatingApp {
                     <img src="${firstImage}" alt="${title}" class="item-image" loading="lazy" decoding="async">
                         <div class="marketplace-media-badges" aria-hidden="true">${soldBadgeHtml}${liveAuctionBadgeHtml}${deliveryBadgeHtml}</div>
                         ${shippingBadgeHtml}
-                        <div class="marketplace-category-label" aria-hidden="true">
-                            <i class="fas fa-tag" aria-hidden="true"></i>
-                            <span>${categoryLabel}</span>
-                        </div>
+                        ${this.renderListingCategoryBadge(item.category)}
 	                </div>
 	                <div class="item-info">
 	                    <div class="marketplace-title-row">
@@ -58788,6 +58827,7 @@ class DatingApp {
 	        return `
 	            <div class="dating-feed-card vehicle-feed-card marketplace-feed-card marketplace-item${hasThumbMedia ? ' has-thumb-media' : ''}${marketList ? ' marketplace-listing-row' : ''}" data-id="${item.id}" data-images="${imagesAttr}"${deferImages ? ' data-defer-listing-images="1"' : ''} role="button" tabindex="0" aria-label="Open ${title}">
 	                <div class="vehicle-card-carousel marketplace-item-media" data-photo-index="0">
+                    ${this.renderListingCategoryBadge(item.category)}
 	                    <img ${imageAttributes} alt="${title}" class="item-image" loading="lazy" decoding="async">
                         <div class="marketplace-media-badges" aria-hidden="true">${listingTypeBadgeHtml}${soldBadgeHtml}</div>
                         ${shippingBadgeHtml}
@@ -58846,9 +58886,9 @@ class DatingApp {
         const tagsHtml = tags.length
             ? `<div class="jobs-card-tags">${tags.map((tag) => `<span>${this.escapeHtml(String(tag))}</span>`).join('')}</div>`
             : '';
-        const image = item.companyLogo || item.image || '';
+        const image = item.companyLogo || item.image || (Array.isArray(item.images) ? item.images.find(Boolean) : '') || '';
         const mediaHtml = image
-            ? `<div class="jobs-feed-image"><img src="${this.escapeHtml(image)}" alt="${title}" loading="lazy" decoding="async"></div>`
+            ? `<div class="jobs-feed-image">${this.renderListingCategoryBadge('jobs')}<img src="${this.escapeHtml(image)}" alt="${title}" loading="lazy" decoding="async"></div>`
             : '';
         const logoHtml = image
             ? ''
@@ -58925,6 +58965,7 @@ class DatingApp {
         return `
             <article class="jobs-card marketplace-item jobs-featured-card featured-unified-card featured-profile-card" data-featured-profile-card="1" ${wrapperAttrs}>
                 <div class="jobs-featured-media featured-unified-media vehicle-featured-trust-media">
+                    ${this.renderListingCategoryBadge('jobs')}
                     <div class="carousel-track">${mediaHtml}</div>
                     <span class="vehicle-featured-trust-badge">
                         <i class="fas fa-circle-check" aria-hidden="true"></i>
@@ -62142,6 +62183,7 @@ class DatingApp {
     }
 
     renderPostItemLivePreview() {
+        this.syncPostItemCategoryBadge();
         if (this.isShortTermHostPosting()) {
             this.renderRealestateShortTermComposerPreview();
             return;
@@ -62688,7 +62730,7 @@ class DatingApp {
             <article class="${cardClass}" role="presentation" aria-label="Featured preview">
                 ${tagBlock}
                 <div class="${cardClass.includes('luxury-profile-card') ? 'luxury-profile-media' : 'featured-preview-media'}">
-                    ${this.buildFeaturedAdCarouselHtml(safeImages, title || 'Featured listing')}
+                    ${this.buildFeaturedAdCarouselHtml(safeImages, title || 'Featured listing', category)}
                     ${shippingBadgeHtml}
                     ${cardClass.includes('luxury-profile-card')
                         ? `<div class="luxury-profile-status">
@@ -62744,7 +62786,7 @@ class DatingApp {
         return `
             <article class="featured-ad-card service-featured-card" role="presentation" aria-label="Featured service preview">
                 <div class="featured-ad-tag${tagClass ? ` ${tagClass}` : ''}">${this.escapeHtml(tag)}</div>
-                ${this.buildFeaturedAdCarouselHtml(safeImages, title || service?.title || 'Featured service')}
+                ${this.buildFeaturedAdCarouselHtml(safeImages, title || service?.title || 'Featured service', 'services')}
                 <div class="featured-ad-body">
                     <h4>${this.escapeHtml(title || service?.title || 'Featured service')}</h4>
                     <p>${this.escapeHtml(priceLine || service?.price || 'Price TBD')}</p>
@@ -64111,12 +64153,14 @@ class DatingApp {
                 });
             });
 
-            const badges = media.querySelector('.marketplace-media-badges');
+            const overlays = Array.from(media.children).filter((child) => child.matches(
+                '.listing-category-badge, .marketplace-media-badges, .marketplace-badge, .listing-media-count, .marketplace-media-posted'
+            ));
             media.textContent = '';
             if (prev) media.appendChild(prev);
             media.appendChild(track);
             if (next) media.appendChild(next);
-            if (badges) media.appendChild(badges);
+            overlays.forEach((overlay) => media.appendChild(overlay));
             if (isCompactFeedCard) this.ensureMobileCarouselDots(media, track);
             this.bindMarketplaceFeedMediaLightbox(item, media, sources, title);
 
@@ -65817,6 +65861,9 @@ class DatingApp {
 	        if (!values || typeof values !== 'object') return false;
 	        this.isRestoringPostItemDraft = true;
 	        try {
+                const mainCategory = document.getElementById('item-category');
+                if (mainCategory) mainCategory.value = String(values['item-category'] || '');
+                this.syncPostItemSubcategoryUi(mainCategory?.value || '');
 	            Object.entries(values).forEach(([id, value]) => {
 	                if (id === 'realestateBlockedDates') {
 	                    this.realestateShortTermBlockedDates = this.normalizeRealestateBlockedDateEntries(value);
@@ -68781,6 +68828,7 @@ class DatingApp {
 	            const newPost = {
 	                id: Date.now() + 1,
                     marketplaceItemId: newItem.id,
+                    category,
 	                seller: {
 	                    name: sellerName,
                     avatar: sellerPhoto,

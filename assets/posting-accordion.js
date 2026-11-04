@@ -693,7 +693,7 @@
             categoryRow.className = 'posting-category-row';
             const mainGroup = document.createElement('div');
             mainGroup.className = 'input-group';
-            mainGroup.innerHTML = '<label for="community-post-main-category">Main category</label><select id="community-post-main-category" required></select>';
+            mainGroup.innerHTML = `<label for="community-post-main-category">Main category</label><select id="community-post-main-category" required></select><div class="item-category-image-badge">${this.app.renderListingCategoryBadge('community')}<span>Added automatically to your listing photo.</span></div>`;
             const main = mainGroup.querySelector('select');
             Array.from(get('item-category')?.options || []).filter(option => option.value && !option.disabled && !option.hidden).forEach(option => {
                 const copy = option.cloneNode(true);

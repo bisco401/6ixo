@@ -1,0 +1,119 @@
+/* Use the existing theme layer so its important rules and these controls agree. */
+@layer home-navy-outline {
+    html #main-app .feed-browsing-section .marketplace-section-header {
+        flex-wrap: wrap !important;
+        gap: 10px 16px !important;
+    }
+    html #main-app .feed-browsing-section .marketplace-section-sub { margin-left: auto !important; }
+    html #main-app .feed-browsing-arrows { display: flex !important; gap: 8px !important; flex: 0 0 auto !important; }
+    html #main-app .feed-browsing-arrow {
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        flex: 0 0 40px !important;
+        width: 40px !important;
+        min-height: 40px !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        border: 1px solid #285d9a !important;
+        border-radius: 50% !important;
+        background: #285d9a !important;
+        color: #fff !important;
+        box-shadow: none !important;
+        font-size: 15px !important;
+        cursor: pointer !important;
+    }
+    html #main-app .feed-browsing-arrow:disabled { opacity: .35 !important; cursor: default !important; }
+    html #main-app .feed-browsing-arrow:enabled:hover { background: #1c4679 !important; }
+    html #main-app :is(.feed-browsing-arrow, .feed-browsing-scroll):focus-visible { outline: 3px solid #87abe0 !important; outline-offset: 3px !important; }
+    html #main-app .feed-browsing-footer { min-width: 0 !important; padding-top: 12px !important; }
+    html #main-app .feed-browsing-meta { display: flex !important; align-items: center !important; justify-content: space-between !important; gap: 12px !important; color: #5e7087 !important; font-size: 12px !important; }
+    html #main-app .feed-browsing-meta label { margin: 0 !important; color: inherit !important; font: inherit !important; }
+    html #main-app .feed-browsing-meta output { color: #285d9a !important; font-weight: 700 !important; white-space: nowrap !important; font-variant-numeric: tabular-nums !important; }
+    html #main-app .feed-browsing-scroll {
+        display: block !important;
+        appearance: none !important;
+        -webkit-appearance: none !important;
+        width: 100% !important;
+        height: 32px !important;
+        min-height: 0 !important;
+        margin: 2px 0 0 !important;
+        padding: 0 !important;
+        border: 0 !important;
+        border-radius: 0 !important;
+        box-shadow: none !important;
+        background: transparent !important;
+        cursor: grab !important;
+        touch-action: pan-y !important;
+    }
+    html #main-app .feed-browsing-scroll:active { cursor: grabbing !important; }
+    html #main-app .feed-browsing-scroll:disabled { cursor: default !important; opacity: .5 !important; }
+    html #main-app .feed-browsing-scroll::-webkit-slider-runnable-track { height: 10px; background: #e5ecf5; border-radius: 10px; }
+    html #main-app .feed-browsing-scroll::-webkit-slider-thumb { appearance: none; -webkit-appearance: none; height: 10px; width: var(--feed-scroll-thumb, 80px); background: #285d9a; border: 0; border-radius: 10px; }
+    html #main-app .feed-browsing-scroll::-moz-range-track { height: 10px; background: #e5ecf5; border-radius: 10px; }
+    html #main-app .feed-browsing-scroll::-moz-range-thumb { height: 10px; width: var(--feed-scroll-thumb, 80px); background: #285d9a; border: 0; border-radius: 10px; }
+    html #main-app .feed-browsing-scrubbing { scroll-snap-type: none !important; scroll-behavior: auto !important; }
+    html #main-app .feed-preview-location { display: none !important; }
+
+    @media (min-width: 769px) {
+        /* Pagination may contain only two matches in each category. Let those
+           cards share the available columns instead of reserving whole rows. */
+        html #main-app #home-content #home-listings-grid {
+            grid-template-columns: repeat(auto-fill, minmax(196px, 1fr)) !important;
+            gap: 12px !important;
+        }
+        html #main-app #home-content #home-listings-grid > .home-results-section:not(.home-search-destinations),
+        html #main-app #home-content #home-listings-grid > .home-results-section:not(.home-search-destinations) > .home-results-section-grid { display: contents !important; }
+        html #main-app #home-content #home-listings-grid > .home-results-section:not(.home-search-destinations) > .home-results-section-header { display: none !important; }
+        html #main-app #home-content #home-listings-grid .home-card-item { min-width: 0 !important; }
+        html #main-app #home-content .home-listings { padding: 12px !important; }
+        html #main-app #home-content #home-listings-grid .home-card-img { height: 136px !important; }
+        html #main-app #home-content #home-listings-grid .home-card-body { padding: 10px !important; }
+        html #main-app #home-content #home-listings-grid .home-card-title {
+            display: -webkit-box !important;
+            -webkit-box-orient: vertical !important;
+            -webkit-line-clamp: 2 !important;
+            overflow: hidden !important;
+            font-size: 14px !important;
+            line-height: 1.35 !important;
+            min-height: 38px !important;
+            margin-bottom: 5px !important;
+        }
+        html #main-app #home-content #home-listings-grid .home-card-price { font-size: 16px !important; line-height: 1.3 !important; }
+        html #main-app #home-content #home-listings-grid .home-card-loc { font-size: 12px !important; line-height: 1.35 !important; }
+    }
+
+    @media (min-width: 1024px) {
+        /* Desktop previews match the approved sample; the listing still opens
+           its complete details, contact actions, and seller profile. */
+        html #main-app .feed-browsing-section .marketplace-item.compact {
+            flex: 0 0 232px !important;
+            min-width: 232px !important;
+            max-width: 232px !important;
+        }
+        html #main-app .feed-browsing-section .marketplace-item.compact :is(.marketplace-item-media, .item-image) { height: 148px !important; min-height: 0 !important; }
+        html #main-app .feed-browsing-section .marketplace-item.compact .item-info { padding: 12px !important; background: #fff !important; }
+        html #main-app .feed-browsing-section .marketplace-item.compact .item-title {
+            display: -webkit-box !important;
+            -webkit-box-orient: vertical !important;
+            -webkit-line-clamp: 2 !important;
+            overflow: hidden !important;
+            min-height: 41px !important;
+            font-size: 15px !important;
+            line-height: 1.35 !important;
+        }
+        html #main-app .feed-browsing-section .marketplace-item.compact .marketplace-save-btn { width: 34px !important; height: 34px !important; min-width: 34px !important; min-height: 34px !important; }
+        html #main-app .feed-browsing-section .marketplace-item.compact .item-price { font-size: 18px !important; line-height: 1.3 !important; }
+        html #main-app .feed-browsing-section .marketplace-item.compact :is(.item-date, .item-desc, .marketplace-form-meta, .marketplace-trust-badges, .marketplace-card-actions, .marketplace-seller-row, .item-info > .seller-sub) { display: none !important; }
+        html #main-app .feed-browsing-section .marketplace-item.compact .feed-preview-location { display: block !important; color: #5e7087 !important; margin-top: 8px !important; font-size: 12px !important; line-height: 1.4 !important; }
+    }
+
+    @media (max-width: 600px) {
+        html #main-app .feed-browsing-section .marketplace-section-header h3 { flex: 1 1 160px !important; }
+        html #main-app .feed-browsing-section .marketplace-section-sub { order: 3 !important; flex-basis: 100% !important; margin-left: 0 !important; }
+    }
+    @media (pointer: coarse) {
+        html #main-app .feed-browsing-arrow { width: 44px !important; min-height: 44px !important; flex-basis: 44px !important; }
+        html #main-app .feed-browsing-scroll { height: 44px !important; }
+    }
+}

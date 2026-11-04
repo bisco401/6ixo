@@ -1,5 +1,5 @@
 {
-  "checkedAt": "2026-11-04T18:24:24Z",
+  "checkedAt": "2026-11-04T18:42:39.963Z",
   "listings": {
     "craigslist.org/view/d/bastrop-used-2025-cadillac-xt4-fwd-4d/fuqr_3uo8rgowpq1ctwx-a": {
       "availability": "sold",
@@ -17564,14 +17564,22 @@
       "reason": "Kijiji redirected the exact ad to a confirmed removal"
     },
     "kijiji.ca/v-buy-sell-other/city-of-toronto/omcan-two-bulb-commercial-portable-heat-lamp-display-warmer/1745722370": {
-      "availability": "unavailable",
-      "checkedAt": "2026-11-04T18:24:24Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1745722370",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/omcan-two-bulb-commercial-portable-heat-lamp-display-warmer/1745722370",
+      "availability": "gone",
+      "checkedAt": "2026-11-04T18:42:39.963Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1745722370",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-buy-sell-other/city-of-toronto/vitamix-36019-commercial-bar-blender-48-oz-vm0145/1745722380": {
-      "availability": "unavailable",
-      "checkedAt": "2026-11-04T18:24:24Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1745722380",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/vitamix-36019-commercial-bar-blender-48-oz-vm0145/1745722380",
+      "availability": "gone",
+      "checkedAt": "2026-11-04T18:42:39.963Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1745722380",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-buy-sell-other/city-of-toronto/sagetra-commercial-tomato-slicer/1745722351": {
       "availability": "unavailable",
@@ -17642,6 +17650,15 @@
       "availability": "unavailable",
       "checkedAt": "2026-11-04T18:24:24Z",
       "reason": "Kijiji redirected the exact ad to a confirmed removal"
+    },
+    "turnpikemotorsflorida.com/details/used-2008-chrysler-sebring/130180385": {
+      "id": "import-becf41062782550891",
+      "sourceUrl": "https://www.turnpikemotorsflorida.com/details/used-2008-chrysler-sebring/130180385",
+      "availability": "gone",
+      "checkedAt": "2026-11-04T18:42:39.963Z",
+      "httpStatus": 404,
+      "resolvedUrl": "https://www.turnpikemotorsflorida.com/details/used-2008-chrysler-sebring/130180385",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     }
   }
 }

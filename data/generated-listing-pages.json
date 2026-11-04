@@ -1,5 +1,5 @@
 {
-  "count": 4557,
+  "count": 4555,
   "listings": [
     {
       "id": "hgc-dubai-9f0effbe6756af4c",
@@ -1558,18 +1558,6 @@
         "https://cdn05.carsforsale.com/0f0d9b91d8491b3a314e8d4643a56630/800x600/2010-chevrolet-malibu-lt-4dr-sedan-w-1lt.jpg",
         "https://cdn05.carsforsale.com/0082680d16bf4a4d0003792c64efb86d3c/800x600/2010-chevrolet-malibu-lt-4dr-sedan-w-1lt.jpg",
         "https://cdn05.carsforsale.com/00dfbf501f668497a175aa4ec359bd9dcb/800x600/2010-chevrolet-malibu-lt-4dr-sedan-w-1lt.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "import-becf41062782550891",
-      "slug": "2008-chrysler-sebring-lx-2782550891",
-      "url": "https://6ixo.com/listing/2008-chrysler-sebring-lx-2782550891/",
-      "images": [
-        "https://cdn05.carsforsale.com/00c4f734f7ffef97aff97210c4e219e4f9/800x600/2008-chrysler-sebring-lx-2dr-convertible.jpg",
-        "https://cdn05.carsforsale.com/59e6c5f28c2c11e8828f98c0046db2d8/800x600/2008-chrysler-sebring-lx-2dr-convertible.jpg",
-        "https://cdn05.carsforsale.com/00fa28d2e569d47f15ae6178103ff14616/800x600/2008-chrysler-sebring-lx-2dr-convertible.jpg",
-        "https://cdn05.carsforsale.com/79490a2315805128bd8c58bf092fc5d8/800x600/2008-chrysler-sebring-lx-2dr-convertible.jpg"
       ],
       "categoryKey": "vehicles"
     },
@@ -5431,18 +5419,6 @@
       "categoryKey": "vehicles"
     },
     {
-      "id": "craigslist-2wj5c5s9Xmb7mWQjizSfSY",
-      "slug": "2002-toyota-rav4-with-184-000-miles-runs-super-smooth-1500-mwqjizsfsy",
-      "url": "https://6ixo.com/listing/2002-toyota-rav4-with-184-000-miles-runs-super-smooth-1500-mwqjizsfsy/",
-      "images": [
-        "https://images.craigslist.org/00101_aB9RFcs6eL2_06H051_600x450.jpg",
-        "https://images.craigslist.org/00c0c_au5pimAhnfz_06H051_600x450.jpg",
-        "https://images.craigslist.org/00I0I_k84uIohkU9t_06H051_600x450.jpg",
-        "https://images.craigslist.org/00q0q_kuYPPo6tQ3j_06H051_600x450.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
       "id": "craigslist-prXR3TtSqQocK5ck2JC78e",
       "slug": "2001-toyota-camry-runs-super-smooth-1-500-down-k5ck2jc78e",
       "url": "https://6ixo.com/listing/2001-toyota-camry-runs-super-smooth-1-500-down-k5ck2jc78e/",
@@ -8572,7 +8548,7 @@
       "slug": "samsung-galaxy-a08-4gb-ram-64gb-storage-8589596832",
       "url": "https://6ixo.com/listing/samsung-galaxy-a08-4gb-ram-64gb-storage-8589596832/",
       "images": [
-        "https://samtronixguyana.com/cdn/shop/files/A08_1024x.png?v=1793794805"
+        "https://samtronixguyana.com/cdn/shop/files/A08_3_1024x.png?v=1793798095"
       ],
       "categoryKey": "electronics"
     },
@@ -11209,7 +11185,7 @@
       "slug": "apple-iphone-18-pro-max-sim-256gb-storage-7241062560",
       "url": "https://6ixo.com/listing/apple-iphone-18-pro-max-sim-256gb-storage-7241062560/",
       "images": [
-        "https://samtronixguyana.com/cdn/shop/files/IPHONE18PM_2_1024x.png?v=1793793317"
+        "https://samtronixguyana.com/cdn/shop/files/IPHONE18PM_11_1024x.png?v=1793798215"
       ],
       "categoryKey": "electronics"
     },
@@ -17677,7 +17653,7 @@
       "slug": "apple-iphone-duo-e-sim-256gb-storage-8039397536",
       "url": "https://6ixo.com/listing/apple-iphone-duo-e-sim-256gb-storage-8039397536/",
       "images": [
-        "https://samtronixguyana.com/cdn/shop/files/DUO_1024x.png?v=1793795221"
+        "https://samtronixguyana.com/cdn/shop/files/DUO_4_1024x.png?v=1793797858"
       ],
       "categoryKey": "electronics"
     },
@@ -33222,7 +33198,7 @@
       "slug": "saiya-wireless-headphone-aw-28-8521548960",
       "url": "https://6ixo.com/listing/saiya-wireless-headphone-aw-28-8521548960/",
       "images": [
-        "https://samtronixguyana.com/cdn/shop/files/SAIYA_1024x.png?v=1793795083"
+        "https://samtronixguyana.com/cdn/shop/files/SAIYA_3_1024x.png?v=1793797941"
       ],
       "categoryKey": "electronics"
     },
@@ -38156,6 +38132,7 @@
       "slug": "milwaukee-m18-quik-lok-pole-saw-attachment-like-new-1744644279",
       "url": "https://6ixo.com/listing/milwaukee-m18-quik-lok-pole-saw-attachment-like-new-1744644279/",
       "images": [
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/76/7619f561-e318-4f3f-9e57-f9ec3b3150e0?rule=kijijica-1600-webp",
         "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/6b/6b89b3ca-d80c-4b10-8c7c-aa0714041319?rule=kijijica-1600-webp",
         "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/ac/ac033e03-8cfd-4b2e-b693-87f320b676db?rule=kijijica-1600-webp",
         "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/17/1787cbc0-c605-4711-84bf-1aec48f2e3ae?rule=kijijica-1600-webp",
@@ -55988,9 +55965,6 @@
       "url": "https://6ixo.com/listings/vehicles/page/55/"
     },
     {
-      "url": "https://6ixo.com/listings/vehicles/page/56/"
-    },
-    {
       "url": "https://6ixo.com/listings/auto-parts/"
     },
     {
@@ -57144,9 +57118,6 @@
     },
     {
       "url": "https://6ixo.com/cars-for-sale/united-states/page/36/"
-    },
-    {
-      "url": "https://6ixo.com/cars-for-sale/united-states/page/37/"
     }
   ],
   "retired": [
@@ -68559,6 +68530,16 @@
       "id": "kijiji-1742664549",
       "slug": "2023-honda-pilot-touring-sunroof-leather-navigation-1742664549",
       "url": "https://6ixo.com/listing/2023-honda-pilot-touring-sunroof-leather-navigation-1742664549/"
+    },
+    {
+      "id": "import-becf41062782550891",
+      "slug": "2008-chrysler-sebring-lx-2782550891",
+      "url": "https://6ixo.com/listing/2008-chrysler-sebring-lx-2782550891/"
+    },
+    {
+      "id": "craigslist-2wj5c5s9Xmb7mWQjizSfSY",
+      "slug": "2002-toyota-rav4-with-184-000-miles-runs-super-smooth-1500-mwqjizsfsy",
+      "url": "https://6ixo.com/listing/2002-toyota-rav4-with-184-000-miles-runs-super-smooth-1500-mwqjizsfsy/"
     }
   ]
 }

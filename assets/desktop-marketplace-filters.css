@@ -1,0 +1,81 @@
+/* Only the desktop enhancement gets this styling; the existing mobile panel is restored. */
+@layer home-navy-outline {
+    @media (min-width: 1024px) {
+        html #main-app #marketplace-content .marketplace-filters.market-desktop-ready {
+            padding: 24px !important;
+            gap: 0 !important;
+            border: 0 !important;
+            border-radius: 14px !important;
+            background: #ffffff !important;
+            box-shadow: none !important;
+        }
+        html #main-app #marketplace-content .market-desktop-ready .filter-panel-header { margin-bottom: 22px !important; }
+        html #main-app #marketplace-content .market-desktop-ready .filter-panel-header h3 { margin: 0 !important; font-size: 26px !important; line-height: 1.2 !important; letter-spacing: -.65px !important; color: #152b4c !important; }
+        html #main-app #marketplace-content .market-desktop-ready :is(.filter-eyebrow, .marketplace-filter-layout, .filter-actions-row) { display: none !important; }
+        html #main-app #marketplace-content .market-desktop-toolbar {
+            display: grid !important;
+            grid-template-columns: minmax(0, 1.5fr) minmax(0, 1.2fr) minmax(0, 1.15fr) 120px !important;
+            align-items: center !important;
+            padding: 5px !important;
+            border: 1px solid #dce4ef !important;
+            border-radius: 14px !important;
+            background: #ffffff !important;
+        }
+        html #main-app #marketplace-content .market-desktop-toolbar > :is(.filter-search-bar, .market-desktop-category, .market-desktop-location-field) {
+            position: relative !important;
+            min-width: 0 !important;
+            min-height: 60px !important;
+            margin: 0 !important;
+            padding: 5px 16px !important;
+            border: 0 !important;
+            border-right: 1px solid #dce4ef !important;
+            border-radius: 0 !important;
+            background: #ffffff !important;
+            box-shadow: none !important;
+        }
+        html #main-app #marketplace-content .market-desktop-toolbar .filter-search-bar { display: grid !important; grid-template-columns: 17px minmax(0, 1fr) !important; grid-template-rows: 16px 28px !important; gap: 2px 8px !important; align-content: center !important; align-items: center !important; }
+        html #main-app #marketplace-content .market-desktop-toolbar .filter-search-bar label { grid-column: 1 / -1 !important; }
+        html #main-app #marketplace-content .market-desktop-toolbar .filter-search-bar > i { grid-row: 2 !important; color: #285d9a !important; font-size: 17px !important; }
+        html #main-app #marketplace-content .market-desktop-toolbar #market-search { grid-row: 2 !important; grid-column: 2 !important; }
+        html #main-app #marketplace-content .market-desktop-toolbar :is(.market-desktop-label, .market-desktop-category > label) { display: block !important; width: auto !important; height: auto !important; margin: 0 !important; padding: 0 !important; color: #61728b !important; font-size: 12px !important; font-weight: 600 !important; line-height: 16px !important; text-transform: none !important; letter-spacing: .15px !important; }
+        html #main-app #marketplace-content .market-desktop-toolbar :is(#market-search, #category-filter) {
+            width: 100% !important;
+            min-width: 0 !important;
+            height: 28px !important;
+            min-height: 28px !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            border: 0 !important;
+            border-radius: 4px !important;
+            background-color: #ffffff !important;
+            color: #152b4c !important;
+            font-size: 16px !important;
+            font-weight: 400 !important;
+            line-height: 24px !important;
+            box-shadow: none !important;
+        }
+        html #main-app #marketplace-content .market-desktop-toolbar #market-search::placeholder { color: #61728b !important; opacity: 1 !important; }
+        html #main-app #marketplace-content .market-desktop-toolbar > .market-desktop-category { justify-content: center !important; gap: 2px !important; border-right: 0 !important; }
+        html #main-app #marketplace-content .market-desktop-toolbar #category-filter { appearance: auto !important; padding-right: 4px !important; background-image: none !important; }
+        html #main-app #marketplace-content .market-desktop-toolbar > .market-desktop-location-field { display: flex !important; align-items: center !important; }
+        html #main-app #marketplace-content #market-desktop-location-toggle { display: flex !important; flex-direction: column !important; justify-content: center !important; gap: 2px !important; width: 100% !important; min-width: 0 !important; min-height: 46px !important; margin: 0 !important; padding: 0 !important; border: 0 !important; border-radius: 4px !important; background: #ffffff !important; color: #152b4c !important; box-shadow: none !important; text-align: left !important; cursor: pointer; }
+        html #main-app #marketplace-content .market-desktop-location-line { display: flex !important; align-items: center !important; gap: 8px !important; width: 100% !important; min-width: 0 !important; min-height: 28px !important; font-size: 16px !important; font-weight: 400 !important; line-height: 24px !important; }
+        html #main-app #marketplace-content .market-desktop-location-line > i { flex: 0 0 auto !important; color: #285d9a !important; font-size: 17px !important; }
+        html #main-app #marketplace-content .market-desktop-location-line > i:last-child { font-size: 11px !important; }
+        html #main-app #marketplace-content #market-desktop-location-value { flex: 1 !important; min-width: 0 !important; white-space: nowrap !important; text-overflow: ellipsis !important; overflow: hidden !important; }
+        html #main-app #marketplace-content .market-desktop-toolbar #market-search-btn { display: inline-flex !important; align-items: center !important; justify-content: center !important; gap: 8px !important; width: 120px !important; min-width: 0 !important; height: 60px !important; min-height: 60px !important; margin: 0 !important; padding: 12px !important; border: 0 !important; border-radius: 10px !important; background: #2a5e9e !important; color: #ffffff !important; font-size: 16px !important; font-weight: 600 !important; line-height: 24px !important; letter-spacing: 0 !important; box-shadow: none !important; }
+        html #main-app #marketplace-content .market-desktop-toolbar #market-search-btn:hover { background: #214e86 !important; }
+        html #main-app #marketplace-content .market-desktop-filter-row { display: flex !important; flex-wrap: wrap !important; align-items: center !important; gap: 8px !important; margin-top: 14px !important; }
+        html #main-app #marketplace-content .market-desktop-ready :is(.market-desktop-filter-row > button, #market-advanced-filters > .market-smart-filter) { display: inline-flex !important; align-items: center !important; gap: 6px !important; width: auto !important; min-height: 36px !important; margin: 0 !important; padding: 7px 12px !important; border: 1px solid #dce4ef !important; border-radius: 8px !important; background: #ffffff !important; color: #152b4c !important; font-size: 13px !important; font-weight: 500 !important; line-height: 20px !important; box-shadow: none !important; text-decoration: none !important; }
+        html #main-app #marketplace-content .market-desktop-ready :is(.market-desktop-filter-row > button, #market-advanced-filters > .market-smart-filter):is(.active, [aria-expanded="true"]) { border-color: #285d9a !important; background: #f4f7fb !important; color: #285d9a !important; }
+        html #main-app #marketplace-content .market-desktop-ready #market-advanced-toggle::before { content: "\f1de"; font-family: "Font Awesome 6 Free"; font-weight: 900; }
+        html #main-app #marketplace-content .market-desktop-location-panel { margin-top: 12px !important; border: 1px solid #dce4ef !important; border-radius: 10px !important; background: #f4f7fb !important; }
+        html #main-app #marketplace-content .market-desktop-location-panel[hidden] { display: none !important; }
+        html #main-app #marketplace-content .market-desktop-location-panel .market-location-filter-item { margin: 0 !important; padding: 16px !important; border: 0 !important; background: transparent !important; box-shadow: none !important; }
+        html #main-app #marketplace-content .market-desktop-ready #market-advanced-filters:not(.hidden) { display: flex !important; flex-wrap: wrap !important; align-items: end !important; gap: 12px !important; margin-top: 12px !important; padding: 16px !important; border: 1px solid #dce4ef !important; border-radius: 10px !important; background: #f4f7fb !important; }
+        html #main-app #marketplace-content .market-desktop-ready #market-advanced-filters > .filter-panel-grid { flex: 1 1 320px !important; }
+        html #main-app #marketplace-content .market-desktop-ready #market-advanced-filters .price-filter-item { padding: 0 !important; border: 0 !important; background: transparent !important; }
+        html #main-app #marketplace-content .market-desktop-ready .price-row { padding: 0 !important; border: 0 !important; }
+        html #main-app #marketplace-content .market-desktop-ready :is(input, select, button):focus-visible { outline: 2px solid #285d9a !important; outline-offset: 3px !important; }
+    }
+}

@@ -44,7 +44,7 @@ for (const [attribute, name, content] of [
   html = html.replace(tag, () => `<meta ${attribute}="${name}" content="${escape(content)}">`);
 }
 html = html.replace(/(<div class="home-hero-copy">\s*<h1>)[\s\S]*?(<\/h1>\s*<p>)[\s\S]*?(<\/p>)/,
-  (_, heading, paragraph, end) => `${heading}6ixo worldwide marketplace${paragraph}Find cars for sale, apartments for rent, phones, local events and services on 6ixo.com. Browse worldwide or post an ad for free.${end}`);
+  (_, heading, paragraph, end) => `${heading}6ixo worldwide marketplace${paragraph}<span class="home-search-mobile-copy">Find cars for sale, apartments for rent, phones, local events and services on 6ixo.com. Browse worldwide or post an ad for free.</span><span class="home-search-desktop-copy">Buy and sell locally. Discover more worldwide.</span>${end}`);
 
 // Give crawlers a real About link while retaining the app's modal behavior.
 html = html.replace(/(<a\b[^>]*\bhref=")[^"]*("[^>]*\bid="home-about-link")/, '$1/about/$2');

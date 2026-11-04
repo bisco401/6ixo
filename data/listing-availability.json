@@ -1,5 +1,5 @@
 {
-  "checkedAt": "2026-11-04T12:27:29Z",
+  "checkedAt": "2026-11-04T12:50:05.118Z",
   "listings": {
     "craigslist.org/view/d/bastrop-used-2025-cadillac-xt4-fwd-4d/fuqr_3uo8rgowpq1ctwx-a": {
       "availability": "sold",
@@ -17188,7 +17188,7 @@
       "id": "kijiji-1745677966",
       "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/sagetra-professional-french-fry-cutter/1745677966",
       "availability": "gone",
-      "checkedAt": "2026-11-04T06:53:54.308Z",
+      "checkedAt": "2026-11-04T12:50:05.118Z",
       "httpStatus": 200,
       "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1745677966",
       "reason": "Source returned a removed-ad redirect or HTTP 404/410."
@@ -17254,9 +17254,13 @@
       "reason": "Kijiji redirected the exact ad to a confirmed removal"
     },
     "kijiji.ca/v-buy-sell-other/city-of-toronto/vitamix-36019-commercial-bar-blender-48-oz-vm0145/1745693361": {
-      "availability": "unavailable",
-      "checkedAt": "2026-11-04T12:27:29Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1745693361",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/vitamix-36019-commercial-bar-blender-48-oz-vm0145/1745693361",
+      "availability": "gone",
+      "checkedAt": "2026-11-04T12:50:05.118Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1745693361",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-cars-trucks/city-of-toronto/2013-toyota-rav4-low-km/1745611727": {
       "availability": "unavailable",
@@ -17344,9 +17348,13 @@
       "reason": "Exact source URL returned HTTP 410"
     },
     "kijiji.ca/v-buy-sell-other/mississauga-peel-region/brampton-brand-new-town-homes-for-sale-from-mid-400s/1745693447": {
-      "availability": "unavailable",
-      "checkedAt": "2026-11-04T12:27:29Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1745693447",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/mississauga-peel-region/brampton-brand-new-town-homes-for-sale-from-mid-400s/1745693447",
+      "availability": "gone",
+      "checkedAt": "2026-11-04T12:50:05.118Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/mississauga-peel-region/c26l1700276?radius=50.0&ll=43.57%2C-79.66&adRemoved=1745693447",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-buy-sell-other/mississauga-peel-region/milton-luxury-brand-new-town-homes-for-sale-from-500s/1745677923": {
       "availability": "unavailable",
@@ -17404,19 +17412,31 @@
       "reason": "Kijiji redirected the exact ad to a confirmed removal"
     },
     "kijiji.ca/v-industrial-shelving-racking/mississauga-peel-region/new-wire-mesh-decking-deck-42-x46-and-42-x52-universal-style/1745675775": {
-      "availability": "unavailable",
-      "checkedAt": "2026-11-04T12:27:29Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1745675775",
+      "sourceUrl": "https://www.kijiji.ca/v-industrial-shelving-racking/mississauga-peel-region/new-wire-mesh-decking-deck-42-x46-and-42-x52-universal-style/1745675775",
+      "availability": "gone",
+      "checkedAt": "2026-11-04T12:50:05.118Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-industrial-shelving-racking/mississauga-peel-region/c29659005l1700276?radius=50.0&ll=43.7%2C-79.75&adRemoved=1745675775",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-other-business-industrial/mississauga-peel-region/thermal-labels-shipping-labels-direct-thermal-thermal-transfer/1745681949": {
-      "availability": "unavailable",
-      "checkedAt": "2026-11-04T12:27:29Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1745681949",
+      "sourceUrl": "https://www.kijiji.ca/v-other-business-industrial/mississauga-peel-region/thermal-labels-shipping-labels-direct-thermal-thermal-transfer/1745681949",
+      "availability": "gone",
+      "checkedAt": "2026-11-04T12:50:05.118Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-other-business-industrial/mississauga-peel-region/c145l1700276?radius=50.0&ll=43.7%2C-79.74&adRemoved=1745681949",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-industrial-shelving-racking/mississauga-peel-region/portable-stack-racks-in-stock-heavy-duty-storage-solution/1745676025": {
-      "availability": "unavailable",
-      "checkedAt": "2026-11-04T12:27:29Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1745676025",
+      "sourceUrl": "https://www.kijiji.ca/v-industrial-shelving-racking/mississauga-peel-region/portable-stack-racks-in-stock-heavy-duty-storage-solution/1745676025",
+      "availability": "gone",
+      "checkedAt": "2026-11-04T12:50:05.118Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-industrial-shelving-racking/mississauga-peel-region/c29659005l1700276?radius=50.0&ll=43.7%2C-79.74&adRemoved=1745676025",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "allsoppandallsopp.com/dubai/property/lettings/l-276022": {
       "availability": "gone",
@@ -17517,6 +17537,123 @@
       "availability": "unavailable",
       "checkedAt": "2026-11-04T12:27:29Z",
       "reason": "Kijiji redirected the exact ad to a confirmed removal"
+    },
+    "craigslist.org/view/d/mcallen-2024-mitsubishi-mirage-es/kvhu8ebc62mu7e8draegw2": {
+      "id": "craigslist-kVHU8ebc62mU7E8DRaeGw2",
+      "sourceUrl": "https://www.craigslist.org/view/d/mcallen-2024-mitsubishi-mirage-es/kVHU8ebc62mU7E8DRaeGw2",
+      "availability": "gone",
+      "checkedAt": "2026-11-04T12:50:05.118Z",
+      "httpStatus": 410,
+      "resolvedUrl": "https://www.craigslist.org/view/d/mcallen-2024-mitsubishi-mirage-es/kVHU8ebc62mU7E8DRaeGw2",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "craigslist.org/view/d/mcallen-2013-ford-transit-connect-xl/espfv2pv1h7hxrmbfwusaw": {
+      "id": "craigslist-eSpFv2Pv1H7hxrMbfWuSaW",
+      "sourceUrl": "https://www.craigslist.org/view/d/mcallen-2013-ford-transit-connect-xl/eSpFv2Pv1H7hxrMbfWuSaW",
+      "availability": "gone",
+      "checkedAt": "2026-11-04T12:50:05.118Z",
+      "httpStatus": 410,
+      "resolvedUrl": "https://www.craigslist.org/view/d/mcallen-2013-ford-transit-connect-xl/eSpFv2Pv1H7hxrMbfWuSaW",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "craigslist.org/view/d/mcallen-2008-ford-150-access-cab-work/mcefkykfl6pyuhcw11dtby": {
+      "id": "craigslist-mceFkYKfL6pYUHcW11dTbY",
+      "sourceUrl": "https://www.craigslist.org/view/d/mcallen-2008-ford-150-access-cab-work/mceFkYKfL6pYUHcW11dTbY",
+      "availability": "gone",
+      "checkedAt": "2026-11-04T12:50:05.118Z",
+      "httpStatus": 410,
+      "resolvedUrl": "https://www.craigslist.org/view/d/mcallen-2008-ford-150-access-cab-work/mceFkYKfL6pYUHcW11dTbY",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "craigslist.org/view/d/avondale-estates-2014-toyota-camry-buy/uk636ufa8rgddnqhgav_ka": {
+      "id": "craigslist-uk636UfA8RGDDNQHGaV_KA",
+      "sourceUrl": "https://www.craigslist.org/view/d/avondale-estates-2014-toyota-camry-buy/uk636UfA8RGDDNQHGaV_KA",
+      "availability": "gone",
+      "checkedAt": "2026-11-04T12:50:05.118Z",
+      "httpStatus": 410,
+      "resolvedUrl": "https://www.craigslist.org/view/d/avondale-estates-2014-toyota-camry-buy/uk636UfA8RGDDNQHGaV_KA",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "craigslist.org/view/d/avondale-estates-2018-porsche-macan-buy/ef5fbsba8rgmiaexugbukw": {
+      "id": "craigslist-eF5fbSbA8RGmiaExUGBukw",
+      "sourceUrl": "https://www.craigslist.org/view/d/avondale-estates-2018-porsche-macan-buy/eF5fbSbA8RGmiaExUGBukw",
+      "availability": "gone",
+      "checkedAt": "2026-11-04T12:50:05.118Z",
+      "httpStatus": 410,
+      "resolvedUrl": "https://www.craigslist.org/view/d/avondale-estates-2018-porsche-macan-buy/eF5fbSbA8RGmiaExUGBukw",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "craigslist.org/view/d/south-orange-2017-porsche-cayenne-500/muj2q5b6mw3nwvwhgfrsfz": {
+      "id": "craigslist-mUj2q5b6mw3Nwvwhgfrsfz",
+      "sourceUrl": "https://www.craigslist.org/view/d/south-orange-2017-porsche-cayenne-500/mUj2q5b6mw3Nwvwhgfrsfz",
+      "availability": "gone",
+      "checkedAt": "2026-11-04T12:50:05.118Z",
+      "httpStatus": 410,
+      "resolvedUrl": "https://www.craigslist.org/view/d/south-orange-2017-porsche-cayenne-500/mUj2q5b6mw3Nwvwhgfrsfz",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "craigslist.org/view/d/south-orange-2015-maserati-ghibli-500/58mrybekybmdwxgeqq4tuf": {
+      "id": "craigslist-58MryBEKyBMDwxgEqq4TuF",
+      "sourceUrl": "https://www.craigslist.org/view/d/south-orange-2015-maserati-ghibli-500/58MryBEKyBMDwxgEqq4TuF",
+      "availability": "gone",
+      "checkedAt": "2026-11-04T12:50:05.118Z",
+      "httpStatus": 410,
+      "resolvedUrl": "https://www.craigslist.org/view/d/south-orange-2015-maserati-ghibli-500/58MryBEKyBMDwxgEqq4TuF",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "craigslist.org/view/d/brooklyn-duplex-badroom-bathroom/tyafszn9cd9xjwws3bnthd": {
+      "id": "craigslist-tyafsZN9CD9xJWws3bnTHd",
+      "sourceUrl": "https://www.craigslist.org/view/d/brooklyn-duplex-badroom-bathroom/tyafsZN9CD9xJWws3bnTHd",
+      "availability": "gone",
+      "checkedAt": "2026-11-04T12:50:05.118Z",
+      "httpStatus": 410,
+      "resolvedUrl": "https://www.craigslist.org/view/d/brooklyn-duplex-badroom-bathroom/tyafsZN9CD9xJWws3bnTHd",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "craigslist.org/view/d/astoria-rd-street-studio-with-share/dcxv3m9xhsnym38ajdpmcr": {
+      "id": "craigslist-dcXV3m9XHSNYM38AjDpmcr",
+      "sourceUrl": "https://www.craigslist.org/view/d/astoria-rd-street-studio-with-share/dcXV3m9XHSNYM38AjDpmcr",
+      "availability": "gone",
+      "checkedAt": "2026-11-04T12:50:05.118Z",
+      "httpStatus": 410,
+      "resolvedUrl": "https://www.craigslist.org/view/d/astoria-rd-street-studio-with-share/dcXV3m9XHSNYM38AjDpmcr",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "craigslist.org/view/d/mcallen-speakers/gfv4c1kw6eoyncnqf8fl6q": {
+      "id": "craigslist-gFv4c1Kw6eoYNCnQf8fL6Q",
+      "sourceUrl": "https://www.craigslist.org/view/d/mcallen-speakers/gFv4c1Kw6eoYNCnQf8fL6Q",
+      "availability": "gone",
+      "checkedAt": "2026-11-04T12:50:05.118Z",
+      "httpStatus": 410,
+      "resolvedUrl": "https://www.craigslist.org/view/d/mcallen-speakers/gFv4c1Kw6eoYNCnQf8fL6Q",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "kijiji.ca/v-home-indoor-other/hamilton/reverse-osmosis-system-prices-36/1743115144": {
+      "id": "kijiji-1743115144",
+      "sourceUrl": "https://www.kijiji.ca/v-home-indoor-other/hamilton/reverse-osmosis-system-prices-36/1743115144",
+      "availability": "gone",
+      "checkedAt": "2026-11-04T12:50:05.118Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-home-indoor-other/hamilton/c725l80014?radius=50.0&ll=43.25%2C-79.89&adRemoved=1743115144",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "kijiji.ca/v-cars-trucks/guelph/2024-jeep-wrangler-rubicon-x-35-tires-clean-carfax/1742939215": {
+      "id": "kijiji-1742939215",
+      "sourceUrl": "https://www.kijiji.ca/v-cars-trucks/guelph/2024-jeep-wrangler-rubicon-x-35-tires-clean-carfax/1742939215",
+      "availability": "gone",
+      "checkedAt": "2026-11-04T12:50:05.118Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-cars-trucks/guelph/c174l1700242?adRemoved=1742939215&ll=43.5360602%2C-80.3178288&radius=150.0&rb=50",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "kijiji.ca/v-cars-trucks/hamilton/2023-hyundai-tucson-hybrid-ultimate-awd-sunroof-leather/1742895903": {
+      "id": "kijiji-1742895903",
+      "sourceUrl": "https://www.kijiji.ca/v-cars-trucks/hamilton/2023-hyundai-tucson-hybrid-ultimate-awd-sunroof-leather/1742895903",
+      "availability": "gone",
+      "checkedAt": "2026-11-04T12:50:05.118Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-cars-trucks/hamilton/c174l80014?adRemoved=1742895903&ll=43.1937818%2C-79.89652989999999&radius=150.0&rb=50",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     }
   }
 }

@@ -1,0 +1,176 @@
+/* The approved desktop toolbar uses the existing fields and event handlers.
+   Keep the phone/tablet layout and copy unchanged below 1024px. */
+@layer home-navy-outline {
+    html #main-app #home-content.home-tight-layout .home-search-desktop-copy {
+        display: none !important;
+    }
+
+    @media (min-width: 1024px) {
+        html #main-app #home-content.home-tight-layout .home-search-mobile-copy {
+            display: none !important;
+        }
+
+        html #main-app #home-content.home-tight-layout .home-search-desktop-copy {
+            display: inline !important;
+        }
+
+        html #main-app #home-content.home-tight-layout .home-search {
+            padding: 24px !important;
+            border: 0 !important;
+            border-radius: 14px !important;
+            background: #ffffff !important;
+            box-shadow: none !important;
+        }
+
+        html #main-app #home-content.home-tight-layout .home-search .home-hero-copy h1 {
+            font-size: 26px !important;
+            line-height: 1.2 !important;
+            letter-spacing: -0.65px !important;
+            color: #152b4c !important;
+        }
+
+        html #main-app #home-content.home-tight-layout .home-search .home-hero-copy p {
+            max-width: none !important;
+            margin: 8px 0 22px !important;
+            font-size: 15px !important;
+            font-weight: 400 !important;
+            line-height: 1.5 !important;
+            color: #61728b !important;
+        }
+
+        html #main-app #home-content.home-tight-layout .home-search-row {
+            grid-template-columns: minmax(0, 1.65fr) minmax(0, 1.1fr) minmax(0, 1.15fr) 120px !important;
+            align-items: center !important;
+            gap: 0 !important;
+            padding: 5px !important;
+            border: 1px solid #dce4ef !important;
+            border-radius: 14px !important;
+            background: #ffffff !important;
+            box-shadow: none !important;
+            overflow: visible !important;
+        }
+
+        html #main-app #home-content.home-tight-layout .home-search-row > .home-search-field {
+            align-self: center !important;
+            justify-content: center !important;
+            min-height: 60px !important;
+            gap: 2px !important;
+            padding: 5px 16px !important;
+            border-right: 1px solid #dce4ef !important;
+        }
+
+        html #main-app #home-content.home-tight-layout .home-search-row > .home-search-field:nth-child(3) {
+            border-right: 0 !important;
+        }
+
+        html #main-app #home-content.home-tight-layout .home-search-row .home-search-field label {
+            position: static !important;
+            width: auto !important;
+            height: auto !important;
+            padding: 0 !important;
+            margin: 0 !important;
+            overflow: visible !important;
+            clip: auto !important;
+            clip-path: none !important;
+            white-space: normal !important;
+            color: #61728b !important;
+            font-size: 12px !important;
+            font-weight: 600 !important;
+            line-height: 16px !important;
+            letter-spacing: 0.15px !important;
+        }
+
+        html #main-app #home-content.home-tight-layout .home-search-field > :is(input, select) {
+            min-height: 28px !important;
+            height: 28px !important;
+            padding: 0 24px 0 26px !important;
+            border: 0 !important;
+            border-radius: 4px !important;
+            background-color: #ffffff !important;
+            color: #152b4c !important;
+            font-size: 16px !important;
+            font-weight: 400 !important;
+            line-height: 24px !important;
+            box-shadow: none !important;
+        }
+
+        html #main-app #home-content.home-tight-layout .home-search-field > input::placeholder {
+            color: #61728b !important;
+            opacity: 1 !important;
+        }
+
+        html #main-app #home-content.home-tight-layout .home-search-field > :is(input, select):focus-visible {
+            outline: 2px solid #285d9a !important;
+            outline-offset: 3px !important;
+        }
+
+        html #main-app #home-content.home-tight-layout .home-search-field-icon {
+            left: 16px !important;
+            top: calc(50% + 9px) !important;
+            color: #285d9a !important;
+            font-size: 17px !important;
+        }
+
+        html #main-app #home-content.home-tight-layout #home-use-location {
+            left: 8px !important;
+            width: 32px !important;
+            height: 32px !important;
+            min-height: 32px !important;
+            border: 0 !important;
+            background: transparent !important;
+        }
+
+        html #main-app #home-content.home-tight-layout .area-picker-chevron,
+        html #main-app #home-content.home-tight-layout .home-search-field:has(#home-search-category)::after {
+            content: "";
+            position: absolute !important;
+            right: 22px !important;
+            top: calc(50% + 9px) !important;
+            bottom: auto !important;
+            width: 6px !important;
+            height: 6px !important;
+            border-right: 1.5px solid #152b4c !important;
+            border-bottom: 1.5px solid #152b4c !important;
+            color: #152b4c !important;
+            font-size: 0 !important;
+            line-height: 0 !important;
+            transform: translateY(-50%) rotate(45deg) !important;
+            pointer-events: none !important;
+        }
+
+        html #main-app #home-content.home-tight-layout #home-search-category {
+            padding-left: 0 !important;
+            padding-right: 24px !important;
+            background-image: none !important;
+        }
+
+        html #main-app #home-content.home-tight-layout .home-search-field:has(#home-search-category) > .home-search-field-icon {
+            display: none !important;
+        }
+
+        html #main-app #home-content.home-tight-layout .home-search-actions {
+            grid-column: auto !important;
+            align-self: center !important;
+            width: auto !important;
+        }
+
+        html #main-app #home-content.home-tight-layout #home-search-btn {
+            width: 120px !important;
+            min-width: 0 !important;
+            min-height: 60px !important;
+            height: 60px !important;
+            padding: 12px !important;
+            gap: 8px !important;
+            border-radius: 10px !important;
+            background: #2a5e9e !important;
+            color: #ffffff !important;
+            font-size: 16px !important;
+            font-weight: 600 !important;
+            line-height: 24px !important;
+        }
+
+        html #main-app #home-content.home-tight-layout #home-search-btn:hover {
+            background: #214e86 !important;
+        }
+    }
+}

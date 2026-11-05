@@ -104,3 +104,20 @@
 @media (max-width: 560px) {
     #arrive-content .arrive-trip-form { grid-template-columns: minmax(0, 1fr); }
 }
+
+/* Keep a permanent, unmistakable country-search box above its results. */
+#arrive-content .arrive-country-search-label { margin-top: 12px; color: #20344d; font-weight: 650; }
+#arrive-content #arrive-discovery-country-search {
+    display: block !important; width: 100% !important; min-width: 0;
+    min-height: 48px !important; padding: 11px 14px !important;
+    border: 2px solid #365e91 !important; border-radius: 10px !important;
+    background: #fff !important; color: #20344d !important;
+    font-size: 16px !important; opacity: 1 !important; visibility: visible !important;
+    -webkit-appearance: none; appearance: none;
+}
+#arrive-content #arrive-discovery-country-search::placeholder { color: #61738a; opacity: 1; }
+#arrive-content #arrive-discovery-country-search:focus-visible { outline: 2px solid #285d9a; outline-offset: 2px; }
+#arrive-content #arrive-discovery-country[readonly] {
+    background: #f2f6fc !important; color: #20344d !important; cursor: pointer;
+}
+#arrive-content #arrive-discovery-country-options { top: calc(100% + 4px); }

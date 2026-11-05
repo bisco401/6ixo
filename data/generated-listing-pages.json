@@ -1,5 +1,5 @@
 {
-  "count": 4572,
+  "count": 4570,
   "listings": [
     {
       "id": "hgc-dubai-9f0effbe6756af4c",
@@ -50204,15 +50204,6 @@
       "categoryKey": "real-estate"
     },
     {
-      "id": "kijiji-1742008009",
-      "slug": "1-cheap-gta-junk-removal-437-217-0956-1742008009",
-      "url": "https://6ixo.com/listing/1-cheap-gta-junk-removal-437-217-0956-1742008009/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/1c/1c7af305-5ef4-474c-bfdc-48603b7ec67d?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "services"
-    },
-    {
       "id": "kijiji-1742000636",
       "slug": "2024-ford-bronco-sport-big-bend-carplay-backup-cam-1742000636",
       "url": "https://6ixo.com/listing/2024-ford-bronco-sport-big-bend-carplay-backup-cam-1742000636/",
@@ -50350,16 +50341,6 @@
         "https://guyanahomehub.com/photos/v1/1600/d53f9c50-8a99-43b6-be43-1f1dc17b386a/1786388855589-hmqh9k-0.png.webp"
       ],
       "categoryKey": "real-estate"
-    },
-    {
-      "id": "kijiji-1741833903",
-      "slug": "dinning-hutch-1741833903",
-      "url": "https://6ixo.com/listing/dinning-hutch-1741833903/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/ad/ade2719d-fc34-496c-9131-162076a1d954?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/01/01e8a951-a6ee-4531-8035-24e882912b2c?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "buy-and-sell"
     },
     {
       "id": "kijiji-1741787726",
@@ -51011,18 +50992,18 @@
       "slug": "4-1-2-a-louer-for-rent-st-laurent-saint-laurent-metro-1741513049",
       "url": "https://6ixo.com/listing/4-1-2-a-louer-for-rent-st-laurent-saint-laurent-metro-1741513049/",
       "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/65/655174f7-6cae-4326-bd91-5d42e2a7f436?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/5f/5f30e4fd-38f6-4c21-be5b-7efc5f4d81b5?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/83/832f1d1c-c7ed-416e-b940-17956dcd5b34?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/01/0157957e-2173-4bf5-9dc2-6f148235ade4?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/0a/0adb102c-abb3-4a61-80b3-d20441c92fc5?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/fa/fa567661-a796-4b9c-83ca-b211df36e12b?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/01/012c0fb7-aa21-431e-bf1e-d8187643d917?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/2e/2e165918-7230-4e12-8430-ad6649bee864?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/1a/1a1f241c-1606-4144-bb4d-f929ba00e101?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/63/638deffa-e551-4618-a0ec-bc6dcdb255fe?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/63/630c6205-8d01-4745-938f-d0b99c3402d9?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/76/7640869c-03d1-4038-bccb-7417563bab5e?rule=kijijica-1600-webp"
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/1a/1ae4ccbc-803d-40bb-90eb-ab2e3e52ae75?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/e8/e858d505-9bc7-46bd-88b4-79064645b08b?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/90/9006de34-99e9-4b8c-a6d3-2c561178d2a8?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/56/5689f164-2e86-4064-9d0a-95dd8b98634c?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/17/1753fcfa-e620-4cb7-9e45-13f561901495?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/97/97466b67-d602-4941-b6c5-ba0a6f38b2b8?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/ac/aca5330b-21fc-4986-a49e-271d2e55d00b?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/94/94cebbce-4939-4b24-a2fe-a97c2adef439?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/a2/a2ff713c-ecdb-46d6-b5ca-051cef265339?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/3a/3adac8ea-0634-45c1-a108-268c17913940?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/2c/2cc4e25a-3279-46f9-a93f-ad3006d27c9a?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/4f/4f8fe35c-daf0-4229-9894-c6638b517ab6?rule=kijijica-1600-webp"
       ],
       "categoryKey": "real-estate"
     },
@@ -69158,6 +69139,16 @@
       "id": "kijiji-1740207903",
       "slug": "2009-honda-civic-safety-included-1740207903",
       "url": "https://6ixo.com/listing/2009-honda-civic-safety-included-1740207903/"
+    },
+    {
+      "id": "kijiji-1742008009",
+      "slug": "1-cheap-gta-junk-removal-437-217-0956-1742008009",
+      "url": "https://6ixo.com/listing/1-cheap-gta-junk-removal-437-217-0956-1742008009/"
+    },
+    {
+      "id": "kijiji-1741833903",
+      "slug": "dinning-hutch-1741833903",
+      "url": "https://6ixo.com/listing/dinning-hutch-1741833903/"
     }
   ]
 }

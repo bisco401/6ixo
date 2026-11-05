@@ -291,6 +291,7 @@
         hidePicker(field) {
             const input = this.fields[field], menu = this.root.querySelector('#arrive-discovery-' + field + '-options');
             menu.hidden = true;
+            if (field === 'country') this.root.querySelector('#arrive-discovery-country-picker').hidden = true;
             const control = field === 'country' ? this.countrySearch : input;
             control.setAttribute('aria-expanded', 'false'); control.removeAttribute('aria-activedescendant');
         }
@@ -320,6 +321,7 @@
                 return '<button type="button" role="option" class="arrive-destination-option" data-arrive-option="' + escape(name) +
                     '" id="arrive-' + field + '-option-' + index + '" aria-selected="' + (index === 0) + '"><span>' + escape(name) + '</span>' + extra + '</button>';
             }).join('') : '<p class="arrive-destination-empty">' + (field === 'country' ? 'No matching country.' : this.store.state.preferences.country ? 'No matching city. You can type a city manually.' : 'Choose a country first.') + '</p>';
+            if (field === 'country') this.root.querySelector('#arrive-discovery-country-picker').hidden = false;
             menu.hidden = false; input.setAttribute('aria-expanded', 'true');
             if (matches.length) this.highlightOption(field, 0);
         }
@@ -363,10 +365,16 @@
             };
             this.root.addEventListener('input', update, { ...options, capture: true });
             this.root.addEventListener('change', update, { ...options, capture: true });
-            // The country search is always visible and separate from the selected country.
+            // Country and City are side by side; tapping Country opens its searchable popover.
             this.fields.country.addEventListener('click', () => {
-                this.countrySearch.focus();
                 this.showPicker('country');
+                this.countrySearch.focus();
+            }, options);
+            this.fields.country.addEventListener('keydown', event => {
+                if (!['Enter', ' ', 'ArrowDown'].includes(event.key)) return;
+                event.preventDefault();
+                this.showPicker('country');
+                this.countrySearch.focus();
             }, options);
             this.countrySearch.addEventListener('focus', () => this.showPicker('country'), options);
             this.countrySearch.addEventListener('input', () => this.showPicker('country'), options);

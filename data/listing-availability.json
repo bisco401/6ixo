@@ -1,5 +1,5 @@
 {
-  "checkedAt": "2026-11-05T21:04:54Z",
+  "checkedAt": "2026-11-05T21:30:14.231Z",
   "listings": {
     "craigslist.org/view/d/bastrop-used-2025-cadillac-xt4-fwd-4d/fuqr_3uo8rgowpq1ctwx-a": {
       "availability": "sold",
@@ -22036,6 +22036,15 @@
       "httpStatus": 200,
       "sourceUrl": "https://www.kijiji.ca/v-cars-trucks/city-of-toronto/2013-ford-escape-3-year-warranty-included/1744194484",
       "resolvedUrl": "https://www.kijiji.ca/b-cars-trucks/city-of-toronto/c174l1700273?adRemoved=1744194484&ll=43.6999518%2C-79.4684329&radius=150.0&rb=50"
+    },
+    "craigslist.org/view/d/fort-pierce-ford-250-xl-long-bed-4x4/4emsf2emc6kce2s2glb5ig": {
+      "id": "craigslist-4EMSF2emc6KcE2S2gLb5iG",
+      "sourceUrl": "https://www.craigslist.org/view/d/fort-pierce-ford-250-xl-long-bed-4x4/4EMSF2emc6KcE2S2gLb5iG",
+      "availability": "gone",
+      "checkedAt": "2026-11-05T21:30:14.231Z",
+      "httpStatus": 410,
+      "resolvedUrl": "https://www.craigslist.org/view/d/fort-pierce-ford-250-xl-long-bed-4x4/4EMSF2emc6KcE2S2gLb5iG",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     }
   }
 }

@@ -1,5 +1,5 @@
 {
-  "count": 4616,
+  "count": 4614,
   "listings": [
     {
       "id": "hgc-dubai-9f0effbe6756af4c",
@@ -9432,15 +9432,6 @@
       "url": "https://6ixo.com/listing/1-bedroom-apartment-for-rent-bay-central-bay-central-dubai-bail313064/",
       "images": [
         "https://images.allsoppandallsopp.com/public/temp/a0OdK000003k6OrUAI_s_1-bedroom-apartment-in-bay-central-bay-central-dubai-marina-aed-90k-allsopp-and-allsopp-1ca0f6d6-c3e2-4eb9-9ace-1145466682af.png"
-      ],
-      "categoryKey": "real-estate"
-    },
-    {
-      "id": "allsopp-dubai-l-313103",
-      "slug": "2-bedroom-apartment-for-rent-belgravia-heights-1-district--bail313103",
-      "url": "https://6ixo.com/listing/2-bedroom-apartment-for-rent-belgravia-heights-1-district--bail313103/",
-      "images": [
-        "https://images.allsoppandallsopp.com/public/temp/a0OdK000000cysnUAA_s_2-bedroom-apartment-in-belgravia-heights-1-district-12-jumeirah-village-circle-aed-125k-allsopp-and-allsopp-img0654.jpg"
       ],
       "categoryKey": "real-estate"
     },
@@ -24135,15 +24126,6 @@
         "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/ad/ad66d65c-7ea7-431a-bb0a-56522fd4535e?rule=kijijica-1600-webp"
       ],
       "categoryKey": "electronics"
-    },
-    {
-      "id": "alba-dubai-2166",
-      "slug": "2025-used-jetour-t2-luxury-adubai2166",
-      "url": "https://6ixo.com/listing/2025-used-jetour-t2-luxury-adubai2166/",
-      "images": [
-        "https://storage.albacars.ae/vehicles/drafts/2166/1.jpg"
-      ],
-      "categoryKey": "vehicles"
     },
     {
       "id": "alba-dubai-2164",
@@ -69401,6 +69383,16 @@
       "id": "kijiji-1743892330",
       "slug": "2025-nissan-kicks-play-sv-apple-car-play-android-auto-1743892330",
       "url": "https://6ixo.com/listing/2025-nissan-kicks-play-sv-apple-car-play-android-auto-1743892330/"
+    },
+    {
+      "id": "allsopp-dubai-l-313103",
+      "slug": "2-bedroom-apartment-for-rent-belgravia-heights-1-district--bail313103",
+      "url": "https://6ixo.com/listing/2-bedroom-apartment-for-rent-belgravia-heights-1-district--bail313103/"
+    },
+    {
+      "id": "alba-dubai-2166",
+      "slug": "2025-used-jetour-t2-luxury-adubai2166",
+      "url": "https://6ixo.com/listing/2025-used-jetour-t2-luxury-adubai2166/"
     }
   ]
 }

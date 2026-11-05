@@ -1,5 +1,5 @@
 {
-  "checkedAt": "2026-11-05T06:31:56Z",
+  "checkedAt": "2026-11-05T06:44:32.513Z",
   "listings": {
     "craigslist.org/view/d/bastrop-used-2025-cadillac-xt4-fwd-4d/fuqr_3uo8rgowpq1ctwx-a": {
       "availability": "sold",
@@ -17713,6 +17713,15 @@
       "availability": "gone",
       "checkedAt": "2026-11-05T06:31:56Z",
       "reason": "Exact source URL returned HTTP 404"
+    },
+    "kijiji.ca/v-buy-sell-other/city-of-toronto/eurodib-20-qt-commercial-spiral-mixer/1745758848": {
+      "id": "kijiji-1745758848",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/eurodib-20-qt-commercial-spiral-mixer/1745758848",
+      "availability": "gone",
+      "checkedAt": "2026-11-05T06:44:32.513Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1745758848",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     }
   }
 }

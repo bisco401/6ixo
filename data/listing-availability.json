@@ -1,5 +1,5 @@
 {
-  "checkedAt": "2026-11-05T12:28:45Z",
+  "checkedAt": "2026-11-05T12:42:35.936Z",
   "listings": {
     "craigslist.org/view/d/bastrop-used-2025-cadillac-xt4-fwd-4d/fuqr_3uo8rgowpq1ctwx-a": {
       "availability": "sold",
@@ -17661,49 +17661,85 @@
       "reason": "Exact source URL returned HTTP 404"
     },
     "kijiji.ca/v-buy-sell-other/city-of-toronto/eurodib-20-qt-commercial-spiral-mixer/1745758848": {
-      "availability": "unavailable",
-      "checkedAt": "2026-11-05T12:28:45Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1745758848",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/eurodib-20-qt-commercial-spiral-mixer/1745758848",
+      "availability": "gone",
+      "checkedAt": "2026-11-05T12:42:35.936Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1745758848",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-buy-sell-other/city-of-toronto/sage-manufacturing-wall-shelf-12-x-48-stainless-steel-18-gauge/1745758956": {
-      "availability": "unavailable",
-      "checkedAt": "2026-11-05T12:28:45Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1745758956",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/sage-manufacturing-wall-shelf-12-x-48-stainless-steel-18-gauge/1745758956",
+      "availability": "gone",
+      "checkedAt": "2026-11-05T12:42:35.936Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1745758956",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-buy-sell-other/city-of-toronto/eurodib-10-commercial-manual-meat-slicer/1745758952": {
-      "availability": "unavailable",
-      "checkedAt": "2026-11-05T12:28:45Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1745758952",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/eurodib-10-commercial-manual-meat-slicer/1745758952",
+      "availability": "gone",
+      "checkedAt": "2026-11-05T12:42:35.936Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1745758952",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-buy-sell-other/city-of-toronto/sagetra-commercial-tomato-slicer/1745758937": {
-      "availability": "unavailable",
-      "checkedAt": "2026-11-05T12:28:45Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1745758937",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/sagetra-commercial-tomato-slicer/1745758937",
+      "availability": "gone",
+      "checkedAt": "2026-11-05T12:42:35.936Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1745758937",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-buy-sell-other/city-of-toronto/sagetra-professional-french-fry-cutter/1745758892": {
-      "availability": "unavailable",
-      "checkedAt": "2026-11-05T12:28:45Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1745758892",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/sagetra-professional-french-fry-cutter/1745758892",
+      "availability": "gone",
+      "checkedAt": "2026-11-05T12:42:35.936Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1745758892",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-buy-sell-other/city-of-toronto/omcan-two-bulb-commercial-portable-heat-lamp-display-warmer/1745758877": {
-      "availability": "unavailable",
-      "checkedAt": "2026-11-05T12:28:45Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1745758877",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/omcan-two-bulb-commercial-portable-heat-lamp-display-warmer/1745758877",
+      "availability": "gone",
+      "checkedAt": "2026-11-05T12:42:35.936Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1745758877",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-buy-sell-other/city-of-toronto/rosko-countertop-4-burner-commercial-gas-stovetop/1745758883": {
-      "availability": "unavailable",
-      "checkedAt": "2026-11-05T12:28:45Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1745758883",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/rosko-countertop-4-burner-commercial-gas-stovetop/1745758883",
+      "availability": "gone",
+      "checkedAt": "2026-11-05T12:42:35.936Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1745758883",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-buy-sell-other/city-of-toronto/sagetra-triple-commercial-sink-dents/1745758865": {
-      "availability": "unavailable",
-      "checkedAt": "2026-11-05T12:28:45Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1745758865",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/sagetra-triple-commercial-sink-dents/1745758865",
+      "availability": "gone",
+      "checkedAt": "2026-11-05T12:42:35.936Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1745758865",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-buy-sell-other/city-of-toronto/medsup-21-white-polypropylene-bouffant-cap-1000pcs/1745758850": {
-      "availability": "unavailable",
-      "checkedAt": "2026-11-05T12:28:45Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1745758850",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/medsup-21-white-polypropylene-bouffant-cap-1000pcs/1745758850",
+      "availability": "gone",
+      "checkedAt": "2026-11-05T12:42:35.936Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1745758850",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-other-business-industrial/mississauga-peel-region/wholesale-clear-packing-tape-2-x-100-m-36-rolls-box/1745726493": {
       "availability": "unavailable",
@@ -17794,6 +17830,78 @@
       "availability": "sold",
       "checkedAt": "2026-11-05T12:28:45Z",
       "reason": "All offers for this exact listing are unavailable"
+    },
+    "craigslist.org/view/d/houston-2016-bmw-650i-gran-coupe-down/aufd8tvaq376vwseddmjgg": {
+      "id": "craigslist-aUfd8Tvaq376VWsEdDMJGg",
+      "sourceUrl": "https://www.craigslist.org/view/d/houston-2016-bmw-650i-gran-coupe-down/aUfd8Tvaq376VWsEdDMJGg",
+      "availability": "gone",
+      "checkedAt": "2026-11-05T12:42:35.936Z",
+      "httpStatus": 410,
+      "resolvedUrl": "https://www.craigslist.org/view/d/houston-2016-bmw-650i-gran-coupe-down/aUfd8Tvaq376VWsEdDMJGg",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "craigslist.org/view/d/marietta-2018-volkswagen-golf/lmi1rgnb8rgiefv0lwe46w": {
+      "id": "craigslist-Lmi1RgnB8RGiEfv0LwE46w",
+      "sourceUrl": "https://www.craigslist.org/view/d/marietta-2018-volkswagen-golf/Lmi1RgnB8RGiEfv0LwE46w",
+      "availability": "gone",
+      "checkedAt": "2026-11-05T12:42:35.936Z",
+      "httpStatus": 410,
+      "resolvedUrl": "https://www.craigslist.org/view/d/marietta-2018-volkswagen-golf/Lmi1RgnB8RGiEfv0LwE46w",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "craigslist.org/view/d/avondale-estates-2017-infiniti-qx30-buy/4p8hqu_a8rgfola8aa6nbg": {
+      "id": "craigslist-4P8hqu_A8RGfOLA8aA6Nbg",
+      "sourceUrl": "https://www.craigslist.org/view/d/avondale-estates-2017-infiniti-qx30-buy/4P8hqu_A8RGfOLA8aA6Nbg",
+      "availability": "gone",
+      "checkedAt": "2026-11-05T12:42:35.936Z",
+      "httpStatus": 410,
+      "resolvedUrl": "https://www.craigslist.org/view/d/avondale-estates-2017-infiniti-qx30-buy/4P8hqu_A8RGfOLA8aA6Nbg",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "craigslist.org/view/d/avondale-estates-2015-bmw-x1-buy-here/ylvas9_a8rgf_8xpihanfg": {
+      "id": "craigslist-YlVaS9_A8RGf_8xpihAnFg",
+      "sourceUrl": "https://www.craigslist.org/view/d/avondale-estates-2015-bmw-x1-buy-here/YlVaS9_A8RGf_8xpihAnFg",
+      "availability": "gone",
+      "checkedAt": "2026-11-05T12:42:35.936Z",
+      "httpStatus": 410,
+      "resolvedUrl": "https://www.craigslist.org/view/d/avondale-estates-2015-bmw-x1-buy-here/YlVaS9_A8RGf_8xpihAnFg",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "craigslist.org/view/d/spotswood-2016-jeep-cherokee-latitude/yjpqmbdb8rgmq6kfdxjvoq": {
+      "id": "craigslist-yjPqmBDB8RGmq6KfdxjVOQ",
+      "sourceUrl": "https://www.craigslist.org/view/d/spotswood-2016-jeep-cherokee-latitude/yjPqmBDB8RGmq6KfdxjVOQ",
+      "availability": "gone",
+      "checkedAt": "2026-11-05T12:42:35.936Z",
+      "httpStatus": 410,
+      "resolvedUrl": "https://www.craigslist.org/view/d/spotswood-2016-jeep-cherokee-latitude/yjPqmBDB8RGmq6KfdxjVOQ",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "craigslist.org/view/d/woodside-2020-bmw-x3-great-deal/bvaahrdb8rgci_rzd2dosa": {
+      "id": "craigslist-BvaahRDB8RGcI_RZd2DOSA",
+      "sourceUrl": "https://www.craigslist.org/view/d/woodside-2020-bmw-x3-great-deal/BvaahRDB8RGcI_RZd2DOSA",
+      "availability": "gone",
+      "checkedAt": "2026-11-05T12:42:35.936Z",
+      "httpStatus": 410,
+      "resolvedUrl": "https://www.craigslist.org/view/d/woodside-2020-bmw-x3-great-deal/BvaahRDB8RGcI_RZd2DOSA",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "craigslist.org/view/d/bronx-bedrooms-bath/upab1j2zetztqkxbjtjyhb": {
+      "id": "craigslist-uPaB1j2zEtZTQkxBJtjyhB",
+      "sourceUrl": "https://www.craigslist.org/view/d/bronx-bedrooms-bath/uPaB1j2zEtZTQkxBJtjyhB",
+      "availability": "gone",
+      "checkedAt": "2026-11-05T12:42:35.936Z",
+      "httpStatus": 410,
+      "resolvedUrl": "https://www.craigslist.org/view/d/bronx-bedrooms-bath/uPaB1j2zEtZTQkxBJtjyhB",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
+    },
+    "kijiji.ca/v-apartments-condos/ville-de-montreal/4-1-2-2-chambre-a-louer-for-rent-a-chambly/1743456828": {
+      "id": "kijiji-1743456828",
+      "sourceUrl": "https://www.kijiji.ca/v-apartments-condos/ville-de-montreal/4-1-2-2-chambre-a-louer-for-rent-a-chambly/1743456828",
+      "availability": "gone",
+      "checkedAt": "2026-11-05T12:42:35.936Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-appartement-condo/ville-de-montreal/c37l1700281?radius=50.0&ll=45.44627%2C-73.29045&adRemoved=1743456828",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     }
   }
 }

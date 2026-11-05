@@ -108,6 +108,26 @@ assert.equal(timers.size, 1);
 nearby.stopLocationTracking();
 assert.equal(timers.size, 0, 'Stop background feed work when tracking is suspended');
 
+const deferred = makeFlow();
+deferred.homeQuickFilters = { nearMe: false };
+deferred.homeDeviceSearchPending = true;
+deferred.homeLocationDraft = { text: 'Oakville, Canada' };
+deferred.resolvedDeviceLocation = { city: 'Oakville', country: 'Canada' };
+deferred.applyResolvedLocationDefaults = options => assert.equal(options.refreshHome, false);
+deferred.refreshDeviceLocationFeeds = async () => {
+  deferred.renders++;
+  deferred.homeDeviceSearchPending = false;
+};
+deferred.scheduleLocationAwareResultsRefresh();
+await advance(750);
+assert.equal(deferred.renders, 0, 'Do not redraw the home search during a location edit');
+assert.equal(timers.size, 1, 'A deferred refresh has one retry, even without Near me toggled');
+deferred.homeLocationDraft = null;
+await advance(750);
+assert.equal(deferred.renders, 1, 'A queued device search resumes when the location edit finishes');
+assert.equal(deferred.deviceLocationRenderedCity, 'oakville|canada');
+assert.equal(timers.size, 0);
+
 windowStub.scrollY = 1200;
 cardTop = 1300;
 const restoreScroll = nearby.captureLocationRefreshScroll();

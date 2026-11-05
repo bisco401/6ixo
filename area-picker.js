@@ -151,6 +151,10 @@
             if (applying) await applying;
             const query = field.value;
             const confirmed = app.getCurrentLocationDisplayText?.() || '';
+            // A GPS label is never a manual destination, including while the
+            // device is moving and the next area lookup is still in flight.
+            if (!app.homeLocationDraft && !app.manualDiscoveryLocation && field.dataset.autoLocationDefault === '1'
+                && (query === confirmed || query === app.lastConfirmedDeviceLocation?.label)) return true;
             if (!app.homeLocationDraft && (!query.trim()
                 || (query.trim() === confirmed && app.deviceLocationFeedsReady))) return true;
             if (!app.homeLocationDraft) {

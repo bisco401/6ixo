@@ -47,3 +47,13 @@ assert.equal(field.value, 'Atla', 'Keyboard blur must not restore the previous s
 documentEvents.pointerdown({ target: { closest: () => null } });
 assert.equal(field.value, 'Paris, France', 'Cancelling must retain an existing manual selection');
 console.log('Area picker recovery passed: keyboard blur preserves drafts; explicit cancellation restores GPS or the manual selection.');
+
+field.value = 'Oakville, Canada';
+field.dataset.autoLocationDefault = '1';
+app.deviceLocationFeedsReady = false;
+app.getCurrentLocationDisplayText = () => '';
+app.lastConfirmedDeviceLocation = { label: 'Oakville, Canada' };
+window.SIXO_LOCATION_AUTOCOMPLETE.search = () => { throw new Error('A GPS label must never be committed as a manual destination'); };
+assert.equal(await app.resolveHomeLocationAutocomplete(), true,
+    'Submitting a keyword search between GPS fixes keeps following the device');
+assert.equal(app.homeLocationDraft, null);

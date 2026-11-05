@@ -15832,6 +15832,15 @@ class DatingApp {
         return resolved.country ? this.formatDeviceLocationLabel(this.getAccuracySupportedDeviceLocation(resolved)) : '';
     }
 
+    isDeviceLocationRefreshingNearby() {
+        const previous = this.lastConfirmedDeviceLocation;
+        return !this.manualDiscoveryLocation && this.locationPermissionState !== 'denied'
+            && this.hasUsableCurrentLocation() && Boolean(previous?.label)
+            && Number.isFinite(previous.lat) && Number.isFinite(previous.lng)
+            && Date.now() - previous.confirmedAt < 90000
+            && this.calculateDistance(previous.lat, previous.lng, this.userLocation.lat, this.userLocation.lng, { precise: true }) < 5;
+    }
+
     getCurrentLocationDefaultParts() {
         const liveLocation = this.getCurrentLocationDisplayText() ? this.getDiscoveryLocationLabelParts() : {};
         const homeSelection = typeof this.getHomeSearchLocationSelection === 'function'
@@ -16214,8 +16223,17 @@ class DatingApp {
             searchInput.title = 'Search a city and country.';
             delete searchInput.dataset.locationAccuracy;
             delete searchInput.dataset.locationProvider;
+            delete searchInput.dataset.locationRefreshing;
             return;
         }
+        if (!label && !forceMessage && this.isDeviceLocationRefreshingNearby()) {
+            // Retain the last confirmed label through an in-flight lookup. It
+            // is display-only: getDeviceListingLocationScope remains pending.
+            searchInput.dataset.locationRefreshing = '1';
+            searchInput.title = `${this.lastConfirmedDeviceLocation.label} — updating from live device location.`;
+            return;
+        }
+        delete searchInput.dataset.locationRefreshing;
         if (!label) {
             // Clear only automatic values; a manually chosen search area is not
             // the user's live location and must remain a separate choice.
@@ -16644,6 +16662,13 @@ class DatingApp {
         const nextRegion = String(region || parsed.region || '').trim();
         const nextCountry = String(country || parsed.country || '').trim();
         const { country: countryInput, city: citySelect, hidden } = this.getHomeLocationControls();
+        const nextText = (auto ? String(text || '').trim() : '')
+            || [nextCity, nextRegion, nextCountry].filter(Boolean).join(', ') || String(text || '').trim();
+        if (auto && hidden?.value === nextText && hidden?.dataset.autoLocationDefault === '1'
+            && (!countryInput || countryInput.value === nextCountry)
+            && (!citySelect || citySelect.value === nextCity)) {
+            return { city: nextCity, region: nextRegion, country: nextCountry, text: nextText };
+        }
 
         if (countryInput) {
             countryInput.value = nextCountry;
@@ -16653,8 +16678,6 @@ class DatingApp {
         if (citySelect) {
             citySelect.dataset.autoLocationDefault = auto ? '1' : '0';
         }
-        const nextText = (auto ? String(text || '').trim() : '')
-            || [nextCity, nextRegion, nextCountry].filter(Boolean).join(', ') || String(text || '').trim();
         if (hidden) {
             hidden.value = nextText;
             hidden.dataset.autoLocationDefault = auto ? '1' : '0';
@@ -18314,6 +18337,7 @@ class DatingApp {
         // GPS/network failures. Expired coordinates still cannot drive Near me.
         this.lastConfirmedDeviceLocation = {
             label: resolvedLabel,
+            lat, lng, confirmedAt: Date.now(),
             approximate: resolvedGeo.approximate === true || !this.isDeviceLocationCityAccurate(appliedLocation)
         };
         this.deviceLocationStatus = '';
@@ -18328,15 +18352,22 @@ class DatingApp {
         // fix resolves first must still align the restored home filters on entry.
         const cityKey = `${this.normalizeLocationText(resolvedGeo.city)}|${this.normalizeLocationText(resolvedGeo.country)}`;
         const refreshFeeds = forceBrowserLocation || !this.didApplyEntryLocationDefaults
-            || this.deviceLocationRenderedCity !== cityKey;
+            || this.deviceLocationRenderedCity !== cityKey || this.homeDeviceSearchPending;
+        const deferHomeRefresh = refreshFeeds && !forceBrowserLocation && this.didApplyEntryLocationDefaults
+            && this.activeScreen === 'home' && this.isLocationResultsRefreshBusy();
         try {
             // GPS watch callbacks refresh coordinates frequently. Rebuilding the
             // same city resets listing/carousel DOM while the visitor is scrolling.
-            if (refreshFeeds) {
+            if (deferHomeRefresh) {
+                this.homeDeviceSearchPending = true;
+            } else if (refreshFeeds) {
                 const restoreScroll = this.captureLocationRefreshScroll();
-                this.applyResolvedLocationDefaults({ forceBrowserLocation: forceBrowserLocation || this.didApplyEntryLocationDefaults === false || (this.strictDeviceLocation && changedCity) });
+                this.applyResolvedLocationDefaults({ forceBrowserLocation: forceBrowserLocation || this.didApplyEntryLocationDefaults === false || (this.strictDeviceLocation && changedCity), refreshHome: false });
                 await this.refreshDeviceLocationFeeds();
                 restoreScroll();
+                // A newer fix can arrive while rendering. Record the area that
+                // actually rendered so the next lookup does not rebuild it again.
+                if (generation === this.locationLifecycleGeneration) this.deviceLocationRenderedCity = cityKey;
                 if (this.locationAwareResultsTimer != null) {
                     window.clearTimeout(this.locationAwareResultsTimer);
                     this.locationAwareResultsTimer = null;
@@ -18355,16 +18386,16 @@ class DatingApp {
             return;
         }
         if (this.userLocation !== appliedLocation || generation !== this.locationLifecycleGeneration || !this.hasUsableCurrentLocation()) return;
-        this.deviceLocationRenderedCity = cityKey;
+        if (!deferHomeRefresh) this.deviceLocationRenderedCity = cityKey;
         this.deviceLocationFeedsReady = true;
         this.updateHomeCurrentLocationDisplay();
         this.updateDeviceLocationUi();
         this.updateMarketplaceLocationControls();
-        if (!refreshFeeds) this.scheduleLocationAwareResultsRefresh();
+        if (!refreshFeeds || deferHomeRefresh) this.scheduleLocationAwareResultsRefresh();
         if (resolvedGeo.needsCityRetry) this.scheduleLocationLabelRetry();
     }
 
-    applyResolvedLocationDefaults({ forceBrowserLocation = false } = {}) {
+    applyResolvedLocationDefaults({ forceBrowserLocation = false, refreshHome = true } = {}) {
         const selected = this.manualDiscoveryLocation || this.currentUser.location;
         let city = selected.city || '';
         const country = selected.country || '';
@@ -18404,7 +18435,7 @@ class DatingApp {
         );
         if (canRefreshHomeLocation) {
             this.setHomeLocationControls({ city, region, country, text: displayLocation, auto: true });
-            this.applyHomeFilters();
+            if (refreshHome) this.applyHomeFilters();
         }
         this.updateHomeCurrentLocationDisplay(displayLocation || 'Location detected');
 
@@ -19118,10 +19149,16 @@ class DatingApp {
         };
     }
 
+    isLocationResultsRefreshBusy() {
+        return Date.now() - Number(this.lastLocationBrowsingActivityAt || 0) < 750
+            || (this.activeScreen === 'home' && Boolean(this.homeLocationDraft));
+    }
+
     scheduleLocationAwareResultsRefresh() {
         if (document.visibilityState === 'hidden' || !this.hasUsableCurrentLocation()) return;
         if (this.strictDeviceLocation && !this.deviceLocationFeedsReady) return;
-        const needsRefresh = (this.activeScreen === 'home' && this.homeQuickFilters?.nearMe)
+        const pendingHomeSearch = this.activeScreen === 'home' && this.homeDeviceSearchPending;
+        const needsRefresh = pendingHomeSearch || (this.activeScreen === 'home' && this.homeQuickFilters?.nearMe)
             || (this.activeScreen === 'marketplace' && this.marketplaceQuickFilters?.nearMe)
             || (this.activeScreen === 'community' && this.communityFilters?.nearMe)
             || (this.activeScreen === 'vehicles' && this.vehicleFilters?.nearMe)
@@ -19129,9 +19166,9 @@ class DatingApp {
             || (this.currentDatingCategory === 'companionship' && this.activeScreen === 'dating');
         if (!needsRefresh || this.locationAwareResultsTimer != null) return;
         const lastRefresh = this.lastLocationAwareResultsRefresh;
-        if (lastRefresh?.screen === this.activeScreen
+        if (!pendingHomeSearch && lastRefresh?.screen === this.activeScreen
             && this.calculateDistance(lastRefresh.lat, lastRefresh.lng, this.userLocation.lat, this.userLocation.lng, { precise: true }) < 0.25) return;
-        const delayMs = lastRefresh?.screen === this.activeScreen
+        const delayMs = pendingHomeSearch ? 750 : lastRefresh?.screen === this.activeScreen
             ? Math.max(100, 30000 - (Date.now() - lastRefresh.at))
             : 100;
         const screenName = this.activeScreen;
@@ -19143,7 +19180,7 @@ class DatingApp {
                 this.scheduleLocationAwareResultsRefresh();
                 return;
             }
-            if (Date.now() - Number(this.lastLocationBrowsingActivityAt || 0) < 750) {
+            if (this.isLocationResultsRefreshBusy()) {
                 this.scheduleLocationAwareResultsRefresh();
                 return;
             }
@@ -19151,7 +19188,12 @@ class DatingApp {
             this.lastLocationAwareResultsRefresh = {
                 screen: this.activeScreen, at: Date.now(), lat: this.userLocation.lat, lng: this.userLocation.lng
             };
-            if (this.activeScreen === 'home' && this.homeQuickFilters?.nearMe) {
+            if (this.activeScreen === 'home' && this.homeDeviceSearchPending) {
+                this.applyResolvedLocationDefaults({ refreshHome: false });
+                await this.refreshDeviceLocationFeeds();
+                const location = this.resolvedDeviceLocation;
+                if (location) this.deviceLocationRenderedCity = `${this.normalizeLocationText(location.city)}|${this.normalizeLocationText(location.country)}`;
+            } else if (this.activeScreen === 'home' && this.homeQuickFilters?.nearMe) {
                 await this.applyHomeFilters({ scrollToResults: false });
             }
             if (this.activeScreen === 'marketplace' && this.marketplaceQuickFilters?.nearMe) {
@@ -21426,6 +21468,7 @@ class DatingApp {
     }
 
     renderHomeTodayDeals() {
+        if (this.strictDeviceLocation && !this.getCurrentLocationDisplayText() && this.isDeviceLocationRefreshingNearby()) return;
         const section = document.getElementById('home-today-deals');
         const row = document.getElementById('home-today-deals-row');
         if (!section || !row) return;
@@ -21629,6 +21672,7 @@ class DatingApp {
 	    }
 
 	    renderHomePersonalizedRows(pool = null) {
+            if (this.strictDeviceLocation && !this.getCurrentLocationDisplayText() && this.isDeviceLocationRefreshingNearby()) return;
 	        const recommendedEl = document.getElementById('home-recommended-row');
 	        const recentSection = document.getElementById('home-recent-row-section');
 	        const recentEl = document.getElementById('home-recent-row');
@@ -41738,6 +41782,13 @@ class DatingApp {
     async applyHomeFilters({ scrollToResults = false } = {}) {
             const requestId = (this.homeSearchRequestId || 0) + 1;
             this.homeSearchRequestId = requestId;
+            if (this.strictDeviceLocation && !this.getCurrentLocationDisplayText() && this.isDeviceLocationRefreshingNearby()) {
+                // Keep the scoped cards and the user's draft in place until the
+                // latest device area is confirmed; never render an empty scope.
+                this.homeDeviceSearchPending = true;
+                return;
+            }
+            this.homeDeviceSearchPending = false;
 		        const normalizeText = (value) => String(value || '')
 		            .toLowerCase()
 	            .replace(/[^a-z0-9]+/g, ' ')

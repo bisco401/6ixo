@@ -1,5 +1,5 @@
 {
-  "checkedAt": "2026-11-05T18:26:00Z",
+  "checkedAt": "2026-11-05T18:42:08.315Z",
   "listings": {
     "craigslist.org/view/d/bastrop-used-2025-cadillac-xt4-fwd-4d/fuqr_3uo8rgowpq1ctwx-a": {
       "availability": "sold",
@@ -17622,29 +17622,49 @@
       "reason": "Kijiji redirected the exact ad to a confirmed removal"
     },
     "kijiji.ca/v-buy-sell-other/city-of-toronto/sage-manufacturing-wall-shelf-12-x-48-stainless-steel-18-gauge/1745758956": {
-      "availability": "unavailable",
-      "checkedAt": "2026-11-05T18:26:00Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1745758956",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/sage-manufacturing-wall-shelf-12-x-48-stainless-steel-18-gauge/1745758956",
+      "availability": "gone",
+      "checkedAt": "2026-11-05T18:42:08.315Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1745758956",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-buy-sell-other/city-of-toronto/eurodib-10-commercial-manual-meat-slicer/1745758952": {
-      "availability": "unavailable",
-      "checkedAt": "2026-11-05T18:26:00Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1745758952",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/eurodib-10-commercial-manual-meat-slicer/1745758952",
+      "availability": "gone",
+      "checkedAt": "2026-11-05T18:42:08.315Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1745758952",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-buy-sell-other/city-of-toronto/sagetra-commercial-tomato-slicer/1745758937": {
-      "availability": "unavailable",
-      "checkedAt": "2026-11-05T18:26:00Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1745758937",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/sagetra-commercial-tomato-slicer/1745758937",
+      "availability": "gone",
+      "checkedAt": "2026-11-05T18:42:08.315Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1745758937",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-buy-sell-other/city-of-toronto/sagetra-professional-french-fry-cutter/1745758892": {
-      "availability": "unavailable",
-      "checkedAt": "2026-11-05T18:26:00Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1745758892",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/sagetra-professional-french-fry-cutter/1745758892",
+      "availability": "gone",
+      "checkedAt": "2026-11-05T18:42:08.315Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1745758892",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-buy-sell-other/city-of-toronto/omcan-two-bulb-commercial-portable-heat-lamp-display-warmer/1745758877": {
-      "availability": "unavailable",
-      "checkedAt": "2026-11-05T18:26:00Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1745758877",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/omcan-two-bulb-commercial-portable-heat-lamp-display-warmer/1745758877",
+      "availability": "gone",
+      "checkedAt": "2026-11-05T18:42:08.315Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1745758877",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-buy-sell-other/city-of-toronto/rosko-countertop-4-burner-commercial-gas-stovetop/1745758883": {
       "availability": "unavailable",
@@ -17796,24 +17816,40 @@
       "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-buy-sell-other/city-of-toronto/eurodib-20-qt-commercial-spiral-mixer/1745766423": {
-      "availability": "unavailable",
-      "checkedAt": "2026-11-05T18:26:00Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1745766423",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/eurodib-20-qt-commercial-spiral-mixer/1745766423",
+      "availability": "gone",
+      "checkedAt": "2026-11-05T18:42:08.315Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1745766423",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-buy-sell-other/city-of-toronto/vitamix-36019-commercial-bar-blender-48-oz-vm0145/1745766435": {
-      "availability": "unavailable",
-      "checkedAt": "2026-11-05T18:26:00Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1745766435",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/vitamix-36019-commercial-bar-blender-48-oz-vm0145/1745766435",
+      "availability": "gone",
+      "checkedAt": "2026-11-05T18:42:08.315Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1745766435",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-buy-sell-other/city-of-toronto/sage-manufacturing-wall-shelf-12-x-48-stainless-steel-18-gauge/1745766373": {
-      "availability": "unavailable",
-      "checkedAt": "2026-11-05T18:26:00Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1745766373",
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-other/city-of-toronto/sage-manufacturing-wall-shelf-12-x-48-stainless-steel-18-gauge/1745766373",
+      "availability": "gone",
+      "checkedAt": "2026-11-05T18:42:08.315Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-other/city-of-toronto/c26l1700273?radius=50.0&ll=43.67%2C-79.44&adRemoved=1745766373",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "kijiji.ca/v-room-rental-roommate/mississauga-peel-region/brampton-private-quite-room-for-female/1745758907": {
-      "availability": "unavailable",
-      "checkedAt": "2026-11-05T18:26:00Z",
-      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+      "id": "kijiji-1745758907",
+      "sourceUrl": "https://www.kijiji.ca/v-room-rental-roommate/mississauga-peel-region/brampton-private-quite-room-for-female/1745758907",
+      "availability": "gone",
+      "checkedAt": "2026-11-05T18:42:08.315Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-room-rental-roommate/mississauga-peel-region/c36l1700276?radius=50.0&ll=43.72958%2C-79.71282&adRemoved=1745758907",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     },
     "craigslist.org/view/d/fort-pierce-ford-expedition-owner-clean/4ejxxn8b9wjxrcrgd7m71d": {
       "availability": "gone",
@@ -17869,6 +17905,15 @@
       "availability": "unavailable",
       "checkedAt": "2026-11-05T18:26:00Z",
       "reason": "Kijiji redirected the exact ad to a confirmed removal"
+    },
+    "kijiji.ca/v-hutch-display-cabinet/hamilton/dinning-hutch/1741833903": {
+      "id": "kijiji-1741833903",
+      "sourceUrl": "https://www.kijiji.ca/v-hutch-display-cabinet/hamilton/dinning-hutch/1741833903",
+      "availability": "gone",
+      "checkedAt": "2026-11-05T18:42:08.315Z",
+      "httpStatus": 200,
+      "resolvedUrl": "https://www.kijiji.ca/b-hutch-display-cabinet/hamilton/c250l80014?radius=50.0&ll=43.35%2C-79.87&adRemoved=1741833903",
+      "reason": "Source returned a removed-ad redirect or HTTP 404/410."
     }
   }
 }

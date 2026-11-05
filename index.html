@@ -130,7 +130,7 @@
     <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
     <link rel="preload" href="assets/fonts/sora-latin.3902474d3ece.woff2" as="font" type="font/woff2" crossorigin>
     <link rel="stylesheet" href="styles.css?v=20261101-search-suggestions-2">
-    <link rel="stylesheet" href="assets/arrive-discovery.css?v=20261101-saved-itinerary-3">
+    <link rel="stylesheet" href="assets/arrive-discovery.css?v=20261105-destination-picker-1">
     <link rel="stylesheet" href="assets/shortstay-signature.css?v=20261018-signature-1">
     <link rel="stylesheet" href="assets/stay-host-application.css?v=20261019-host-proof-checks-1">
     <link rel="stylesheet" href="assets/policy-links.css?v=20260930-site-policies-1">
@@ -4192,13 +4192,18 @@
                         <aside class="arrive-discovery-preferences" aria-label="Trip preferences">
                             <h3>Your trip</h3>
                             <form id="dating-schedule-form" class="dating-schedule-form arrive-trip-form">
-                                <label class="arrive-discovery-field" for="arrive-discovery-country">Country
-                                    <select id="arrive-discovery-country" required><option value="">Choose country</option></select>
-                                </label>
-                                <label class="arrive-discovery-field" for="arrive-discovery-city">City
-                                    <input id="arrive-discovery-city" type="text" placeholder="Choose or type a city" list="arrive-discovery-cities" autocomplete="off">
-                                </label>
-                                <datalist id="arrive-discovery-cities"></datalist>
+                                <div class="arrive-destination-control">
+                                    <label class="arrive-discovery-field" for="arrive-discovery-country">Country
+                                        <input id="arrive-discovery-country" type="text" required placeholder="Search country or code (e.g. CA, US)" autocomplete="off" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="arrive-discovery-country-options">
+                                    </label>
+                                    <div id="arrive-discovery-country-options" class="arrive-destination-options" role="listbox" aria-label="Country suggestions" hidden></div>
+                                </div>
+                                <div class="arrive-destination-control">
+                                    <label class="arrive-discovery-field" for="arrive-discovery-city">City
+                                        <input id="arrive-discovery-city" type="text" placeholder="Search or type a city" autocomplete="off" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="arrive-discovery-city-options">
+                                    </label>
+                                    <div id="arrive-discovery-city-options" class="arrive-destination-options" role="listbox" aria-label="City suggestions" hidden></div>
+                                </div>
                                 <input type="hidden" id="dating-schedule-destination">
                                 <div class="arrive-discovery-dates">
                                     <label class="arrive-discovery-field" for="dating-schedule-start">Arrival
@@ -7219,7 +7224,7 @@
     <script src="assets/profile-card-ui.00a6745f6675.js"></script>
         <link rel="stylesheet" href="assets/posting-accordion.css?v=20261012-property-categories-1">
     <script src="assets/posting-accordion.js?v=20261104-category-badges-1"></script>
-    <script src="assets/arrive-discovery.js?v=20261101-saved-itinerary-3"></script>
+    <script src="assets/arrive-discovery.js?v=20261105-destination-picker-1"></script>
     <script src="app.js?v=20261105-moving-search-1"></script>
         <script src="rental-finance-ui.js?v=20260930-stay-booking-ready-1"></script>
         <script src="vehicle-rental-flow.js?v=20260914-host-insurance-1"></script>

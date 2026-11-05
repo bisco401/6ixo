@@ -215,8 +215,56 @@
                 startDate: root.querySelector('#dating-schedule-start'), endDate: root.querySelector('#dating-schedule-end')
             };
             this.countrySearch = root.querySelector('#arrive-discovery-country-search');
+            this.setupDestinationClear();
             this.hydrate(); this.bind(); this.loadCountries(); this.render(); this.loadCitiesForCountry();
             this.store.ready.then(() => { if (this.store.current()) { this.hydrate(); this.render(); this.loadCitiesForCountry(); } });
+        }
+        setupDestinationClear() {
+            if (!document.getElementById('arrive-destination-clear-styles')) {
+                const style = document.createElement('style');
+                style.id = 'arrive-destination-clear-styles';
+                style.textContent = '#arrive-content .arrive-destination-control>.arrive-destination-clear{position:absolute!important;bottom:0!important;right:2px!important;z-index:5;width:36px!important;height:44px!important;min-height:44px!important;display:flex;align-items:center;justify-content:center;border:0!important;border-radius:8px;background:transparent!important;color:#49617d!important;font:normal 24px/1 sans-serif!important;cursor:pointer;padding:0!important;touch-action:manipulation}#arrive-content .arrive-destination-control>.arrive-destination-clear[hidden]{display:none!important}#arrive-content .arrive-destination-control>.arrive-destination-clear:focus-visible{outline:2px solid #285d9a;outline-offset:-2px}#arrive-content .arrive-destination-row .arrive-discovery-field input{padding-right:42px!important}';
+                document.head.appendChild(style);
+            }
+            this.clearButtons = {};
+            for (const field of ['country', 'city']) {
+                const control = this.fields[field].closest('.arrive-destination-control');
+                if (!control) continue;
+                const button = document.createElement('button');
+                button.type = 'button';
+                button.className = 'arrive-destination-clear';
+                button.setAttribute('aria-label', 'Clear ' + field);
+                button.title = 'Clear ' + field;
+                button.textContent = '\u00d7';
+                button.hidden = true;
+                control.appendChild(button);
+                button.addEventListener('click', event => {
+                    event.stopPropagation();
+                    this.clearDestination(field);
+                }, { signal: this.abort.signal });
+                this.clearButtons[field] = button;
+            }
+        }
+        updateDestinationClear() {
+            for (const field of ['country', 'city']) {
+                if (this.clearButtons[field]) this.clearButtons[field].hidden = !Boolean(this.fields[field].value.trim());
+            }
+        }
+        clearDestination(field) {
+            if (!this.store.current()) return;
+            const prefs = this.store.state.preferences;
+            if (field === 'country') {
+                prefs.country = ''; prefs.city = '';
+                this.fields.country.value = ''; this.fields.city.value = ''; this.countrySearch.value = '';
+                this.cityLoadKey = ''; this.cityCacheKey = ''; this.cityCatalog = []; this.cityOptions = [];
+                this.cityRequest++;
+                this.hidePicker('country'); this.hidePicker('city');
+            } else {
+                prefs.city = ''; this.fields.city.value = '';
+                this.hidePicker('city');
+            }
+            prefs.updatedAt = this.stamp(); this.tab = 'discover'; this.limit = 24; this.signature = '';
+            this.syncLegacy(); this.updateDestinationClear(); this.render(); this.store.save();
         }
         retire() { this.abort.abort(); window.clearTimeout(this.timer); this.store.retire(); }
         stamp() { return Math.max(Date.now(), this.store.state.preferences.updatedAt + 1, ...this.store.state.saved.map(x => x.updatedAt + 1)); }
@@ -484,6 +532,7 @@
         }
         render() {
             if (!this.store.current()) return;
+            this.updateDestinationClear();
             const prefs = this.store.state.preferences;
             const extraCount = prefs.categories.filter(value => !CATEGORIES.slice(0, 6).includes(value)).length;
             this.root.querySelector('.arrive-discovery-more-interests summary').textContent = extraCount ? 'More interests (' + extraCount + ' selected)' : 'More interests';

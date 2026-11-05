@@ -59,4 +59,10 @@
         position: static !important;
         max-width: 100% !important;
     }
+    /* A featured feed is already labeled: remove overlaid category and promo tags
+       from featured listing/profile cards without affecting ordinary feeds. */
+    html .home-featured-ads .featured-ad-card .listing-category-badge,
+    html .home-featured-ads .featured-ad-card > .featured-ad-tag {
+        display: none !important;
+    }
 }

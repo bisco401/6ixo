@@ -130,7 +130,7 @@
     <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
     <link rel="preload" href="assets/fonts/sora-latin.3902474d3ece.woff2" as="font" type="font/woff2" crossorigin>
     <link rel="stylesheet" href="styles.css?v=20261101-search-suggestions-2">
-    <link rel="stylesheet" href="assets/arrive-discovery.css?v=20261105-side-by-side-4">
+    <link rel="stylesheet" href="assets/arrive-discovery.css?v=20261105-force-two-columns-5">
     <link rel="stylesheet" href="assets/shortstay-signature.css?v=20261018-signature-1">
     <link rel="stylesheet" href="assets/stay-host-application.css?v=20261019-host-proof-checks-1">
     <link rel="stylesheet" href="assets/policy-links.css?v=20260930-site-policies-1">
@@ -4192,7 +4192,7 @@
                         <aside class="arrive-discovery-preferences" aria-label="Trip preferences">
                             <h3>Your trip</h3>
                             <form id="dating-schedule-form" class="dating-schedule-form arrive-trip-form">
-                                <div class="arrive-destination-row">
+                                <div class="arrive-destination-row" style="display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px!important;grid-column:1/-1!important;width:100%!important;align-items:start!important;">
                                     <div class="arrive-destination-control arrive-country-control">
                                         <label class="arrive-discovery-field" for="arrive-discovery-country">Country
                                             <input id="arrive-discovery-country" type="text" placeholder="Choose country" readonly aria-label="Country, tap to search and select" aria-haspopup="dialog" aria-controls="arrive-discovery-country-picker">

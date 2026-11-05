@@ -77,3 +77,30 @@
 #arrive-content .arrive-discovery-extra-checks { display: grid; grid-template-columns: minmax(0, 1fr); gap: 7px; }
 @media(max-width: 900px) { #arrive-content .arrive-discovery-extra-checks { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
 @media(max-width: 560px) { #arrive-content .arrive-discovery-extra-checks { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+/* Searchable country/city selectors on Arrive+ (including iPhone Safari). */
+#arrive-content .arrive-destination-control { position: relative; min-width: 0; }
+#arrive-content .arrive-destination-options {
+    position: absolute; top: calc(100% + 4px); left: 0; right: 0; z-index: 100;
+    max-height: 250px; overflow-y: auto; overscroll-behavior: contain;
+    border: 1px solid #cbd6e5; border-radius: 10px; background: #fff;
+    box-shadow: 0 10px 24px rgba(22, 44, 70, .16);
+    -webkit-overflow-scrolling: touch;
+}
+#arrive-content .arrive-destination-options[hidden] { display: none !important; }
+#arrive-content .arrive-destination-option {
+    display: flex; align-items: center; justify-content: space-between; gap: 8px;
+    width: 100%; min-height: 44px; margin: 0; padding: 10px 12px;
+    border: 0; border-bottom: 1px solid #ecf0f5; border-radius: 0;
+    background: #fff; color: #20344d; font: inherit; font-size: 15px;
+    text-align: left; cursor: pointer;
+}
+#arrive-content .arrive-destination-option:last-child { border-bottom: 0; }
+#arrive-content .arrive-destination-option.active,
+#arrive-content .arrive-destination-option:hover,
+#arrive-content .arrive-destination-option:focus-visible { background: #eaf1fc; outline: none; }
+#arrive-content .arrive-destination-option small { font-size: 11px; color: #61738a; font-weight: 600; }
+#arrive-content .arrive-destination-empty { margin: 0; padding: 12px; color: #61738a; font-size: 13px; }
+@media (max-width: 560px) {
+    #arrive-content .arrive-trip-form { grid-template-columns: minmax(0, 1fr); }
+}

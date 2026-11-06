@@ -9,28 +9,28 @@
   "categories": ["shopping", "travel", "business", "lifestyle"],
   "icons": [
     {
-      "src": "/icon-192.png?v=202603040620",
+      "src": "/assets/6ixo-icon-192-20261106.png",
       "sizes": "192x192",
       "type": "image/png"
     },
     {
-      "src": "/icon-512.png?v=202603040620",
+      "src": "/assets/6ixo-icon-512-20261106.png",
       "sizes": "512x512",
       "type": "image/png"
     },
     {
-      "src": "/icon-512.png?v=202603040620",
+      "src": "/assets/6ixo-icon-512-20261106.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "/favicon-32x32.png?v=202603040620",
+      "src": "/assets/6ixo-favicon-32x32-20261106.png",
       "sizes": "32x32",
       "type": "image/png"
     },
     {
-      "src": "/apple-touch-icon.png?v=202603040620",
+      "src": "/assets/6ixo-apple-touch-icon-20261106.png",
       "sizes": "180x180",
       "type": "image/png"
     }

@@ -1,6 +1,44 @@
 {
-  "count": 5388,
+  "count": 5475,
   "listings": [
+    {
+      "id": "craigslist-4mn2CeQVnWFrTK6LfPFrf8",
+      "slug": "bertazzoni-heritage-48-free-standing-dual-fuel-range-ivory-tk6lfpfrf8",
+      "url": "https://6ixo.com/listing/bertazzoni-heritage-48-free-standing-dual-fuel-range-ivory-tk6lfpfrf8/",
+      "images": [
+        "https://images.craigslist.org/01313_lgF2A6AE5un_0kM0dY_1200x900.jpg",
+        "https://images.craigslist.org/01010_2liq9YDKBx7_0lk0gu_1200x900.jpg",
+        "https://images.craigslist.org/00H0H_jkhJeiEwYPH_0kk0fu_1200x900.jpg"
+      ],
+      "categoryKey": "buy-and-sell"
+    },
+    {
+      "id": "category-2f72b5fa68222c56f4",
+      "slug": "refurbished-beko-wtb7201w-7kg-1200rpm-washing-machine-whit-68222c56f4",
+      "url": "https://6ixo.com/listing/refurbished-beko-wtb7201w-7kg-1200rpm-washing-machine-whit-68222c56f4/",
+      "images": [
+        "https://centralhomeappliances.com/cdn/shop/files/WhatsAppImage2026-11-05at18.12.21.jpg?v=1793884118&width=1920"
+      ],
+      "categoryKey": "buy-and-sell"
+    },
+    {
+      "id": "category-f59eea662bc507ecc9",
+      "slug": "refurbished-blomberg-lwf174310w-7kg-1400rpm-washing-machin-2bc507ecc9",
+      "url": "https://6ixo.com/listing/refurbished-blomberg-lwf174310w-7kg-1400rpm-washing-machin-2bc507ecc9/",
+      "images": [
+        "https://centralhomeappliances.com/cdn/shop/files/WhatsAppImage2026-10-30at18.06.53.jpg?v=1793386474&width=1920"
+      ],
+      "categoryKey": "buy-and-sell"
+    },
+    {
+      "id": "category-54b61dba7792b9f101",
+      "slug": "refurbished-beko-asl141w-558l-american-style-fridge-freeze-7792b9f101",
+      "url": "https://6ixo.com/listing/refurbished-beko-asl141w-558l-american-style-fridge-freeze-7792b9f101/",
+      "images": [
+        "https://centralhomeappliances.com/cdn/shop/files/WhatsAppImage2026-10-09at6.21.34PM_12.jpg?v=1791568706&width=1920"
+      ],
+      "categoryKey": "buy-and-sell"
+    },
     {
       "id": "allsopp-dubai-sup151400",
       "slug": "1-bedroom-apartment-for-rent-travo-tower-a-travo-the-views-isup151400",
@@ -9515,11 +9553,29 @@
       "categoryKey": "buy-and-sell"
     },
     {
+      "id": "category-6a176e6a60f35993ba",
+      "slug": "exams-and-data-manager-60f35993ba",
+      "url": "https://6ixo.com/listing/exams-and-data-manager-60f35993ba/",
+      "images": [
+        "https://www.twrecruitment.com/images/og-image.jpg"
+      ],
+      "categoryKey": "jobs"
+    },
+    {
       "id": "kijiji-1745775136",
       "slug": "az-city-drivers-job-1745775136",
       "url": "https://6ixo.com/listing/az-city-drivers-job-1745775136/",
       "images": [
         "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/05/059ce235-a555-4ba5-b450-76caae79a875?rule=kijijica-1600-webp"
+      ],
+      "categoryKey": "jobs"
+    },
+    {
+      "id": "category-6181fd718febfca1c8",
+      "slug": "early-years-educator-8febfca1c8",
+      "url": "https://6ixo.com/listing/early-years-educator-8febfca1c8/",
+      "images": [
+        "https://www.twrecruitment.com/images/og-image.jpg"
       ],
       "categoryKey": "jobs"
     },
@@ -9666,6 +9722,24 @@
       "categoryKey": "electronics"
     },
     {
+      "id": "category-e9c453155801235331",
+      "slug": "drama-teacher-5801235331",
+      "url": "https://6ixo.com/listing/drama-teacher-5801235331/",
+      "images": [
+        "https://www.twrecruitment.com/images/og-image.jpg"
+      ],
+      "categoryKey": "jobs"
+    },
+    {
+      "id": "category-cf876cf8fa8533873c",
+      "slug": "stem-teacher-fa8533873c",
+      "url": "https://6ixo.com/listing/stem-teacher-fa8533873c/",
+      "images": [
+        "https://www.twrecruitment.com/images/og-image.jpg"
+      ],
+      "categoryKey": "jobs"
+    },
+    {
       "id": "kijiji-1745771761",
       "slug": "microwave-oven-1745771761",
       "url": "https://6ixo.com/listing/microwave-oven-1745771761/",
@@ -9674,6 +9748,15 @@
         "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/f8/f8c22d1d-2e7c-486b-96ae-b82590c85011?rule=kijijica-1600-webp"
       ],
       "categoryKey": "buy-and-sell"
+    },
+    {
+      "id": "category-fdccfbdf4ab9187ce0",
+      "slug": "music-teacher-part-time-4ab9187ce0",
+      "url": "https://6ixo.com/listing/music-teacher-part-time-4ab9187ce0/",
+      "images": [
+        "https://www.twrecruitment.com/images/og-image.jpg"
+      ],
+      "categoryKey": "jobs"
     },
     {
       "id": "kijiji-1745771220",
@@ -9743,6 +9826,15 @@
         "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/46/46201379-e12f-4852-9998-4dfbb1f320ac?rule=kijijica-1600-webp"
       ],
       "categoryKey": "auto-parts"
+    },
+    {
+      "id": "category-d3de11d96093f3d67a",
+      "slug": "science-technician-6093f3d67a",
+      "url": "https://6ixo.com/listing/science-technician-6093f3d67a/",
+      "images": [
+        "https://www.twrecruitment.com/images/og-image.jpg"
+      ],
+      "categoryKey": "jobs"
     },
     {
       "id": "kijiji-1745770791",
@@ -40355,6 +40447,15 @@
       "categoryKey": "electronics"
     },
     {
+      "id": "category-00757ce47ba6a4f398",
+      "slug": "operations-manager-7ba6a4f398",
+      "url": "https://6ixo.com/listing/operations-manager-7ba6a4f398/",
+      "images": [
+        "https://tayloredapps.co.za/wp-content/uploads/2023/03/TA_Fav_270.jpg"
+      ],
+      "categoryKey": "jobs"
+    },
+    {
       "id": "craigslist-RO0EggjJ8RGCvK-FU2M3ig",
       "slug": "1995-dodge-ram-2500-laramie-sport-4x4-5-9l-12-valve-0-rust-cvkfu2m3ig",
       "url": "https://6ixo.com/listing/1995-dodge-ram-2500-laramie-sport-4x4-5-9l-12-valve-0-rust-cvkfu2m3ig/",
@@ -55489,6 +55590,24 @@
       "categoryKey": "vehicles"
     },
     {
+      "id": "category-d7adff451e55e2716d",
+      "slug": "samsung-43-inch-f6000f-full-hd-smart-tv-ua43f6000fkxxa-1e55e2716d",
+      "url": "https://6ixo.com/listing/samsung-43-inch-f6000f-full-hd-smart-tv-ua43f6000fkxxa-1e55e2716d/",
+      "images": [
+        "https://www.products4u.co.za/wp-content/uploads/2026/09/UA43F6000F-1.webp"
+      ],
+      "categoryKey": "electronics"
+    },
+    {
+      "id": "category-de2f5fda5055faf0da",
+      "slug": "samsung-32-inch-h5000f-hd-smart-tv-ua32h5000fkxxa-5055faf0da",
+      "url": "https://6ixo.com/listing/samsung-32-inch-h5000f-hd-smart-tv-ua32h5000fkxxa-5055faf0da/",
+      "images": [
+        "https://www.products4u.co.za/wp-content/uploads/2026/09/UA32H5000F-1.png"
+      ],
+      "categoryKey": "electronics"
+    },
+    {
       "id": "kijiji-1743480887",
       "slug": "bright-2-bdrm-basement-apartment-young-sheppard-1743480887",
       "url": "https://6ixo.com/listing/bright-2-bdrm-basement-apartment-young-sheppard-1743480887/",
@@ -56304,6 +56423,15 @@
         "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/48/488a9041-1b15-4eb7-b91a-6da0c5d03bf8?rule=kijijica-1600-webp"
       ],
       "categoryKey": "vehicles"
+    },
+    {
+      "id": "category-32fd8d7b47907499e8",
+      "slug": "senior-financial-manager-financial-services-47907499e8",
+      "url": "https://6ixo.com/listing/senior-financial-manager-financial-services-47907499e8/",
+      "images": [
+        "https://tayloredapps.co.za/wp-content/uploads/2023/03/TA_Fav_270.jpg"
+      ],
+      "categoryKey": "jobs"
     },
     {
       "id": "kijiji-1735072989",
@@ -59639,6 +59767,35 @@
       "categoryKey": "vehicles"
     },
     {
+      "id": "category-24a1217fd0c877376b",
+      "slug": "goldair-guf-450-upright-freezer-d0c877376b",
+      "url": "https://6ixo.com/listing/goldair-guf-450-upright-freezer-d0c877376b/",
+      "images": [
+        "https://www.products4u.co.za/wp-content/uploads/2026/07/GUF-450-1.webp",
+        "https://www.products4u.co.za/wp-content/uploads/2026/07/GUF-450-2.webp"
+      ],
+      "categoryKey": "buy-and-sell"
+    },
+    {
+      "id": "category-1b4f44e9cdeced3d71",
+      "slug": "goldair-gss-600a-side-by-side-fridge-600l-white-cdeced3d71",
+      "url": "https://6ixo.com/listing/goldair-gss-600a-side-by-side-fridge-600l-white-cdeced3d71/",
+      "images": [
+        "https://www.products4u.co.za/wp-content/uploads/2026/07/GSS-600A-1.jpg"
+      ],
+      "categoryKey": "buy-and-sell"
+    },
+    {
+      "id": "category-82fed95a24fdc4ec5f",
+      "slug": "goldair-gfr-500dc-4-door-fridge-500l-brushed-aluminium-fre-24fdc4ec5f",
+      "url": "https://6ixo.com/listing/goldair-gfr-500dc-4-door-fridge-500l-brushed-aluminium-fre-24fdc4ec5f/",
+      "images": [
+        "https://www.products4u.co.za/wp-content/uploads/2026/07/GFR-500DC-1.jpg",
+        "https://www.products4u.co.za/wp-content/uploads/2026/07/GFR-500DC-2.jpg"
+      ],
+      "categoryKey": "buy-and-sell"
+    },
+    {
       "id": "kijiji-1740647553",
       "slug": "2024-ford-edge-sel-apple-car-play-android-auto-1740647553",
       "url": "https://6ixo.com/listing/2024-ford-edge-sel-apple-car-play-android-auto-1740647553/",
@@ -59888,6 +60045,29 @@
         "https://guyanahomehub.com/photos/v1/1600/d0dd6520-5395-449e-8f51-42be72cb3dc1/1783589702889-n6iq56-0.jpg.webp"
       ],
       "categoryKey": "real-estate"
+    },
+    {
+      "id": "category-994621bf5054fbac3d",
+      "slug": "goldair-120l-white-upright-freezer-and-bottom-fridge-gdd-1-5054fbac3d",
+      "url": "https://6ixo.com/listing/goldair-120l-white-upright-freezer-and-bottom-fridge-gdd-1-5054fbac3d/",
+      "images": [
+        "https://www.products4u.co.za/wp-content/uploads/2026/07/GDD-120-1.jpg",
+        "https://www.products4u.co.za/wp-content/uploads/2026/07/GDD-120-3.webp",
+        "https://www.products4u.co.za/wp-content/uploads/2026/07/GDD-120-2.webp"
+      ],
+      "categoryKey": "buy-and-sell"
+    },
+    {
+      "id": "category-fe85cebf87c288c7af",
+      "slug": "bosch-kgn55vi20z-series-4-freestanding-fridge-freezer-bott-87c288c7af",
+      "url": "https://6ixo.com/listing/bosch-kgn55vi20z-series-4-freestanding-fridge-freezer-bott-87c288c7af/",
+      "images": [
+        "https://cdn-ildabib.nitrocdn.com/CSlzkzwgJKqMQQLuVmgQiMGRHFfSbBwX/assets/images/optimized/rev-5c3b100/www.products4u.co.za/wp-content/uploads/2026/07/KGN55VI20Z-1-scaled.webp",
+        "https://cdn-ildabib.nitrocdn.com/CSlzkzwgJKqMQQLuVmgQiMGRHFfSbBwX/assets/images/optimized/rev-5c3b100/www.products4u.co.za/wp-content/uploads/2026/07/KGN55VI20Z-5-scaled.webp",
+        "https://cdn-ildabib.nitrocdn.com/CSlzkzwgJKqMQQLuVmgQiMGRHFfSbBwX/assets/images/optimized/rev-5c3b100/www.products4u.co.za/wp-content/uploads/2026/07/KGN55VI20Z-4-scaled.webp",
+        "https://cdn-ildabib.nitrocdn.com/CSlzkzwgJKqMQQLuVmgQiMGRHFfSbBwX/assets/images/optimized/rev-5c3b100/www.products4u.co.za/wp-content/uploads/2026/07/KGN55VI20Z-3-scaled.webp"
+      ],
+      "categoryKey": "buy-and-sell"
     },
     {
       "id": "kijiji-1740289213",
@@ -61715,6 +61895,29 @@
       "categoryKey": "vehicles"
     },
     {
+      "id": "category-c66716c1a71ce18d3e",
+      "slug": "samsung-43-inch-professional-smart-signage-qmc-lh43qmcepgc-a71ce18d3e",
+      "url": "https://6ixo.com/listing/samsung-43-inch-professional-smart-signage-qmc-lh43qmcepgc-a71ce18d3e/",
+      "images": [
+        "https://www.products4u.co.za/wp-content/uploads/2026/05/LH43QMCEPGCXEN-1.webp",
+        "https://www.products4u.co.za/wp-content/uploads/2026/05/LH43QMCEPGCXEN-4.webp",
+        "https://www.products4u.co.za/wp-content/uploads/2026/05/LH43QMCEPGCXEN-3.webp",
+        "https://www.products4u.co.za/wp-content/uploads/2026/05/LH43QMCEPGCXEN-2.webp"
+      ],
+      "categoryKey": "electronics"
+    },
+    {
+      "id": "category-f29029ca3ada7016be",
+      "slug": "samsung-2-14-m-85-neo-qled-qn950f-8k-samsung-vision-ai-sma-3ada7016be",
+      "url": "https://6ixo.com/listing/samsung-2-14-m-85-neo-qled-qn950f-8k-samsung-vision-ai-sma-3ada7016be/",
+      "images": [
+        "https://cdn-ildabib.nitrocdn.com/CSlzkzwgJKqMQQLuVmgQiMGRHFfSbBwX/assets/images/optimized/rev-5c3b100/www.products4u.co.za/wp-content/uploads/2026/05/QA85QN950FAKXXA-1.webp",
+        "https://cdn-ildabib.nitrocdn.com/CSlzkzwgJKqMQQLuVmgQiMGRHFfSbBwX/assets/images/optimized/rev-5c3b100/www.products4u.co.za/wp-content/uploads/2026/05/QA85QN950FAKXXA-3.webp",
+        "https://cdn-ildabib.nitrocdn.com/CSlzkzwgJKqMQQLuVmgQiMGRHFfSbBwX/assets/images/optimized/rev-5c3b100/www.products4u.co.za/wp-content/uploads/2026/05/QA85QN950FAKXXA-2.webp"
+      ],
+      "categoryKey": "electronics"
+    },
+    {
       "id": "kijiji-1626997300",
       "slug": "katrina-and-the-waves-lp-walking-on-sunshine-1626997300",
       "url": "https://6ixo.com/listing/katrina-and-the-waves-lp-walking-on-sunshine-1626997300/",
@@ -62546,6 +62749,36 @@
         "https://cdn2.jacars.net/media/cache/17/31/1731bdb2b4bc5e39f66fa4abc96f3b21.webp"
       ],
       "categoryKey": "auto-parts"
+    },
+    {
+      "id": "category-cb29830638e7a3b3c2",
+      "slug": "hisense-50-inches-4k-qled-smart-tv-50q6q-38e7a3b3c2",
+      "url": "https://6ixo.com/listing/hisense-50-inches-4k-qled-smart-tv-50q6q-38e7a3b3c2/",
+      "images": [
+        "https://kriselectronics.com/wp-content/uploads/2026/04/images-2.jpg",
+        "https://kriselectronics.com/wp-content/uploads/2026/04/images-3.jpg"
+      ],
+      "categoryKey": "electronics"
+    },
+    {
+      "id": "category-aeb6eecd3029a1d5d1",
+      "slug": "hisense-55-inches-4k-qled-smart-tv-55q6q-3029a1d5d1",
+      "url": "https://6ixo.com/listing/hisense-55-inches-4k-qled-smart-tv-55q6q-3029a1d5d1/",
+      "images": [
+        "https://kriselectronics.com/wp-content/uploads/2026/04/images-2.jpg",
+        "https://kriselectronics.com/wp-content/uploads/2026/04/images-3.jpg"
+      ],
+      "categoryKey": "electronics"
+    },
+    {
+      "id": "category-b08249451a4e84616f",
+      "slug": "hisense-65-inches-4k-qled-smart-tv-65q6q-1a4e84616f",
+      "url": "https://6ixo.com/listing/hisense-65-inches-4k-qled-smart-tv-65q6q-1a4e84616f/",
+      "images": [
+        "https://kriselectronics.com/wp-content/uploads/2026/04/images-2.jpg",
+        "https://kriselectronics.com/wp-content/uploads/2026/04/images-3.jpg"
+      ],
+      "categoryKey": "electronics"
     },
     {
       "id": "jacars-2509981",
@@ -63940,6 +64173,40 @@
       "categoryKey": "vehicles"
     },
     {
+      "id": "category-41145280b7fab1ca46",
+      "slug": "15kg-ai-top-load-washer-with-ecobubbletm-and-digital-inver-b7fab1ca46",
+      "url": "https://6ixo.com/listing/15kg-ai-top-load-washer-with-ecobubbletm-and-digital-inver-b7fab1ca46/",
+      "images": [
+        "https://cdn-ildabib.nitrocdn.com/CSlzkzwgJKqMQQLuVmgQiMGRHFfSbBwX/assets/images/optimized/rev-5c3b100/www.products4u.co.za/wp-content/uploads/2026/01/WA80F15S5CFA-1.jpg",
+        "https://cdn-ildabib.nitrocdn.com/CSlzkzwgJKqMQQLuVmgQiMGRHFfSbBwX/assets/images/optimized/rev-5c3b100/www.products4u.co.za/wp-content/uploads/2026/01/WA80F15S5CFA-5.jpg",
+        "https://cdn-ildabib.nitrocdn.com/CSlzkzwgJKqMQQLuVmgQiMGRHFfSbBwX/assets/images/optimized/rev-5c3b100/www.products4u.co.za/wp-content/uploads/2026/01/WA80F15S5CFA-4.jpg",
+        "https://cdn-ildabib.nitrocdn.com/CSlzkzwgJKqMQQLuVmgQiMGRHFfSbBwX/assets/images/optimized/rev-5c3b100/www.products4u.co.za/wp-content/uploads/2026/01/WA80F15S5CFA-3.jpg"
+      ],
+      "categoryKey": "buy-and-sell"
+    },
+    {
+      "id": "category-6ebbb93e40963a6e67",
+      "slug": "defy-9kg-front-loader-steamcure-technology-manhattan-gray--40963a6e67",
+      "url": "https://6ixo.com/listing/defy-9kg-front-loader-steamcure-technology-manhattan-gray--40963a6e67/",
+      "images": [
+        "https://www.products4u.co.za/wp-content/uploads/2026/01/DAW-389-1.png",
+        "https://www.products4u.co.za/wp-content/uploads/2026/01/DAW-389-4.png",
+        "https://www.products4u.co.za/wp-content/uploads/2026/01/DAW-389-3.png",
+        "https://www.products4u.co.za/wp-content/uploads/2026/01/DAW-389-2.png"
+      ],
+      "categoryKey": "buy-and-sell"
+    },
+    {
+      "id": "category-f188e72f9d7af96ec8",
+      "slug": "goldair-6-kg-front-loader-washing-machine-9d7af96ec8",
+      "url": "https://6ixo.com/listing/goldair-6-kg-front-loader-washing-machine-9d7af96ec8/",
+      "images": [
+        "https://www.products4u.co.za/wp-content/uploads/2026/01/GFL-600-1-1.webp",
+        "https://www.products4u.co.za/wp-content/uploads/2026/01/GFL-600-1.webp"
+      ],
+      "categoryKey": "buy-and-sell"
+    },
+    {
       "id": "kijiji-1731424235",
       "slug": "2019-ram-1500-classic-tradesman-crew-cab-4x4-5-7l-hemi-cam-1731424235",
       "url": "https://6ixo.com/listing/2019-ram-1500-classic-tradesman-crew-cab-4x4-5-7l-hemi-cam-1731424235/",
@@ -64460,6 +64727,30 @@
       "categoryKey": "vehicles"
     },
     {
+      "id": "category-56de76b7150324f8ba",
+      "slug": "bosch-series-4-frontloader-washing-machine-9-kg-silver-ino-150324f8ba",
+      "url": "https://6ixo.com/listing/bosch-series-4-frontloader-washing-machine-9-kg-silver-ino-150324f8ba/",
+      "images": [
+        "https://www.products4u.co.za/wp-content/uploads/2025/07/WGA1440XZA-1.webp",
+        "https://www.products4u.co.za/wp-content/uploads/2025/07/WGA1440XZA-4.webp",
+        "https://www.products4u.co.za/wp-content/uploads/2025/07/WGA1440XZA-3.webp",
+        "https://www.products4u.co.za/wp-content/uploads/2025/07/WGA1440XZA-2.webp"
+      ],
+      "categoryKey": "buy-and-sell"
+    },
+    {
+      "id": "category-0d3b580af12af39798",
+      "slug": "bosch-wga2540xza-series-4-frontloader-washing-machine-10-k-f12af39798",
+      "url": "https://6ixo.com/listing/bosch-wga2540xza-series-4-frontloader-washing-machine-10-k-f12af39798/",
+      "images": [
+        "https://www.products4u.co.za/wp-content/uploads/2025/07/WGA2540XZA-1.webp",
+        "https://www.products4u.co.za/wp-content/uploads/2025/07/WGA2540XZA-5.webp",
+        "https://www.products4u.co.za/wp-content/uploads/2025/07/WGA2540XZA-4.webp",
+        "https://www.products4u.co.za/wp-content/uploads/2025/07/WGA2540XZA-3.webp"
+      ],
+      "categoryKey": "buy-and-sell"
+    },
+    {
       "id": "dealer-28970f8f5935b4a528",
       "slug": "citroen-c4-cactus-puretech-feel-2018-18-plate-5935b4a528",
       "url": "https://6ixo.com/listing/citroen-c4-cactus-puretech-feel-2018-18-plate-5935b4a528/",
@@ -64490,6 +64781,41 @@
         "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/65/65a012c4-cfaf-4d71-915e-77309a339d8f?rule=kijijica-1600-webp"
       ],
       "categoryKey": "real-estate"
+    },
+    {
+      "id": "category-cd64b0da98aa39fa78",
+      "slug": "samsung-27-odyssey-g32a-fhd-1ms-165hz-gaming-monitor-ls27a-98aa39fa78",
+      "url": "https://6ixo.com/listing/samsung-27-odyssey-g32a-fhd-1ms-165hz-gaming-monitor-ls27a-98aa39fa78/",
+      "images": [
+        "https://www.products4u.co.za/wp-content/uploads/2025/06/LS27AG320NNXZA-2.jpg",
+        "https://www.products4u.co.za/wp-content/uploads/2025/06/LS27AG320NNXZA-1.jpg",
+        "https://www.products4u.co.za/wp-content/uploads/2025/06/LS27AG320NNXZA-4.jpg"
+      ],
+      "categoryKey": "electronics"
+    },
+    {
+      "id": "category-7d3e6e4a65e9b1a29c",
+      "slug": "samsung-24-essential-curved-monitor-s3-s36c-ls24c360eamxue-65e9b1a29c",
+      "url": "https://6ixo.com/listing/samsung-24-essential-curved-monitor-s3-s36c-ls24c360eamxue-65e9b1a29c/",
+      "images": [
+        "https://www.products4u.co.za/wp-content/uploads/2025/06/LS24C360EAMXUE-1.webp",
+        "https://www.products4u.co.za/wp-content/uploads/2025/06/LS24C360EAMXUE-3.webp",
+        "https://www.products4u.co.za/wp-content/uploads/2025/06/LS24C360EAMXUE-2.webp",
+        "https://www.products4u.co.za/wp-content/uploads/2025/06/LS24C360EAMXUE-4.webp"
+      ],
+      "categoryKey": "electronics"
+    },
+    {
+      "id": "category-cfd02b7583270bc53e",
+      "slug": "samsung-24-odyssey-g32a-fhd-165hz-1ms-gaming-monitor-ls24a-83270bc53e",
+      "url": "https://6ixo.com/listing/samsung-24-odyssey-g32a-fhd-165hz-1ms-gaming-monitor-ls24a-83270bc53e/",
+      "images": [
+        "https://www.products4u.co.za/wp-content/uploads/2025/06/LS24AG320NAXXA-1.webp",
+        "https://www.products4u.co.za/wp-content/uploads/2025/06/LS24AG320NAXXA-3.webp",
+        "https://www.products4u.co.za/wp-content/uploads/2025/06/LS24AG320NAXXA-4.webp",
+        "https://www.products4u.co.za/wp-content/uploads/2025/06/LS24AG320NAXXA-2.webp"
+      ],
+      "categoryKey": "electronics"
     },
     {
       "id": "kijiji-1718448268",
@@ -64542,6 +64868,25 @@
         "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/28/287fefb1-51ad-47d0-a29b-1cfaa5e37719?rule=kijijica-1600-webp",
         "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/58/58964d3c-6833-4473-8c0b-5f805a61dd20?rule=kijijica-1600-webp",
         "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/48/48d673eb-35de-4532-a5dd-b94725f37c9c?rule=kijijica-1600-webp"
+      ],
+      "categoryKey": "buy-and-sell"
+    },
+    {
+      "id": "category-6645d025bd24542b7b",
+      "slug": "lg-f2v5frpy-9-5kg-front-loader-washer-dryer-combo-with-ai--bd24542b7b",
+      "url": "https://6ixo.com/listing/lg-f2v5frpy-9-5kg-front-loader-washer-dryer-combo-with-ai--bd24542b7b/",
+      "images": [
+        "https://www.products4u.co.za/wp-content/uploads/2025/05/F2V5FRPYJ-1.jpg",
+        "https://www.products4u.co.za/wp-content/uploads/2025/05/F2V5FRPYJ-2.jpg"
+      ],
+      "categoryKey": "buy-and-sell"
+    },
+    {
+      "id": "category-cdb1e23ad51aa281b8",
+      "slug": "aeg-60cm-7000-series-freestanding-dishwasher-with-15-place-d51aa281b8",
+      "url": "https://6ixo.com/listing/aeg-60cm-7000-series-freestanding-dishwasher-with-15-place-d51aa281b8/",
+      "images": [
+        "https://www.products4u.co.za/wp-content/uploads/2025/05/FFB83706PM-1.webp"
       ],
       "categoryKey": "buy-and-sell"
     },
@@ -64620,6 +64965,27 @@
       "categoryKey": "buy-and-sell"
     },
     {
+      "id": "category-ef73945218e38de42e",
+      "slug": "goldair-130-litre-double-door-fridge-freezer-bar-fridge-gd-18e38de42e",
+      "url": "https://6ixo.com/listing/goldair-130-litre-double-door-fridge-freezer-bar-fridge-gd-18e38de42e/",
+      "images": [
+        "https://www.products4u.co.za/wp-content/uploads/2025/03/GDD-130A-1.jpg",
+        "https://www.products4u.co.za/wp-content/uploads/2025/03/GDD-130A-2.jpg"
+      ],
+      "categoryKey": "buy-and-sell"
+    },
+    {
+      "id": "category-d02c4fd33704fcedf7",
+      "slug": "hisense-h225tts-combi-refrigerator-3704fcedf7",
+      "url": "https://6ixo.com/listing/hisense-h225tts-combi-refrigerator-3704fcedf7/",
+      "images": [
+        "https://www.products4u.co.za/wp-content/uploads/2025/03/H225TTS-2.webp",
+        "https://www.products4u.co.za/wp-content/uploads/2025/03/H225TTS-2-1.webp",
+        "https://www.products4u.co.za/wp-content/uploads/2025/03/H370BMI-WD-4.jpg"
+      ],
+      "categoryKey": "buy-and-sell"
+    },
+    {
       "id": "kijiji-1712369349",
       "slug": "honda-v6-engines-and-transmissions-acura-3-0-3-2-3-5-3-7-m-1712369349",
       "url": "https://6ixo.com/listing/honda-v6-engines-and-transmissions-acura-3-0-3-2-3-5-3-7-m-1712369349/",
@@ -64636,6 +65002,26 @@
         "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/03/03bbd910-94a1-4085-b3b4-4928aa48e942?rule=kijijica-1600-webp"
       ],
       "categoryKey": "auto-parts"
+    },
+    {
+      "id": "category-90e1e0d5ed2a2c4129",
+      "slug": "samsung-43-du7000-crystal-uhd-4k-hdr-smart-tv-ua43du7000kx-ed2a2c4129",
+      "url": "https://6ixo.com/listing/samsung-43-du7000-crystal-uhd-4k-hdr-smart-tv-ua43du7000kx-ed2a2c4129/",
+      "images": [
+        "https://www.products4u.co.za/wp-content/uploads/2025/02/UA43DU7000-3.webp",
+        "https://www.products4u.co.za/wp-content/uploads/2025/02/UA43DU7000-2.jpg",
+        "https://www.products4u.co.za/wp-content/uploads/2025/02/UA43DU7000-1.jpg"
+      ],
+      "categoryKey": "electronics"
+    },
+    {
+      "id": "category-14186cc4f27794803a",
+      "slug": "aeg-bob35702xv-r4999-00-60cm-built-in-oven-57l-stainless-s-f27794803a",
+      "url": "https://6ixo.com/listing/aeg-bob35702xv-r4999-00-60cm-built-in-oven-57l-stainless-s-f27794803a/",
+      "images": [
+        "https://www.products4u.co.za/wp-content/uploads/2025/02/BOB35702XV-1.webp"
+      ],
+      "categoryKey": "buy-and-sell"
     },
     {
       "id": "kijiji-1724351792",
@@ -64676,6 +65062,389 @@
         "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/30/30a0caae-5eae-4abd-a203-03e0995f9ecb?rule=kijijica-1600-webp"
       ],
       "categoryKey": "vehicles"
+    },
+    {
+      "id": "category-61afda8bd3ed6fa8e8",
+      "slug": "hisense-8-5kg-front-load-wash-dry-inverter-washing-machine-d3ed6fa8e8",
+      "url": "https://6ixo.com/listing/hisense-8-5kg-front-load-wash-dry-inverter-washing-machine-d3ed6fa8e8/",
+      "images": [
+        "https://kriselectronics.com/wp-content/uploads/2025/01/67598cec963c6.png"
+      ],
+      "categoryKey": "buy-and-sell"
+    },
+    {
+      "id": "category-aae93773ee5b074e65",
+      "slug": "hisense-529l-inverter-refrigerator-with-water-dispenser-71-ee5b074e65",
+      "url": "https://6ixo.com/listing/hisense-529l-inverter-refrigerator-with-water-dispenser-71-ee5b074e65/",
+      "images": [
+        "https://kriselectronics.com/wp-content/uploads/2025/01/230.jpg",
+        "https://kriselectronics.com/wp-content/uploads/2025/01/6319d76c0dd26.jpg",
+        "https://kriselectronics.com/wp-content/uploads/2025/01/6319d76c6f29b.jpg"
+      ],
+      "categoryKey": "buy-and-sell"
+    },
+    {
+      "id": "category-53ccc60c19635354ad",
+      "slug": "hisense-601l-inverter-side-by-side-refrigerator-rc-82ws-19635354ad",
+      "url": "https://6ixo.com/listing/hisense-601l-inverter-side-by-side-refrigerator-rc-82ws-19635354ad/",
+      "images": [
+        "https://kriselectronics.com/wp-content/uploads/2025/01/932.jpg",
+        "https://kriselectronics.com/wp-content/uploads/2025/01/6508644db6a4b.jpg",
+        "https://kriselectronics.com/wp-content/uploads/2025/01/6508644dcc335.jpg",
+        "https://kriselectronics.com/wp-content/uploads/2025/01/6508644dcc335-1.jpg"
+      ],
+      "categoryKey": "buy-and-sell"
+    },
+    {
+      "id": "category-471a7bca1f7bdafcbe",
+      "slug": "hisense-100-inch-qled-4k-smart-tv-100q7q-1f7bdafcbe",
+      "url": "https://6ixo.com/listing/hisense-100-inch-qled-4k-smart-tv-100q7q-1f7bdafcbe/",
+      "images": [
+        "https://kriselectronics.com/wp-content/uploads/2025/01/hisense-100-inch-4k-smart-144hz-qled-gaming-tv-histv100q7q-5bc8-640x640-1.webp",
+        "https://kriselectronics.com/wp-content/uploads/2025/01/66929a487219d.jpg",
+        "https://kriselectronics.com/wp-content/uploads/2025/01/66929a4d802fc.jpg",
+        "https://kriselectronics.com/wp-content/uploads/2025/01/66929a5166616.jpg"
+      ],
+      "categoryKey": "electronics"
+    },
+    {
+      "id": "category-22331ed49835b6c0a0",
+      "slug": "hisense-wt5t1825dt-18kg-tide-5-smart-top-loader-washing-ma-9835b6c0a0",
+      "url": "https://6ixo.com/listing/hisense-wt5t1825dt-18kg-tide-5-smart-top-loader-washing-ma-9835b6c0a0/",
+      "images": [
+        "https://www.products4u.co.za/wp-content/uploads/2025/01/WT5T1825DT-1.webp",
+        "https://www.products4u.co.za/wp-content/uploads/2025/01/WT5T1825DT-2.webp",
+        "https://www.products4u.co.za/wp-content/uploads/2025/01/WT5T1825DT-4.webp",
+        "https://www.products4u.co.za/wp-content/uploads/2025/01/WT5T1825DT-5.webp"
+      ],
+      "categoryKey": "buy-and-sell"
+    },
+    {
+      "id": "category-773f2571a9561a0ce3",
+      "slug": "hisense-205l-top-freezer-refrigerator-ref205drb-a9561a0ce3",
+      "url": "https://6ixo.com/listing/hisense-205l-top-freezer-refrigerator-ref205drb-a9561a0ce3/",
+      "images": [
+        "https://kriselectronics.com/wp-content/uploads/2025/01/2.jpg",
+        "https://kriselectronics.com/wp-content/uploads/2025/01/62a32f05173ed-scaled.jpg"
+      ],
+      "categoryKey": "buy-and-sell"
+    },
+    {
+      "id": "category-98c62bbbd8770c198b",
+      "slug": "hisense-205l-top-freezer-refrigerator-ref205dr-d8770c198b",
+      "url": "https://6ixo.com/listing/hisense-205l-top-freezer-refrigerator-ref205dr-d8770c198b/",
+      "images": [
+        "https://kriselectronics.com/wp-content/uploads/2025/01/387-1.jpg"
+      ],
+      "categoryKey": "buy-and-sell"
+    },
+    {
+      "id": "category-01206faae7f718aa3f",
+      "slug": "hisense-154l-top-freezer-refrigerator-ref200dr-e7f718aa3f",
+      "url": "https://6ixo.com/listing/hisense-154l-top-freezer-refrigerator-ref200dr-e7f718aa3f/",
+      "images": [
+        "https://kriselectronics.com/wp-content/uploads/2025/01/212.opt-1.jpg"
+      ],
+      "categoryKey": "buy-and-sell"
+    },
+    {
+      "id": "category-3c783b3825fb66d596",
+      "slug": "hisense-124-liters-top-freezer-refrigerator-ref172dr-25fb66d596",
+      "url": "https://6ixo.com/listing/hisense-124-liters-top-freezer-refrigerator-ref172dr-25fb66d596/",
+      "images": [
+        "https://kriselectronics.com/wp-content/uploads/2025/01/924.jpg"
+      ],
+      "categoryKey": "buy-and-sell"
+    },
+    {
+      "id": "category-861c21220991e200e5",
+      "slug": "hisense-20l-microwave-oven-h20moms10-silver-0991e200e5",
+      "url": "https://6ixo.com/listing/hisense-20l-microwave-oven-h20moms10-silver-0991e200e5/",
+      "images": [
+        "https://kriselectronics.com/wp-content/uploads/2025/01/202.opt-1.png",
+        "https://kriselectronics.com/wp-content/uploads/2025/01/202.opt_.png"
+      ],
+      "categoryKey": "buy-and-sell"
+    },
+    {
+      "id": "category-9eab0655d58588e03b",
+      "slug": "hisense-20l-microwave-oven-h20mows10-white-d58588e03b",
+      "url": "https://6ixo.com/listing/hisense-20l-microwave-oven-h20mows10-white-d58588e03b/",
+      "images": [
+        "https://kriselectronics.com/wp-content/uploads/2025/01/6267d1ce6acd1.png",
+        "https://kriselectronics.com/wp-content/uploads/2025/01/6267d1ce8e32f.jpg"
+      ],
+      "categoryKey": "buy-and-sell"
+    },
+    {
+      "id": "category-36a506f085dfc58a72",
+      "slug": "hisense-20l-microwave-oven-h20mobs6-black-85dfc58a72",
+      "url": "https://6ixo.com/listing/hisense-20l-microwave-oven-h20mobs6-black-85dfc58a72/",
+      "images": [
+        "https://kriselectronics.com/wp-content/uploads/2025/01/199.jpg",
+        "https://kriselectronics.com/wp-content/uploads/2025/01/6267bcebf22ca-scaled.jpg"
+      ],
+      "categoryKey": "buy-and-sell"
+    },
+    {
+      "id": "category-7a6aa504fb40395183",
+      "slug": "hisense-34-liters-inverter-microwave-oven-grill-h34mobs10h-fb40395183",
+      "url": "https://6ixo.com/listing/hisense-34-liters-inverter-microwave-oven-grill-h34mobs10h-fb40395183/",
+      "images": [
+        "https://kriselectronics.com/wp-content/uploads/2025/01/1110.png",
+        "https://kriselectronics.com/wp-content/uploads/2025/01/66c88da93effb.png",
+        "https://kriselectronics.com/wp-content/uploads/2025/01/66c88da970b27.png",
+        "https://kriselectronics.com/wp-content/uploads/2025/01/66c88da9cbfce.png"
+      ],
+      "categoryKey": "buy-and-sell"
+    },
+    {
+      "id": "category-f58e58a0b3d6b02763",
+      "slug": "hisense-26-liters-microwave-26mos5h-silver-b3d6b02763",
+      "url": "https://6ixo.com/listing/hisense-26-liters-microwave-26mos5h-silver-b3d6b02763/",
+      "images": [
+        "https://kriselectronics.com/wp-content/uploads/2025/01/669927c047451.jpg",
+        "https://kriselectronics.com/wp-content/uploads/2025/01/1078.opt_.jpg",
+        "https://kriselectronics.com/wp-content/uploads/2025/01/669927c05d905.jpg",
+        "https://kriselectronics.com/wp-content/uploads/2025/01/669927c10898b.jpg"
+      ],
+      "categoryKey": "buy-and-sell"
+    },
+    {
+      "id": "category-08bb71452f5efb0564",
+      "slug": "hisense-3-0hp-inverter-floor-standing-ac-af30pe-inv-2f5efb0564",
+      "url": "https://6ixo.com/listing/hisense-3-0hp-inverter-floor-standing-ac-af30pe-inv-2f5efb0564/",
+      "images": [
+        "https://kriselectronics.com/wp-content/uploads/2025/01/898.jpg",
+        "https://kriselectronics.com/wp-content/uploads/2025/01/64e37965b6355.jpg",
+        "https://kriselectronics.com/wp-content/uploads/2025/01/64e37965e20c8.jpg"
+      ],
+      "categoryKey": "buy-and-sell"
+    },
+    {
+      "id": "category-e17fa43763fd982b05",
+      "slug": "hisense-2-0hp-inverter-floor-standing-ac-af20pe-inv-63fd982b05",
+      "url": "https://6ixo.com/listing/hisense-2-0hp-inverter-floor-standing-ac-af20pe-inv-63fd982b05/",
+      "images": [
+        "https://kriselectronics.com/wp-content/uploads/2025/01/898.jpg",
+        "https://kriselectronics.com/wp-content/uploads/2025/01/64e37965b6355.jpg",
+        "https://kriselectronics.com/wp-content/uploads/2025/01/64e37965e20c8.jpg"
+      ],
+      "categoryKey": "buy-and-sell"
+    },
+    {
+      "id": "category-62dfcd7816f759b534",
+      "slug": "hisense-2-0hp-floor-standing-ac-af20fc1-16f759b534",
+      "url": "https://6ixo.com/listing/hisense-2-0hp-floor-standing-ac-af20fc1-16f759b534/",
+      "images": [
+        "https://kriselectronics.com/wp-content/uploads/2025/01/198.jpg",
+        "https://kriselectronics.com/wp-content/uploads/2025/01/626699e2dbbb7.jpg"
+      ],
+      "categoryKey": "buy-and-sell"
+    },
+    {
+      "id": "category-2472103b94fd00f5fc",
+      "slug": "hisense-3-0hp-floor-standing-ac-af30fc1-94fd00f5fc",
+      "url": "https://6ixo.com/listing/hisense-3-0hp-floor-standing-ac-af30fc1-94fd00f5fc/",
+      "images": [
+        "https://kriselectronics.com/wp-content/uploads/2025/01/198.jpg",
+        "https://kriselectronics.com/wp-content/uploads/2025/01/626699e2dbbb7.jpg"
+      ],
+      "categoryKey": "buy-and-sell"
+    },
+    {
+      "id": "category-04515bb9245de34077",
+      "slug": "hisense-2hp-inverter-split-air-conditioner-as18dk-245de34077",
+      "url": "https://6ixo.com/listing/hisense-2hp-inverter-split-air-conditioner-as18dk-245de34077/",
+      "images": [
+        "https://kriselectronics.com/wp-content/uploads/2025/01/12DK1.jpg",
+        "https://kriselectronics.com/wp-content/uploads/2025/01/12DK2.jpg"
+      ],
+      "categoryKey": "buy-and-sell"
+    },
+    {
+      "id": "category-eae6511318d254e6b7",
+      "slug": "hisense-1hp-inverter-split-air-conditioner-as09dk-18d254e6b7",
+      "url": "https://6ixo.com/listing/hisense-1hp-inverter-split-air-conditioner-as09dk-18d254e6b7/",
+      "images": [
+        "https://kriselectronics.com/wp-content/uploads/2025/01/12DK1.jpg",
+        "https://kriselectronics.com/wp-content/uploads/2025/01/12DK2.jpg"
+      ],
+      "categoryKey": "buy-and-sell"
+    },
+    {
+      "id": "category-2e845a83fb8c849bb3",
+      "slug": "hisense-2hp-split-ac-as18tg-fb8c849bb3",
+      "url": "https://6ixo.com/listing/hisense-2hp-split-ac-as18tg-fb8c849bb3/",
+      "images": [
+        "https://kriselectronics.com/wp-content/uploads/2025/01/62739ff89c744-scaled.jpg",
+        "https://kriselectronics.com/wp-content/uploads/2025/01/62739ff73c989-scaled.jpg",
+        "https://kriselectronics.com/wp-content/uploads/2025/01/62739ff67557a-scaled.jpg",
+        "https://kriselectronics.com/wp-content/uploads/2025/01/238.jpg"
+      ],
+      "categoryKey": "buy-and-sell"
+    },
+    {
+      "id": "category-2df7ab62acc060aa14",
+      "slug": "hisense-1-5hp-split-ac-as12tg-acc060aa14",
+      "url": "https://6ixo.com/listing/hisense-1-5hp-split-ac-as12tg-acc060aa14/",
+      "images": [
+        "https://kriselectronics.com/wp-content/uploads/2025/01/62739ff89c744-scaled.jpg",
+        "https://kriselectronics.com/wp-content/uploads/2025/01/62739ff73c989-scaled.jpg",
+        "https://kriselectronics.com/wp-content/uploads/2025/01/62739ff67557a-scaled.jpg",
+        "https://kriselectronics.com/wp-content/uploads/2025/01/238.jpg"
+      ],
+      "categoryKey": "buy-and-sell"
+    },
+    {
+      "id": "category-e19fc5f3c5a4245aef",
+      "slug": "hisense-1hp-split-ac-as09tg-c5a4245aef",
+      "url": "https://6ixo.com/listing/hisense-1hp-split-ac-as09tg-c5a4245aef/",
+      "images": [
+        "https://kriselectronics.com/wp-content/uploads/2025/01/62739ff89c744-scaled.jpg",
+        "https://kriselectronics.com/wp-content/uploads/2025/01/62739ff67557a-scaled.jpg",
+        "https://kriselectronics.com/wp-content/uploads/2025/01/62739ff73c989-scaled.jpg",
+        "https://kriselectronics.com/wp-content/uploads/2025/01/238.jpg"
+      ],
+      "categoryKey": "buy-and-sell"
+    },
+    {
+      "id": "category-865ae5feddb749477d",
+      "slug": "hisense-portable-ac-1-5hp-ddb749477d",
+      "url": "https://6ixo.com/listing/hisense-portable-ac-1-5hp-ddb749477d/",
+      "images": [
+        "https://kriselectronics.com/wp-content/uploads/2025/01/207.jpg"
+      ],
+      "categoryKey": "buy-and-sell"
+    },
+    {
+      "id": "category-86495804ee2c698931",
+      "slug": "hisense-32-smart-tv-32a4s-ee2c698931",
+      "url": "https://6ixo.com/listing/hisense-32-smart-tv-32a4s-ee2c698931/",
+      "images": [
+        "https://kriselectronics.com/wp-content/uploads/2025/01/images-1.jpg"
+      ],
+      "categoryKey": "electronics"
+    },
+    {
+      "id": "category-ef2e33a0d1e4bd93d0",
+      "slug": "hisense-40-smart-tv-40a4s-d1e4bd93d0",
+      "url": "https://6ixo.com/listing/hisense-40-smart-tv-40a4s-d1e4bd93d0/",
+      "images": [
+        "https://kriselectronics.com/wp-content/uploads/2025/01/images.jpg"
+      ],
+      "categoryKey": "electronics"
+    },
+    {
+      "id": "category-0b34487db1d8a66f70",
+      "slug": "hisense-43-smart-tv-43a4q-b1d8a66f70",
+      "url": "https://6ixo.com/listing/hisense-43-smart-tv-43a4q-b1d8a66f70/",
+      "images": [
+        "https://kriselectronics.com/wp-content/uploads/2025/01/65326ff163f54.jpg",
+        "https://kriselectronics.com/wp-content/uploads/2025/01/962.opt_.jpg"
+      ],
+      "categoryKey": "electronics"
+    },
+    {
+      "id": "category-f782ca86a213274197",
+      "slug": "hisense-65-uhd-4k-smart-tv-65a6q-a213274197",
+      "url": "https://6ixo.com/listing/hisense-65-uhd-4k-smart-tv-65a6q-a213274197/",
+      "images": [
+        "https://kriselectronics.com/wp-content/uploads/2025/01/55A6Q.jpg",
+        "https://kriselectronics.com/wp-content/uploads/2025/01/673c601fd6ef0-1.png"
+      ],
+      "categoryKey": "electronics"
+    },
+    {
+      "id": "category-0210a68f64ca3b50ee",
+      "slug": "hisense-70-uhd-4k-smart-tv-70a6n-64ca3b50ee",
+      "url": "https://6ixo.com/listing/hisense-70-uhd-4k-smart-tv-70a6n-64ca3b50ee/",
+      "images": [
+        "https://kriselectronics.com/wp-content/uploads/2025/01/A6-70.avif",
+        "https://kriselectronics.com/wp-content/uploads/2025/01/651a904d27f3d-1.jpg",
+        "https://kriselectronics.com/wp-content/uploads/2025/01/651a904c9e064.jpg"
+      ],
+      "categoryKey": "electronics"
+    },
+    {
+      "id": "category-75dad6843e7625b90a",
+      "slug": "hisense-55-uhd-4k-smart-tv-55a6q-3e7625b90a",
+      "url": "https://6ixo.com/listing/hisense-55-uhd-4k-smart-tv-55a6q-3e7625b90a/",
+      "images": [
+        "https://kriselectronics.com/wp-content/uploads/2025/01/55A6Q.jpg",
+        "https://kriselectronics.com/wp-content/uploads/2025/01/66c88a82c4f8a.png",
+        "https://kriselectronics.com/wp-content/uploads/2025/01/66c88a83eed81.jpg",
+        "https://kriselectronics.com/wp-content/uploads/2025/01/66c88a8324e85.png"
+      ],
+      "categoryKey": "electronics"
+    },
+    {
+      "id": "category-53e556125ce8021f64",
+      "slug": "hisense-58-uhd-4k-smart-tv-58a6n-5ce8021f64",
+      "url": "https://6ixo.com/listing/hisense-58-uhd-4k-smart-tv-58a6n-5ce8021f64/",
+      "images": [
+        "https://kriselectronics.com/wp-content/uploads/2025/01/1176.png",
+        "https://kriselectronics.com/wp-content/uploads/2025/01/673c651b0ffcb.png"
+      ],
+      "categoryKey": "electronics"
+    },
+    {
+      "id": "category-aceb5261c006943157",
+      "slug": "hisense-75-inch-smart-qled-tv-75q6q-c006943157",
+      "url": "https://6ixo.com/listing/hisense-75-inch-smart-qled-tv-75q6q-c006943157/",
+      "images": [
+        "https://kriselectronics.com/wp-content/uploads/2025/01/75Q6Q.webp",
+        "https://kriselectronics.com/wp-content/uploads/2025/01/669bd3913fbfb.jpg",
+        "https://kriselectronics.com/wp-content/uploads/2025/01/669bd393ce261.jpg",
+        "https://kriselectronics.com/wp-content/uploads/2025/01/669bd39535619.jpg"
+      ],
+      "categoryKey": "electronics"
+    },
+    {
+      "id": "category-2d970d54582f542bae",
+      "slug": "hisense-85-inch-smart-qled-tv-85q6q-582f542bae",
+      "url": "https://6ixo.com/listing/hisense-85-inch-smart-qled-tv-85q6q-582f542bae/",
+      "images": [
+        "https://kriselectronics.com/wp-content/uploads/2025/01/85Q6N.jpg",
+        "https://kriselectronics.com/wp-content/uploads/2025/01/669bd3913fbfb.jpg",
+        "https://kriselectronics.com/wp-content/uploads/2025/01/669bd393ce261.jpg",
+        "https://kriselectronics.com/wp-content/uploads/2025/01/669bd39535619.jpg"
+      ],
+      "categoryKey": "electronics"
+    },
+    {
+      "id": "category-e9b8bb70214cd2cf36",
+      "slug": "lg-65-inch-nanocell-nano80t6a-series-uhd-4k-smart-tv-with--214cd2cf36",
+      "url": "https://6ixo.com/listing/lg-65-inch-nanocell-nano80t6a-series-uhd-4k-smart-tv-with--214cd2cf36/",
+      "images": [
+        "https://kriselectronics.com/wp-content/uploads/2025/01/NANO75.png",
+        "https://kriselectronics.com/wp-content/uploads/2025/01/NANO751.jpg",
+        "https://kriselectronics.com/wp-content/uploads/2025/01/NANO752.jpg",
+        "https://kriselectronics.com/wp-content/uploads/2025/01/NANO753.jpg"
+      ],
+      "categoryKey": "electronics"
+    },
+    {
+      "id": "category-9fac4d7ff3ccdfb988",
+      "slug": "lg-65-inch-oled-evo-4k-smart-tv-ai-magic-remote-dolby-visi-f3ccdfb988",
+      "url": "https://6ixo.com/listing/lg-65-inch-oled-evo-4k-smart-tv-ai-magic-remote-dolby-visi-f3ccdfb988/",
+      "images": [
+        "https://kriselectronics.com/wp-content/uploads/2025/01/65C46.png",
+        "https://kriselectronics.com/wp-content/uploads/2025/01/65C462.png",
+        "https://kriselectronics.com/wp-content/uploads/2025/01/65C461.png",
+        "https://kriselectronics.com/wp-content/uploads/2025/01/65C463.png"
+      ],
+      "categoryKey": "electronics"
+    },
+    {
+      "id": "category-c4d65d2bf5e114e542",
+      "slug": "hisense-1-5hp-inverter-split-air-conditioner-as12dk-f5e114e542",
+      "url": "https://6ixo.com/listing/hisense-1-5hp-inverter-split-air-conditioner-as12dk-f5e114e542/",
+      "images": [
+        "https://kriselectronics.com/wp-content/uploads/2025/01/12DK1.jpg",
+        "https://kriselectronics.com/wp-content/uploads/2025/01/12DK2.jpg"
+      ],
+      "categoryKey": "buy-and-sell"
     },
     {
       "id": "kijiji-1724341344",
@@ -64810,6 +65579,17 @@
       "categoryKey": "vehicles"
     },
     {
+      "id": "category-b939fdd2428360de55",
+      "slug": "beko-rjne300ex-228l-pearl-steel-freezer-428360de55",
+      "url": "https://6ixo.com/listing/beko-rjne300ex-228l-pearl-steel-freezer-428360de55/",
+      "images": [
+        "https://cdn-ildabib.nitrocdn.com/CSlzkzwgJKqMQQLuVmgQiMGRHFfSbBwX/assets/images/optimized/rev-5c3b100/www.products4u.co.za/wp-content/uploads/2024/08/RJNE300EX-1.jpg",
+        "https://cdn-ildabib.nitrocdn.com/CSlzkzwgJKqMQQLuVmgQiMGRHFfSbBwX/assets/images/optimized/rev-5c3b100/www.products4u.co.za/wp-content/uploads/2024/08/RJNE300EX-3.jpg",
+        "https://cdn-ildabib.nitrocdn.com/CSlzkzwgJKqMQQLuVmgQiMGRHFfSbBwX/assets/images/optimized/rev-5c3b100/www.products4u.co.za/wp-content/uploads/2024/08/RJNE300EX-2.jpg"
+      ],
+      "categoryKey": "buy-and-sell"
+    },
+    {
       "id": "kijiji-1699178734",
       "slug": "toyota-camry-corolla-matrix-rav4-sienna-prius-transmission-1699178734",
       "url": "https://6ixo.com/listing/toyota-camry-corolla-matrix-rav4-sienna-prius-transmission-1699178734/",
@@ -64857,6 +65637,38 @@
         "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/60/60a094b2-24aa-4c2c-b252-dcfe55220541?rule=kijijica-1600-webp",
         "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/d7/d78eabf9-98a3-42f6-b34f-3b55727f49d9?rule=kijijica-1600-webp",
         "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/eb/eb4622a1-d11b-4205-91c4-e7869fa6b3e8?rule=kijijica-1600-webp"
+      ],
+      "categoryKey": "electronics"
+    },
+    {
+      "id": "category-eff13252f462d6fd3e",
+      "slug": "24-led-monitor-c24f390fha-with-curved-display-lc24f390fhax-f462d6fd3e",
+      "url": "https://6ixo.com/listing/24-led-monitor-c24f390fha-with-curved-display-lc24f390fhax-f462d6fd3e/",
+      "images": [
+        "https://www.products4u.co.za/wp-content/uploads/2024/07/LC24F390FHAXXA-5.webp",
+        "https://www.products4u.co.za/wp-content/uploads/2024/07/LC24F390FHAXXA-4.webp",
+        "https://www.products4u.co.za/wp-content/uploads/2024/07/LC24F390FHAXXA-3.webp",
+        "https://www.products4u.co.za/wp-content/uploads/2024/07/LC24F390FHAXXA-2.webp"
+      ],
+      "categoryKey": "electronics"
+    },
+    {
+      "id": "category-ed8f8f76de5fdc6fe5",
+      "slug": "aeg-rcb36102nx-318l-7000-series-bottom-freezer-fridge-with-de5fdc6fe5",
+      "url": "https://6ixo.com/listing/aeg-rcb36102nx-318l-7000-series-bottom-freezer-fridge-with-de5fdc6fe5/",
+      "images": [
+        "https://cdn-ildabib.nitrocdn.com/CSlzkzwgJKqMQQLuVmgQiMGRHFfSbBwX/assets/images/optimized/rev-5c3b100/www.products4u.co.za/wp-content/uploads/2024/04/RCB36102NX.webp"
+      ],
+      "categoryKey": "buy-and-sell"
+    },
+    {
+      "id": "category-09ef5d01105235b654",
+      "slug": "samsung-1m-38cm-55-ls01t-qled-4k-the-serif-qa55ls01dakxxa-105235b654",
+      "url": "https://6ixo.com/listing/samsung-1m-38cm-55-ls01t-qled-4k-the-serif-qa55ls01dakxxa-105235b654/",
+      "images": [
+        "https://www.products4u.co.za/wp-content/uploads/2022/06/1-in-the-serif-ls01t-qa55ls01takxxl-frontwhite-227500880.webp",
+        "https://www.products4u.co.za/wp-content/uploads/2022/06/2-in-the-serif-ls01t-qa55ls01takxxl-rsidewhite-227500852.webp",
+        "https://www.products4u.co.za/wp-content/uploads/2022/06/3-in-the-serif-ls01t-qa55ls01takxxl-268662042.webp"
       ],
       "categoryKey": "electronics"
     },
@@ -64971,6 +65783,46 @@
       "categoryKey": "vehicles"
     },
     {
+      "id": "category-772fea5e2c7bcc4987",
+      "slug": "grandstream-dual-band-wi-fi-router-gwn7052-2c7bcc4987",
+      "url": "https://6ixo.com/listing/grandstream-dual-band-wi-fi-router-gwn7052-2c7bcc4987/",
+      "images": [
+        "https://justelectronics.co.za/wp-content/uploads/2023/06/Grandstream-Wi-Fi-Router-GWN7052.jpg"
+      ],
+      "categoryKey": "electronics"
+    },
+    {
+      "id": "category-bbcfdabdc9d5224b3c",
+      "slug": "samsung-ls24a600-24-viewfinity-s6-qhd-monitor-ls24a600ucex-c9d5224b3c",
+      "url": "https://6ixo.com/listing/samsung-ls24a600-24-viewfinity-s6-qhd-monitor-ls24a600ucex-c9d5224b3c/",
+      "images": [
+        "https://www.products4u.co.za/wp-content/uploads/2023/02/LS24A600UCEXXS-1.webp",
+        "https://www.products4u.co.za/wp-content/uploads/2023/02/LS24A600UCEXXS-2.webp"
+      ],
+      "categoryKey": "electronics"
+    },
+    {
+      "id": "category-0d939454773461af8d",
+      "slug": "samsung-ls19a330nhm-19-flat-monitor-with-eye-comfort-techn-773461af8d",
+      "url": "https://6ixo.com/listing/samsung-ls19a330nhm-19-flat-monitor-with-eye-comfort-techn-773461af8d/",
+      "images": [
+        "https://www.products4u.co.za/wp-content/uploads/2022/11/LS19A330NHMXZN-1.webp",
+        "https://www.products4u.co.za/wp-content/uploads/2022/11/LS19A330NHMXZN-4.webp",
+        "https://www.products4u.co.za/wp-content/uploads/2022/11/LS19A330NHMXZN-3.webp",
+        "https://www.products4u.co.za/wp-content/uploads/2022/11/LS19A330NHMXZN-2.webp"
+      ],
+      "categoryKey": "electronics"
+    },
+    {
+      "id": "category-3400ff8665a1c6c723",
+      "slug": "sony-stereo-headphones-mdr-zx310ap-65a1c6c723",
+      "url": "https://6ixo.com/listing/sony-stereo-headphones-mdr-zx310ap-65a1c6c723/",
+      "images": [
+        "https://justelectronics.co.za/wp-content/uploads/2022/04/Sony-ZX310-AP-Wired-On-Ear-Headphones-with-Mic.jpg"
+      ],
+      "categoryKey": "electronics"
+    },
+    {
       "id": "dealer-d61ace478554470b50",
       "slug": "mini-mini-one-2015-65-plate-8554470b50",
       "url": "https://6ixo.com/listing/mini-mini-one-2015-65-plate-8554470b50/",
@@ -64981,6 +65833,25 @@
         "https://aacarsdna.com/images/vehicles/83/large/e347ab337243c30ea9ad4075f53971c2.jpg"
       ],
       "categoryKey": "vehicles"
+    },
+    {
+      "id": "category-696232f402db7b4d01",
+      "slug": "lg-f2v5ggp2t-8-5kg-wash-5kg-dry-vcm-ai-ddtm-steamtm-f2v5gg-02db7b4d01",
+      "url": "https://6ixo.com/listing/lg-f2v5ggp2t-8-5kg-wash-5kg-dry-vcm-ai-ddtm-steamtm-f2v5gg-02db7b4d01/",
+      "images": [
+        "https://www.products4u.co.za/wp-content/uploads/2021/12/M-01v.webp"
+      ],
+      "categoryKey": "buy-and-sell"
+    },
+    {
+      "id": "category-82a489c72d9be6676f",
+      "slug": "goldair-gbf-130w-white-bar-fridge-2d9be6676f",
+      "url": "https://6ixo.com/listing/goldair-gbf-130w-white-bar-fridge-2d9be6676f/",
+      "images": [
+        "https://cdn-ildabib.nitrocdn.com/CSlzkzwgJKqMQQLuVmgQiMGRHFfSbBwX/assets/images/optimized/rev-5c3b100/www.products4u.co.za/wp-content/uploads/2021/12/20211210_163213-002-rotated.jpg",
+        "https://cdn-ildabib.nitrocdn.com/CSlzkzwgJKqMQQLuVmgQiMGRHFfSbBwX/assets/images/optimized/rev-5c3b100/www.products4u.co.za/wp-content/uploads/2021/12/GOLDAIR-GBF-130S-SILVER-BAR-FRIDGE.jpg"
+      ],
+      "categoryKey": "buy-and-sell"
     },
     {
       "id": "kijiji-1566846528",
@@ -64997,6 +65868,33 @@
         "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/90/907982c8-aa66-4542-ae87-9cd3288b4eb6?rule=kijijica-1600-webp",
         "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/18/181b9173-fd5e-4779-ba7b-cea35c107bc6?rule=kijijica-1600-webp",
         "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/ab/abe4cfee-f08d-4ccc-8b95-583775939036?rule=kijijica-1600-webp"
+      ],
+      "categoryKey": "electronics"
+    },
+    {
+      "id": "category-df48b510f360d29583",
+      "slug": "goldair-guss-240-double-door-r7999-00-under-counter-fridge-f360d29583",
+      "url": "https://6ixo.com/listing/goldair-guss-240-double-door-r7999-00-under-counter-fridge-f360d29583/",
+      "images": [
+        "https://www.products4u.co.za/wp-content/uploads/2021/05/Screen-Shot-2021-05-03-at-11.06.07-AM.png"
+      ],
+      "categoryKey": "buy-and-sell"
+    },
+    {
+      "id": "category-dd4b67b9c015f40fd8",
+      "slug": "sony-stereo-headphones-mdr-zx110-c015f40fd8",
+      "url": "https://6ixo.com/listing/sony-stereo-headphones-mdr-zx110-c015f40fd8/",
+      "images": [
+        "https://justelectronics.co.za/wp-content/uploads/2021/06/Sony-MDR-ZX110-Stereo-Headphones-Black.jpg"
+      ],
+      "categoryKey": "electronics"
+    },
+    {
+      "id": "category-f0a1261ebf843ea8c8",
+      "slug": "pioneer-tv-headphones-with-5-meter-cord-bf843ea8c8",
+      "url": "https://6ixo.com/listing/pioneer-tv-headphones-with-5-meter-cord-bf843ea8c8/",
+      "images": [
+        "https://justelectronics.co.za/wp-content/uploads/2021/01/Pioneer-Stereo-TV-Headphones-With-5-Meter-Cord.jpg"
       ],
       "categoryKey": "electronics"
     },
@@ -65489,6 +66387,15 @@
       "url": "https://6ixo.com/listings/page/150/"
     },
     {
+      "url": "https://6ixo.com/listings/page/151/"
+    },
+    {
+      "url": "https://6ixo.com/listings/page/152/"
+    },
+    {
+      "url": "https://6ixo.com/listings/page/153/"
+    },
+    {
       "url": "https://6ixo.com/listings/electronics/"
     },
     {
@@ -65520,6 +66427,9 @@
     },
     {
       "url": "https://6ixo.com/listings/electronics/page/11/"
+    },
+    {
+      "url": "https://6ixo.com/listings/electronics/page/12/"
     },
     {
       "url": "https://6ixo.com/listings/vehicles/"
@@ -65894,6 +66804,9 @@
       "url": "https://6ixo.com/listings/jobs/page/5/"
     },
     {
+      "url": "https://6ixo.com/listings/jobs/page/6/"
+    },
+    {
       "url": "https://6ixo.com/listings/fashion/"
     },
     {
@@ -65952,6 +66865,9 @@
     },
     {
       "url": "https://6ixo.com/listings/buy-and-sell/page/14/"
+    },
+    {
+      "url": "https://6ixo.com/listings/buy-and-sell/page/15/"
     },
     {
       "url": "https://6ixo.com/listings/country/canada/electronics/"
@@ -66470,10 +67386,31 @@
       "url": "https://6ixo.com/listings/country/kenya/page/6/"
     },
     {
+      "url": "https://6ixo.com/listings/country/nigeria/electronics/"
+    },
+    {
+      "url": "https://6ixo.com/listings/country/nigeria/buy-and-sell/"
+    },
+    {
       "url": "https://6ixo.com/listings/country/nigeria/"
     },
     {
+      "url": "https://6ixo.com/listings/country/nigeria/page/2/"
+    },
+    {
+      "url": "https://6ixo.com/listings/country/south-africa/electronics/"
+    },
+    {
+      "url": "https://6ixo.com/listings/country/south-africa/jobs/"
+    },
+    {
+      "url": "https://6ixo.com/listings/country/south-africa/buy-and-sell/"
+    },
+    {
       "url": "https://6ixo.com/listings/country/south-africa/"
+    },
+    {
+      "url": "https://6ixo.com/listings/country/south-africa/page/2/"
     },
     {
       "url": "https://6ixo.com/listings/country/united-arab-emirates/electronics/"
@@ -66518,7 +67455,16 @@
       "url": "https://6ixo.com/listings/country/united-arab-emirates/page/6/"
     },
     {
+      "url": "https://6ixo.com/listings/country/united-kingdom/jobs/"
+    },
+    {
+      "url": "https://6ixo.com/listings/country/united-kingdom/buy-and-sell/"
+    },
+    {
       "url": "https://6ixo.com/listings/country/united-kingdom/"
+    },
+    {
+      "url": "https://6ixo.com/listings/country/united-kingdom/page/2/"
     },
     {
       "url": "https://6ixo.com/listings/country/united-states/electronics/"

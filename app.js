@@ -4149,6 +4149,7 @@ class DatingApp {
                 this.refreshActiveMarketplaceView();
             }
             this.renderHomeTodayDeals();
+            window.SIXO_ARRIVE_DISCOVERY?.refresh(this);
             return listings;
         } catch (err) {
             console.warn('Supabase marketplace listings load failed:', err);
@@ -4385,6 +4386,7 @@ class DatingApp {
             if (this.activeScreen === 'marketplace' || this.activeScreen === 'home') {
                 this.applyMarketplaceFilters();
             }
+            window.SIXO_ARRIVE_DISCOVERY?.refresh(this);
             return listings;
         } catch (err) {
             console.warn('Supabase short-term listings load failed:', err);
@@ -6183,6 +6185,7 @@ class DatingApp {
             } else if (this.activeScreen === 'home') {
                 void this.applyHomeFilters({ scrollToResults: false });
             }
+            window.SIXO_ARRIVE_DISCOVERY?.refresh(this);
             return listings;
         } catch (err) {
             console.warn('Oxglow real estate listings load failed:', err);
@@ -6217,6 +6220,7 @@ class DatingApp {
                 this.renderHomePersonalizedRows();
             }
             this.renderHomeTodayDeals();
+            window.SIXO_ARRIVE_DISCOVERY?.refresh(this);
             return items;
         } catch (err) {
             console.warn('Oxglow electronics listings load failed:', err);
@@ -6256,6 +6260,7 @@ class DatingApp {
     }
 
     refreshImportedListingViews() {
+        window.SIXO_ARRIVE_DISCOVERY?.refresh(this);
         this.syncScrapedHomeFeaturedAds(this.scrapedHomeFeaturedRows);
         if (this.activeScreen === 'vehicles') {
             this.renderVehiclesFeed(document.querySelector('.vehicles-chip.active')?.dataset.category || 'all');
@@ -6417,6 +6422,7 @@ class DatingApp {
                 this.applyHomeFilters({ scrollToResults: false });
                 this.renderHomePersonalizedRows();
             }
+            window.SIXO_ARRIVE_DISCOVERY?.refresh(this);
             return listings;
         } catch (err) {
             console.warn('Supabase vehicle rental listings load failed:', err);

@@ -11,7 +11,7 @@ function fixture(seed = {}) {
 }
 const plain = value => JSON.parse(JSON.stringify(value));
 const entry = changes => ({ kind: 'service', id: 'one', title: 'Restaurant', country: 'Ghana', city: 'Accra', categories: ['Restaurants'], image: 'https://example.com/one.jpg', price: 'GHS 50', updatedAt: 1, ...changes });
-test('selecting interests combines categories in the destination country and prioritizes the chosen city', () => {
+test('country browsing combines selected categories and a city narrows results strictly', () => {
     const { model } = fixture();
     const app = { getCountryAliasLabel: s => s === 'GH' ? 'Ghana' : s };
     const records = [
@@ -22,8 +22,9 @@ test('selecting interests combines categories in the destination country and pri
         { ...entry({ id: 'plumber', categories: ['Plumbing'] }), postedAt: 2000 }
     ];
     const prefs = { country: 'GH', city: 'Accra', categories: ['Restaurants', 'Car rental'] };
-    assert.deepEqual(plain(model.discover(app, records, prefs).map(x => x.id)), ['car', 'accra', 'kumasi']);
-    assert.deepEqual(plain(model.discover(app, records, { ...prefs, categories: ['Restaurants'] }).map(x => x.id)), ['accra', 'kumasi']);
+    assert.deepEqual(plain(model.discover(app, records, prefs).map(x => x.id)), ['car', 'accra']);
+    assert.deepEqual(plain(model.discover(app, records, { ...prefs, categories: ['Restaurants'] }).map(x => x.id)), ['accra']);
+    assert.deepEqual(plain(model.discover(app, records, { ...prefs, city: '' }).map(x => x.id)), ['kumasi', 'car', 'accra']);
     assert.equal(model.discover(app, records, { ...prefs, categories: [] }).length, 0);
     assert.equal(model.discover(app, records, { ...prefs, country: '' }).length, 0);
 });
@@ -145,4 +146,44 @@ test('collect rejects sold, unpublished, unsafe and unrelated entries while keep
     };
     assert.deepEqual(plain(model.collect(app).map(x => x.id)), ['active']);
     assert.equal(model.snapshot(entry({ image: 'javascript:alert(1)' })).image, 'assets/ad-placeholder.svg');
+});
+
+
+test('city search excludes unknown cities and other countries, and expanding preserves categories and dates', () => {
+    const { model } = fixture();
+    const records = [
+        { ...entry({ id: 'unknown', city: '' }), postedAt: 50 },
+        { ...entry({ id: 'other-city', city: 'Kumasi' }), postedAt: 10 },
+        { ...entry({ id: 'other-country', country: 'Canada' }), postedAt: 30 },
+        { ...entry({ id: 'pickup', city: 'Kumasi', categories: ['Airport pickup'] }), postedAt: 40 },
+        { ...entry({ id: 'dated', city: 'Kumasi', categories: ['Events'], eventDate: '2026-12-01' }), postedAt: 20 }
+    ];
+    const prefs = { country: 'Ghana', city: 'Accra', categories: ['Restaurants', 'Events'], startDate: '2026-11-06', endDate: '2026-11-13' };
+    assert.equal(model.discover({}, records, prefs).length, 0);
+    assert.deepEqual(plain(model.discover({}, records, { ...prefs, city: '' }).map(x => x.id)), ['unknown', 'other-city']);
+});
+
+test('complete city names match with accents and Unicode while partial and similarly named cities stay separate', () => {
+    const { model } = fixture();
+    const app = { isLooseLocationMatch: () => true };
+    assert.equal(model.matchesCity(app, ' Montréal ', 'montreal'), true);
+    assert.equal(model.matchesCity(app, 'Adenta, Greater Accra', 'Adenta'), true);
+    assert.equal(model.matchesCity(app, 'Adenta, Greater Accra', 'Accra'), false);
+    assert.equal(model.matchesCity(app, 'Toronto, Ontario', 'Toronto'), true);
+    assert.equal(model.matchesCity({ getHomeSearchCityAliases: city => city === 'New York City' ? [city, 'NYC', 'New York'] : [city] }, 'New York City', 'NYC'), true);
+    assert.equal(model.matchesCity(app, '北京', '北京'), true);
+    for (const [city, target] of [['York', 'New York'], ['London', 'Londonderry'], ['Accra', 'Acc'], ['北京', '上海'], ['', 'Accra']]) {
+        assert.equal(model.matchesCity(app, city, target), false, city + ' vs ' + target);
+    }
+});
+
+test('events appear without dates or a trip submission and are refined when dates are supplied', () => {
+    const { model } = fixture();
+    const records = [
+        { ...entry({ id: 'event', categories: ['Events'], eventDate: '2026-11-08' }), postedAt: 1 },
+        { ...entry({ id: 'unknown-date', categories: ['Events'] }), postedAt: 0 }
+    ];
+    const prefs = { country: 'Ghana', city: 'Accra', categories: ['Events'] };
+    assert.deepEqual(plain(model.discover({}, records, prefs).map(x => x.id)), ['event', 'unknown-date']);
+    assert.deepEqual(plain(model.discover({}, records, { ...prefs, startDate: '2026-11-06' }).map(x => x.id)), ['event']);
 });

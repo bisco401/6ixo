@@ -131,7 +131,7 @@
     <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
     <link rel="preload" href="assets/fonts/sora-latin.3902474d3ece.woff2" as="font" type="font/woff2" crossorigin>
     <link rel="stylesheet" href="styles.css?v=20261101-search-suggestions-2">
-    <link rel="stylesheet" href="assets/arrive-discovery.css?v=20261105-force-two-columns-5">
+    <link rel="stylesheet" href="assets/arrive-discovery.css?v=20261106-live-matches-1">
     <link rel="stylesheet" href="assets/shortstay-signature.css?v=20261018-signature-1">
     <link rel="stylesheet" href="assets/stay-host-application.css?v=20261019-host-proof-checks-1">
     <link rel="stylesheet" href="assets/policy-links.css?v=20260930-site-policies-1">
@@ -4192,7 +4192,8 @@
                 <section id="arrive-plus-schedule" class="dating-section dating-schedule arrive-discovery-screen" aria-label="Arrive+ trip discovery">
                     <div class="arrive-discovery-layout">
                         <aside class="arrive-discovery-preferences" aria-label="Trip preferences">
-                            <h3>Your trip</h3>
+                            <h3>Choose your destination</h3>
+                            <p class="arrive-discovery-intro">Pick a country and categories to see matching listings below. Add a city to narrow your search.</p>
                             <form id="dating-schedule-form" class="dating-schedule-form arrive-trip-form">
                                 <div class="arrive-destination-row" style="display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px!important;grid-column:1/-1!important;width:100%!important;align-items:start!important;">
                                     <div class="arrive-destination-control arrive-country-control">
@@ -4214,15 +4215,19 @@
                                     </div>
                                 </div>
                                 <input type="hidden" id="dating-schedule-destination">
-                                <div class="arrive-discovery-dates">
-                                    <label class="arrive-discovery-field" for="dating-schedule-start">Arrival
-                                        <input type="date" id="dating-schedule-start">
-                                    </label>
-                                    <label class="arrive-discovery-field" for="dating-schedule-end">Departure
-                                        <input type="date" id="dating-schedule-end">
-                                    </label>
-                                </div>
-                                <p id="arrive-discovery-date-error" role="alert" hidden></p>
+                                <details id="arrive-discovery-travel-dates" class="arrive-discovery-travel-dates">
+                                    <summary>Travel dates (optional)</summary>
+                                    <p class="arrive-discovery-hint">Add dates to filter events during your stay.</p>
+                                    <div class="arrive-discovery-dates">
+                                        <label class="arrive-discovery-field" for="dating-schedule-start">Arrival
+                                            <input type="date" id="dating-schedule-start">
+                                        </label>
+                                        <label class="arrive-discovery-field" for="dating-schedule-end">Departure
+                                            <input type="date" id="dating-schedule-end">
+                                        </label>
+                                    </div>
+                                    <p id="arrive-discovery-date-error" role="alert" hidden></p>
+                                </details>
                                 <details class="arrive-discovery-offers">
                                     <summary>Request local offers</summary>
                                     <label class="arrive-discovery-field" for="dating-schedule-wants">What are you looking for?
@@ -4259,8 +4264,8 @@
                         </aside>
                         <section class="arrive-discovery-feed" aria-label="Trip listings">
                             <header class="arrive-discovery-heading">
-                                <h3 id="arrive-discovery-title">Discover your destination</h3>
-                                <p id="arrive-plus-preview-subtitle">Choose a country and check your interests to see matching listings.</p>
+                                <h3 id="arrive-discovery-title" tabindex="-1">Explore your destination</h3>
+                                <p id="arrive-plus-preview-subtitle">Choose a country and categories. Matching listings appear automatically.</p>
                             </header>
                             <div id="arrive-discovery-tabs" class="arrive-discovery-tabs" role="tablist" aria-label="Trip listings">
                                 <button id="arrive-tab-discover" type="button" role="tab" data-arrive-tab="discover" aria-selected="true" aria-controls="arrive-plus-preview-list"><i class="fas fa-compass" aria-hidden="true"></i> Discover</button>
@@ -7233,8 +7238,8 @@
     <script src="assets/profile-card-ui.00a6745f6675.js"></script>
         <link rel="stylesheet" href="assets/posting-accordion.css?v=20261012-property-categories-1">
     <script src="assets/posting-accordion.js?v=20261104-category-badges-1"></script>
-    <script src="assets/arrive-discovery.js?v=20261105-destination-clear-1"></script>
-    <script src="app.js?v=20261106-profile-card-clean-photos-1"></script>
+    <script src="assets/arrive-discovery.js?v=20261106-live-matches-1"></script>
+    <script src="app.js?v=20261106-arrive-live-matches-1"></script>
         <script src="rental-finance-ui.js?v=20260930-stay-booking-ready-1"></script>
         <script src="vehicle-rental-flow.js?v=20260914-host-insurance-1"></script>
 			</body>

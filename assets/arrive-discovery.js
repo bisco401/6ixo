@@ -189,8 +189,15 @@
         return [...records.values()];
     }
     function matchesCity(app, city, target) {
-        if (!text(city) || !text(target)) return false;
-        return app.isLooseLocationMatch ? app.isLooseLocationMatch(city, target, { allowFuzzy: false }) : fold(city) === fold(target);
+        const key = value => text(value).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^\p{L}\p{N}]+/gu, ' ').trim();
+        // Imported locations may include a region after the city. Match the city
+        // and its established aliases, without treating a region or substring as a city.
+        const names = value => {
+            const label = text(value).split(',')[0].trim();
+            return (app.getHomeSearchCityAliases?.(label) || [label]).map(key).filter(Boolean);
+        };
+        const cityNames = names(city), targetNames = names(target);
+        return cityNames.some(name => targetNames.includes(name));
     }
     function discover(app, records, preferences) {
         const country = countryKey(app, preferences.country), selected = preferences.categories || [];
@@ -198,11 +205,12 @@
         const start = dateKey(preferences.startDate), end = dateKey(preferences.endDate);
         return records.filter(item => {
             if (countryKey(app, item.country) !== country || !item.categories.some(c => selected.includes(c))) return false;
+            if (text(preferences.city) && !matchesCity(app, item.city, preferences.city)) return false;
             if (item.categories.includes('Events') && (start || end)) {
                 if (!item.eventDate || start && end && end < start || start && item.eventDate < start || end && item.eventDate > end) return false;
             }
             return true;
-        }).sort((a, b) => Number(matchesCity(app, b.city, preferences.city)) - Number(matchesCity(app, a.city, preferences.city)) || b.postedAt - a.postedAt || a.title.localeCompare(b.title));
+        }).sort((a, b) => b.postedAt - a.postedAt || a.title.localeCompare(b.title));
     }
     class Discovery {
         constructor(app, root) {
@@ -275,6 +283,7 @@
             this.countrySearch.value = '';
             this.fields.city.value = prefs.city;
             this.fields.startDate.value = prefs.startDate; this.fields.endDate.value = prefs.endDate;
+            if (prefs.startDate || prefs.endDate) this.root.querySelector('#arrive-discovery-travel-dates').open = true;
             this.root.querySelectorAll('#arrive-plus-checklist input').forEach(input => {
                 input.checked = prefs.categories.includes(input.value);
                 input.closest('label')?.classList.toggle('checked', input.checked);
@@ -489,6 +498,11 @@
                 this.root.querySelector('[data-arrive-tab="' + this.tab + '"]').focus();
             }, options);
             this.root.querySelector('#arrive-plus-preview-list').addEventListener('click', event => {
+                if (event.target.closest('[data-arrive-expand-country]')) {
+                    this.clearDestination('city');
+                    this.root.querySelector('#arrive-discovery-title').focus({ preventScroll: true });
+                    return;
+                }
                 const save = event.target.closest('[data-arrive-save]');
                 const open = event.target.closest('[data-arrive-open]');
                 if (save) this.toggle(save.dataset.arriveSave);
@@ -546,25 +560,34 @@
             this.root.querySelector('#arrive-discovery-count').textContent = saved.length;
             this.root.querySelector('#arrive-discovery-storage').textContent = this.store.status();
             const title = this.root.querySelector('#arrive-discovery-title');
-            title.textContent = this.tab === 'saved' ? 'Your saved itinerary' : prefs.city ? 'Discover ' + prefs.city : prefs.country ? 'Discover ' + prefs.country : 'Discover your destination';
+            title.textContent = this.tab === 'saved' ? 'Your saved itinerary' : 'Explore your destination';
             this.root.querySelectorAll('[data-arrive-tab]').forEach(button => button.setAttribute('aria-selected', String(button.dataset.arriveTab === this.tab)));
             this.root.querySelector('#arrive-plus-preview-list').setAttribute('aria-labelledby', 'arrive-tab-' + this.tab);
             const datesInvalid = prefs.startDate && prefs.endDate && prefs.endDate < prefs.startDate;
             const error = this.root.querySelector('#arrive-discovery-date-error');
             error.hidden = !datesInvalid; error.textContent = datesInvalid ? 'Departure must be on or after arrival.' : '';
-            this.root.querySelector('#arrive-plus-preview-subtitle').textContent = this.tab === 'saved' ? 'Open a saved profile to view its details. Your choices stay here when you change the checklist or destination.' : prefs.country ? [prefs.country, prefs.city ? prefs.city + ' first' : '', prefs.startDate && prefs.endDate && !datesInvalid ? this.app.formatScheduleRangeShort(prefs.startDate, prefs.endDate) : ''].filter(Boolean).join(' · ') : 'Choose a country and check your interests to see matching listings.';
+            const destination = [prefs.city, prefs.country].filter(Boolean).join(', ');
+            this.root.querySelector('#arrive-plus-preview-subtitle').textContent = this.tab === 'saved'
+                ? 'Your saved choices stay here when you change categories or destination.'
+                : prefs.country
+                    ? [destination, prefs.categories.join(' + '), prefs.startDate && prefs.endDate && !datesInvalid ? this.app.formatScheduleRangeShort(prefs.startDate, prefs.endDate) : ''].filter(Boolean).join(' · ')
+                    : 'Choose a country and categories. Matching listings appear automatically.';
             const summary = this.root.querySelector('#arrive-plus-preview-summary');
-            summary.textContent = items.length ? items.length + (items.length === 1 ? ' listing' : ' listings') : '';
-            summary.classList.toggle('is-empty', !items.length);
+            summary.textContent = this.tab === 'saved' ? saved.length + ' saved' : prefs.country && prefs.categories.length
+                ? items.length + (items.length === 1 ? ' match in ' : ' matches in ') + destination : '';
+            summary.classList.toggle('is-empty', !summary.textContent);
             this.root.querySelector('#arrive-discovery-more').hidden = items.length <= this.limit;
-            const signature = JSON.stringify([this.tab, this.limit, prefs.country, prefs.city, saved, items.slice(0, this.limit).map(x => [x.key, x.title, x.image, x.price, x.city, x.eventDate, x.unavailable])]);
+            const canExpand = !items.length && this.tab === 'discover' && prefs.country && prefs.city && prefs.categories.length;
+            const countryMatches = canExpand ? discover(this.app, this.records, { ...prefs, city: '' }).length : 0;
+            const signature = JSON.stringify([this.tab, this.limit, prefs, saved, countryMatches, items.slice(0, this.limit).map(x => [x.key, x.title, x.image, x.price, x.city, x.country, x.categories, x.eventDate, x.unavailable])]);
             if (signature === this.signature) return;
             this.signature = signature;
             const list = this.root.querySelector('#arrive-plus-preview-list');
             if (!items.length) {
-                const heading = this.tab === 'saved' ? 'Keep the listings you like.' : !prefs.country ? 'Where are you heading?' : !prefs.categories.length ? 'What would you like to explore?' : 'No matching listings here yet.';
-                const detail = this.tab === 'saved' ? 'Tap Save to itinerary on a profile in Discover to find it here later.' : !prefs.country ? 'Choose your destination country to get started.' : !prefs.categories.length ? 'Check a category and matching listings will appear here.' : 'Try another interest or travel window. Your saved choices stay in Saved itinerary.';
-                list.innerHTML = '<div class="arrive-discovery-empty"><i class="fas fa-' + (this.tab === 'saved' ? 'bookmark' : 'compass') + '" aria-hidden="true"></i><h4>' + heading + '</h4><p>' + detail + '</p></div>';
+                const heading = this.tab === 'saved' ? 'Keep the listings you like.' : !prefs.country ? 'Where are you heading?' : !prefs.categories.length ? 'What would you like to explore?' : 'No matches in ' + destination + ' yet.';
+                const detail = this.tab === 'saved' ? 'Tap Save to itinerary on a listing in Discover to find it here later.' : !prefs.country ? 'Choose a country, then add a city to narrow your search.' : !prefs.categories.length ? 'Choose one or more categories above. No trip submission is needed.' : datesInvalid ? 'Check your arrival and departure dates above.' : 'No listings match your selected categories' + (prefs.startDate || prefs.endDate ? ' and travel dates' : '') + '. Try another category or expand your destination.';
+                const expand = canExpand ? '<button type="button" class="btn-secondary" data-arrive-expand-country>Search all of ' + escape(prefs.country) + (countryMatches ? ' (' + countryMatches + ')' : '') + '</button>' : '';
+                list.innerHTML = '<div class="arrive-discovery-empty"><i class="fas fa-' + (this.tab === 'saved' ? 'bookmark' : 'compass') + '" aria-hidden="true"></i><h4>' + escape(heading) + '</h4><p>' + escape(detail) + '</p>' + expand + '</div>';
                 return;
             }
             list.innerHTML = items.slice(0, this.limit).map(item => {

@@ -68,6 +68,8 @@ The workflow wakes every 24 hours to check all imported source URLs for removals
 failed discovery groups retry then, without advancing their successful checkpoint.
 A manual workflow dispatch forces all source searches. The Ghana, Kenya, Guyana and
 Kijiji standalone workflows remain available for manual repair and have no competing schedule.
+The listing-integrity repair workflow is also manual: the shared discovery job
+validates new ads without allowing a separate audit to rewrite existing content.
 
 Kenya discovery uses SamTech Auto Parts, Autostore EA, Kai & Karo and Laptops in
 Kenya, with exact product identity, working source photos and public business

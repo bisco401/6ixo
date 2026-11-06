@@ -1,17 +1,7 @@
 name: Verify imported listing images and categories
 on:
-  push:
-    branches: [main]
-    paths:
-      - data/*.csv
-      - data/listing-integrity-repairs.json
-      - scripts/lib/listing-integrity.cjs
-      - scripts/repair-listing-feeds.mjs
-      - scripts/audit-listing-alignment.mjs
-      - automations/n8n/6ixo*kijiji*.json
-      - kijiji_scrape.py
-  schedule:
-    - cron: "41 */6 * * *"
+  # Existing-listing repairs are manual; scheduled discovery validates new ads
+  # in refresh-marketplace-listings.yml without rewriting saved listing content.
   workflow_dispatch:
 permissions:
   contents: write

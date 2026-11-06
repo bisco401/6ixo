@@ -39,7 +39,7 @@ function main() {
   }
   if (restored.length) {
     fs.writeFileSync(file, policy.toCsv(parsed.headers, parsed.rows));
-    fs.writeFileSync(repairFile, JSON.stringify(ledger, null, 2) + '\n');
+    fs.writeFileSync(repairFile, JSON.stringify(ledger) + '\n');
   }
   fs.mkdirSync('output', { recursive: true });
   fs.writeFileSync('output/ghana-gallery-recovery-report.json', JSON.stringify({ checkedAt: new Date().toISOString(), restored }, null, 2) + '\n');

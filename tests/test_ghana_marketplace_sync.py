@@ -10,6 +10,22 @@ from oxglow_scrape import Listing, image_download_candidates, extract_listing_at
 
 
 class GhanaMarketplaceSyncTests(unittest.TestCase):
+    def test_fresh_verified_gallery_replaces_stale_local_gallery(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            image = root / 'data/oxglow-listing-images/stale.jpg'
+            image.parent.mkdir(parents=True)
+            image.write_bytes(b'old image')
+            existing = {'id': 'old', 'source_url': 'https://oxglow.com.gh/listing/part', 'title': 'Car part',
+                        'country': 'Ghana', 'status': 'published', 'scraped_at': '2026-10-01T00:00:00Z',
+                        'image_urls': 'data/oxglow-listing-images/stale.jpg'}
+            new = {**existing, 'scraped_at': '2026-11-06T00:00:00Z', 'image_urls': 'https://oxglow.com.gh/uploads/medium/own.jpg',
+                   'attributes': json.dumps({'listingIdentity': {'sourceUrl': existing['source_url'], 'title': 'Car part',
+                                            'images': ['https://oxglow.com.gh/uploads/medium/own.jpg']}})}
+            rows, _ = merge_ghana_listings([existing], [new], root)
+            self.assertEqual(rows[0]['image_urls'], new['image_urls'])
+            self.assertEqual(rows[0]['scraped_at'], existing['scraped_at'])
+
     def undated_listing(self):
         return Listing(
             title="Existing car part", price="GHS 100", url="https://oxglow.com.gh/listing/part",

@@ -7,6 +7,7 @@ import argparse
 import json
 import re
 import sys
+import subprocess
 from dataclasses import asdict, dataclass
 from datetime import datetime, timezone
 from pathlib import Path
@@ -19,6 +20,7 @@ from oxglow_scrape import (
     download_listing_images,
     enrich_from_detail,
     fetch_live_listing_cards,
+    fetch_html,
     full_size_image_url,
 )
 
@@ -232,8 +234,10 @@ def merge_ghana_listings(
     prepared = []
     for row in incoming:
         current = existing_by_url.get(clean(row.get("source_url")))
+        if current and current.get("sync_visibility") in {"reviewed_image_mismatch", "source_identity_mismatch", "foreign_contact", "foreign_seller", "foreign_location"}:
+            continue
         row = preserve_listing_date(row, current or {})
-        if current and has_managed_local_images(current, repository_root):
+        if current and has_managed_local_images(current, repository_root) and not row_attributes(row).get("listingIdentity"):
             row = {**row, "image_urls": current["image_urls"]}
         prepared.append(row)
 
@@ -296,6 +300,10 @@ def localize_published_ghana_images(
             continue
         if remote_images or final_images != current_images:
             row["image_urls"] = "|".join(final_images)
+            attributes = row_attributes(row)
+            if attributes.get("listingIdentity"):
+                attributes["listingIdentity"] = {**attributes["listingIdentity"], "images": final_images}
+                row["attributes"] = json.dumps(attributes, ensure_ascii=False, separators=(",", ":"))
             localized_listings += 1
             localized_images += len(downloaded)
 
@@ -312,17 +320,27 @@ def scrape_source(
     localize_vehicles: int = 0,
 ) -> list[dict[str, str]]:
     cards = fetch_live_listing_cards(source.url, limit, delay)
-    rows = []
+    candidates = []
     for index, card in enumerate(cards):
         try:
-            listing = enrich_from_detail(card, delay=delay)
-            if source.name == "vehicles" and index < localize_vehicles:
-                listing = download_listing_images(listing, Path("data/oxglow-vehicles-images"), delay=delay)
+            body = fetch_html(card.url, delay=delay)
+            listing = enrich_from_detail(card, delay=delay, source_html=body)
             row = normalize_listing(listing, source, checked_at)
             if row:
-                rows.append(row)
+                candidates.append({"row": row, "html": body})
         except Exception as error:  # One removed detail page must not abort the whole country refresh.
             print(f"warning: {source.name} detail failed for {card.url}: {error}", file=sys.stderr)
+    # Verify the displayed gallery and seller together. Original media links can
+    # expire, and a cached local gallery must never replace a newly verified one.
+    verification = subprocess.run(
+        ["node", str(Path(__file__).parent / "scripts/verify-ghana-listings.cjs")],
+        input=json.dumps({"checkedAt": checked_at, "candidates": candidates}),
+        text=True, capture_output=True, check=True,
+    )
+    result = json.loads(verification.stdout)
+    rows = result["rows"]
+    for held in result["held"]:
+        print(f"warning: Ghana source verification: {held['url']}: {held['reason']}", file=sys.stderr)
     if not rows:
         raise RuntimeError(f"Oxglow returned no publishable {source.name} listings; refusing a partial refresh.")
     return rows

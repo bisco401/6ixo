@@ -421,6 +421,8 @@ def merge(path, incoming):
             if old.get("sync_visibility") in {"reviewed_image_mismatch", "foreign_gallery"}:
                 continue
             row["id"] = old["id"]
+            from ghana_marketplace_sync import preserve_listing_date
+            row = preserve_listing_date(row, old)
             old.update(row)
             updated += 1
         else:

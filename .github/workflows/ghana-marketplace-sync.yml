@@ -1,8 +1,7 @@
 name: Sync Ghana marketplace listings
 
 on:
-  schedule:
-    - cron: "37 7 * * *"
+  # Automatic discovery is owned by refresh-marketplace-listings.yml every 48h.
   workflow_dispatch:
 
 permissions:
@@ -18,28 +17,40 @@ jobs:
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
       - name: Refresh current Ghana inventory
         run: >-
           python ghana_marketplace_sync.py
-          --limit-per-source 25
+          --limit-per-source 60
           --max-published 0
           --min-total 8
-          --localize-vehicles 10
-          --localize-published
+      - name: Resolve stale automatic gallery holds using fresh exact source evidence
+        run: node scripts/reconcile-ghana-gallery-holds.cjs
+      - name: Check Ghana removals and publication guards
+        run: |
+          python -m pip install beautifulsoup4 requests
+          python scripts/check-listing-availability.py --countries Ghana --workers 8
+          node scripts/repair-listing-feeds.mjs data/scraped-listings.csv data/oxglow-auto-parts-accessories-recent.csv data/oxglow-electronics-recent.csv data/oxglow-real-estate-recent.csv
+          node scripts/listing-publication.test.cjs
       - name: Verify Ghana inventory
         run: python -m unittest tests/test_ghana_marketplace_sync.py
       - name: Commit listing updates
         shell: bash
         run: |
-          if git diff --quiet -- data/scraped-listings.csv data/oxglow-vehicles-images data/oxglow-listing-images; then
+          if git diff --quiet -- data; then
             echo "No Ghana marketplace changes."
             exit 0
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/scraped-listings.csv data/oxglow-vehicles-images data/oxglow-listing-images
+          git add data/*.csv data/listing-availability.json data/listing-integrity-repairs.json
           git commit -m "Sync Ghana marketplace listings"
-          git push
+          git pull --rebase origin main
+          git push origin HEAD:main

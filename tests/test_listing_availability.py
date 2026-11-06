@@ -14,6 +14,27 @@ spec.loader.exec_module(module)
 
 
 class AvailabilityTest(unittest.TestCase):
+    def test_country_check_removes_duplicates_and_preserves_other_countries(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root = pathlib.Path(folder)
+            rows = [dict(self.row, country='Kenya'), dict(self.row, source_url='https://other.example/keep', country='Canada')]
+            feeds = [root / 'main.csv', root / 'kenya.csv']
+            for feed in feeds:
+                with feed.open('w') as handle:
+                    writer = csv.DictWriter(handle, fieldnames=list(rows[0])); writer.writeheader(); writer.writerows(rows)
+            args = ['check', '--files', *map(str, feeds), '--countries', 'Kenya', '--ledger', str(root/'ledger.json'), '--report', str(root/'report.json')]
+            response = SimpleNamespace(status_code=404, text='<title>Page Not Found</title>', url=self.row['source_url'])
+            with patch('sys.argv', args), patch.object(module.requests, 'get', return_value=response) as fetch:
+                module.main()
+            self.assertEqual(fetch.call_count, 1)
+            for feed in feeds:
+                with feed.open() as handle:
+                    actual = list(csv.DictReader(handle))
+                self.assertEqual(actual[0]['status'], 'rejected')
+                self.assertEqual(actual[1]['status'], 'published')
+                self.assertFalse(actual[1]['source_availability'])
+            self.assertIn('example.com/car/1', json.loads((root/'ledger.json').read_text())['listings'])
+
     def setUp(self):
         self.row = {"title": "Toyota Corolla 2022", "source_url": "https://example.com/car/1", "status": "published"}
 

@@ -188,6 +188,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--files", nargs="+", default=FEEDS)
     parser.add_argument("--workers", type=int, default=16)
+    parser.add_argument("--countries", nargs="+", help="Check only these countries; preserve all other rows")
     parser.add_argument("--max-urls", type=int, default=0)
     parser.add_argument("--crawl4ai-url", default="")
     parser.add_argument("--cache-dir", type=Path)
@@ -209,6 +210,11 @@ def main():
             if url := source_url(row):
                 by_url[url].append(row)
     urls = sorted(by_url, key=lambda u: min(r.get("source_availability_checked_at") or "" for r in by_url[u]))
+    if args.countries:
+        # Legacy Oxglow feeds have no country column. Once a source URL is
+        # selected, update every duplicate, including those legacy copies.
+        urls = [u for u in urls if any(r.get("country") in args.countries for r in by_url[u])
+                or (urlsplit(u).netloc.removeprefix("www.") == "oxglow.com.gh" and "Ghana" in args.countries)]
     if args.max_urls:
         urls = urls[:args.max_urls]
     if args.cache_dir:

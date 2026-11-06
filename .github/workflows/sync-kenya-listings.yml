@@ -1,9 +1,7 @@
 name: Sync recent Kenya listings
 
 on:
-  schedule:
-    # Check daily; the cadence job permits a sync every 48 hours across months.
-    - cron: "41 18 * * *"
+  # Automatic discovery is owned by refresh-marketplace-listings.yml every 48h.
   workflow_dispatch:
 
 permissions:
@@ -14,89 +12,54 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  cadence:
-    runs-on: ubuntu-latest
-    timeout-minutes: 2
-    permissions: {}
-    outputs:
-      due: ${{ steps.check.outputs.due }}
-    steps:
-      - name: Check 48-hour schedule
-        id: check
-        run: |
-          python3 - <<'PY'
-          import os
-          from datetime import date, datetime, timezone
-
-          # Continue from the September 6 sync on a fixed two-day UTC cadence.
-          anchor = date(2026, 9, 6)
-          today = datetime.now(timezone.utc).date()
-          elapsed_days = (today - anchor).days
-          due = os.environ['GITHUB_EVENT_NAME'] == 'workflow_dispatch' or (
-              elapsed_days >= 0 and elapsed_days % 2 == 0
-          )
-          with open(os.environ['GITHUB_OUTPUT'], 'a', encoding='utf-8') as output:
-              output.write(f"due={str(due).lower()}\n")
-          print('Kenya sync is due.' if due else 'Next Kenya sync is tomorrow.')
-          PY
-
   sync:
-    needs: cadence
-    if: needs.cadence.outputs.due == 'true'
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 30
     steps:
-      - name: Check out repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
         with:
           ref: main
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
+      - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-
-      - name: Sync crawler-allowed Kenya listings
-        run: >-
-          python3 sebu_scrape.py
-          --csv data/kenya-listings.csv
-          --cache data/sebu-listings-cache.json
-          --max-per-category 10
-          --workers 3
-          --request-delay 0.15
-
-      - name: Validate category coverage and media
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Install source parsers
+        run: python -m pip install beautifulsoup4 requests
+      - name: Verify public Kenya source parsers
+        run: python -m unittest discover -s tests -p test_kenya_public_refresh.py
+      - name: Search current publicly contactable Kenya inventory
+        id: kenya
+        continue-on-error: true
+        run: python scripts/refresh-kenya-public-listings.py
+      - name: Check Kenya source deletions across both feeds
+        run: python scripts/check-listing-availability.py --countries Kenya --workers 8
+      - name: Apply publication and identity checks
         run: |
-          python3 - <<'PY'
-          import csv
-          from pathlib import Path
-
-          core = {"buy_sell", "clothing", "services"}
-          with Path("data/kenya-listings.csv").open(newline="", encoding="utf-8-sig") as handle:
-              rows = [row for row in csv.DictReader(handle) if row.get("source_site") == "Sebu"]
-          assert rows, "The Kenya sync produced no Sebu listings"
-          present = {row.get("app_category", "") for row in rows}
-          assert not core - present, f"Missing core categories: {sorted(core - present)}"
-          assert len(present) >= 5, f"Too little category coverage: {sorted(present)}"
-          invalid = [
-              row.get("id", "") for row in rows
-              if not row.get("image_urls", "").startswith("https://pictures.sebu.co.ke/")
-              or not row.get("source_url", "").startswith("https://sebu.co.ke/")
-              or row.get("phone", "").strip()
-          ]
-          assert not invalid, f"Listings have invalid source/media/contact fields: {invalid[:5]}"
-          print(f"validated {len(rows)} Kenya listings across {len(present)} app categories")
-          PY
-
-      - name: Commit fresh listings
+          node scripts/repair-listing-feeds.mjs data/scraped-listings.csv data/kenya-listings.csv
+          node scripts/listing-publication.test.cjs
+      - name: Commit verified listings and removals
         run: |
-          if git diff --quiet -- data/kenya-listings.csv data/sebu-listings-cache.json; then
-            echo "No Kenya listing changes to publish"
+          if git diff --quiet -- data; then
+            echo "No Kenya changes to publish"
             exit 0
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/kenya-listings.csv data/sebu-listings-cache.json
-          git commit -m "Sync recent Kenya listings"
+          git add data/scraped-listings.csv data/kenya-listings.csv data/listing-availability.json
+          git commit -m "Sync verified Kenya listings and availability"
           git pull --rebase origin main
           git push origin HEAD:main
+      - name: Save source report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: kenya-source-reports
+          path: output/*report.json
+          retention-days: 14
+      - name: Report incomplete discovery
+        if: steps.kenya.outcome == 'failure'
+        run: |
+          echo "Some Kenya sources could not be verified. See the source report."
+          exit 1

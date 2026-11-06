@@ -377,8 +377,8 @@ def extract_listing_attributes(source_html: str) -> dict[str, str]:
     return parser.attributes
 
 
-def enrich_from_detail(listing: Listing, delay: float) -> Listing:
-    detail_html = fetch_html(listing.url, delay=delay)
+def enrich_from_detail(listing: Listing, delay: float, source_html: str | None = None) -> Listing:
+    detail_html = source_html if source_html is not None else fetch_html(listing.url, delay=delay)
     listing.phone_numbers = extract_phone_numbers(detail_html)
     listing.attributes = extract_listing_attributes(detail_html)
 

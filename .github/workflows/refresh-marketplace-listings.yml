@@ -44,6 +44,7 @@ jobs:
           python -m unittest discover -s tests -p test_china_supplier_refresh.py
           python -m unittest discover -s tests -p test_preserve_existing_listings.py
           python -m unittest discover -s tests -p test_expansion_refresh.py
+          python -m unittest discover -s tests -p test_category_refresh.py
           python -m unittest discover -s tests -p test_guyana_marketplace_refresh.py
           python -m unittest discover -s tests -p test_ghana_marketplace_sync.py
           node --test tests/ghana_source_verification.test.cjs
@@ -87,6 +88,16 @@ jobs:
         if: steps.discovery.outputs.expansion == 'true'
         continue-on-error: true
         run: python scripts/refresh-expansion-listings.py
+      - name: Add new electronics and appliances in Lagos, Johannesburg and London
+        id: products
+        if: steps.discovery.outputs.products == 'true'
+        continue-on-error: true
+        run: python scripts/refresh-category-listings.py --kind product --report output/product-listing-refresh-report.json
+      - name: Add current vacancies with verified recruiter contacts and closing dates
+        id: jobs
+        if: steps.discovery.outputs.jobs == 'true'
+        continue-on-error: true
+        run: python scripts/refresh-category-listings.py --kind job --report output/job-listing-refresh-report.json
       - name: Refresh Guyana property and electronics
         id: guyana
         if: steps.discovery.outputs.guyana == 'true'

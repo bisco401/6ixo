@@ -7,7 +7,7 @@ import os
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
-SOURCES = ("regional", "general", "ghana", "kenya", "china", "expansion", "guyana", "dubai_vehicles", "dubai_marketplace")
+SOURCES = ("regional", "general", "ghana", "kenya", "china", "expansion", "products", "jobs", "guyana", "dubai_vehicles", "dubai_marketplace")
 
 
 def due(state, source, now, force=False):

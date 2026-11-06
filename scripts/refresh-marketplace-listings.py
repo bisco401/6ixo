@@ -43,7 +43,7 @@ K_CATEGORIES = [("cars-trucks", "174", "vehicles", "vehicles"),
                 ("electronics", "15", "electronics", "other")]
 CL_CATEGORIES = [("cta", "vehicles", "vehicles"), ("pta", "vehicles", "auto_parts"),
                  ("rea", "real_estate", "for_sale"), ("apa", "real_estate", "for_rent_long"),
-                 ("ele", "electronics", "other")]
+                 ("ele", "electronics", "other"), ("ppa", "other", "appliances")]
 # Canonical /view/d URLs no longer contain the source area's hostname.
 CL_REGIONS = {
     "newyork": "New York City", "atlanta": "Atlanta / Metro",

@@ -10,7 +10,7 @@ import re
 import threading
 from collections import Counter, defaultdict
 from concurrent.futures import ThreadPoolExecutor, as_completed
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from urllib.parse import parse_qs, urljoin, urlsplit
 
@@ -49,6 +49,20 @@ def entities(value):
         yield value
         if "@graph" in value:
             yield from entities(value["@graph"])
+
+
+def job_expiry(value):
+    """A date-only deadline includes the entire day; malformed dates are unknown."""
+    try:
+        text = str(value or '').strip()
+        parsed = datetime.fromisoformat(text.replace('Z', '+00:00'))
+        if parsed.tzinfo is None:
+            parsed = parsed.replace(tzinfo=timezone.utc)
+        if re.fullmatch(r'\d{4}-\d{2}-\d{2}', text):
+            parsed += timedelta(days=1)
+        return parsed
+    except (ValueError, TypeError):
+        return None
 
 
 def classify(row, status, body, resolved_url=""):
@@ -127,16 +141,25 @@ def classify(row, status, body, resolved_url=""):
         for entity in structured_entities:
             kinds = entity.get("@type", [])
             kinds = kinds if isinstance(kinds, list) else [kinds]
-            if not set(kinds) & {"Product", "Vehicle", "Car", "Apartment", "House", "RealEstateListing"}:
+            if not set(kinds) & {"Product", "ProductGroup", "Vehicle", "Car", "Apartment", "House", "RealEstateListing", "JobPosting"}:
                 continue
-            own_name = str(entity.get("name", "")).lower()
+            own_name = str(entity.get("title") if 'JobPosting' in kinds else entity.get("name", "")).lower()
             own_url = str(entity.get("url") or entity.get("@id") or "").split("#")[0]
             exact = bool(own_url) and source_key(urljoin(original, own_url)) == source_key(original)
             if own_url and not exact:
                 continue
             if not exact and not (matched and own_name and own_name.strip() == title.lower().strip()):
                 continue
+            if 'JobPosting' in kinds:
+                deadline = job_expiry(entity.get('validThrough'))
+                if deadline and deadline <= datetime.now(timezone.utc):
+                    return 'unavailable', 'This exact vacancy has passed its source closing date'
+                # Continue to the visible closed-vacancy checks below.
+                continue
             offers = entity.get("offers", [])
+            if 'ProductGroup' in kinds:
+                offers = [o for variant in entity.get('hasVariant', []) if isinstance(variant, dict)
+                          for o in (variant.get('offers', []) if isinstance(variant.get('offers', []), list) else [variant.get('offers')])]
             offers = offers if isinstance(offers, list) else [offers]
             offers = [referenced.get(o.get("@id"), o) for o in offers if isinstance(o, dict)]
             offers = [o for o in offers if not o.get("url") or source_key(urljoin(original, o["url"])) == source_key(original)]
@@ -152,7 +175,7 @@ def classify(row, status, body, resolved_url=""):
         node.decompose()
     if matched:
         # Explicit badges and alerts; exclude seller descriptions such as "never sold".
-        for node in soup.find_all(string=re.compile(r"sold|out of stock|no longer available|expired|removed", re.I)):
+        for node in soup.find_all(string=re.compile(r"sold|out of stock|no longer available|expired|removed|closed|filled", re.I)):
             text = str(node).strip()
             if len(text) > 140 or (node.parent and node.parent.name in {"option", "label"}):
                 continue
@@ -162,6 +185,12 @@ def classify(row, status, body, resolved_url=""):
                 return "unavailable", f"Matching source listing displays: {text}"
             if re.fullmatch(r"out of stock[.!]?", text, re.I):
                 return "unavailable", "Matching source listing displays: Out of stock"
+            if row.get('app_category') == 'jobs' and re.fullmatch(r"(?:this )?(?:job|role|vacancy|position|applications) (?:has been |is |are |has )?(?:closed|filled|expired|no longer available)[.!]?|applications (?:are )?closed[.!]?", text, re.I):
+                return 'unavailable', f'Matching source vacancy displays: {text}'
+        # WooCommerce stores can expose stock only as a class on the primary product.
+        primary = soup.select_one('[data-elementor-type="product"].type-product, div[id^="product-"].type-product')
+        if primary and 'outofstock' in primary.get('class', []) and primary.select_one('h1.product_title'):
+            return 'unavailable', 'Matching primary product is explicitly out of stock'
     if not matched:
         return "unknown", "Source loaded but the listing identity was not confirmed"
     return "active", "Source title still matches the exact listing"

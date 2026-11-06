@@ -5547,11 +5547,15 @@ class DatingApp {
         if (appCategory === 'clothing') item.fashionCategory = appSubcategory || '';
         if (appCategory === 'jobs') {
             item.jobCategory = appSubcategory || 'other';
-            item.employmentType = String(attributes.employmentType || 'full_time').trim();
-            item.experienceLevel = String(attributes.experienceLevel || 'entry').trim();
+            item.employmentType = String(attributes.employmentType || '').trim();
+            item.experienceLevel = String(attributes.experienceLevel || '').trim();
             item.remote = Boolean(attributes.remote);
             item.payMin = Number.isFinite(Number(attributes.payMin)) ? Number(attributes.payMin) : item.price;
             item.payMax = Number.isFinite(Number(attributes.payMax)) ? Number(attributes.payMax) : null;
+            item.payUnit = String(attributes.payUnit || '').trim();
+            item.jobPayText = String(attributes.jobPayText || '').trim();
+            if (item.jobPayText) item.priceText = item.jobPayText;
+            item.applicationUrl = /^https:\/\//i.test(String(attributes.applicationUrl || '')) ? attributes.applicationUrl : '';
             item.jobStatus = String(attributes.jobStatus || 'Open role').trim();
             item.companyLogo = item.image || '';
         }
@@ -56463,6 +56467,10 @@ class DatingApp {
             this.showNotification('This listing is marked as sold.', { force: true, type: 'warn' });
             return;
         }
+        if (item.category === 'jobs' && /^https:\/\//i.test(String(item.applicationUrl || ''))) {
+            window.open(item.applicationUrl, '_blank', 'noopener,noreferrer');
+            return;
+        }
         this.openMarketplaceChat(item, options);
     }
 
@@ -61895,6 +61903,7 @@ class DatingApp {
             full_time: 'Full-time',
             part_time: 'Part-time',
             contract: 'Contract',
+            temporary: 'Temporary',
             internship: 'Internship'
         };
         return map[type] || 'Role';
@@ -61921,12 +61930,13 @@ class DatingApp {
     }
 
     getJobPayLabel(item) {
+        if (item?.jobPayText) return String(item.jobPayText);
         const min = this.getJobPayMin(item);
         const max = this.getJobPayMax(item);
-        const unit = item?.payUnit === 'year' ? '/yr' : '/hr';
-        if (min && max && min !== max) return `$${min}-${max}${unit}`;
-        if (min) return `$${min}${unit}`;
-        if (typeof item?.price !== 'undefined') return `$${item.price}${unit}`;
+        const unit = ({ year: '/yr', month: '/month', week: '/week', day: '/day', hour: '/hr', hr: '/hr' })[item?.payUnit] || '';
+        const money = (value) => new Intl.NumberFormat('en-US', { style: 'currency', currency: item?.currency || 'USD', maximumFractionDigits: 2 }).format(value);
+        if (min && max && min !== max) return `${money(min)}–${money(max)}${unit}`;
+        if (min) return `${money(min)}${unit}`;
         return 'Pay TBD';
     }
 

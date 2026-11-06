@@ -16,6 +16,19 @@ for (const phone of ['', 'N/A', 'Contact seller', '+187646064XX', '0000000000', 
 for (const phone of ['+86 755 1234 5678','(647) 403-0077','0759710738 0756500101','0595972097/0260180627','0248928734 or 0553346512']) assert.ok(integrity.phone(phone),phone);
 assert.equal(integrity.phone('0759710738 0756500101'),'0759710738 | 0756500101');
 const rental = app.normalizeCsvScrapedListingRow(row).item;
+const job = app.normalizeCsvScrapedListingRow({...row, title:'Science Technician', source_url:'https://recruiter.example/jobs/123', app_category:'jobs', app_subcategory:'education', currency:'GBP', price_value:'95', price_text:'GBP 95–110/day',
+ attributes:JSON.stringify({payMin:95,payMax:110,payUnit:'day',employmentType:'temporary',applicationUrl:'https://recruiter.example/jobs/123'})}).item;
+assert.equal(job.category, 'jobs');
+assert.equal(app.getJobPayLabel(job), '£95.00–£110.00/day');
+assert.equal(job.experienceLevel, '', 'Imported jobs do not invent experience requirements');
+assert.equal(app.getJobTypeLabel(job.employmentType), 'Temporary');
+assert.equal(app.getJobPayLabel({...job,payMin:32000,payMax:32000,payUnit:'year'}), '£32,000.00/yr');
+assert.equal(app.getJobPayLabel({...job,jobPayText:'Pay not specified'}), 'Pay not specified');
+let appliedAt = '';
+context.window.open = (url) => { appliedAt = url; };
+app.marketplaceItems = [job];
+app.handleMarketplaceMessage(job.id);
+assert.equal(appliedAt, 'https://recruiter.example/jobs/123', 'Imported applications open the real recruiter vacancy');
 assert.equal(rental.condition, '', 'Missing source condition remains unspecified');
 const unspecifiedVehicle=app.normalizeCsvScrapedListingRow({...row,source_url:'https://example.com/listing/toyota-sedan',title:'Toyota sedan',app_category:'vehicles',app_subcategory:'vehicles',target_surface:'vehicles'});
 assert.ok(unspecifiedVehicle.isVehicle);

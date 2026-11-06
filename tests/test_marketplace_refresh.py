@@ -116,6 +116,13 @@ class RefreshTest(unittest.TestCase):
         self.assertEqual(row["city"], "Spring")
         self.assertEqual(row["phone"], "+17135551234")
 
+    def test_appliances_are_discovered_and_keep_their_source_category(self):
+        self.assertIn(('ppa', 'other', 'appliances'), module.CL_CATEGORIES)
+        body = '<nav class="breadcrumbs-container"><a href="/search/area/houston?cat=ppa">appliances</a></nav><h1>Whirlpool Washer</h1><section id="postingbody">Call 713-555-1234</section><script type="application/ld+json">{"@type":"Product","name":"Whirlpool Washer","image":["https://images.craigslist.org/washer_600x450.jpg"],"offers":{"price":"250","availableAtOrFrom":{"address":{"addressLocality":"Houston"}}}}</script>'
+        row = module.craigslist_row(body, 'https://www.craigslist.org/view/d/washer/own', 'Houston', 'other', 'appliances', 'today')
+        self.assertEqual((row['app_category'], row['app_subcategory']), ('other', 'appliances'))
+        self.assertEqual(row['price_value'], '250')
+
     def test_craigslist_own_category_outweighs_search_bucket_and_related_links(self):
         body = '<nav class="breadcrumbs-container"><a href="/search/area/houston?cat=ssq">for sale</a><a href="/search/area/houston?cat=ctd">cars+trucks</a></nav><h1>2014 Toyota Corolla</h1><section id="postingbody">Call 713-555-1234</section><aside><a href="/search/area/houston?cat=sss">Related services</a></aside><script type="application/ld+json">{"@type":"Product","name":"2014 Toyota Corolla","image":["https://example.com/car.jpg"],"offers":{"price":"8000","availableAtOrFrom":{"address":{"addressLocality":"Spring"}}}}</script>'
         row = module.craigslist_row(body, 'https://www.craigslist.org/view/d/car/AbC123', 'Houston', 'services', 'other', 'today')

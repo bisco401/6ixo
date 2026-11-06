@@ -11384,6 +11384,15 @@
       "categoryKey": "jobs"
     },
     {
+      "id": "kijiji-1739082855",
+      "slug": "garage-door-hamilton-365-602-8441-1739082855",
+      "url": "https://6ixo.com/listing/garage-door-hamilton-365-602-8441-1739082855/",
+      "images": [
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/e2/e2c8c25d-e5e4-410c-8252-e4ff70bdc783?rule=kijijica-1600-webp"
+      ],
+      "categoryKey": "services"
+    },
+    {
       "id": "apify-b9abbf0c2afa",
       "slug": "toyota-vitz-2010-abbf0c2afa",
       "url": "https://6ixo.com/listing/toyota-vitz-2010-abbf0c2afa/",
@@ -12334,6 +12343,19 @@
       "categoryKey": "community"
     },
     {
+      "id": "kijiji-1743457336",
+      "slug": "same-day-cleaners-cleaning-lady-house-office-cleaners-4372-1743457336",
+      "url": "https://6ixo.com/listing/same-day-cleaners-cleaning-lady-house-office-cleaners-4372-1743457336/",
+      "images": [
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/f9/f995ba38-14c2-4a59-8476-39286ef07fc1?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/d1/d1750a51-2bca-4f41-8da6-0b0a69fb7ec4?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/52/52fa0802-caa5-46eb-aec6-d36f46edae54?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/e3/e379a5eb-691b-4630-b698-eb47ecc9bfdb?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/c4/c4306a90-9407-47c7-89ab-ffc98b9e9e86?rule=kijijica-1600-webp"
+      ],
+      "categoryKey": "services"
+    },
+    {
       "id": "samtronix-gy-15952993419424",
       "slug": "hp-omnibook-3-hz0088dx-snapdragon-x-x1-26-100-14-8gb-ram-2-2993419424",
       "url": "https://6ixo.com/listing/hp-omnibook-3-hz0088dx-snapdragon-x-x1-26-100-14-8gb-ram-2-2993419424/",
@@ -12361,6 +12383,20 @@
         "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/83/83813424-f1e3-48db-b651-15bef3346271?rule=kijijica-1600-webp"
       ],
       "categoryKey": "jobs"
+    },
+    {
+      "id": "kijiji-1744896436",
+      "slug": "2027-jc-trailers-60ton-4-axle-float-1744896436",
+      "url": "https://6ixo.com/listing/2027-jc-trailers-60ton-4-axle-float-1744896436/",
+      "images": [
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/1c/1c2d91e7-69cb-41de-a0ce-1b78d14ccc1e?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/82/82926792-d31c-47b5-9424-d92372f17510?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/fb/fb623112-83bb-465c-bfff-702668e1c278?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/ea/ea5a95a7-d5e3-4aa4-8ea1-76b7fe04e900?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/98/982ec93f-9504-4f43-a469-04fd797c8747?rule=kijijica-1600-webp",
+        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/9f/9ff65ce8-4310-44ed-94f7-87bae8fc2137?rule=kijijica-1600-webp"
+      ],
+      "categoryKey": "buy-and-sell"
     },
     {
       "id": "apify-515f6f097422",
@@ -34929,19 +34965,6 @@
       "categoryKey": "services"
     },
     {
-      "id": "kijiji-1743457336",
-      "slug": "same-day-cleaners-cleaning-lady-house-office-cleaners-4372-1743457336",
-      "url": "https://6ixo.com/listing/same-day-cleaners-cleaning-lady-house-office-cleaners-4372-1743457336/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/f9/f995ba38-14c2-4a59-8476-39286ef07fc1?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/d1/d1750a51-2bca-4f41-8da6-0b0a69fb7ec4?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/52/52fa0802-caa5-46eb-aec6-d36f46edae54?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/e3/e379a5eb-691b-4630-b698-eb47ecc9bfdb?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/c4/c4306a90-9407-47c7-89ab-ffc98b9e9e86?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "services"
-    },
-    {
       "id": "kijiji-1741078365",
       "slug": "2023-bmw-x3-xdrive30i-x-drive-alloys-sunroof-1741078365",
       "url": "https://6ixo.com/listing/2023-bmw-x3-xdrive30i-x-drive-alloys-sunroof-1741078365/",
@@ -40350,20 +40373,6 @@
         "https://media.kijiji.ca/api/v1/ca-prod-dealer-ads/images/3b/3b8456ea-aa83-4239-92ab-62e9cd93fde8?rule=kijijica-1600-webp"
       ],
       "categoryKey": "services"
-    },
-    {
-      "id": "kijiji-1744896436",
-      "slug": "2027-jc-trailers-60ton-4-axle-float-1744896436",
-      "url": "https://6ixo.com/listing/2027-jc-trailers-60ton-4-axle-float-1744896436/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/1c/1c2d91e7-69cb-41de-a0ce-1b78d14ccc1e?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/82/82926792-d31c-47b5-9424-d92372f17510?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/fb/fb623112-83bb-465c-bfff-702668e1c278?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/ea/ea5a95a7-d5e3-4aa4-8ea1-76b7fe04e900?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/98/982ec93f-9504-4f43-a469-04fd797c8747?rule=kijijica-1600-webp",
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/9f/9ff65ce8-4310-44ed-94f7-87bae8fc2137?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "buy-and-sell"
     },
     {
       "id": "kijiji-1744896007",
@@ -49534,15 +49543,6 @@
         "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/e7/e74a436c-27c4-4418-90f0-6a7a82b2d0e3?rule=kijijica-1600-webp"
       ],
       "categoryKey": "jobs"
-    },
-    {
-      "id": "kijiji-1739082855",
-      "slug": "garage-door-hamilton-365-602-8441-1739082855",
-      "url": "https://6ixo.com/listing/garage-door-hamilton-365-602-8441-1739082855/",
-      "images": [
-        "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/e2/e2c8c25d-e5e4-410c-8252-e4ff70bdc783?rule=kijijica-1600-webp"
-      ],
-      "categoryKey": "services"
     },
     {
       "id": "kijiji-1744497643",

@@ -401,14 +401,25 @@ def main() -> int:
     parser.add_argument("--refresh-existing", action="store_true")
     parser.add_argument("--prune-missing", action="store_true")
     parser.add_argument("--dry-run", action="store_true")
+    parser.add_argument("--report", type=Path, default=Path("output/guyana-marketplace-refresh-report.json"))
     args = parser.parse_args()
 
-    electronics = scrape_samtronix(limit=max(0, args.max_electronics), status=args.status)
-    properties = scrape_home_hub(limit=max(0, args.max_properties), status=args.status, delay=max(0, args.delay))
+    failures = []
+    batches = {}
+    for source, scrape in [
+        ("Samtronix Guyana", lambda: scrape_samtronix(limit=max(0, args.max_electronics), status=args.status)),
+        ("Guyana Home Hub", lambda: scrape_home_hub(limit=max(0, args.max_properties), status=args.status, delay=max(0, args.delay))),
+    ]:
+        try:
+            batches[source] = scrape()
+        except (OSError, ValueError, RuntimeError, KeyError, TypeError) as error:
+            failures.append({"source": source, "reason": str(error)[:240]})
+            batches[source] = []
+    electronics, properties = batches["Samtronix Guyana"], batches["Guyana Home Hub"]
     normalized = electronics + properties
     by_url = {row["source_url"]: row for row in normalized}
     normalized = sorted(by_url.values(), key=lambda row: row["scraped_at"], reverse=True)
-    removed = prune_missing_managed_rows(args.csv, normalized, dry_run=args.dry_run) if args.prune_missing else 0
+    removed = prune_missing_managed_rows(args.csv, normalized, dry_run=args.dry_run) if args.prune_missing and not failures else 0
     normalized = align_rows_to_csv(args.csv, normalized)
     inserted, updated = merge_csv(
         args.csv,
@@ -416,24 +427,16 @@ def main() -> int:
         dry_run=args.dry_run,
         refresh_existing=args.refresh_existing,
     )
-    print(
-        json.dumps(
-            {
-                "sources": {
-                    "Samtronix Guyana": len(electronics),
-                    "Guyana Home Hub": len(properties),
-                },
-                "eligible_public_listings": len(normalized),
-                "inserted": inserted,
-                "updated": updated,
-                "removed": removed,
-                "status": args.status,
-                "dry_run": args.dry_run,
-            },
-            indent=2,
-        )
-    )
-    return 0 if normalized else 2
+    report = {
+        "sources": {name: len(rows) for name, rows in batches.items()},
+        "eligible_public_listings": len(normalized), "inserted": inserted,
+        "updated": updated, "removed": removed, "status": args.status,
+        "dry_run": args.dry_run, "failures": failures,
+    }
+    args.report.parent.mkdir(parents=True, exist_ok=True)
+    args.report.write_text(json.dumps(report, indent=2) + "\n")
+    print(json.dumps(report, indent=2))
+    return 1 if failures else (0 if normalized else 2)
 
 
 if __name__ == "__main__":

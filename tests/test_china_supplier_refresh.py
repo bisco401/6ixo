@@ -22,6 +22,14 @@ class ChinaSupplierTests(unittest.TestCase):
             '<a href="tel:+8675728827856">Call our office</a>' if contact else '') + (
             '<script type="application/ld+json">'+json.dumps(entity)+'</script><div class="related"><img src="https://supplier.example/foreign.jpg"></div>')
 
+    def test_discovery_excludes_articles_before_limiting_new_products(self):
+        host = 'www.sinovcleglobal.com'
+        paths = ['/product/verified-vehicle']
+        self.assertTrue(module.product_url('https://' + host + '/product/new-vehicle', host, paths))
+        self.assertFalse(module.product_url('https://' + host + '/press-release/our-new-car-factory-news', host, paths))
+        self.assertFalse(module.product_url('https://' + host + '/official-partner-brands-trusted-car-export-partnerships', host, paths))
+        self.assertTrue(module.product_url('https://www.oneday-global.com/new-magnetic-power-bank.html', 'www.oneday-global.com', ['/existing-power-bank.html']))
+
     def test_exact_product_contact_gallery_and_quote_are_verified(self):
         row = module.parse_product(self.page(), self.url, self.base, '2026-11-06T06:00:00Z')
         self.assertEqual(row['country'], 'China')

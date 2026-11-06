@@ -44,6 +44,7 @@ jobs:
           python -m unittest discover -s tests -p test_china_supplier_refresh.py
           python -m unittest discover -s tests -p test_preserve_existing_listings.py
           python -m unittest discover -s tests -p test_expansion_refresh.py
+          python -m unittest discover -s tests -p test_guyana_marketplace_refresh.py
           python -m unittest discover -s tests -p test_ghana_marketplace_sync.py
           node --test tests/ghana_source_verification.test.cjs
           node scripts/regional-listing-location.test.cjs

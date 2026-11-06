@@ -143,6 +143,14 @@ def parse_product(body, url, base, checked, contact_body=''):
                 source_miss_count='0', source_miss_recorded_at='', source_unavailable_reason='', attributes=json.dumps(attrs, ensure_ascii=False))
 
 
+def product_url(url, host, known_paths):
+    path = urlsplit(url).path
+    explicit = bool(re.search(r'/(?:product|products|wdk-listing)/[^/]+/?$', path))
+    root_template = bool(known_paths) and all(p.strip('/').count('/') == 0 for p in known_paths)
+    root_item = root_template and path.strip('/').count('/') == 0 and path.count('-') >= 3 and not re.search(r'contact|about|privacy|blog|category', path)
+    return urlsplit(url).netloc == host and (explicit or root_item)
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--new-per-supplier', type=int, default=12)
@@ -189,9 +197,7 @@ def main():
                 failures.append({'url': url, 'reason': str(error)[:180]})
         paths = [urlsplit(r['source_url']).path for r in records] or [urlsplit(base['source_url']).path]
         def is_product(url):
-            path = urlsplit(url).path
-            return urlsplit(url).netloc == host and (bool(re.search(r'/(?:product|products|wdk-listing)/[^/]+/?$', path))
-                    or (all(p.count('/') <= 2 for p in paths) and path.count('/') <= 2 and path.count('-') >= 3 and not re.search(r'contact|about|privacy|blog|category', path)))
+            return product_url(url, host, paths)
         catalogs = sorted(u for u in links if urlsplit(u).netloc == host and not is_product(u)
                           and re.search(r'/(?:shop|products?|collections|all-products)(?:/|$)', urlsplit(u).path))[:3]
         for url in catalogs:

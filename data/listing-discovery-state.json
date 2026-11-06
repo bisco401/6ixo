@@ -1,0 +1,46 @@
+{
+  "intervalHours": 48,
+  "sources": {
+    "regional": {
+      "lastAttemptAt": "2026-11-06T06:23:09.541022+00:00",
+      "outcome": "failure"
+    },
+    "general": {
+      "lastAttemptAt": "2026-11-06T06:23:09.541022+00:00",
+      "outcome": "success",
+      "lastSuccessfulSlot": "2026-11-06T00:00:00+00:00"
+    },
+    "ghana": {
+      "lastAttemptAt": "2026-11-06T06:23:09.541022+00:00",
+      "outcome": "success",
+      "lastSuccessfulSlot": "2026-11-06T00:00:00+00:00"
+    },
+    "kenya": {
+      "lastAttemptAt": "2026-11-06T06:23:09.541022+00:00",
+      "outcome": "failure"
+    },
+    "china": {
+      "lastAttemptAt": "2026-11-06T06:23:09.541022+00:00",
+      "outcome": "failure"
+    },
+    "expansion": {
+      "lastAttemptAt": "2026-11-06T06:23:09.541022+00:00",
+      "outcome": "success",
+      "lastSuccessfulSlot": "2026-11-06T00:00:00+00:00"
+    },
+    "guyana": {
+      "lastAttemptAt": "2026-11-06T06:23:09.541022+00:00",
+      "outcome": "failure"
+    },
+    "dubai_vehicles": {
+      "lastAttemptAt": "2026-11-06T06:23:09.541022+00:00",
+      "outcome": "success",
+      "lastSuccessfulSlot": "2026-11-06T00:00:00+00:00"
+    },
+    "dubai_marketplace": {
+      "lastAttemptAt": "2026-11-06T06:23:09.541022+00:00",
+      "outcome": "success",
+      "lastSuccessfulSlot": "2026-11-06T00:00:00+00:00"
+    }
+  }
+}

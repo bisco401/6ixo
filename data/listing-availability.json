@@ -1,5 +1,5 @@
 {
-  "checkedAt": "2026-11-06T06:06:47Z",
+  "checkedAt": "2026-11-06T06:19:00Z",
   "listings": {
     "craigslist.org/view/d/bastrop-used-2025-cadillac-xt4-fwd-4d/fuqr_3uo8rgowpq1ctwx-a": {
       "availability": "sold",
@@ -17608,6 +17608,11 @@
     "kijiji.ca/v-cars-trucks/hamilton/2009-jeep-grand-cherokee-larado/1744826485": {
       "availability": "unavailable",
       "checkedAt": "2026-11-06T06:06:47Z",
+      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+    },
+    "kijiji.ca/v-room-rental-roommate/edmonton/quiet-large-room-for-rent-113-ave-96st-available-asap/1745786505": {
+      "availability": "unavailable",
+      "checkedAt": "2026-11-06T06:19:00Z",
       "reason": "Kijiji redirected the exact ad to a confirmed removal"
     }
   }

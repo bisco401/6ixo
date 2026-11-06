@@ -14,6 +14,34 @@ spec.loader.exec_module(module)
 
 
 class AvailabilityTest(unittest.TestCase):
+    def test_pruning_removes_confirmed_deletions_from_all_feeds_and_keeps_unknowns(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root = pathlib.Path(folder)
+            gone = dict(self.row, country='Ghana')
+            unknown = dict(self.row, country='Kenya', source_url='https://example.com/car/blocked')
+            active = dict(self.row, country='China', source_url='https://example.com/car/active')
+            prior = dict(self.row, country='Jamaica', source_url='https://example.com/car/prior', source_availability='gone', source_unavailable_reason='Exact source URL returned HTTP 404')
+            fields = list(dict.fromkeys(k for r in [gone, unknown, active, prior] for k in r))
+            feeds = [root/'main.csv', root/'backup.csv']
+            for feed in feeds:
+                with feed.open('w') as handle:
+                    writer = csv.DictWriter(handle, fieldnames=fields); writer.writeheader(); writer.writerows([gone, unknown, active, prior])
+            def response(url, **kwargs):
+                status = 404 if url == gone['source_url'] else 200 if url == active['source_url'] else 403
+                return SimpleNamespace(status_code=status, text='<h1>Toyota Corolla 2022</h1>', url=url)
+            args = ['check', '--files', *map(str, feeds), '--prune-confirmed', '--ledger', str(root/'ledger.json'), '--report', str(root/'report.json')]
+            with patch('sys.argv', args), patch.object(module.requests.Session, 'get', side_effect=response):
+                module.main()
+            for feed in feeds:
+                with feed.open() as handle:
+                    rows = list(csv.DictReader(handle))
+                self.assertEqual({r['country'] for r in rows}, {'Kenya', 'China'})
+            ledger = json.loads((root/'ledger.json').read_text())['listings']
+            self.assertEqual(ledger['example.com/car/1']['availability'], 'gone')
+            self.assertEqual(ledger['example.com/car/prior']['availability'], 'gone')
+            self.assertNotIn('example.com/car/blocked', ledger)
+            self.assertEqual(set(json.loads((root/'report.json').read_text())['removedRowsByFeed'].values()), {2})
+
     def test_country_check_removes_duplicates_and_preserves_other_countries(self):
         with tempfile.TemporaryDirectory() as folder:
             root = pathlib.Path(folder)
@@ -24,7 +52,7 @@ class AvailabilityTest(unittest.TestCase):
                     writer = csv.DictWriter(handle, fieldnames=list(rows[0])); writer.writeheader(); writer.writerows(rows)
             args = ['check', '--files', *map(str, feeds), '--countries', 'Kenya', '--ledger', str(root/'ledger.json'), '--report', str(root/'report.json')]
             response = SimpleNamespace(status_code=404, text='<title>Page Not Found</title>', url=self.row['source_url'])
-            with patch('sys.argv', args), patch.object(module.requests, 'get', return_value=response) as fetch:
+            with patch('sys.argv', args), patch.object(module.requests.Session, 'get', return_value=response) as fetch:
                 module.main()
             self.assertEqual(fetch.call_count, 1)
             for feed in feeds:
@@ -47,11 +75,11 @@ class AvailabilityTest(unittest.TestCase):
                 writer.writeheader(); writer.writerow(self.row)
             body = '<title>Toyota Corolla 2022</title><h1>Toyota Corolla 2022</h1>\n<p>Source specifications</p>'
             args = ["check", "--files", str(feed), "--cache-dir", str(root / "cache"), "--report", str(root / "report.json"), "--dry-run"]
-            with patch("sys.argv", args), patch.object(module.requests, "get", return_value=SimpleNamespace(status_code=200, text=body, url=self.row["source_url"])):
+            with patch("sys.argv", args), patch.object(module.requests.Session, "get", return_value=SimpleNamespace(status_code=200, text=body, url=self.row["source_url"])):
                 module.main()
             cached = root / "cache" / (hashlib.sha256(self.row["source_url"].encode()).hexdigest() + ".html")
             self.assertEqual(cached.read_text(), body)
-            with patch("sys.argv", args), patch.object(module.requests, "get", side_effect=AssertionError("Cached status must not refetch")):
+            with patch("sys.argv", args), patch.object(module.requests.Session, "get", side_effect=AssertionError("Cached status must not refetch")):
                 module.main()
             self.assertEqual(cached.read_text(), body)
 

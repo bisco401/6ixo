@@ -7,7 +7,7 @@ import os
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
-SOURCES = ("regional", "general", "ghana", "kenya", "guyana", "dubai_vehicles", "dubai_marketplace")
+SOURCES = ("regional", "general", "ghana", "kenya", "china", "expansion", "guyana", "dubai_vehicles", "dubai_marketplace")
 
 
 def due(state, source, now, force=False):
@@ -41,9 +41,9 @@ def main():
     state = json.loads(args.state.read_text()) if args.state.exists() else {"intervalHours": 48, "sources": {}}
     now = datetime.now(timezone.utc)
     if args.action == "plan":
-        # Anchor to the six-hour scheduler slot so a few seconds of Actions
-        # queue jitter cannot postpone a 48-hour search for another six hours.
-        slot = now.replace(hour=now.hour // 6 * 6, minute=0, second=0, microsecond=0)
+        # Daily UTC slots preserve a two-day cadence across month boundaries
+        # without adding another day when the runner starts a little late.
+        slot = now.replace(hour=0, minute=0, second=0, microsecond=0)
         lines = [f"started_at={slot.isoformat()}"] + [f"{source}={str(due(state, source, now, os.environ.get('GITHUB_EVENT_NAME') == 'workflow_dispatch')).lower()}" for source in SOURCES]
         if os.environ.get("GITHUB_OUTPUT"):
             with open(os.environ["GITHUB_OUTPUT"], "a") as handle:

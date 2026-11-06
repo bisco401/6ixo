@@ -1,8 +1,7 @@
 name: Sync Guyana marketplace listings
 
 on:
-  schedule:
-    - cron: "17 10 * * *"
+  # Automatic discovery is owned by refresh-marketplace-listings.yml every 48h.
   workflow_dispatch:
 
 permissions:
@@ -31,7 +30,6 @@ jobs:
           --max-electronics 12
           --max-properties 20
           --refresh-existing
-          --prune-missing
       - name: Commit listing updates
         shell: bash
         run: |

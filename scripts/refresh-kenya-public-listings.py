@@ -158,6 +158,7 @@ def main():
     parser.add_argument("--workers", type=int, default=4)
     parser.add_argument("--report", type=Path, default=Path("output/kenya-public-refresh-report.json"))
     parser.add_argument("--cache-dir", type=Path)
+    parser.add_argument("--new-only", action="store_true")
     parser.add_argument("--dry-run", action="store_true")
     args = parser.parse_args()
     checked = datetime.now(timezone.utc).isoformat(timespec="seconds").replace("+00:00", "Z")
@@ -222,17 +223,19 @@ def main():
         links = list(dict.fromkeys(links))
         links.sort(key=lambda u: key(u) in known)  # New inventory before routine checks.
         candidates = list(dict.fromkeys(links[:args.candidate_limit] + [r["source_url"] for r in known.values() if r.get("source_site") == name]))
+        if args.new_only:
+            candidates = [u for u in candidates if key(u) not in known]
         with ThreadPoolExecutor(max_workers=args.workers) as pool:
             found = [r for r in pool.map(load, [(source, u) for u in candidates]) if r]
         incoming.extend(found)
         reports[source] = {"catalogsFetched": fetched, "discovered": len(links), "checked": len(candidates), "verified": len(found)}
         print(f"{name}: {len(links)} discovered, {len(found)} verified", flush=True)
-    merged = {str(f.relative_to(ROOT)): refresh.merge(f, incoming) for f in feeds} if incoming and not args.dry_run else {}
+    merged = {str(f.relative_to(ROOT)): refresh.merge(f, incoming, new_only=args.new_only) for f in feeds} if incoming and not args.dry_run else {}
     report = {"checkedAt": checked, "sources": reports, "eligible": len(incoming), "merged": merged, "failures": failures}
     args.report.parent.mkdir(parents=True, exist_ok=True)
     args.report.write_text(json.dumps(report, indent=2) + "\n")
     print(json.dumps({k: v for k, v in report.items() if k != "failures"}, indent=2))
-    if not incoming or any(not r["discovered"] or not r["verified"] for r in reports.values()):
+    if any(not r["discovered"] or (not r["verified"] and (r["checked"] or not args.new_only)) for r in reports.values()):
         raise SystemExit("Incomplete source coverage; existing inventory retained and failed sources require retry")
 
 

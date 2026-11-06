@@ -416,6 +416,7 @@ def main():
     parser.add_argument("--workers", type=int, default=3)
     parser.add_argument("--cache-dir", type=Path)
     parser.add_argument("--report", type=Path, default=Path("output/regional-listing-refresh-report.json"))
+    parser.add_argument("--new-only", action="store_true")
     parser.add_argument("--dry-run", action="store_true")
     args = parser.parse_args()
     checked = datetime.now(timezone.utc).isoformat(timespec="seconds").replace("+00:00", "Z")
@@ -468,11 +469,14 @@ def main():
             links = list(dict.fromkeys(links))
             if not links:
                 raise ValueError("No listing links in public catalogue")
+            discovered = len(links)
             # New URLs first; revisit existing inventory for changed prices/details.
             links.sort(key=lambda u: (availability.source_key(u) in existing_by_url,
                                       existing_by_url.get(availability.source_key(u), {}).get("scraped_at", "")))
             known = [r["source_url"] for r in sorted(existing, key=lambda r: r.get("scraped_at", "")) if r.get("source_site") == name]
             links = list(dict.fromkeys(links[:args.candidate_limit] + known))[:max(args.candidate_limit, 120)]
+            if args.new_only:
+                links = [u for u in links if availability.source_key(u) not in existing_by_url]
             found = []
             with ThreadPoolExecutor(max_workers=args.workers) as pool:
                 for row, error in pool.map(load, [(source, u) for u in links]):
@@ -481,19 +485,19 @@ def main():
                     elif availability.source_key(row["source_url"]) in existing_by_url or len([r for r in found if availability.source_key(r["source_url"]) not in existing_by_url]) < args.limit_per_source:
                         found.append(row)
             incoming.extend(found)
-            source_reports[source] = {"name": name, "candidates": len(links), "verified": len(found)}
+            source_reports[source] = {"name": name, "discovered": discovered, "candidates": len(links), "verified": len(found)}
         except (requests.RequestException, ValueError) as error:
             failures.append({"source": source, "url": catalogue, "reason": str(error)[:240]})
-            source_reports[source] = {"name": name, "candidates": 0, "verified": 0}
+            source_reports[source] = {"name": name, "discovered": 0, "candidates": 0, "verified": 0}
         print(f"{name}: {source_reports[source]['verified']} verified", flush=True)
-    merged = refresh.merge(ROOT / "data/scraped-listings.csv", incoming) if incoming and not args.dry_run else {}
+    merged = refresh.merge(ROOT / "data/scraped-listings.csv", incoming, new_only=args.new_only) if incoming and not args.dry_run else {}
     report = {"checkedAt": checked, "sources": source_reports, "eligible": len(incoming), "merged": merged,
               "countries": dict(Counter(r["country"] for r in incoming)), "failures": failures,
               "ids": [r["id"] for r in incoming], "urls": [r["source_url"] for r in incoming]}
     args.report.parent.mkdir(parents=True, exist_ok=True)
     args.report.write_text(json.dumps(report, indent=2, ensure_ascii=False))
     print(json.dumps({k: v for k, v in report.items() if k not in {"ids", "urls", "failures"}}, indent=2))
-    if not incoming:
+    if any(not r["discovered"] or (r["candidates"] and not r["verified"]) for r in source_reports.values()) or (not incoming and not args.new_only):
         raise SystemExit("No verified records; saved listings retained")
 
 

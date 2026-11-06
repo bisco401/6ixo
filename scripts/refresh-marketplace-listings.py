@@ -407,7 +407,7 @@ def kenya_retail_row(body, url, checked):
     return row
 
 
-def merge(path, incoming):
+def merge(path, incoming, new_only=False):
     with path.open(newline="", encoding="utf-8-sig") as handle:
         reader = csv.DictReader(handle)
         headers, existing = list(reader.fieldnames or []), list(reader)
@@ -417,6 +417,8 @@ def merge(path, incoming):
     for row in incoming:
         old = by_url.get(row["source_url"].rstrip("/"))
         if old:
+            if new_only:
+                continue
             # Source refresh never clears an explicit image-review hold.
             if old.get("sync_visibility") in {"reviewed_image_mismatch", "foreign_gallery"}:
                 continue
@@ -504,7 +506,7 @@ def main():
                 stem.with_suffix(".json").write_text(json.dumps({"url": url, "status": int(item["status_code"]), "resolvedUrl": item.get("redirected_url") or url}))
         return result
     incoming = []
-    if "canada" in sources and "Canada" in countries:
+    if "canada" in sources:
         tasks = [(city, slug, loc, cat) for city, slug, loc in CANADA for cat in K_CATEGORIES if not category_filter or cat[2] in category_filter]
         def load_canada(task):
             city, slug, loc, (cat_slug, cat_id, category, subcategory) = task
@@ -513,6 +515,8 @@ def main():
             try:
                 state = kijiji.extract_state(fetch(url))
                 items = [item for item in state.values() if isinstance(item, dict) and item.get("title") and item.get("imageUrls") and item.get("url")]
+                if not items:
+                    raise ValueError("No recognizable inventory in the source catalogue")
                 items = [item for item in items if eligible_url(item.get("url", ""))]
                 items.sort(key=lambda item: str(item.get("activationDate") or ""), reverse=True)
                 for item in items[:args.candidate_limit]:
@@ -545,7 +549,7 @@ def main():
             return found
         with ThreadPoolExecutor(max_workers=args.workers) as pool:
             incoming.extend(row for group in pool.map(load_canada, tasks) for row in group)
-    if "craigslist" in sources and "United States" in countries:
+    if "craigslist" in sources:
         regions = {}
         for row in rows:
             host = urlsplit(row.get("source_url") or "").netloc
@@ -576,7 +580,7 @@ def main():
             return found
         with ThreadPoolExecutor(max_workers=args.workers) as pool:
             incoming.extend(row for group in pool.map(load_cl, tasks) for row in group)
-    if "jamaica" in sources and "Jamaica" in countries:
+    if "jamaica" in sources:
         tasks = [("https://www.jacars.net/" + path, category, subcategory) for path, category, subcategory in JA_CATEGORIES if not category_filter or category in category_filter]
         pages = crawl([url for url, _, _ in tasks]) if args.crawl4ai_url else {}
         for url, category, subcategory in tasks:
@@ -597,11 +601,11 @@ def main():
                 print(f"Jamaica {category}/{subcategory}: {len(found)}", flush=True)
             except (requests.RequestException, ValueError) as error:
                 failures.append({"url": url, "reason": type(error).__name__})
-    if "kenya" in sources and "Kenya" in countries and (not category_filter or "electronics" in category_filter):
+    if "kenya" in sources and (not category_filter or "electronics" in category_filter):
         home = "https://laptopsinkenya.com/"
         try:
             soup = BeautifulSoup(fetch(home), "html.parser")
-            links = list(dict.fromkeys(a["href"] for a in soup.select('a[href]') if a["href"].startswith(home + "product/")))[:args.candidate_limit]
+            links = list(dict.fromkeys(a["href"] for a in soup.select('a[href]') if a["href"].startswith(home + "product/") and eligible_url(a["href"])))[:args.candidate_limit]
             def load_kenya(link):
                 try:
                     row = kenya_retail_row(fetch(link), link, checked)
@@ -627,7 +631,7 @@ def main():
     ke = [row for row in incoming if row["country"] == "Kenya"]
     if ke:
         destinations[ROOT / "data/kenya-listings.csv"] = ke
-    merged = {str(path.relative_to(ROOT)): merge(path, batch) for path, batch in destinations.items()}
+    merged = {str(path.relative_to(ROOT)): merge(path, batch, new_only=args.new_only) for path, batch in destinations.items()}
     report = {"checkedAt": checked, "eligible": len(incoming), "countries": dict(Counter(r["country"] for r in incoming)),
               "categories": dict(Counter(r["app_category"] + "/" + r["app_subcategory"] for r in incoming)),
               "cities": dict(Counter(r["city"] + ", " + r["country"] for r in incoming)), "merged": merged,
@@ -635,7 +639,7 @@ def main():
     args.report.parent.mkdir(parents=True, exist_ok=True)
     args.report.write_text(json.dumps(report, indent=2))
     print(json.dumps({k: v for k, v in report.items() if k not in {"ids", "cities", "failures"}}, indent=2))
-    if not incoming:
+    if not incoming and (failures or not args.new_only):
         raise SystemExit("No qualifying new records; existing records preserved")
 
 

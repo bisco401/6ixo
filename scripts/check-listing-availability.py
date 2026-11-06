@@ -53,7 +53,7 @@ def entities(value):
 
 def classify(row, status, body, resolved_url=""):
     soup = BeautifulSoup(body or "", "html.parser")
-    for node in soup.select('[class*="related"], [class*="recommend"], [class*="similar"], [class*="up-sells"], [class*="cross-sells"], [id*="related"]'):
+    for node in soup.select('[class*="related"], [class*="recommend"], [class*="similar"], [class*="up-sells"], [class*="cross-sells"], [id*="related"], .featured-vehicles'):
         node.decompose()
     heading = " ".join(h.get_text(" ", strip=True) for h in soup.select("h1"))
     page_title = soup.title.get_text(" ", strip=True) if soup.title else ""
@@ -122,7 +122,9 @@ def classify(row, status, body, resolved_url=""):
             structured = json.loads(script.string or script.get_text(), strict=False)
         except (ValueError, TypeError):
             continue
-        for entity in entities(structured):
+        structured_entities = list(entities(structured))
+        referenced = {e["@id"]: e for e in structured_entities if e.get("@id")}
+        for entity in structured_entities:
             kinds = entity.get("@type", [])
             kinds = kinds if isinstance(kinds, list) else [kinds]
             if not set(kinds) & {"Product", "Vehicle", "Car", "Apartment", "House", "RealEstateListing"}:
@@ -136,7 +138,9 @@ def classify(row, status, body, resolved_url=""):
                 continue
             offers = entity.get("offers", [])
             offers = offers if isinstance(offers, list) else [offers]
-            stock = [str(o.get("availability", "")).rsplit("/", 1)[-1] for o in offers if isinstance(o, dict)]
+            offers = [referenced.get(o.get("@id"), o) for o in offers if isinstance(o, dict)]
+            offers = [o for o in offers if not o.get("url") or source_key(urljoin(original, o["url"])) == source_key(original)]
+            stock = [str(o.get("availability", "")).rsplit("/", 1)[-1] for o in offers]
             if any(s in {"InStock", "LimitedAvailability", "PreOrder", "BackOrder"} for s in stock):
                 return "active", "Matching listing has an available source offer"
             if stock and all(s in {"SoldOut", "OutOfStock", "Discontinued"} for s in stock):
@@ -144,7 +148,7 @@ def classify(row, status, body, resolved_url=""):
     for node in soup.select("script,style,nav,footer,header,template"):
         node.decompose()
     # Never scan recommendations for availability text belonging to another ad.
-    for node in soup.select('[class*="related"], [class*="recommend"], [class*="similar"], [id*="related"]'):
+    for node in soup.select('[class*="related"], [class*="recommend"], [class*="similar"], [id*="related"], .featured-vehicles'):
         node.decompose()
     if matched:
         # Explicit badges and alerts; exclude seller descriptions such as "never sold".
@@ -195,6 +199,7 @@ def main():
     parser.add_argument("--report", type=Path, default=Path("output/listing-availability-report.json"))
     parser.add_argument("--ledger", type=Path, default=Path("data/listing-availability.json"))
     parser.add_argument("--dry-run", action="store_true")
+    parser.add_argument("--prune-confirmed", action="store_true", help="Remove confirmed unavailable records from feeds, retaining source tombstones")
     args = parser.parse_args()
     checked_at = datetime.now(timezone.utc).isoformat(timespec="seconds").replace("+00:00", "Z")
     feeds, by_url = {}, defaultdict(list)
@@ -219,14 +224,24 @@ def main():
         urls = urls[:args.max_urls]
     if args.cache_dir:
         args.cache_dir.mkdir(parents=True, exist_ok=True)
-    limits = defaultdict(lambda: threading.Semaphore(3))
+    # Reuse connections and interleave hosts so one slow source cannot occupy
+    # every worker while other countries wait. Limit each source to six requests.
+    host_queues = defaultdict(list)
+    for url in urls:
+        host_queues[urlsplit(url).netloc].append(url)
+    from itertools import zip_longest
+    urls = [url for batch in zip_longest(*host_queues.values()) for url in batch if url]
+    limits = defaultdict(lambda: threading.Semaphore(6))
+    clients = threading.local()
     def load(url):
         cache = args.cache_dir / (hashlib.sha256(url.encode()).hexdigest() + ".json") if args.cache_dir else None
         if cache and cache.exists():
             return json.loads(cache.read_text())
         with limits[urlsplit(url).netloc]:
             try:
-                response = requests.get(url, headers={"User-Agent": USER_AGENT}, timeout=22)
+                if not hasattr(clients, "session"):
+                    clients.session = requests.Session()
+                response = clients.session.get(url, headers={"User-Agent": USER_AGENT}, timeout=22)
                 status, body, resolved = response.status_code, response.text, response.url
                 if cache:
                     cache.with_suffix(".html").write_text(body)
@@ -269,6 +284,23 @@ def main():
     for result in results:
         for row in by_url[result["url"]]:
             apply_result(row, result, checked_at)
+    removed_rows, pruned_confirmations = {}, {}
+    checked_keys = {source_key(r["url"]) for r in results}
+    for path, (headers, rows) in list(feeds.items()):
+        removed = [r for r in rows if args.prune_confirmed and source_key(source_url(r)) in checked_keys
+                   and r.get("source_availability") in UNAVAILABLE]
+        removed_rows[str(path)] = len(removed)
+        for row in removed:
+            pruned_confirmations[source_key(source_url(row))] = {
+                "availability": row["source_availability"],
+                "checkedAt": row.get("source_availability_checked_at") or checked_at,
+                "reason": row.get("source_unavailable_reason") or "Previously confirmed unavailable source",
+            }
+        if removed:
+            # The availability ledger prevents other feed copies or stale imports
+            # from bringing a confirmed removal back onto the public site.
+            removed_ids = {id(r) for r in removed}
+            feeds[path] = (headers, [r for r in rows if id(r) not in removed_ids])
     if not args.dry_run:
         for path, (headers, rows) in feeds.items():
             headers = list(dict.fromkeys(headers + FIELDS))
@@ -279,6 +311,8 @@ def main():
                 writer.writerows(rows)
             temporary.replace(path)
         ledger = json.loads(args.ledger.read_text()).get("listings", {}) if args.ledger.exists() else {}
+        for key, confirmation in pruned_confirmations.items():
+            ledger.setdefault(key, confirmation)
         for result in results:
             key = source_key(result["url"])
             if result["availability"] == "active":
@@ -288,6 +322,7 @@ def main():
         args.ledger.parent.mkdir(parents=True, exist_ok=True)
         args.ledger.write_text(json.dumps({"checkedAt": checked_at, "listings": ledger}, indent=2) + "\n")
     report = {"checkedAt": checked_at, "checkedUrls": len(results), "counts": dict(Counter(r["availability"] for r in results)),
+              "removedRowsByFeed": removed_rows,
               "byDomain": {h: dict(Counter(r["availability"] for r in results if urlsplit(r["url"]).netloc == h)) for h in sorted({urlsplit(r["url"]).netloc for r in results})},
               "results": results}
     args.report.parent.mkdir(parents=True, exist_ok=True)

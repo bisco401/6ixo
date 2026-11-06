@@ -1,8 +1,7 @@
 name: Sync recent Kijiji listings
 
 on:
-  schedule:
-    - cron: "23 */6 * * *"
+  # Automatic discovery is owned by refresh-marketplace-listings.yml every 48h.
   workflow_dispatch:
 
 permissions:

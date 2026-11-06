@@ -2,8 +2,8 @@ name: Refresh marketplace listings and availability
 
 on:
   schedule:
-    # Availability every six hours; successful discovery sources run every 48h.
-    - cron: "17 */6 * * *"
+    # Check deletions every 24 hours; discover new inventory every 48 hours.
+    - cron: "17 6 * * *"
   workflow_dispatch:
 
 permissions:
@@ -16,7 +16,7 @@ concurrency:
 jobs:
   refresh:
     runs-on: ubuntu-latest
-    timeout-minutes: 60
+    timeout-minutes: 180
     env:
       CRAWL4AI_URL: ${{ vars.CRAWL4AI_URL }}
     steps:
@@ -41,50 +41,58 @@ jobs:
           python -m unittest discover -s tests -p test_regional_listing_refresh.py
           python -m unittest discover -s tests -p test_listing_discovery_cadence.py
           python -m unittest discover -s tests -p test_kenya_public_refresh.py
+          python -m unittest discover -s tests -p test_china_supplier_refresh.py
+          python -m unittest discover -s tests -p test_preserve_existing_listings.py
+          python -m unittest discover -s tests -p test_expansion_refresh.py
           python -m unittest discover -s tests -p test_ghana_marketplace_sync.py
           node --test tests/ghana_source_verification.test.cjs
           node scripts/regional-listing-location.test.cjs
           node scripts/listing-integrity.test.cjs
+      - name: Preserve existing listings before discovery
+        run: python scripts/preserve-existing-listings.py capture
       - name: Import New York, Florida, Atlanta, Texas and Ethiopia sources
         id: regional
         if: steps.discovery.outputs.regional == 'true'
         continue-on-error: true
         run: >-
           python scripts/refresh-regional-listings.py
-          --limit-per-source 12 --candidate-limit 36 --workers 3
+          --new-only --limit-per-source 12 --candidate-limit 36 --workers 3
       - name: Import current Canada, US, Jamaica and Kenya ads
         id: general
         if: steps.discovery.outputs.general == 'true'
         continue-on-error: true
         run: >-
           python scripts/refresh-marketplace-listings.py
-          --limit-per-region-category 6 --candidate-limit 24 --workers 8
+          --new-only --limit-per-region-category 6 --candidate-limit 24 --workers 8
           --crawl4ai-url "$CRAWL4AI_URL"
-      - name: Restore missing US states from exact source addresses
-        if: steps.discovery.outputs.general == 'true'
-        continue-on-error: true
-        run: |
-          python scripts/backfill-listing-regions.py --workers 4
-          python scripts/backfill-listing-regions.py --apply-report
       - name: Refresh Ghana vehicles, parts, property and electronics
         id: ghana
         if: steps.discovery.outputs.ghana == 'true'
         continue-on-error: true
         run: |
-          python ghana_marketplace_sync.py --limit-per-source 60 --max-published 0 --min-total 8
-          node scripts/reconcile-ghana-gallery-holds.cjs
+          python ghana_marketplace_sync.py --new-only --limit-per-source 60 --max-published 0 --min-total 8
       - name: Search Kenya public dealer inventory
         id: kenya
         if: steps.discovery.outputs.kenya == 'true'
         continue-on-error: true
-        run: python scripts/refresh-kenya-public-listings.py
+        run: python scripts/refresh-kenya-public-listings.py --new-only
+      - name: Search China suppliers and refresh their exact product inventory
+        id: china
+        if: steps.discovery.outputs.china == 'true'
+        continue-on-error: true
+        run: python scripts/refresh-china-supplier-listings.py --new-only
+      - name: Add new Lagos, Johannesburg and London dealer listings
+        id: expansion
+        if: steps.discovery.outputs.expansion == 'true'
+        continue-on-error: true
+        run: python scripts/refresh-expansion-listings.py
       - name: Refresh Guyana property and electronics
         id: guyana
         if: steps.discovery.outputs.guyana == 'true'
         continue-on-error: true
         run: >-
           python guyana_marketplace_scrape.py --csv data/guyana-listings.csv
-          --max-electronics 30 --max-properties 36 --status published --refresh-existing
+          --max-electronics 30 --max-properties 36 --status published
       - name: Refresh Dubai dealer vehicles
         id: dubai_vehicles
         if: steps.discovery.outputs.dubai_vehicles == 'true'
@@ -95,8 +103,6 @@ jobs:
         if: steps.discovery.outputs.dubai_marketplace == 'true'
         continue-on-error: true
         run: python dubai_marketplace_scrape.py --limit 20 --audit-dir output/dubai-marketplace
-      - name: Check all imported feeds and update shared availability
-        run: python scripts/check-listing-availability.py --workers 16 --crawl4ai-url "$CRAWL4AI_URL"
       - name: Enforce real source images, complete phones and category routing
         run: >-
           node scripts/repair-listing-feeds.mjs
@@ -104,6 +110,10 @@ jobs:
           data/guyana-listings.csv data/kenya-listings.csv data/kijiji-gta-recent-with-phones.csv
           data/oxglow-auto-parts-accessories-recent.csv data/oxglow-electronics-recent.csv
           data/oxglow-real-estate-recent.csv
+      - name: Keep discovery additions and preserve every existing record
+        run: python scripts/preserve-existing-listings.py enforce
+      - name: Check all imported feeds and update shared availability
+        run: python scripts/check-listing-availability.py --workers 24 --prune-confirmed --crawl4ai-url "$CRAWL4AI_URL"
       - name: Verify public feeds
         run: node scripts/listing-publication.test.cjs
       - name: Record successful searches and report source failures

@@ -318,8 +318,13 @@ def scrape_source(
     delay: float,
     checked_at: str,
     localize_vehicles: int = 0,
+    exclude_urls: set[str] | None = None,
 ) -> list[dict[str, str]]:
     cards = fetch_live_listing_cards(source.url, limit, delay)
+    if exclude_urls is not None:
+        cards = [card for card in cards if card.url.rstrip("/") not in exclude_urls]
+        if not cards:
+            return []
     candidates = []
     for index, card in enumerate(cards):
         try:
@@ -355,6 +360,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--min-total", type=int, default=8)
     parser.add_argument("--localize-vehicles", type=int, default=0)
     parser.add_argument("--localize-published", action="store_true")
+    parser.add_argument("--new-only", action="store_true")
     parser.add_argument("--dry-run", action="store_true")
     return parser
 
@@ -365,13 +371,15 @@ def main() -> int:
         raise SystemExit("Source and minimum totals must be positive; publication and localization limits cannot be negative.")
 
     checked_at = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
+    columns, existing = read_existing_csv(args.output)
+    exclude_urls = {r.get("source_url", "").rstrip("/") for r in existing} if args.new_only else None
     incoming = []
     source_counts = {}
     for source in SOURCES:
-        rows = scrape_source(source, args.limit_per_source, args.delay, checked_at, args.localize_vehicles)
+        rows = scrape_source(source, args.limit_per_source, args.delay, checked_at, args.localize_vehicles, exclude_urls)
         incoming.extend(rows)
         source_counts[source.name] = len(rows)
-    if len(incoming) < args.min_total:
+    if len(incoming) < args.min_total and not args.new_only:
         raise RuntimeError(f"Only {len(incoming)} Ghana listings were collected; refusing to update the CSV.")
 
     columns, existing = read_existing_csv(args.output)

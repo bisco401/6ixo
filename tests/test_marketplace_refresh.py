@@ -65,10 +65,11 @@ class RefreshTest(unittest.TestCase):
                                     K_CATEGORIES=[('cars-trucks', '174', 'vehicles', 'vehicles')]), \
                      patch.object(module.requests, 'get', return_value=blocked), \
                      patch.object(module.requests, 'post', return_value=rendered) as browser, \
-                     patch.object(module.kijiji, 'extract_state', return_value={}), \
+                     patch.object(module.kijiji, 'extract_state', return_value={'existing': {'id': 'existing', 'title': 'Existing car', 'imageUrls': ['https://example.test/photo.jpg'], 'url': 'https://example.test/existing'}}), \
                      patch.object(module.sys, 'argv', args), contextlib.redirect_stdout(io.StringIO()):
-                    with self.assertRaisesRegex(SystemExit, 'No qualifying new records'):
-                        module.main()
+                    # A successful catalogue containing only saved ads is a
+                    # completed new-only search, with no detail fetch or update.
+                    module.main()
                 browser.assert_called_once()
                 self.assertEqual(browser.call_args.kwargs['json']['urls'], [url])
                 cached = json.loads((root / 'cache' / (hashlib.sha256(url.encode()).hexdigest() + '.json')).read_text())

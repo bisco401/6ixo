@@ -468,6 +468,30 @@ function createListingIntegrity() {
         if (result[field]) result[field] = String(result[field]).split('|').filter(value => !excluded.has(normalizeImage(value))).join('|');
       }
     }
+    // Display copies are tied to an exact reviewed photo. Apply them after
+    // source verification so a later scrape can keep its original evidence.
+    if (repair.displayPhotos && typeof repair.displayPhotos === 'object') {
+      const photoUrl = value => decode(value).trim();
+      const replacements = new Map(Object.entries(repair.displayPhotos)
+        .filter(([original, edited]) => photoUrl(original) && typeof edited === 'string'
+          && /^\/?data\/watermark-free-images\/[a-z0-9-]+\.(?:png|jpe?g|webp)$/i.test(edited))
+        .map(([original, edited]) => [photoUrl(original), edited]));
+      const excluded = new Set(Array.isArray(repair.excludedImages) ? repair.excludedImages.map(imageKey) : []);
+      for (const [original, edited] of replacements) {
+        if (excluded.has(imageKey(original))) excluded.add(imageKey(edited));
+      }
+      const display = images => images.filter(image => !excluded.has(imageKey(image)))
+        .map(image => replacements.get(photoUrl(image)) || image)
+        .filter(image => !excluded.has(imageKey(image)));
+      for (const field of ['image_urls', 'image_files', 'image_url']) {
+        if (result[field]) result[field] = display(String(result[field]).split('|')).join('|');
+      }
+      const proof = a.listingIdentity;
+      if (proof && Array.isArray(proof.images) && key(proof.sourceUrl) === key(sourceUrl(row))
+          && identityText(proof.title) === identityText(result.title)) {
+        a.listingIdentity = { ...proof, images: display(proof.images) };
+      }
+    }
     result.attributes = JSON.stringify(a);
     return limitPublicFields(result);
   };

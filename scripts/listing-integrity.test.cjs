@@ -251,6 +251,21 @@ const broken=own.replace('jacket','broken');
 const futureRow={...row,source_url:url,image_urls:[own,broken].join('|'),attributes:JSON.stringify({imageVerifiedAt:'2027-01-01T00:00:00Z'})};
 assert.equal(integrity.applyRepair(futureRow,{sourceUrl:url,title:row.title,checkedAt:'2026-09-16T00:00:00Z',excludedImages:[broken]}).image_urls,own,'New scrape timestamps must not restore a reviewed broken image');
 
+const cleanPhoto = 'data/watermark-free-images/verified-own-photo.png';
+const reimportedPhoto = {
+    ...futureRow, image_urls: [own, broken].join('|'),
+    attributes: JSON.stringify({ imageVerifiedAt: '2027-01-01T00:00:00Z',
+        listingIdentity: { sourceUrl: url, title: row.title, images: [own, broken] } })
+};
+const displayRepair = { sourceUrl: url, title: row.title, checkedAt: '2026-11-06T00:00:00Z',
+    displayPhotos: { [own]: cleanPhoto } };
+const displayed = integrity.applyRepair(reimportedPhoto, displayRepair);
+assert.equal(displayed.image_urls, [cleanPhoto, broken].join('|'), 'A new scrape retains the clean display copy and gallery order');
+assert.equal(integrity.publicationIssue(displayed), '', 'The original source proof still binds the edited photo');
+assert.equal(integrity.applyRepair(displayed, { ...displayRepair, excludedImages: [own] }).image_urls, broken, 'A later photo exclusion also removes its edited copy');
+assert.equal(integrity.applyRepair({ ...reimportedPhoto, source_url: movedUrl }, displayRepair).image_urls, reimportedPhoto.image_urls);
+assert.equal(integrity.applyRepair(reimportedPhoto, { ...displayRepair, holdReason: 'reviewed_image_mismatch' }).status, 'rejected');
+
 // A reviewed room rental belongs in For Rent while its photo review hold remains.
 const roomRentalUrl='https://www.kijiji.ca/v-short-term-rental/city-of-toronto/room-for-rent/1741762769';
 const roomRentalRow={...row,id:'kijiji-1741762769',source_url:roomRentalUrl,title:'room for rent',app_category:'real_estate',app_subcategory:'for_rent_short',city:'Toronto',country:'Canada'};

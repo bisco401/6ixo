@@ -32376,6 +32376,7 @@ class DatingApp {
 
         surface.addEventListener('touchmove', (event) => {
             if (start?.kind !== 'touch') return;
+            if (event.defaultPrevented) { cancelDrag(); return; }
             if (event.touches?.length !== 1) { cancelDrag(); return; }
             const touch = Array.from(event.touches).find((item) => item.identifier === start.inputId);
             if (!touch) return;
@@ -32385,6 +32386,7 @@ class DatingApp {
 
         surface.addEventListener('touchend', (event) => {
             if (start?.kind !== 'touch') return;
+            if (event.defaultPrevented) { cancelDrag(); return; }
             const touch = Array.from(event.changedTouches || []).find((item) => item.identifier === start.inputId);
             if (!touch) return;
             finish(touch.clientX, touch.clientY);
@@ -32638,6 +32640,7 @@ class DatingApp {
             if (!touch) return;
             const host = getHost(event.target);
             if (!host) return;
+            if (host.dataset.modalSwipeSurfaceBound === '1') return;
             if (host.classList?.contains('carousel-track') && host.dataset.touchDragEnabled === '1') return;
             swipeState = {
                 host,
@@ -46458,8 +46461,73 @@ class DatingApp {
         });
     }
 
+    bindProfileSwipeClose(modal, onClose, modalId) {
+        if (!modal || !modalId || modal.dataset.profileSwipeCloseBound === '1') return;
+        modal.dataset.profileSwipeCloseBound = '1';
+        let start = null;
+        let suppressClickUntil = 0;
+        const thresholdPx = 80;
+        const axisBias = 1.35;
+        const reset = () => { start = null; };
+        const updateDirection = (touch) => {
+            if (!start || start.direction) return;
+            const dx = touch.clientX - start.x;
+            const dy = Math.abs(touch.clientY - start.y);
+            if (Math.max(Math.abs(dx), dy) < 10) return;
+            if (dy >= Math.abs(dx)) start.direction = 'vertical';
+            else if (Math.abs(dx) > dy * axisBias) start.direction = dx > 0 ? 'right' : 'left';
+        };
+        const reserveGesture = (event) => {
+            // Capture runs before the photo gallery; it yields when default is prevented.
+            if (event.cancelable) event.preventDefault();
+            suppressClickUntil = Date.now() + 420;
+        };
+
+        modal.addEventListener('touchstart', (event) => {
+            reset();
+            suppressClickUntil = 0;
+            if (!this.isModalOpen(modalId) || event.touches?.length !== 1) return;
+            if (event.target?.closest?.('button, a, input, select, textarea, video, [role="slider"], [contenteditable]:not([contenteditable="false"]), .cb-profile-thumbnails, .gt-thumbnails, .carousel-track:not([data-modal-swipe-surface-bound])')) return;
+            const touch = event.touches[0];
+            start = { x: touch.clientX, y: touch.clientY, id: touch.identifier, direction: null };
+        }, { passive: true, capture: true });
+
+        modal.addEventListener('touchmove', (event) => {
+            if (!start) return;
+            if (!this.isModalOpen(modalId) || event.touches?.length !== 1) { reset(); return; }
+            const touch = Array.from(event.touches).find(item => item.identifier === start.id);
+            if (!touch) { reset(); return; }
+            updateDirection(touch);
+            if (start.direction === 'right') reserveGesture(event);
+        }, { passive: false, capture: true });
+
+        modal.addEventListener('touchend', (event) => {
+            if (!start) return;
+            const touch = Array.from(event.changedTouches || []).find(item => item.identifier === start.id);
+            if (!touch) return;
+            updateDirection(touch);
+            const state = start;
+            reset();
+            if (!this.isModalOpen(modalId) || state.direction !== 'right') return;
+            reserveGesture(event);
+            const dx = touch.clientX - state.x;
+            const dy = Math.abs(touch.clientY - state.y);
+            if (dx < thresholdPx || dx <= dy * axisBias) return;
+            onClose({ useHistory: false });
+            this.popModalHistoryState(modalId);
+        }, { passive: false, capture: true });
+
+        modal.addEventListener('touchcancel', reset, { passive: true, capture: true });
+        modal.addEventListener('click', (event) => {
+            if (Date.now() >= suppressClickUntil) return;
+            event.preventDefault();
+            event.stopImmediatePropagation();
+        }, true);
+    }
+
     bindProfileCloseButton(closeBtn, onClose, modalId = '') {
         if (!closeBtn || closeBtn.dataset.closeBound) return;
+        this.bindProfileSwipeClose(closeBtn.closest?.('.modal'), onClose, modalId);
         let lastCloseAt = 0;
         const close = (event) => {
             event?.preventDefault?.();

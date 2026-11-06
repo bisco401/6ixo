@@ -1,4 +1,4 @@
-/* Reuse the existing controls and listeners; restore their exact positions on mobile. */
+/* Coordinate desktop and mobile layouts around the same native search controls. */
 (function () {
     'use strict';
     function setup() {
@@ -16,6 +16,7 @@
         const quick = key => panel.querySelector(`.market-smart-filter[data-quick-filter="${key}"]`);
         if (![queryBar, input, searchButton, applyButton, categoryItem, locationItem, advanced, advancedToggle, quick('price'), quick('posted_today'), quick('verified_seller'), quick('open_now')].every(Boolean)) return;
         panel.dataset.desktopFiltersBound = '1';
+        const mobile = window.createMarketplaceMobileFilters?.(panel);
         let shell, toolbar, filterRow, locationPanel, locationToggle, locationValue, searchLabel, searchIcon;
         let enabled = false, originalPlaceholder = '', originalSearchRole = null;
         const positions = new Map();
@@ -69,8 +70,12 @@
         }
 
         function updateLayout() {
-            if (media.matches === enabled) return;
+            if (media.matches === enabled) {
+                if (!enabled) mobile?.enable();
+                return;
+            }
             if (media.matches) {
+                mobile?.disable();
                 if (!shell) createShell();
                 enabled = true;
                 originalPlaceholder = input.getAttribute('placeholder');
@@ -108,6 +113,7 @@
                 panel.classList.remove('market-desktop-ready');
                 shell.hidden = true;
                 document.getElementById('price-filter-max').setCustomValidity('');
+                mobile?.enable();
             }
         }
 

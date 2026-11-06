@@ -30,7 +30,8 @@
       "position": [
         160,
         420
-      ]
+      ],
+      "disabled": true
     },
     {
       "parameters": {
@@ -179,5 +180,6 @@
   ],
   "triggerCount": 0,
   "updatedAt": "2026-05-16T00:00:00.000Z",
-  "versionId": "6ixo-check-listing-availability-v1"
+  "versionId": "6ixo-check-listing-availability-v1",
+  "active": false
 }

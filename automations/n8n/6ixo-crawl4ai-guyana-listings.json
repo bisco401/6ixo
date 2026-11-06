@@ -30,7 +30,8 @@
       "position": [
         120,
         420
-      ]
+      ],
+      "disabled": true
     },
     {
       "parameters": {
@@ -176,5 +177,6 @@
   ],
   "triggerCount": 1,
   "updatedAt": "2026-08-28T07:27:44.631Z",
-  "versionId": "6ixo-crawl4ai-guyana-listings-v1"
+  "versionId": "6ixo-crawl4ai-guyana-listings-v1",
+  "active": false
 }

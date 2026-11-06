@@ -12,6 +12,14 @@ spec.loader.exec_module(module)
 class CategorySourceTests(unittest.TestCase):
     checked = '2026-11-06T09:00:00Z'
 
+    def test_legacy_exports_cannot_start_competing_schedules(self):
+        for path in (module.ROOT / 'automations/n8n').glob('*.json'):
+            workflow = json.loads(path.read_text())
+            for node in workflow.get('nodes', []):
+                if node.get('type') == 'n8n-nodes-base.scheduleTrigger':
+                    self.assertTrue(node.get('disabled'), path.name)
+                    self.assertFalse(workflow.get('active'), path.name)
+
     def product(self, state='InStock', foreign=False):
         url = 'https://kriselectronics.com/product/hisense-refrigerator/'
         product = {'@type': 'Product', '@id': url + '#product', 'name': 'Hisense Refrigerator',

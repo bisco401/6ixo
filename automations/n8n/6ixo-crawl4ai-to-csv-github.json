@@ -30,7 +30,8 @@
       "position": [
         120,
         420
-      ]
+      ],
+      "disabled": true
     },
     {
       "parameters": {
@@ -219,5 +220,6 @@
   ],
   "triggerCount": 0,
   "updatedAt": "2026-05-05T20:06:58.885Z",
-  "versionId": "6ixo-crawl4ai-csv"
+  "versionId": "6ixo-crawl4ai-csv",
+  "active": false
 }

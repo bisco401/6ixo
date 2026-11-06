@@ -30,7 +30,8 @@
       "position": [
         0,
         180
-      ]
+      ],
+      "disabled": true
     },
     {
       "parameters": {

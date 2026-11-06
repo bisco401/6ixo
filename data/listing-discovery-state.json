@@ -41,6 +41,15 @@
       "lastAttemptAt": "2026-11-06T06:23:09.541022+00:00",
       "outcome": "success",
       "lastSuccessfulSlot": "2026-11-06T00:00:00+00:00"
+    },
+    "products": {
+      "lastAttemptAt": "2026-11-06T07:20:24.476229+00:00",
+      "outcome": "failure"
+    },
+    "jobs": {
+      "lastAttemptAt": "2026-11-06T07:20:24.476229+00:00",
+      "outcome": "success",
+      "lastSuccessfulSlot": "2026-11-06T00:00:00+00:00"
     }
   }
 }

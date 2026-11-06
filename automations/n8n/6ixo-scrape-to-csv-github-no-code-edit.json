@@ -30,7 +30,8 @@
       "position": [
         160,
         420
-      ]
+      ],
+      "disabled": true
     },
     {
       "parameters": {
@@ -152,5 +153,6 @@
   ],
   "triggerCount": 0,
   "updatedAt": "2026-05-05T17:03:07.197Z",
-  "versionId": "6ixo-csv-no-code-editing"
+  "versionId": "6ixo-csv-no-code-editing",
+  "active": false
 }

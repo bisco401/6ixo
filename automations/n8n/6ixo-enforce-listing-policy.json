@@ -30,7 +30,8 @@
       "position": [
         120,
         420
-      ]
+      ],
+      "disabled": true
     },
     {
       "parameters": {
@@ -176,5 +177,6 @@
     }
   ],
   "triggerCount": 1,
-  "versionId": "6ixo-enforce-listing-policy-v1"
+  "versionId": "6ixo-enforce-listing-policy-v1",
+  "active": false
 }

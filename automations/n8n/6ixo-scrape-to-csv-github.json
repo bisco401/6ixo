@@ -30,7 +30,8 @@
       "position": [
         220,
         420
-      ]
+      ],
+      "disabled": true
     },
     {
       "parameters": {
@@ -88,5 +89,6 @@
   ],
   "triggerCount": 2,
   "updatedAt": "2026-05-05T00:00:00.000Z",
-  "versionId": "6ixo-scrape-to-csv-v1"
+  "versionId": "6ixo-scrape-to-csv-v1",
+  "active": false
 }

@@ -59,8 +59,8 @@ def row_from_page(source, url, checked):
         images += re.findall(re.escape(folder)+r'[^"<>\\\s?]+\.(?:jpg|jpeg|png|webp)',decoded)
     images = list(dict.fromkeys(images))[:4]
     if not images: raise ValueError('No exact vehicle photos')
-    # Use the image format parameter present on the dealer's rendered gallery URLs.
-    images = [i.split('?')[0] + '?format=auto' for i in images]
+    # Bound the dealer's 6000px originals and use a format supported by mobile Safari.
+    images = [i.split('?')[0] + '?width=1600&format=jpeg' for i in images]
     price = str(int(float(offer['price'])))
     if int(price) <= 0 or offer.get('priceCurrency') != 'AED': raise ValueError('Invalid purchase price')
     year = str(car.get('productionDate',''))

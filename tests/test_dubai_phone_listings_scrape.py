@@ -12,6 +12,7 @@ class DubaiPublicPhoneTests(unittest.TestCase):
     def test_accepts_phone_and_full_purchase_price_from_exact_seller_page(self):
         row=row_from_page(self.page(),URL,'2026-09-20T00:00:00Z')
         self.assertEqual(row['phone'],'+97143772503')
+        self.assertEqual(row['image_urls'],'https://storage.albacars.ae/vehicles/drafts/123/1.jpg?width=1600&format=jpeg')
         self.assertEqual(row['price_value'],'95000')
         self.assertEqual(json.loads(row['attributes'])['contactSource'],URL)
     def test_refuses_missing_masked_contact_sold_wrong_vehicle_or_seller(self):

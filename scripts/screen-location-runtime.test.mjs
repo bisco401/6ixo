@@ -45,7 +45,7 @@ const document = new EventTarget();
 Object.assign(document, {
     getElementById: id => elements.get(id) || null,
     createElement: tag => new Field(tag.toUpperCase()),
-    body: new Field('BODY'), activeElement: null
+    body: new Field('BODY'), documentElement: { getBoundingClientRect: () => ({ top: 0, left: 0 }) }, activeElement: null
 });
 const viewport = Object.assign(new EventTarget(), { offsetTop: 0, offsetLeft: 0, width: 1280, height: 900 });
 const window = Object.assign(new EventTarget(), { innerWidth: 1280, innerHeight: 900, visualViewport: viewport });
@@ -108,6 +108,25 @@ for (const [country, city] of groups) {
         await settle();
         assert.equal(document.activeElement, input, `${city}: choosing a country suggestion also opens its cities`);
         assert.equal(input.getAttribute('aria-expanded'), 'true');
+        // Reproduce the screenshot: type a city in Country, then tap City
+        // without first choosing a Country suggestion or pressing Enter.
+        countryInput.value = 'Dubai'; countryInput.dispatchEvent(new Event('input'));
+        input.focus(); await settle();
+        let nearbyOptions = document.body.children[0].children[1].children;
+        assert.equal(nearbyOptions[0].children[0].textContent, 'Dubai, United Arab Emirates', city);
+        assert.ok(nearbyOptions.some(option => option.children[0].textContent === 'Sharjah, United Arab Emirates'));
+        assert.ok(nearbyOptions.some(option => option.children[0].textContent === 'Ajman, United Arab Emirates'));
+        assert.ok(nearbyOptions.every(option => option.children[0].textContent.endsWith(', United Arab Emirates')));
+        assert.equal(countryInput.value, 'Dubai', 'Recognition preserves the unconfirmed country draft');
+        nearbyOptions.find(option => option.children[0].textContent === 'Sharjah, United Arab Emirates').dispatchEvent(new Event('click'));
+        assert.equal(elements.get(country).value, 'United Arab Emirates', 'Choosing a nearby city normalizes the country');
+        assert.equal(elements.get(city).value, 'Sharjah');
+        countryInput.value = 'Dubai'; enter(countryInput); await settle();
+        assert.equal(elements.get(country).value, 'United Arab Emirates');
+        assert.equal(input.value, '', 'Confirming a city in Country offers a choice of nearby cities');
+        nearbyOptions = document.body.children[0].children[1].children;
+        assert.equal(nearbyOptions[0].children[0].textContent, 'Dubai, United Arab Emirates');
+        assert.ok(nearbyOptions.some(option => option.children[0].textContent === 'Ajman, United Arab Emirates'));
     } else {
         assert.equal(elements.get(city).dataset.locationCountry, 'United Kingdom', 'Standalone location fields retain qualified worldwide search');
     }
@@ -228,12 +247,15 @@ for (const scenario of [
     { name: 'keyboard above', height: 440, top: 280, offset: 0, origin: 0 },
     { name: 'panned fixed origin', height: 360, top: 440, offset: 180, origin: 180 },
     { name: 'opposite fixed origin', height: 360, top: 440, offset: 180, origin: -180 },
+    { name: 'visual-relative Safari field', height: 360, top: 100, offset: 180, origin: -180, documentShift: -180 },
     { name: 'keyboard below', height: 440, top: 70, offset: 0, origin: 0 },
     { name: 'little room', height: 160, top: 60, offset: 0, origin: 0, hidden: true },
     { name: 'offscreen field', height: 360, top: 20, offset: 180, origin: 180, hidden: true },
     { name: 'keyboard dismissed', height: 844, top: 400, offset: 0, origin: 0 }
 ]) {
     Object.assign(viewport, { height: scenario.height, width: 390, offsetTop: scenario.offset, offsetLeft: 0 });
+    window.scrollY = 600;
+    document.documentElement.getBoundingClientRect = () => ({ top: -600 + (scenario.documentShift || 0), left: 0 });
     cityInput.rect = { left: 30, top: scenario.top, bottom: scenario.top + 44, width: 330 };
     popup.fixedOriginTop = scenario.origin;
     popup.scrollHeight = 950;
@@ -244,7 +266,8 @@ for (const scenario of [
     if (scenario.hidden) continue;
     const box = popup.getBoundingClientRect();
     assert.ok(box.bottom <= cityInput.rect.top - 6 || box.top >= cityInput.rect.bottom + 6, `${scenario.name}: input stays uncovered`);
-    assert.ok(box.top >= scenario.offset + 12 && box.bottom <= scenario.offset + scenario.height - 12, `${scenario.name}: menu fits above the keyboard`);
+    const visibleTop = scenario.offset + (scenario.documentShift || 0);
+    assert.ok(box.top >= visibleTop + 12 && box.bottom <= visibleTop + scenario.height - 12, `${scenario.name}: menu fits above the keyboard`);
     assert.ok(box.left >= 12 && box.right <= 378, `${scenario.name}: menu fits the screen width`);
 }
 console.log('Keyboard geometry passed: above/below placement, panned popover origins, small viewports, focus and draft preservation.');

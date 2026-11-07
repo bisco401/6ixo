@@ -5,7 +5,7 @@
     const cache = new Map();
     const normalize = value => String(value || '').normalize('NFD').replace(/\p{M}/gu, '').toLowerCase().trim().replace(/\s+/g, ' ');
     const prefixKey = value => Array.from(value).slice(0, 2).map(c => c.codePointAt(0).toString(16)).join('-');
-    const aliases = { US: ['usa', 'u.s.', 'u.s.a.', 'united states of america'], GB: ['uk', 'u.k.', 'britain', 'great britain'] };
+    const aliases = { US: ['usa', 'u.s.', 'u.s.a.', 'united states of america'], GB: ['uk', 'u.k.', 'britain', 'great britain'], AE: ['uae', 'u.a.e.'] };
     async function read(name) {
         if (!/^(catalog|[0-9a-f]+(?:-[0-9a-f]+)?|country-[A-Z]{2})$/.test(name)) throw new Error('Invalid search data');
         if (!cache.has(name)) {
@@ -26,7 +26,7 @@
         }
         return cache.get(name);
     }
-    async function search(value, { limit = 12, regions = [], country = '', type = '' } = {}) {
+    async function search(value, { limit = 12, regions = [], country = '', type = '', nearCity = '', nearRegion = '' } = {}) {
         const text = normalize(value).slice(0, 160);
         const parts = text.split(',').map(part => part.trim()).filter(Boolean);
         const query = parts[0] || '', qualifiers = parts.slice(1);
@@ -41,8 +41,17 @@
         if (type === 'country') return countryResults;
         if (type === 'city' && scopedCountry && Array.from(query).length < 2) {
             const records = await read(`country-${scopedCountry.code}`);
-            return records.filter(([city, region]) => normalize(city).startsWith(query)
-                && qualifiers.every(part => [normalize(region), ...countryNames(scopedCountry)].some(name => name.startsWith(part))))
+            const origin = nearCity && records.find(([city, region]) => normalize(city) === normalize(nearCity)
+                && (!nearRegion || normalize(region) === normalize(nearRegion)));
+            const distance = ([, , lat, lng]) => {
+                const radians = Math.PI / 180;
+                return Math.sin((lat - origin[2]) * radians / 2) ** 2
+                    + Math.cos(lat * radians) * Math.cos(origin[2] * radians) * Math.sin((lng - origin[3]) * radians / 2) ** 2;
+            };
+            const matches = records.filter(([city, region]) => normalize(city).startsWith(query)
+                && qualifiers.every(part => [normalize(region), ...countryNames(scopedCountry)].some(name => name.startsWith(part))));
+            if (origin) matches.sort((a, b) => distance(a) - distance(b) || a[0].localeCompare(b[0]));
+            return matches
                 .slice(0, Math.min(50, Math.max(1, limit)))
                 .map(([city, region]) => ({ id: `city-${scopedCountry.code}-${city}-${region}`, city, region,
                     country: scopedCountry.name, countryCode: scopedCountry.code, label: `${city}, ${scopedCountry.name}`, type: 'city' }));

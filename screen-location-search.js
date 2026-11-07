@@ -80,7 +80,14 @@
             if (!active || popup.hidden) return;
             const rect = active.input.getBoundingClientRect();
             const viewport = root.visualViewport;
-            const left = viewport?.offsetLeft || 0, top = viewport?.offsetTop || 0;
+            // Safari can return visual-viewport-relative element rectangles
+            // while the keyboard pans. Measure the document's coordinate
+            // origin so viewport bounds and the input use the same space.
+            const documentRect = document.documentElement.getBoundingClientRect();
+            const left = Math.max(0, (viewport?.offsetLeft || 0)
+                + Math.min(0, documentRect.left + (root.scrollX || 0)));
+            const top = Math.max(0, (viewport?.offsetTop || 0)
+                + Math.min(0, documentRect.top + (root.scrollY || 0)));
             const width = viewport?.width || root.innerWidth, height = viewport?.height || root.innerHeight;
             const gap = 6, edge = 12;
             const below = top + height - edge - rect.bottom - gap, above = rect.top - top - edge - gap;
@@ -130,6 +137,27 @@
             return clean(countryControl && hasDraft(countryControl) ? countryControl.input.value
                 : control.group.country ? control.group.country.value : control.source.dataset.locationCountry);
         }
+        async function cityScope(control) {
+            const country = selectedCountry(control);
+            if (!country) return { country: '' };
+            const countryControl = control.group.controls.find(member => member.field === 'country');
+            if (!countryControl || !hasDraft(countryControl)) {
+                const nearby = control.group.cityAnchor?.country === country ? control.group.cityAnchor : null;
+                return { country, nearCity: nearby?.city || '', nearRegion: nearby?.region || '' };
+            }
+            const countries = await root.SIXO_LOCATION_AUTOCOMPLETE.search(country, { type: 'country' });
+            const exactCountry = countries.find(result => result.exact);
+            if (exactCountry) {
+                const nearby = control.group.cityAnchor?.country === exactCountry.country ? control.group.cityAnchor : null;
+                return { country: exactCountry.country, nearCity: nearby?.city || '', nearRegion: nearby?.region || '' };
+            }
+            // A visitor may type a city (for example Dubai) in Country and
+            // move straight to City. Resolve that draft without changing it
+            // until they confirm a suggestion or submit the location.
+            const cities = await root.SIXO_LOCATION_AUTOCOMPLETE.search(country, { type: 'city' });
+            const exactCity = cities.find(result => result.exact);
+            return exactCity ? { country: exactCity.country, nearCity: exactCity.city, nearRegion: exactCity.region } : { country };
+        }
         async function search(control, query) {
             // Standalone location fields can still select a city or country.
             // Paired fields each have one role, including an empty city search.
@@ -140,9 +168,12 @@
                 const cities = await root.SIXO_LOCATION_AUTOCOMPLETE.search(`${query}, ${country}`);
                 return [...matches.filter(result => result.type === 'country'), ...cities];
             }
-            return root.SIXO_LOCATION_AUTOCOMPLETE.search(query, {
-                type: control.field, country: control.field === 'city' ? selectedCountry(control) : ''
-            });
+            if (control.field === 'country') {
+                const countries = await root.SIXO_LOCATION_AUTOCOMPLETE.search(query, { type: 'country' });
+                return countries.length ? countries : root.SIXO_LOCATION_AUTOCOMPLETE.search(query, { type: 'city' });
+            }
+            const scope = await cityScope(control);
+            return root.SIXO_LOCATION_AUTOCOMPLETE.search(query, { type: 'city', limit: scope.nearCity ? 24 : 12, ...scope });
         }
         function fieldLabel(control) {
             return !control.group.country ? 'city or country' : control.field;
@@ -177,7 +208,10 @@
                 member.input.removeAttribute('aria-invalid');
             }
             if (draft?.group === control.group) draft = null;
-            applySelection(control.group, result, control.field);
+            if (result?.city) control.group.cityAnchor = result;
+            else if (control.field === 'country') control.group.cityAnchor = null;
+            const selection = control.field === 'country' && result?.city ? { ...result, city: '', region: '' } : result;
+            applySelection(control.group, selection, control.field);
             for (const member of controls.values()) sync(member);
             close();
             if (advanceToCity) showCountryCities(control);
@@ -257,7 +291,9 @@
                 if (ticket !== request || active !== control || control.input.value !== query) return;
                 results = matches;
                 list.replaceChildren(); list.setAttribute('aria-busy', 'false');
-                status.textContent = matches.length ? `Choose a ${fieldLabel(control)}` : noMatches(control);
+                status.textContent = matches.length
+                    ? control.field === 'country' && matches[0].type === 'city' ? 'Choose a city to set its country' : `Choose a ${fieldLabel(control)}`
+                    : noMatches(control);
                 for (const [index, result] of matches.entries()) {
                     const option = document.createElement('button');
                     option.type = 'button'; option.tabIndex = -1;
@@ -267,7 +303,8 @@
                     const label = document.createElement('span');
                     label.textContent = result.label;
                     const detail = document.createElement('small');
-                    detail.textContent = result.type === 'country' ? 'Country · all cities' : result.region;
+                    detail.textContent = result.type === 'country' ? 'Country · all cities'
+                        : control.field === 'country' ? `City in ${result.country}` : result.region;
                     option.append(label, detail);
                     option.addEventListener('pointerdown', event => event.preventDefault());
                     option.addEventListener('click', () => { if (ticket === request) choose(control, result, { advanceToCity: true }); });

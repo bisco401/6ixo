@@ -4,6 +4,7 @@ Disallow: /automations/
 Disallow: /data/
 # Listing photographs must remain crawlable for image search and product snippets.
 Allow: /data/*-images/
+Allow: /data/listing-image-cache/
 Disallow: /investor-proposal-video/
 Disallow: /marketing/
 Disallow: /mobile/

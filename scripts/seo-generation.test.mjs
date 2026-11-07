@@ -171,6 +171,12 @@ test('inventory builds paginate, deduplicate, preserve URLs, retire sold pages, 
   const rows = Array.from({ length: 40 }, (_, i) => ({ id: `id-${i}`, status: 'published', phone: '+14165551234', app_category: 'electronics', title: `Laptop ${i}`, description: 'A complete description of this laptop and its useful features.', image_urls: 'https://example.com/photo.jpg', city: 'Toronto', country: 'Canada', source_url: `https://example.com/ad/${i}`, price_value: '2500', price_text: '$25', currency: 'CAD', source_availability: 'unknown', scraped_at: '2026-10-01' }));
   rows[2].price_text = 'Contact seller'; rows[2].price_value = '';
   rows[3].price_text = 'Contact seller for price'; rows[3].price_value = '';
+  rows[0].image_urls = 'https://example.com/blocked-photo.jpg';
+  await fs.mkdir(path.join(root, 'data/listing-image-cache'), { recursive: true });
+  await fs.writeFile(path.join(root, 'data/listing-image-cache/cached.jpg'), Buffer.alloc(2048));
+  await fs.writeFile(path.join(root, 'data/listing-image-cache.json'), JSON.stringify({
+    'https://example.com/blocked-photo.jpg': '/data/listing-image-cache/cached.jpg'
+  }));
   const writeFeed = async records => fs.writeFile(path.join(root, 'data/scraped-listings.csv'), headers.join(',') + '\n' + records.map(row => headers.map(h => `"${String(row[h] || '').replaceAll('"', '""')}"`).join(',')).join('\n'));
   await writeFeed([...rows, rows[0], { ...rows[1], id: 'duplicate-source' }, { ...rows[0], id: 'rejected', status: 'rejected' }, { ...rows[0], id: 'sold', source_availability: 'sold' }]);
   const first = await generate(root);
@@ -184,6 +190,9 @@ test('inventory builds paginate, deduplicate, preserve URLs, retire sold pages, 
   const firstListing = first.listings.find(l => l.id === 'id-0');
   const listingFile = path.join(root, 'listing', firstListing.slug, 'index.html');
   const listingHtml = await fs.readFile(listingFile, 'utf8');
+  assert.ok(firstPage.includes('src="https://6ixo.com/data/listing-image-cache/cached.jpg"'));
+  assert.ok(listingHtml.includes('src="https://6ixo.com/data/listing-image-cache/cached.jpg"'));
+  assert.doesNotMatch(listingHtml, /blocked-photo\.jpg/);
   assert.ok(listingHtml.includes('"price":25'));
   assert.ok(!listingHtml.includes('InStock'));
   assert.doesNotMatch(listingHtml, /View original listing|Contact seller|href="https:\/\/example\.com\/ad\//i);
@@ -198,6 +207,7 @@ test('inventory builds paginate, deduplicate, preserve URLs, retire sold pages, 
   assert.equal(await fs.readFile(path.join(root, 'sitemap.xml'), 'utf8'), sitemapBefore);
   assert.equal((await fs.stat(listingFile)).mtimeMs, statBefore.mtimeMs);
   assert.ok(sitemapBefore.includes('<image:loc>https://example.com/photo.jpg</image:loc>'));
+  assert.ok(sitemapBefore.includes('<image:loc>https://6ixo.com/data/listing-image-cache/cached.jpg</image:loc>'));
   rows[0].title = 'A renamed laptop'; rows[1].source_availability = 'sold';
   await writeFeed(rows);
   const next = await generate(root);

@@ -11,7 +11,7 @@
         '.my-post-thumb', '.my-auction-thumb', '.category-photo-click',
         '#marketplace-item-track img', '#vehicle-modal-image', '#realestate-modal-image',
         '#service-modal-image', '#luxury-ad-image', '#seller-profile-luxury-image',
-        '#ml-frame img', '.ml-thumb img', '.vehicle-media-thumb img', '.realestate-media-thumb img'
+        '#ml-frame img', '.ml-thumb img', '.marketplace-media-thumb img', '.vehicle-media-thumb img', '.realestate-media-thumb img'
     ].join(', ');
     function normalizeSource(value, base = 'https://6ixo.com/') {
         if (!value) return '';
@@ -122,6 +122,6 @@
         }
     }).observe(document.documentElement, { childList: true, subtree: true, attributes: true, attributeFilter: ['src'] });
     visit(document);
-    fetch('/data/listing-image-cache.json?v=20261106-1').then(response => response.ok ? response.json() : {})
+    fetch('/data/listing-image-cache.json?v=20261107-nigeria-1', { cache: 'no-cache' }).then(response => response.ok ? response.json() : {})
         .then(value => { cache = value; visit(document); }).catch(() => {});
 })();

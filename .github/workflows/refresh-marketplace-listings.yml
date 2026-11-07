@@ -128,6 +128,8 @@ jobs:
         run: python scripts/check-listing-availability.py --workers 24 --prune-confirmed --crawl4ai-url "$CRAWL4AI_URL"
       - name: Verify public feeds
         run: node scripts/listing-publication.test.cjs
+      - name: Cache Nigeria dealer photos that block cross-site embedding
+        run: python scripts/cache-nigeria-listing-images.py
       - name: Record successful searches and report source failures
         env:
           DISCOVERY_STARTED_AT: ${{ steps.discovery.outputs.started_at }}
@@ -141,7 +143,7 @@ jobs:
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/*listings.csv data/kijiji-gta-recent-with-phones.csv data/oxglow-*-recent.csv data/listing-availability.json data/listing-integrity-repairs.json data/listing-discovery-state.json
+          git add data/*listings.csv data/kijiji-gta-recent-with-phones.csv data/oxglow-*-recent.csv data/listing-availability.json data/listing-integrity-repairs.json data/listing-discovery-state.json data/listing-image-cache.json data/listing-image-cache/
           git commit -m "Refresh marketplace listings and confirmed availability"
           git pull --rebase origin main
           git push origin HEAD:main

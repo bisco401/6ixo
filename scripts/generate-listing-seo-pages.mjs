@@ -97,6 +97,8 @@ export async function generate(root = ROOT) {
   const readOptionalJson = async name => { try { return JSON.parse(await fs.readFile(path.join(root, 'data', name), 'utf8')).listings || {}; } catch (e) { if (e.code === 'ENOENT') return {}; throw e; } };
   const availability = await readOptionalJson('listing-availability.json');
   const repairs = await readOptionalJson('listing-integrity-repairs.json');
+  let imageCache = {};
+  try { imageCache = JSON.parse(await fs.readFile(path.join(root, 'data/listing-image-cache.json'), 'utf8')); } catch (e) { if (e.code !== 'ENOENT') throw e; }
   rows.sort((a, b) => (Date.parse(b.scraped_at) || 0) - (Date.parse(a.scraped_at) || 0));
   const seen = new Set(), usedSlugs = new Set(), titles = new Set(), descriptions = new Set(), listings = [];
   for (const original of rows) {
@@ -114,7 +116,7 @@ export async function generate(root = ROOT) {
     if (keys.some(key => seen.has(key))) continue;
     const imageUrls = [];
     for (const raw of clean(row.image_files || row.image_urls).split('|')) {
-      const image = raw.trim().replace(/^\.\//, '').replace(/^\//, '');
+      const image = (imageCache[raw.trim()] || raw.trim()).replace(/^\.\//, '').replace(/^\//, '');
       if (/placeholder|photoapparat|map\d*\.craigslist\.org|\{\{/i.test(image)) continue;
       if (image.startsWith('data/') && !image.split('/').includes('..')) {
         try { const stat = await fs.stat(path.join(root, image)); if (stat.isFile() && stat.size > 1024) imageUrls.push(`${ORIGIN}/${image.split('/').map(encodeURIComponent).join('/')}`); } catch {}

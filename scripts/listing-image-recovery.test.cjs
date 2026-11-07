@@ -12,6 +12,18 @@ test('dealer originals use bounded, iOS-compatible renditions', () => {
         assert.equal(normalizeSource(result.href), result.href);
     }
 });
+test('every Nigeria dealer gallery photo has a same-origin copy', () => {
+    const root = path.resolve(__dirname, '..');
+    const { parseCsv } = require('./listing-sync-policy.cjs');
+    const cache = JSON.parse(fs.readFileSync(path.join(root, 'data/listing-image-cache.json')));
+    const { rows } = parseCsv(fs.readFileSync(path.join(root, 'data/scraped-listings.csv'), 'utf8'));
+    for (const row of rows.filter(row => row.country === 'Nigeria' && row.status === 'published')) {
+        for (const source of row.image_urls.split('|').filter(url => url.startsWith('https://www.korrectcars.com/uploads/cars/'))) {
+            assert.ok(cache[source], `${row.title} is missing a cached gallery photo: ${source}`);
+            assert.ok(fs.statSync(path.join(root, cache[source])).size > 1024);
+        }
+    }
+});
 test('unrelated providers, signed query strings and local photos retain their identity', () => {
     const signed = 'https://example.com/image.jpg?token=a%2Bb&width=50';
     assert.equal(normalizeSource(signed), signed);

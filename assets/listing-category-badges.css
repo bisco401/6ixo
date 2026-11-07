@@ -16,26 +16,49 @@
         z-index: 7 !important;
         display: inline-flex !important;
         align-items: center !important;
+        box-sizing: border-box !important;
         width: max-content !important;
-        max-width: calc(100% - 88px) !important;
-        min-height: 24px !important;
+        max-width: calc(100% - 16px) !important;
+        height: auto !important;
+        min-height: 28px !important;
         margin: 0 !important;
-        padding: 4px 9px !important;
+        padding: 4px 8px !important;
         border: 1px solid rgba(255, 255, 255, .35) !important;
         border-radius: 6px !important;
         background: #173b65 !important;
         color: #fff !important;
         box-shadow: 0 1px 4px #0b1b3026 !important;
         font-family: inherit !important;
-        font-size: 11px !important;
+        font-size: 12px !important;
         font-weight: 700 !important;
-        line-height: 1.2 !important;
+        line-height: 1.35 !important;
         letter-spacing: .01em !important;
         text-transform: none !important;
-        white-space: nowrap !important;
-        overflow: hidden !important;
-        text-overflow: ellipsis !important;
+        white-space: normal !important;
+        overflow-wrap: anywhere !important;
+        overflow: visible !important;
+        text-overflow: clip !important;
         pointer-events: none !important;
+    }
+    /* Reserve photo space only when another control actually occupies it. */
+    html :has(> .listing-media-count) > .listing-category-badge {
+        max-width: calc(100% - 88px) !important;
+    }
+    html :has(> .realestate-airbnb-save) > .listing-category-badge {
+        max-width: calc(100% - 64px) !important;
+    }
+    /* List rows already show the date and listing type beside their thumbnail.
+       Keep that thumbnail's category complete and its gallery controls clear. */
+    html #marketplace-items.marketplace-list-view .marketplace-listing-row .listing-category-badge {
+        max-width: calc(100% - 16px) !important;
+    }
+    html #marketplace-items.marketplace-list-view .marketplace-listing-row :is(
+        .marketplace-media-posted, .marketplace-feed-type-badge, .listing-media-count) {
+        display: none !important;
+    }
+    html .marketplace-item-media.has-mobile-carousel-dots > .marketplace-media-posted {
+        bottom: 42px !important;
+        line-height: 1.35 !important;
     }
     /* Existing status labels have their own row, below the main category. */
     html :has(> .listing-category-badge) > :is(.marketplace-media-badges,
@@ -43,7 +66,7 @@
         .featured-unified-badge, .vehicle-featured-trust-badge, .marketplace-badge.cross-border),
     html .featured-ad-card:has(.listing-category-badge) > .featured-ad-tag,
     html :has(> .image-carousel > .listing-category-badge) > .cross-border-featured-badge {
-        top: 38px !important;
+        top: 42px !important;
     }
     html .item-category-image-badge:not([hidden]) {
         display: flex !important;

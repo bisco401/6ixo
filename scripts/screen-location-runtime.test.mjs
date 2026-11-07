@@ -92,7 +92,8 @@ for (const [country, city] of groups) {
         countryInput.value = 'Ghana'; enter(countryInput); await settle();
         assert.equal(elements.get(city).value, '', `${city}: changing countries clears the old city`);
         assert.equal(input.value, '');
-        input.focus(); await settle();
+        assert.equal(document.activeElement, input, `${city}: confirming a country moves directly to its city field`);
+        assert.equal(input.getAttribute('aria-expanded'), 'true', `${city}: country confirmation opens its city menu without a second tap`);
         const options = document.body.children[0].children[1].children;
         assert.ok(options.length > 0 && options.every(option => option.children[0].textContent.endsWith(', Ghana')), `${city}: empty city menu stays in Ghana`);
         assert.ok(options.some(option => option.children[0].textContent === 'Accra, Ghana'));
@@ -101,6 +102,12 @@ for (const [country, city] of groups) {
         options.find(option => option.children[0].textContent === 'Accra, Ghana').dispatchEvent(new Event('click'));
         assert.equal(elements.get(city).value, 'Accra');
         assert.equal(elements.get(country).value, 'Ghana');
+        countryInput.focus(); await settle();
+        const countryOptions = document.body.children[0].children[1].children;
+        countryOptions.find(option => option.children[0].textContent === 'Ghana').dispatchEvent(new Event('click'));
+        await settle();
+        assert.equal(document.activeElement, input, `${city}: choosing a country suggestion also opens its cities`);
+        assert.equal(input.getAttribute('aria-expanded'), 'true');
     } else {
         assert.equal(elements.get(city).dataset.locationCountry, 'United Kingdom', 'Standalone location fields retain qualified worldwide search');
     }
@@ -117,6 +124,7 @@ document.dispatchEvent(click); await settle();
 assert.equal(elements.get(country).value, 'Kenya');
 assert.equal(elements.get(city).value, 'Nairobi', 'Search commits both autofilled fields without losing the city');
 assert.equal(button.clicks, 1, 'Apply is forwarded once after the complete area is confirmed');
+assert.equal(cityInput.getAttribute('aria-expanded'), 'false', 'Submitting country and city together does not reopen suggestions');
 
 countryInput.value = 'China'; enter(countryInput); await settle();
 cityInput.value = 'London'; enter(cityInput); await settle();
@@ -125,6 +133,8 @@ assert.equal(elements.get(city).value, '');
 assert.equal(cityInput.getAttribute('aria-invalid'), 'true');
 
 countryInput.focus(); countryInput.value = 'Canada'; countryInput.dispatchEvent(new Event('input'));
+assert.equal(document.activeElement, countryInput, 'Typing a country must not move focus before the visitor confirms it');
+assert.equal(elements.get(country).value, 'China', 'An unfinished country draft must not change committed filters');
 const fieldClick = new Event('click'); Object.defineProperty(fieldClick, 'target', { value: cityInput });
 document.dispatchEvent(fieldClick);
 cityInput.focus(); cityInput.value = 'London'; cityInput.dispatchEvent(new Event('input'));

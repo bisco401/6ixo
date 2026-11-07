@@ -163,7 +163,14 @@
             control.input.title = control.field === 'city' && control.source.dataset.locationCountry
                 ? [clean(control.source.value), control.source.dataset.locationCountry].filter(Boolean).join(', ') : '';
         }
-        function choose(control, result) {
+        function showCountryCities(control) {
+            if (control.field !== 'country' || !clean(control.group.country?.value)) return;
+            const city = control.group.controls.find(member => member.field === 'city');
+            if (!city) return;
+            city.input.focus();
+            if (active !== city) show(city);
+        }
+        function choose(control, result, { advanceToCity = false } = {}) {
             control.group.revision++;
             for (const member of control.group.controls) {
                 member.dirty = false;
@@ -173,9 +180,14 @@
             applySelection(control.group, result, control.field);
             for (const member of controls.values()) sync(member);
             close();
+            if (advanceToCity) showCountryCities(control);
         }
-        async function resolve(control) {
-            if (!control || !hasDraft(control)) return true;
+        async function resolve(control, { advanceToCity = false } = {}) {
+            if (!control) return true;
+            if (!hasDraft(control)) {
+                if (advanceToCity) showCountryCities(control);
+                return true;
+            }
             if (!control.dirty) { control.dirty = true; draft = control; control.group.revision++; }
             const query = control.input.value.trim(), revision = control.group.revision;
             if (!query) { choose(control, null); return true; }
@@ -188,7 +200,7 @@
                     return false;
                 }
                 control.input.removeAttribute('aria-invalid');
-                choose(control, matches[0]);
+                choose(control, matches[0], { advanceToCity });
                 return true;
             } catch {
                 status.textContent = 'Suggestions could not load. Type again to retry.';
@@ -258,7 +270,7 @@
                     detail.textContent = result.type === 'country' ? 'Country · all cities' : result.region;
                     option.append(label, detail);
                     option.addEventListener('pointerdown', event => event.preventDefault());
-                    option.addEventListener('click', () => { if (ticket === request) choose(control, result); });
+                    option.addEventListener('click', () => { if (ticket === request) choose(control, result, { advanceToCity: true }); });
                     list.append(option);
                 }
                 position();
@@ -339,8 +351,8 @@
                     cancelDraft(); close(); return;
                 }
                 if (event.key === 'Enter') {
-                    if (active === control && selected >= 0 && results[selected]) choose(control, results[selected]);
-                    else if (control.field === 'country') resolve(control);
+                    if (active === control && selected >= 0 && results[selected]) choose(control, results[selected], { advanceToCity: true });
+                    else if (control.field === 'country') resolve(control, { advanceToCity: true });
                     else resolveGroup(control);
                     return;
                 }

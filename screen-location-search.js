@@ -107,16 +107,34 @@
         function hasDraft(control) {
             return control.dirty || control.input.value.trim().toLocaleLowerCase() !== committedValue(control).toLocaleLowerCase();
         }
-        async function search(control, query) {
-            const matches = await root.SIXO_LOCATION_AUTOCOMPLETE.search(query);
+        function selectedCountry(control) {
             const countryControl = control.group.controls.find(member => member.field === 'country');
-            const country = clean(countryControl && hasDraft(countryControl) ? countryControl.input.value
+            return clean(countryControl && hasDraft(countryControl) ? countryControl.input.value
                 : control.group.country ? control.group.country.value : control.source.dataset.locationCountry);
-            if (control.field !== 'city' || !country || !query.trim() || query.includes(',')) return matches;
-            // A city-only edit belongs to the selected country. An explicit
-            // country option or a qualified city may still change that country.
-            const cities = await root.SIXO_LOCATION_AUTOCOMPLETE.search(`${query}, ${country}`);
-            return [...matches.filter(result => result.type === 'country'), ...cities];
+        }
+        async function search(control, query) {
+            // Standalone location fields can still select a city or country.
+            // Paired fields each have one role, including an empty city search.
+            if (!control.group.country) {
+                const country = selectedCountry(control);
+                const matches = await root.SIXO_LOCATION_AUTOCOMPLETE.search(query);
+                if (!country || !query.trim() || query.includes(',')) return matches;
+                const cities = await root.SIXO_LOCATION_AUTOCOMPLETE.search(`${query}, ${country}`);
+                return [...matches.filter(result => result.type === 'country'), ...cities];
+            }
+            return root.SIXO_LOCATION_AUTOCOMPLETE.search(query, {
+                type: control.field, country: control.field === 'city' ? selectedCountry(control) : ''
+            });
+        }
+        function fieldLabel(control) {
+            return !control.group.country ? 'city or country' : control.field;
+        }
+        function noMatches(control) {
+            if (control.field === 'city' && control.group.country && selectedCountry(control)) {
+                return `No matching cities in ${selectedCountry(control)}. Try another city or change the country.`;
+            }
+            return control.group.country && control.field === 'city' && !control.input.value.trim()
+                ? 'Choose a country or type a city name.' : `No matches. Try a ${fieldLabel(control)} name.`;
         }
         function sync(control) {
             if (control.dirty) return;
@@ -147,7 +165,7 @@
                 const matches = await search(control, query);
                 if (revision !== control.group.revision || !control.dirty || control.input.value.trim() !== query) return false;
                 if (!matches.length) {
-                    status.textContent = 'No matches. Try a city or country name.';
+                    status.textContent = noMatches(control);
                     control.input.setAttribute('aria-invalid', 'true');
                     return false;
                 }
@@ -185,7 +203,7 @@
         }
         function show(control, delay = 0) {
             if (draft && draft !== control && draft.group !== control.group) cancelDraft();
-            if (active !== control) list.replaceChildren();
+            list.replaceChildren();
             if (active && active !== control) active.input.setAttribute('aria-expanded', 'false');
             active = control;
             const ticket = ++request;
@@ -193,7 +211,8 @@
             results = []; selected = -1;
             control.input.removeAttribute('aria-activedescendant');
             list.setAttribute('aria-busy', 'true');
-            status.textContent = 'Loading cities and countries…';
+            list.setAttribute('aria-label', control.group.country ? (control.field === 'city' ? 'Cities' : 'Countries') : 'Cities and countries');
+            status.textContent = control.group.country ? (control.field === 'city' ? 'Loading cities…' : 'Loading countries…') : 'Loading cities and countries…';
             popup.hidden = false;
             if (typeof popup.showPopover === 'function' && !popup.matches(':popover-open')) popup.showPopover();
             control.input.setAttribute('aria-expanded', 'true');
@@ -208,7 +227,7 @@
                 if (ticket !== request || active !== control || control.input.value !== query) return;
                 results = matches;
                 list.replaceChildren(); list.setAttribute('aria-busy', 'false');
-                status.textContent = matches.length ? 'Choose a city or country' : 'No matches. Try a city or country name.';
+                status.textContent = matches.length ? `Choose a ${fieldLabel(control)}` : noMatches(control);
                 for (const [index, result] of matches.entries()) {
                     const option = document.createElement('button');
                     option.type = 'button'; option.tabIndex = -1;
@@ -238,13 +257,13 @@
             const input = document.createElement('input');
             input.type = 'search'; input.id = `${source.id}-autocomplete`;
             input.className = `${source.className.replace(/\bhidden\b/g, '')} location-search-input`;
-            input.placeholder = field === 'country' ? 'Country or city' : 'City or country';
+            input.placeholder = group.country ? (field === 'country' ? 'Country' : 'City') : 'City or country';
             input.autocomplete = 'off'; input.spellcheck = false;
             input.setAttribute('role', 'combobox');
             input.setAttribute('aria-autocomplete', 'list');
             input.setAttribute('aria-controls', list.id);
             input.setAttribute('aria-expanded', 'false');
-            input.setAttribute('aria-label', source.getAttribute('aria-label') || (field === 'country' ? 'Country or city' : 'City or country'));
+            input.setAttribute('aria-label', source.getAttribute('aria-label') || input.placeholder);
             input.maxLength = 160;
             source.dataset.locationSearchSource = '1';
             source.style.setProperty('display', 'none', 'important');
@@ -258,7 +277,14 @@
             Object.defineProperty(source, 'value', {
                 configurable: true,
                 get() { return descriptor.get.call(this); },
-                set(value) { descriptor.set.call(this, value); sync(control); }
+                set(value) {
+                    const previous = clean(descriptor.get.call(this));
+                    descriptor.set.call(this, value); sync(control);
+                    if (field === 'country' && previous !== clean(descriptor.get.call(this))) {
+                        group.revision++;
+                        if (active?.group === group && active.field === 'city') show(active);
+                    }
+                }
             });
             source.focus = options => input.focus(options);
             new MutationObserver(() => sync(control)).observe(source, { childList: true, subtree: true });
@@ -295,6 +321,7 @@
                 }
                 if (event.key === 'Enter') {
                     if (active === control && selected >= 0 && results[selected]) choose(control, results[selected]);
+                    else if (control.field === 'country') resolve(control);
                     else resolveGroup(control);
                     return;
                 }

@@ -7,13 +7,16 @@
     const prefixKey = value => Array.from(value).slice(0, 2).map(c => c.codePointAt(0).toString(16)).join('-');
     const aliases = { US: ['usa', 'u.s.', 'u.s.a.', 'united states of america'], GB: ['uk', 'u.k.', 'britain', 'great britain'] };
     async function read(name) {
-        if (!/^(catalog|[0-9a-f]+(?:-[0-9a-f]+)?)$/.test(name)) throw new Error('Invalid search data');
+        if (!/^(catalog|[0-9a-f]+(?:-[0-9a-f]+)?|country-[A-Z]{2})$/.test(name)) throw new Error('Invalid search data');
         if (!cache.has(name)) {
             const promise = (async () => {
                 const controller = new AbortController();
                 const timer = setTimeout(() => controller.abort(), 12000);
                 try {
-                    const response = await fetch(`/data/geography/search/${name}.json?v=${VERSION}`, { credentials: 'omit', signal: controller.signal });
+                    const url = name.startsWith('country-') ? `/data/geography/${name.slice(8)}.json` : `/data/geography/search/${name}.json`;
+                    const response = await fetch(`${url}?v=${VERSION}`, { credentials: 'omit', signal: controller.signal });
+                    // Some catalog entries have no populated-place data.
+                    if (name.startsWith('country-') && response.status === 404) return [];
                     if (!response.ok) throw new Error('Location suggestions unavailable');
                     return await response.json();
                 } finally { clearTimeout(timer); }
@@ -23,19 +26,32 @@
         }
         return cache.get(name);
     }
-    async function search(value, { limit = 12, regions = [] } = {}) {
+    async function search(value, { limit = 12, regions = [], country = '', type = '' } = {}) {
         const text = normalize(value).slice(0, 160);
         const parts = text.split(',').map(part => part.trim()).filter(Boolean);
         const query = parts[0] || '', qualifiers = parts.slice(1);
         const catalog = await read('catalog');
         const countries = catalog.countries;
         const countryNames = row => [normalize(row.name), row.code.toLowerCase(), ...(aliases[row.code] || [])];
-        const countryResults = qualifiers.length ? [] : countries.filter(row => !query || countryNames(row).some(name => name.startsWith(query)))
+        const scopedCountry = country ? countries.find(row => countryNames(row).includes(normalize(country))) : null;
+        if (country && !scopedCountry) return [];
+        const countryResults = qualifiers.length || type === 'city' ? [] : countries.filter(row => (!scopedCountry || row.code === scopedCountry.code)
+            && (!query || countryNames(row).some(name => name.startsWith(query))))
             .map(row => ({ id: `country-${row.code}`, city: '', country: row.name, countryCode: row.code, region: '', label: row.name, type: 'country', exact: countryNames(row).includes(query) }));
+        if (type === 'country') return countryResults;
+        if (type === 'city' && scopedCountry && Array.from(query).length < 2) {
+            const records = await read(`country-${scopedCountry.code}`);
+            return records.filter(([city, region]) => normalize(city).startsWith(query)
+                && qualifiers.every(part => [normalize(region), ...countryNames(scopedCountry)].some(name => name.startsWith(part))))
+                .slice(0, Math.min(50, Math.max(1, limit)))
+                .map(([city, region]) => ({ id: `city-${scopedCountry.code}-${city}-${region}`, city, region,
+                    country: scopedCountry.name, countryCode: scopedCountry.code, label: `${city}, ${scopedCountry.name}`, type: 'city' }));
+        }
         if (!query) return countryResults;
         const countryMap = new Map(countries.map(row => [row.code, row]));
         // Home supports state/province scopes. City-only controls omit this list.
-        const regionResults = regions.filter(row => (normalize(row.name).startsWith(query) || normalize(row.abbr) === query)
+        const regionResults = regions.filter(row => type !== 'city' && (!scopedCountry || row.country === scopedCountry.name)
+            && (normalize(row.name).startsWith(query) || normalize(row.abbr) === query)
             && qualifiers.every(part => {
                 const country = countries.find(country => country.name === row.country);
                 return country && countryNames(country).some(name => name.startsWith(part));
@@ -46,7 +62,8 @@
         let cityResults = [];
         if (Array.from(query).length >= 2 && catalog.shards.includes(key)) {
             const records = await read(key);
-            cityResults = records.filter(([, , region, code, , names]) => names.some(name => name.startsWith(query))
+            cityResults = records.filter(([, , region, code, , names]) => (!scopedCountry || code === scopedCountry.code)
+                && names.some(name => name.startsWith(query))
                 && qualifiers.every(part => [normalize(region), ...countryNames(countryMap.get(code))].some(name => name.startsWith(part))))
                 .map(([id, city, region, code, population, names]) => ({ id: `city-${id}`, city, region, country: countryMap.get(code).name,
                     countryCode: code, population, label: `${city}, ${countryMap.get(code).name}`, type: 'city', exact: names.includes(query) }));

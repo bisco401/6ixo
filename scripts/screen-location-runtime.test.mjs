@@ -43,7 +43,7 @@ const context = vm.createContext({ window, document, Event, setTimeout, clearTim
     HTMLInputElement: Field, HTMLSelectElement: Select, MutationObserver: class { observe() {} },
     Option: class { constructor(text, value) { this.text = text; this.value = value; } },
     fetch: async url => {
-        assert.match(url, /^\/data\/geography\/search\/[\w-]+\.json\?v=/);
+        assert.match(url, /^\/data\/geography\/(?:search\/[\w-]+|[A-Z]{2})\.json\?v=/);
         return { ok: true, json: async () => JSON.parse(readFileSync(new URL(url.slice(1).split('?')[0], root), 'utf8')) };
     }
 });
@@ -75,7 +75,25 @@ for (const [country, city] of groups) {
     assert.equal(elements.get(city).value, 'London', city);
     assert.equal(country ? elements.get(country).value : elements.get(city).dataset.locationCountry, 'Canada', `${city}: city-only edits must respect the selected country`);
     input.value = 'London, United Kingdom'; enter(input); await settle();
-    assert.equal(country ? elements.get(country).value : elements.get(city).dataset.locationCountry, 'United Kingdom', `${city}: an explicit qualifier can change the country`);
+    if (country) {
+        assert.equal(elements.get(country).value, 'Canada', `${city}: a city qualifier cannot override the selected country`);
+        assert.equal(input.getAttribute('aria-invalid'), 'true');
+        const countryInput = elements.get(`${country}-autocomplete`);
+        countryInput.value = 'Ghana'; enter(countryInput); await settle();
+        assert.equal(elements.get(city).value, '', `${city}: changing countries clears the old city`);
+        assert.equal(input.value, '');
+        input.focus(); await settle();
+        const options = document.body.children[0].children[1].children;
+        assert.ok(options.length > 0 && options.every(option => option.children[0].textContent.endsWith(', Ghana')), `${city}: empty city menu stays in Ghana`);
+        assert.ok(options.some(option => option.children[0].textContent === 'Accra, Ghana'));
+        assert.equal(input.placeholder, 'City');
+        assert.equal(countryInput.placeholder, 'Country');
+        options.find(option => option.children[0].textContent === 'Accra, Ghana').dispatchEvent(new Event('click'));
+        assert.equal(elements.get(city).value, 'Accra');
+        assert.equal(elements.get(country).value, 'Ghana');
+    } else {
+        assert.equal(elements.get(city).dataset.locationCountry, 'United Kingdom', 'Standalone location fields retain qualified worldwide search');
+    }
 }
 
 const pair = groups.find(([country]) => country === 'electronics-country');
@@ -122,7 +140,7 @@ for (const [nextCountry, nextCity] of [
     assert.equal(elements.get(country).value, nextCountry, `${nextCity}: country is committed`);
     assert.equal(elements.get(city).value, nextCity, `${nextCity}: city is committed`);
 }
-console.log(`Screen location runtime passed: all ${groups.length} control groups, eight listing countries, selected-country isolation, explicit country changes and autofilled Search.`);
+console.log(`Screen location runtime passed: all ${groups.length} control groups, Ghana city menus, country isolation, country changes and autofilled Search.`);
 
 // Draft edits must not reset filters, normalize spaces, or trigger a lookup for
 // every key. Exercise the real event handlers with a pending older response.
@@ -159,3 +177,25 @@ assert.ok(searches.length > 0);
 assert.equal(cityInput.value, 'New ');
 window.SIXO_LOCATION_AUTOCOMPLETE.search = autocompleteSearch;
 console.log('Screen typing passed: spaces, deferred lookup, no filter resets, stale responses and keyboard composition.');
+
+// A country update while a city lookup is pending must retire the old menu
+// and any Enter commit, even when the query text has not changed.
+countryInput.value = 'Ghana'; enter(countryInput); await settle();
+let finishGhana;
+window.SIXO_LOCATION_AUTOCOMPLETE.search = (query, options) => options?.country === 'Ghana'
+    ? new Promise(resolve => { finishGhana = resolve; }) : autocompleteSearch(query, options);
+cityInput.value = ''; cityInput.focus(); await settle();
+elements.get(country).value = 'Canada'; await settle();
+finishGhana([{ city: 'Accra', country: 'Ghana', label: 'Accra, Ghana', type: 'city' }]); await settle();
+assert.ok(popup.children[1].children.length > 0);
+assert.ok(popup.children[1].children.every(option => option.children[0].textContent.endsWith(', Canada')), 'A late Ghana response cannot replace the Canadian city menu');
+window.SIXO_LOCATION_AUTOCOMPLETE.search = autocompleteSearch;
+countryInput.value = 'Ghana'; enter(countryInput); await settle();
+window.SIXO_LOCATION_AUTOCOMPLETE.search = () => new Promise(resolve => { finishGhana = resolve; });
+cityInput.value = 'Accra'; enter(cityInput); await settle();
+elements.get(country).value = 'Canada';
+finishGhana([{ city: 'Accra', country: 'Ghana', label: 'Accra, Ghana', type: 'city' }]); await settle();
+assert.equal(elements.get(country).value, 'Canada', 'A stale Enter resolution cannot undo a newer country change');
+assert.equal(elements.get(city).value, '', 'A stale Enter resolution cannot commit a city in the old country');
+window.SIXO_LOCATION_AUTOCOMPLETE.search = autocompleteSearch;
+console.log('Country changes retire pending city suggestions and commits.');

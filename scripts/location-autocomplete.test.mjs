@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import vm from 'node:vm';
 
 const root = new URL('../', import.meta.url);
@@ -8,11 +8,12 @@ let failKey = '';
 const context = {
     setTimeout, clearTimeout, AbortController,
     fetch: async (url, options) => {
-        assert.match(url, /^\/data\/geography\/search\/(catalog|[0-9a-f]+(?:-[0-9a-f]+)?)\.json\?v=[\w-]+$/);
+        assert.match(url, /^\/data\/geography\/(?:search\/(catalog|[0-9a-f]+(?:-[0-9a-f]+)?)|[A-Z]{2})\.json\?v=[\w-]+$/);
         assert.equal(options.credentials, 'omit');
         requests.push(url);
         if (failKey && url.includes(failKey)) throw new Error('Simulated offline shard');
-        return { ok: true, json: async () => JSON.parse(readFileSync(new URL(url.slice(1).split('?')[0], root), 'utf8')) };
+        const file = new URL(url.slice(1).split('?')[0], root);
+        return { ok: existsSync(file), status: existsSync(file) ? 200 : 404, json: async () => JSON.parse(readFileSync(file, 'utf8')) };
     }
 };
 vm.runInNewContext(readFileSync(new URL('location-autocomplete.js', root), 'utf8'), context);
@@ -52,9 +53,31 @@ assert.ok((await search('')).length > 240, 'An empty field offers the country dr
 assert.ok((await search('a')).every(row => row.type === 'country'), 'Cities need two letters');
 assert.ok((await search('sa', { limit: 7 })).length <= 7);
 
-failKey = '/61-63.json';
-await assert.rejects(search('Accr'), /offline/);
+const ghanaCities = await search('', { type: 'city', country: 'Ghana' });
+assert.ok(ghanaCities.some(row => row.city === 'Accra'), 'An empty Ghana city field offers real cities immediately');
+assert.ok(ghanaCities.every(row => row.type === 'city' && row.country === 'Ghana'));
+const beforeCountryCache = requests.length;
+const initialA = await search('a', { type: 'city', country: 'GH' });
+assert.ok(initialA.length > 0 && initialA.every(row => row.city.toLowerCase().startsWith('a') && row.country === 'Ghana'));
+assert.equal(requests.length, beforeCountryCache, 'Empty and one-letter searches reuse the country data');
+assert.equal((await search('Accr', { type: 'city', country: 'Ghana' }))[0].city, 'Accra');
+assert.ok((await search('ca', { type: 'city', country: 'Canada' })).every(row => row.type === 'city' && row.country === 'Canada'));
+assert.equal((await search('London', { type: 'city', country: 'Canada', limit: 1 }))[0].country, 'Canada', 'Country filtering precedes ranking and limits');
+assert.equal((await search('London, United Kingdom', { type: 'city', country: 'Canada' })).length, 0);
+assert.equal((await search('Kenya', { type: 'city', country: 'Ghana' })).length, 0, 'City fields never offer countries');
+assert.equal((await search('', { type: 'city', country: 'Gha' })).length, 0, 'An unresolved country draft cannot fall back to global suggestions');
+assert.equal((await search('', { type: 'city' })).length, 0, 'An unscoped empty city field never shows countries');
+assert.equal((await search('', { type: 'city', country: 'Antarctica' })).length, 0, 'Countries without populated-place data show an empty city list');
+assert.ok((await search('ca', { type: 'country' })).every(row => row.type === 'country'));
+assert.equal((await search('Toronto', { type: 'country' })).length, 0);
+failKey = '/KE.json';
+await assert.rejects(search('', { type: 'city', country: 'Kenya' }), /offline/);
 failKey = '';
-assert.equal((await search('Accr'))[0].label, 'Accra, Ghana', 'Failed requests can be retried');
+assert.ok((await search('', { type: 'city', country: 'Kenya' })).length > 0, 'Failed country requests can be retried');
+
+failKey = '/6b-75.json';
+await assert.rejects(search('Kumasi'), /offline/);
+failKey = '';
+assert.equal((await search('Kumasi'))[0].label, 'Kumasi, Ghana', 'Failed requests can be retried');
 assert.ok(requests.every(url => !url.includes('Atla') && !url.includes('Atlanta')), 'Full queries are not sent in data URLs');
 console.log('City autocomplete passed: Atlanta prefix, population ranking, regions/countries, accents, typed qualifiers, country fallback, local-only shards, caching and retries.');

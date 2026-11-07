@@ -82,12 +82,30 @@
             const viewport = root.visualViewport;
             const left = viewport?.offsetLeft || 0, top = viewport?.offsetTop || 0;
             const width = viewport?.width || root.innerWidth, height = viewport?.height || root.innerHeight;
-            const below = top + height - rect.bottom - 12, above = rect.top - top - 12;
+            const gap = 6, edge = 12;
+            const below = top + height - edge - rect.bottom - gap, above = rect.top - top - edge - gap;
             const useAbove = below < 180 && above > below;
-            popup.style.width = `${Math.min(Math.max(rect.width, 300), width - 24)}px`;
-            popup.style.left = `${Math.max(left + 12, Math.min(rect.left, left + width - popup.offsetWidth - 12))}px`;
-            popup.style.maxHeight = `${Math.max(100, Math.min(340, useAbove ? above : below))}px`;
-            popup.style.top = `${useAbove ? rect.top - Math.min(popup.scrollHeight, above, 340) - 6 : rect.bottom + 6}px`;
+            const available = useAbove ? above : below;
+            const visible = available >= 72 && rect.bottom > top && rect.top < top + height;
+            popup.style.visibility = visible ? 'visible' : 'hidden';
+            active.input.setAttribute('aria-expanded', String(visible));
+            if (!visible) {
+                selected = -1;
+                active.input.removeAttribute('aria-activedescendant');
+                return;
+            }
+            popup.style.width = `${Math.max(0, Math.min(Math.max(rect.width, 300), width - edge * 2))}px`;
+            popup.style.maxHeight = `${Math.min(340, available)}px`;
+            // iOS can move the fixed/popover origin when the keyboard pans the
+            // visual viewport. Measure that origin and the rendered border box
+            // instead of mixing CSS offsets with scrollHeight/content size.
+            popup.style.left = '0px';
+            popup.style.top = '0px';
+            const box = popup.getBoundingClientRect();
+            const targetLeft = Math.max(left + edge, Math.min(rect.left, left + width - box.width - edge));
+            const targetTop = useAbove ? rect.top - box.height - gap : rect.bottom + gap;
+            popup.style.left = `${targetLeft - box.left}px`;
+            popup.style.top = `${targetTop - box.top}px`;
         }
         function close() {
             request++; clearTimeout(timer);
@@ -315,6 +333,7 @@
             input.addEventListener('keydown', event => {
                 if (control.composing || event.isComposing || event.keyCode === 229) return;
                 if (!['ArrowDown', 'ArrowUp', 'Enter', 'Escape'].includes(event.key)) return;
+                if (active === control && popup.style.visibility === 'hidden' && event.key.startsWith('Arrow')) return;
                 event.stopImmediatePropagation(); event.preventDefault();
                 if (event.key === 'Escape') {
                     cancelDraft(); close(); return;

@@ -22,7 +22,16 @@ class Field extends EventTarget {
     insertAdjacentElement(_, input) { input.screen = this.screen; elements.set(input.id, input); }
     closest(selector) { return selector === '.content-screen' ? this.screen : this.tagName === 'BUTTON' ? this : null; }
     contains(element) { return this.children.includes(element) || this.children.some(child => child.contains?.(element)); }
-    getBoundingClientRect() { return { left: 20, top: 20, bottom: 64, width: 320 }; }
+    getBoundingClientRect() {
+        if (this.id === 'screen-location-suggestions') {
+            const top = (parseFloat(this.style.top) || 0) + (this.fixedOriginTop || 0);
+            const left = (parseFloat(this.style.left) || 0) + (this.fixedOriginLeft || 0);
+            const height = Math.min(this.scrollHeight + 2, parseFloat(this.style.maxHeight) || Infinity);
+            const width = parseFloat(this.style.width) || 320;
+            return { left, top, right: left + width, bottom: top + height, width, height };
+        }
+        return this.rect || { left: 20, top: 20, bottom: 64, width: 320 };
+    }
     scrollIntoView() {}
     focus() { document.activeElement = this; this.dispatchEvent(new Event('focus')); }
     click() { this.clicks = (this.clicks || 0) + 1; }
@@ -38,7 +47,8 @@ Object.assign(document, {
     createElement: tag => new Field(tag.toUpperCase()),
     body: new Field('BODY'), activeElement: null
 });
-const window = Object.assign(new EventTarget(), { innerWidth: 1280, innerHeight: 900 });
+const viewport = Object.assign(new EventTarget(), { offsetTop: 0, offsetLeft: 0, width: 1280, height: 900 });
+const window = Object.assign(new EventTarget(), { innerWidth: 1280, innerHeight: 900, visualViewport: viewport });
 const context = vm.createContext({ window, document, Event, setTimeout, clearTimeout, AbortController,
     HTMLInputElement: Field, HTMLSelectElement: Select, MutationObserver: class { observe() {} },
     Option: class { constructor(text, value) { this.text = text; this.value = value; } },
@@ -199,3 +209,32 @@ assert.equal(elements.get(country).value, 'Canada', 'A stale Enter resolution ca
 assert.equal(elements.get(city).value, '', 'A stale Enter resolution cannot commit a city in the old country');
 window.SIXO_LOCATION_AUTOCOMPLETE.search = autocompleteSearch;
 console.log('Country changes retire pending city suggestions and commits.');
+
+// Keyboard resizing/panning must never place suggestions over the typing field.
+countryInput.value = 'Ghana'; enter(countryInput); await settle();
+cityInput.value = ''; cityInput.focus(); await settle();
+for (const scenario of [
+    { name: 'desktop below', height: 900, top: 100, offset: 0, origin: 0 },
+    { name: 'keyboard above', height: 440, top: 280, offset: 0, origin: 0 },
+    { name: 'panned fixed origin', height: 360, top: 440, offset: 180, origin: 180 },
+    { name: 'opposite fixed origin', height: 360, top: 440, offset: 180, origin: -180 },
+    { name: 'keyboard below', height: 440, top: 70, offset: 0, origin: 0 },
+    { name: 'little room', height: 160, top: 60, offset: 0, origin: 0, hidden: true },
+    { name: 'offscreen field', height: 360, top: 20, offset: 180, origin: 180, hidden: true },
+    { name: 'keyboard dismissed', height: 844, top: 400, offset: 0, origin: 0 }
+]) {
+    Object.assign(viewport, { height: scenario.height, width: 390, offsetTop: scenario.offset, offsetLeft: 0 });
+    cityInput.rect = { left: 30, top: scenario.top, bottom: scenario.top + 44, width: 330 };
+    popup.fixedOriginTop = scenario.origin;
+    popup.scrollHeight = 950;
+    viewport.dispatchEvent(new Event('resize'));
+    assert.equal(popup.style.visibility, scenario.hidden ? 'hidden' : 'visible', scenario.name);
+    assert.equal(document.activeElement, cityInput, 'Repositioning must preserve input focus');
+    assert.equal(cityInput.value, '', 'Repositioning must preserve the draft');
+    if (scenario.hidden) continue;
+    const box = popup.getBoundingClientRect();
+    assert.ok(box.bottom <= cityInput.rect.top - 6 || box.top >= cityInput.rect.bottom + 6, `${scenario.name}: input stays uncovered`);
+    assert.ok(box.top >= scenario.offset + 12 && box.bottom <= scenario.offset + scenario.height - 12, `${scenario.name}: menu fits above the keyboard`);
+    assert.ok(box.left >= 12 && box.right <= 378, `${scenario.name}: menu fits the screen width`);
+}
+console.log('Keyboard geometry passed: above/below placement, panned popover origins, small viewports, focus and draft preservation.');

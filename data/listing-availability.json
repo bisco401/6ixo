@@ -1,5 +1,5 @@
 {
-  "checkedAt": "2026-11-06T22:32:46Z",
+  "checkedAt": "2026-11-07T06:33:13Z",
   "listings": {
     "craigslist.org/view/d/bastrop-used-2025-cadillac-xt4-fwd-4d/fuqr_3uo8rgowpq1ctwx-a": {
       "availability": "sold",
@@ -17923,6 +17923,311 @@
     "kijiji.ca/v-fireplace-firewood/hamilton/custom-build-closet-laundry-office-fireplace-mudroom-cabinet/1745811623": {
       "availability": "unavailable",
       "checkedAt": "2026-11-06T22:32:46Z",
+      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+    },
+    "turnpikemotorsflorida.com/details/used-2010-chrysler-town-and-country/123305382": {
+      "availability": "gone",
+      "checkedAt": "2026-11-07T06:33:13Z",
+      "reason": "Exact source URL returned HTTP 404"
+    },
+    "kijiji.ca/v-apartments-condos/city-of-toronto/beautiful-condo-with-1-bedroom-den-with-huge-terrace/1745802662": {
+      "availability": "unavailable",
+      "checkedAt": "2026-11-07T06:33:13Z",
+      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+    },
+    "albacars.ae/buy-used-cars/vehicle/2321-mercedes-benz-e-class-e-300": {
+      "availability": "sold",
+      "checkedAt": "2026-11-07T06:33:13Z",
+      "reason": "All offers for this exact listing are unavailable"
+    },
+    "craigslist.org/view/d/richardson-2012-honda-accord-lx-one/uffvycjf9djl2mjjvh6gma": {
+      "availability": "gone",
+      "checkedAt": "2026-11-07T06:33:13Z",
+      "reason": "Exact source URL returned HTTP 410"
+    },
+    "craigslist.org/view/d/richardson-2019-subaru-forester-sport/2p4cztzdzbmxe28vclmzj2": {
+      "availability": "gone",
+      "checkedAt": "2026-11-07T06:33:13Z",
+      "reason": "Exact source URL returned HTTP 410"
+    },
+    "craigslist.org/view/d/huguenot-2015-infiniti-qx-60-all-wheel/uakxwjcm1jvlves9d3amak": {
+      "availability": "gone",
+      "checkedAt": "2026-11-07T06:33:13Z",
+      "reason": "Exact source URL returned HTTP 410"
+    },
+    "craigslist.org/view/d/fort-worth-nissan-pathfinder-parting/gqfdevft8gckcthqumfwtk": {
+      "availability": "gone",
+      "checkedAt": "2026-11-07T06:33:13Z",
+      "reason": "Exact source URL returned HTTP 410"
+    },
+    "craigslist.org/view/d/leesburg-2009-mitsubishi-lancer-gts/equgz1tlfwxm43c9t9m1zt": {
+      "availability": "gone",
+      "checkedAt": "2026-11-07T06:33:13Z",
+      "reason": "Exact source URL returned HTTP 410"
+    },
+    "craigslist.org/view/d/leesburg-2006-ford-fusion-sel-106k-miles/jzgnv8ne8htkykjm9rcl3b": {
+      "availability": "gone",
+      "checkedAt": "2026-11-07T06:33:13Z",
+      "reason": "Exact source URL returned HTTP 410"
+    },
+    "craigslist.org/view/d/leesburg-2006-dodge-grand-caravan-sxt/tudugw2uphww598asigs8a": {
+      "availability": "gone",
+      "checkedAt": "2026-11-07T06:33:13Z",
+      "reason": "Exact source URL returned HTTP 410"
+    },
+    "craigslist.org/view/d/leesburg-2010-ford-fusion-se/2rcfqe9hsyxuv1pr176gja": {
+      "availability": "gone",
+      "checkedAt": "2026-11-07T06:33:13Z",
+      "reason": "Exact source URL returned HTTP 410"
+    },
+    "albacars.ae/buy-used-cars/vehicle/2244-maserati-levante": {
+      "availability": "sold",
+      "checkedAt": "2026-11-07T06:33:13Z",
+      "reason": "All offers for this exact listing are unavailable"
+    },
+    "craigslist.org/view/d/loganville-2011-dodge-charger-t/fiaryzkmhybfyx6pgqcjwy": {
+      "availability": "gone",
+      "checkedAt": "2026-11-07T06:33:13Z",
+      "reason": "Exact source URL returned HTTP 410"
+    },
+    "craigslist.org/view/d/loganville-2011-honda-odyssey/rifmkwakgpdcgcrq8uwwrp": {
+      "availability": "gone",
+      "checkedAt": "2026-11-07T06:33:13Z",
+      "reason": "Exact source URL returned HTTP 410"
+    },
+    "craigslist.org/view/d/loganville-2016-chevrolet-silverado-1500/pzrzqrsmd3awoywzzuq2dg": {
+      "availability": "gone",
+      "checkedAt": "2026-11-07T06:33:13Z",
+      "reason": "Exact source URL returned HTTP 410"
+    },
+    "craigslist.org/view/d/lubbock-2019-acura-tlx-35-technology/gjqspsidxjantjuymmrj1p": {
+      "availability": "gone",
+      "checkedAt": "2026-11-07T06:33:13Z",
+      "reason": "Exact source URL returned HTTP 410"
+    },
+    "craigslist.org/view/d/loganville-2021-ford-f150-xlt/trsmwctrhn9tesufzv4qpw": {
+      "availability": "gone",
+      "checkedAt": "2026-11-07T06:33:13Z",
+      "reason": "Exact source URL returned HTTP 410"
+    },
+    "craigslist.org/view/d/lithia-springs-print-2017-ford-transit/3mzhus44w9dh632d24axmn": {
+      "availability": "gone",
+      "checkedAt": "2026-11-07T06:33:13Z",
+      "reason": "Exact source URL returned HTTP 410"
+    },
+    "craigslist.org/view/d/lincoln-1953-ford-crestline-convertible/aht45r7odnbz77g3o3kt6h": {
+      "availability": "gone",
+      "checkedAt": "2026-11-07T06:33:13Z",
+      "reason": "Exact source URL returned HTTP 410"
+    },
+    "craigslist.org/view/d/lubbock-2018-buick-enclave-avenir-only/jw3zry8npetqwfwtxhj1wr": {
+      "availability": "gone",
+      "checkedAt": "2026-11-07T06:33:13Z",
+      "reason": "Exact source URL returned HTTP 410"
+    },
+    "craigslist.org/view/d/lubbock-2017-chevrolet-spark-ls-only/qmiddhmvw5to6bq8k7wj7c": {
+      "availability": "gone",
+      "checkedAt": "2026-11-07T06:33:13Z",
+      "reason": "Exact source URL returned HTTP 410"
+    },
+    "craigslist.org/view/d/sugar-land-2002-audi-tt-225hp-quattro/cz586jf8ujhj8dvqjadbvo": {
+      "availability": "gone",
+      "checkedAt": "2026-11-07T06:33:13Z",
+      "reason": "Exact source URL returned HTTP 410"
+    },
+    "jacars.net/adv/2500762_17-inch-rims-and-6-lugs": {
+      "availability": "gone",
+      "checkedAt": "2026-11-07T06:33:13Z",
+      "reason": "Exact source URL returned HTTP 404"
+    },
+    "craigslist.org/view/d/brooklyn-great-affordable-bedroom/wh3wdtfgwq8awrzx4i8kte": {
+      "availability": "gone",
+      "checkedAt": "2026-11-07T06:33:13Z",
+      "reason": "Exact source URL returned HTTP 410"
+    },
+    "allsoppandallsopp.com/dubai/property/lettings/l-312025": {
+      "availability": "gone",
+      "checkedAt": "2026-11-07T06:33:13Z",
+      "reason": "Exact source URL returned HTTP 410"
+    },
+    "jacars.net/adv/2529606_kitchen-cupboard": {
+      "availability": "gone",
+      "checkedAt": "2026-11-07T06:33:13Z",
+      "reason": "Exact source URL returned HTTP 404"
+    },
+    "craigslist.org/view/d/brooklyn-lovely-bedroom-heat-included/bw5rupztqf5enjqkr9vho1": {
+      "availability": "gone",
+      "checkedAt": "2026-11-07T06:33:13Z",
+      "reason": "Exact source URL returned HTTP 410"
+    },
+    "craigslist.org/view/d/sugar-land-2005-infiniti-g35-coupe/cx5zk2owwpnucx1d89q16t": {
+      "availability": "gone",
+      "checkedAt": "2026-11-07T06:33:13Z",
+      "reason": "Exact source URL returned HTTP 410"
+    },
+    "craigslist.org/view/d/sugar-land-2011-lexus-is-250-sport/j19djcscpghi7fechpmcsd": {
+      "availability": "gone",
+      "checkedAt": "2026-11-07T06:33:13Z",
+      "reason": "Exact source URL returned HTTP 410"
+    },
+    "craigslist.org/view/d/houston-2021-mercedes-in-house/htsjkzypsgp9slv8buzdjw": {
+      "availability": "gone",
+      "checkedAt": "2026-11-07T06:33:13Z",
+      "reason": "Exact source URL returned HTTP 410"
+    },
+    "craigslist.org/view/d/houston-2015-mercedes-gl450-no-credit/8bleeht6cmxtt1ltysuvgo": {
+      "availability": "gone",
+      "checkedAt": "2026-11-07T06:33:13Z",
+      "reason": "Exact source URL returned HTTP 410"
+    },
+    "craigslist.org/view/d/houston-2015-chrysler-dwn-has-warranty/4avzcewffnkemjhutwumzk": {
+      "availability": "gone",
+      "checkedAt": "2026-11-07T06:33:13Z",
+      "reason": "Exact source URL returned HTTP 410"
+    },
+    "craigslist.org/view/d/houston-2018-ford-mustang-open-3000-dwn/4ps9z1my5n6zwufjerup7d": {
+      "availability": "gone",
+      "checkedAt": "2026-11-07T06:33:13Z",
+      "reason": "Exact source URL returned HTTP 410"
+    },
+    "craigslist.org/view/d/pine-lake-2013-bmw-x3-brake-cash-price/7tsocm3z9pvkbqugsrhk3g": {
+      "availability": "gone",
+      "checkedAt": "2026-11-07T06:33:13Z",
+      "reason": "Exact source URL returned HTTP 410"
+    },
+    "craigslist.org/view/d/avondale-estates-2015-infiniti-q70-buy/plunh9lb8rgbeqfpr0uj2a": {
+      "availability": "gone",
+      "checkedAt": "2026-11-07T06:33:13Z",
+      "reason": "Exact source URL returned HTTP 410"
+    },
+    "craigslist.org/view/d/marietta-2014-bmw-x3-financing-available/grbazchb8rgdnmke61yzhw": {
+      "availability": "gone",
+      "checkedAt": "2026-11-07T06:33:13Z",
+      "reason": "Exact source URL returned HTTP 410"
+    },
+    "craigslist.org/view/d/jamaica-2008-honda-pilot-vp-seater-real/squktr2vxq4dgpx4vsybfg": {
+      "availability": "gone",
+      "checkedAt": "2026-11-07T06:33:13Z",
+      "reason": "Exact source URL returned HTTP 410"
+    },
+    "craigslist.org/view/d/jamaica-2018-nissan-sentra-sr-midnight/6qlytb1fmwsjpyhd8txzft": {
+      "availability": "gone",
+      "checkedAt": "2026-11-07T06:33:13Z",
+      "reason": "Exact source URL returned HTTP 410"
+    },
+    "craigslist.org/view/d/valley-stream-2010-subaru-foresterruns/jij5cdgrd5tk98obyrxl5r": {
+      "availability": "gone",
+      "checkedAt": "2026-11-07T06:33:13Z",
+      "reason": "Exact source URL returned HTTP 410"
+    },
+    "craigslist.org/view/d/brooklyn-studio-for-rent/7yx9fw4qfhyurjztdw6jds": {
+      "availability": "gone",
+      "checkedAt": "2026-11-07T06:33:13Z",
+      "reason": "Exact source URL returned HTTP 410"
+    },
+    "craigslist.org/view/d/yonkers-3bd-1bath-apt-available-in-park/7rpzjuioeauqqpjbtkv6mo": {
+      "availability": "gone",
+      "checkedAt": "2026-11-07T06:33:13Z",
+      "reason": "Exact source URL returned HTTP 410"
+    },
+    "craigslist.org/view/d/brooklyn-williamsburg-rent-stabilized/vmb4udwcmzbpkkdvifkzze": {
+      "availability": "gone",
+      "checkedAt": "2026-11-07T06:33:13Z",
+      "reason": "Exact source URL returned HTTP 410"
+    },
+    "craigslist.org/view/d/new-york-month-and-half-free-open-view/2hnbeelb8rgxl9alkf3f-q": {
+      "availability": "gone",
+      "checkedAt": "2026-11-07T06:33:13Z",
+      "reason": "Exact source URL returned HTTP 410"
+    },
+    "craigslist.org/view/d/new-york-on-wall-streetwith-rooftop/luuurdnb8rgkk9tcurjg4g": {
+      "availability": "gone",
+      "checkedAt": "2026-11-07T06:33:13Z",
+      "reason": "Exact source URL returned HTTP 410"
+    },
+    "craigslist.org/view/d/new-york-month-freegreat-lightingopen/rghlk9fb8rg_hi3tqjzdra": {
+      "availability": "gone",
+      "checkedAt": "2026-11-07T06:33:13Z",
+      "reason": "Exact source URL returned HTTP 410"
+    },
+    "craigslist.org/view/d/lubbock-rebuilt-chevy-1972-high/w9vvkaxmsps9fsjn7irzs4": {
+      "availability": "gone",
+      "checkedAt": "2026-11-07T06:33:13Z",
+      "reason": "Exact source URL returned HTTP 410"
+    },
+    "craigslist.org/view/d/corpus-christi-rack-ford/61t5fxsax3vtz4wnny5qvc": {
+      "availability": "gone",
+      "checkedAt": "2026-11-07T06:33:13Z",
+      "reason": "Exact source URL returned HTTP 410"
+    },
+    "craigslist.org/view/d/lubbock-rebuilt-chevy-1972-high/nwzytn9fbxrfokpusbccz9": {
+      "availability": "gone",
+      "checkedAt": "2026-11-07T06:33:13Z",
+      "reason": "Exact source URL returned HTTP 410"
+    },
+    "allsoppandallsopp.com/dubai/property/lettings/l-306310": {
+      "availability": "gone",
+      "checkedAt": "2026-11-07T06:33:13Z",
+      "reason": "Exact source URL returned HTTP 410"
+    },
+    "jacars.net/adv/2512307_welding": {
+      "availability": "gone",
+      "checkedAt": "2026-11-07T06:33:13Z",
+      "reason": "Exact source URL returned HTTP 404"
+    },
+    "centralhomeappliances.com/products/refurbished-beko-wtb7201w-7kg-1200rpm-washing-machine-white": {
+      "availability": "unavailable",
+      "checkedAt": "2026-11-07T06:33:13Z",
+      "reason": "All offers for this exact listing are unavailable"
+    },
+    "albacars.ae/buy-used-cars/vehicle/2243-bmw-x5-xdrive40i-m-sport": {
+      "availability": "sold",
+      "checkedAt": "2026-11-07T06:33:13Z",
+      "reason": "All offers for this exact listing are unavailable"
+    },
+    "kijiji.ca/v-buy-sell-desks/mississauga-peel-region/refresh-tos-system-ufficio-furniture-call-us-now/1745783588": {
+      "availability": "unavailable",
+      "checkedAt": "2026-11-07T06:33:13Z",
+      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+    },
+    "kijiji.ca/v-buy-sell-desks/mississauga-peel-region/steelcase-answer-workstation-system-call-now/1745783577": {
+      "availability": "unavailable",
+      "checkedAt": "2026-11-07T06:33:13Z",
+      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+    },
+    "kijiji.ca/v-buy-sell-desks/mississauga-peel-region/haworth-benching-system-used-cubicles-for-sale-call-now/1745783568": {
+      "availability": "unavailable",
+      "checkedAt": "2026-11-07T06:33:13Z",
+      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+    },
+    "kijiji.ca/v-industrial-shelving-racking/mississauga-peel-region/pallet-racking/1745770852": {
+      "availability": "unavailable",
+      "checkedAt": "2026-11-07T06:33:13Z",
+      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+    },
+    "kijiji.ca/v-industrial-shelving-racking/mississauga-peel-region/new-and-used-pallet-racking-warehouse-storage-rack-shelving/1745771240": {
+      "availability": "unavailable",
+      "checkedAt": "2026-11-07T06:33:13Z",
+      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+    },
+    "kijiji.ca/v-general-labour-jobs/mississauga-peel-region/general-labour/1745783494": {
+      "availability": "unavailable",
+      "checkedAt": "2026-11-07T06:33:13Z",
+      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+    },
+    "kijiji.ca/v-room-rental-roommate/city-of-toronto/furnished-bedroom-for-rent/1745766436": {
+      "availability": "unavailable",
+      "checkedAt": "2026-11-07T06:33:13Z",
+      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+    },
+    "kijiji.ca/v-buy-sell-other/city-of-toronto/tcl-power-supply-30805-000458/1745737604": {
+      "availability": "unavailable",
+      "checkedAt": "2026-11-07T06:33:13Z",
+      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+    },
+    "kijiji.ca/v-auto-body-parts/mississauga-peel-region/2014-nissan-versa-note-for-sale/1745693165": {
+      "availability": "unavailable",
+      "checkedAt": "2026-11-07T06:33:13Z",
       "reason": "Kijiji redirected the exact ad to a confirmed removal"
     }
   }

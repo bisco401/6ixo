@@ -2,7 +2,7 @@
   "intervalHours": 48,
   "sources": {
     "regional": {
-      "lastAttemptAt": "2026-11-06T06:23:09.541022+00:00",
+      "lastAttemptAt": "2026-11-07T06:36:11.942385+00:00",
       "outcome": "failure"
     },
     "general": {
@@ -16,11 +16,11 @@
       "lastSuccessfulSlot": "2026-11-06T00:00:00+00:00"
     },
     "kenya": {
-      "lastAttemptAt": "2026-11-06T06:23:09.541022+00:00",
+      "lastAttemptAt": "2026-11-07T06:36:11.942385+00:00",
       "outcome": "failure"
     },
     "china": {
-      "lastAttemptAt": "2026-11-06T06:23:09.541022+00:00",
+      "lastAttemptAt": "2026-11-07T06:36:11.942385+00:00",
       "outcome": "failure"
     },
     "expansion": {
@@ -29,7 +29,7 @@
       "lastSuccessfulSlot": "2026-11-06T00:00:00+00:00"
     },
     "guyana": {
-      "lastAttemptAt": "2026-11-06T06:23:09.541022+00:00",
+      "lastAttemptAt": "2026-11-07T06:36:11.942385+00:00",
       "outcome": "failure"
     },
     "dubai_vehicles": {
@@ -43,7 +43,7 @@
       "lastSuccessfulSlot": "2026-11-06T00:00:00+00:00"
     },
     "products": {
-      "lastAttemptAt": "2026-11-06T07:20:24.476229+00:00",
+      "lastAttemptAt": "2026-11-07T06:36:11.942385+00:00",
       "outcome": "failure"
     },
     "jobs": {

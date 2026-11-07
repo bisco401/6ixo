@@ -39,6 +39,12 @@ fs.mkdirSync(output, { recursive: true });
             await page.locator('#home-search-btn').click();
             await page.waitForFunction(() => app.manualDiscoveryLocation?.country === 'Ghana' && app.manualDiscoveryLocation.city === '');
             assert.equal(await home.getAttribute('aria-expanded'), 'false', 'Countrywide search leaves City closed');
+            // Search must remain clickable while unconfirmed country suggestions are open.
+            await homeCountry.fill('UAE');
+            await page.locator('#home-search-btn').click({ delay: 150 });
+            await page.waitForFunction(() => app.manualDiscoveryLocation?.country === 'United Arab Emirates' && app.manualDiscoveryLocation.city === '');
+            await homeCountry.fill('Ghana'); await homeCountry.press('Enter');
+            await page.waitForFunction(() => document.getElementById('area-picker').hidden);
             await home.tap();
             await homeMenu.getByRole('option', { name: /^Accra, Ghana/ }).waitFor();
             assert.equal(await homeMenu.getByRole('option').first().locator('span').textContent(), 'All cities in Ghana');

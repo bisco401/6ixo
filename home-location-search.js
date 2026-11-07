@@ -15,6 +15,7 @@
         source.dataset.boundAreaPicker = source.dataset.boundInput = source.dataset.boundEnter = '1';
         let active = null, matches = [], selected = -1, request = 0, revision = 0, timer;
         let dirty = false, composing = false, applying = null, anchor = null;
+        let searchPointerDown = false;
         let committed = { country: '', city: '', region: '', text: '' };
         const clean = value => String(value || '').trim();
         const same = (a, b) => clean(a).toLocaleLowerCase() === clean(b).toLocaleLowerCase();
@@ -235,14 +236,23 @@
                 if (matches.length) highlight((selected + (event.key === 'ArrowDown' ? 1 : -1) + matches.length) % matches.length);
             });
             input.addEventListener('blur', () => setTimeout(() => {
-                if (![country, city].includes(document.activeElement) && !panel.contains(document.activeElement)) close();
+                const target = document.activeElement;
+                // Keep the in-flow menu stable until Search receives its click.
+                if (!searchPointerDown && target?.id !== 'home-search-btn' && ![country, city].includes(target) && !panel.contains(target)) close();
             }, 0));
         }
         document.addEventListener('pointerdown', event => {
+            searchPointerDown = Boolean(event.target.closest?.('#home-search-btn'));
             if (group.contains(event.target) || panel.contains(event.target)) return;
-            if (event.target.closest?.('#home-search-btn, #home-search-what')) { close(); return; }
+            // Hiding this menu on pointerdown would move Search before pointerup.
+            if (searchPointerDown) return;
+            if (event.target.closest?.('#home-search-what')) { close(); return; }
             if (dirty) cancel(); else close();
         });
+        // Safari can blur the input without focusing the pressed button.
+        // Release this guard after the click has had a chance to run.
+        document.addEventListener('pointerup', () => setTimeout(() => { searchPointerDown = false; }, 0));
+        document.addEventListener('pointercancel', () => { searchPointerDown = false; });
         for (const id of ['home-use-location', 'site-use-location']) {
             document.getElementById(id)?.addEventListener('click', () => { anchor = null; cancel(); }, true);
         }

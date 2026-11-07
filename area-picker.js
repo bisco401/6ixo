@@ -1,6 +1,7 @@
 (function () {
     'use strict';
     window.SIXO_AREA_PICKER = { setup(app) {
+        if (window.SIXO_HOME_LOCATION_SEARCH?.setup(app)) return;
         const field = document.getElementById('home-search-location');
         const panel = document.getElementById('area-picker');
         const list = document.getElementById('area-picker-countries');

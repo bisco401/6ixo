@@ -333,6 +333,7 @@
 <link rel="stylesheet" href="/assets/seo-navigation.css?v=20261010">
     <link rel="stylesheet" href="assets/home-tight-layout.css?v=20261102-featured-details-1">
     <link rel="stylesheet" href="assets/desktop-search-toolbar.css?v=20261104-unified-1">
+    <link rel="stylesheet" href="assets/home-location-search.css?v=20261107-home-country-city-1">
     <link rel="stylesheet" href="assets/desktop-marketplace-filters.css?v=20261104-compact-1">
     <link rel="stylesheet" href="assets/mobile-marketplace-filters.css?v=20261106-compact-1">
     <script defer src="assets/mobile-marketplace-filters.js?v=20261106-compact-1"></script>
@@ -714,20 +715,27 @@
 	                        <input type="text" id="home-search-what" placeholder="e.g., iPhone 13, bicycle, couch" autocomplete="off">
 	                        <div id="home-smart-suggestions" class="home-smart-suggestions hidden" role="listbox" aria-label="Search suggestions"></div>
 	                    </div>
-	                    <div class="home-search-field">
-	                        <label for="home-search-location"><span class="home-search-mobile-copy">City, country</span><span class="home-search-desktop-copy">Location</span></label>
-	                        <button type="button" id="home-use-location" class="home-search-field-icon" aria-label="Use my location" title="Use my location">
-                                <i class="fas fa-map-marker-alt" aria-hidden="true"></i>
-                            </button>
-	                        <input type="text" id="home-search-location" placeholder="City, Country" autocomplete="off" spellcheck="false" role="combobox" aria-autocomplete="list" aria-haspopup="listbox" aria-controls="area-picker-countries" aria-expanded="false" aria-describedby="area-picker-status home-device-location-status">
-                            <span class="area-picker-chevron" aria-hidden="true">⌄</span>
+                        <div class="home-location-pair">
+                            <div class="home-location-toolbar">
+                                <span>Location</span>
+                                <button type="button" id="home-use-location" aria-label="Use my location"><i class="fas fa-location-arrow" aria-hidden="true"></i><span>Use my location</span></button>
+                            </div>
+                            <div id="home-location-fields" class="home-location-fields">
+                                <label class="home-location-field" for="home-location-country"><span>Country</span>
+                                    <input id="home-location-country" type="text" placeholder="Choose country" autocomplete="off" spellcheck="false" role="combobox" aria-autocomplete="list" aria-haspopup="listbox" aria-controls="area-picker-countries" aria-expanded="false" aria-describedby="area-picker-status home-device-location-status">
+                                </label>
+                                <label class="home-location-field" for="home-location-city"><span class="home-location-label"><span>City</span><small>Optional</small></span>
+                                    <input id="home-location-city" type="text" placeholder="All cities" autocomplete="off" spellcheck="false" role="combobox" aria-autocomplete="list" aria-haspopup="listbox" aria-controls="area-picker-countries" aria-expanded="false" aria-describedby="area-picker-status home-device-location-status">
+                                </label>
+                            </div>
+                            <input type="hidden" id="home-search-location">
                             <div id="area-picker" hidden>
                                 <p id="area-picker-status" role="status"></p>
                                 <div id="area-picker-countries" role="listbox" aria-label="Cities and countries"></div>
                                 <button type="button" id="area-picker-retry" hidden>Try again</button>
                             </div>
 	                    </div>
-                    <div class="home-search-field">
+                    <div class="home-search-field home-search-category-field">
                         <label for="home-search-category">Category</label>
                             <i class="fas fa-th-large home-search-field-icon" aria-hidden="true"></i>
                             <select id="home-search-category" class="home-select">
@@ -7231,7 +7239,8 @@
             <script src="coming-soon-config.js?v=20260911-public-launch-1"></script>
 	    <script src="local-geography.js?v=20260929-stable-location-refresh-1"></script>
         <script src="location-autocomplete.js?v=20261107-all-location-searches-1"></script>
-        <script src="area-picker.js?v=20261107-all-location-searches-1"></script>
+        <script src="home-location-search.js?v=20261107-home-country-city-1"></script>
+        <script src="area-picker.js?v=20261107-home-country-city-1"></script>
         <script src="screen-location-search.js?v=20261107-all-location-searches-1"></script>
         <script src="device-geocoder.js?v=20260929-worldwide-location-1"></script>
     <script src="assets/clean-blue-profile.a5977c70749b.js"></script>

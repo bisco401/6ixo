@@ -26,7 +26,20 @@
         }
         return cache.get(name);
     }
-    async function search(value, { limit = 12, regions = [], country = '', type = '', nearCity = '', nearRegion = '' } = {}) {
+    async function search(value, { limit = 12, regions = [], country = '', type = '', nearCity = '', nearRegion = '', includeNearby = false } = {}) {
+        // Combined location fields keep the exact destination first, followed
+        // by its cities (or nearby places when a city has been entered).
+        if (includeNearby) {
+            const matches = await search(value, { limit, regions, country, type, nearCity, nearRegion });
+            const anchor = matches[0];
+            if (!anchor?.exact || !['country', 'city'].includes(anchor.type)) return matches;
+            try {
+                const nearby = await search('', { type: 'city', country: anchor.country,
+                    nearCity: anchor.city, nearRegion: anchor.region, limit });
+                return [anchor, ...nearby.filter(result => result.city !== anchor.city || result.region !== anchor.region)]
+                    .slice(0, Math.min(50, Math.max(1, limit)));
+            } catch { return matches; } // The recognized destination remains usable offline.
+        }
         const text = normalize(value).slice(0, 160);
         const parts = text.split(',').map(part => part.trim()).filter(Boolean);
         const query = parts[0] || '', qualifiers = parts.slice(1);

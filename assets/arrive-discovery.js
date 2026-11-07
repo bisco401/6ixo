@@ -217,6 +217,7 @@
             this.app = app; this.root = root; this.abort = new AbortController(); this.tab = 'discover'; this.limit = 24; this.records = [];
             this.countries = ARRIVE_COUNTRY_SEEDS.slice(); this.cityCatalog = []; this.cityOptions = [];
             this.cityLoadKey = ''; this.cityCacheKey = ''; this.cityRequest = 0; this.menuItems = { country: [], city: [] }; this.activeOption = { country: 0, city: 0 };
+            this.pickerRequest = { country: 0, city: 0 }; this.cityAnchor = null;
             this.store = new Store(app, hydrate => { if (this.store) { if (hydrate) this.hydrate(); this.render(); } });
             this.fields = {
                 country: root.querySelector('#arrive-discovery-country'), city: root.querySelector('#arrive-discovery-city'),
@@ -262,6 +263,7 @@
             if (!this.store.current()) return;
             const prefs = this.store.state.preferences;
             if (field === 'country') {
+                this.cityAnchor = null;
                 prefs.country = ''; prefs.city = '';
                 this.fields.country.value = ''; this.fields.city.value = ''; this.countrySearch.value = '';
                 this.cityLoadKey = ''; this.cityCacheKey = ''; this.cityCatalog = []; this.cityOptions = [];
@@ -346,6 +348,7 @@
             } catch { /* Typing a city and known local destinations remain usable. */ }
         }
         hidePicker(field) {
+            this.pickerRequest[field]++;
             const input = this.fields[field], menu = this.root.querySelector('#arrive-discovery-' + field + '-options');
             menu.hidden = true;
             if (field === 'country') this.root.querySelector('#arrive-discovery-country-picker').hidden = true;
@@ -362,51 +365,118 @@
                 if (active) (field === 'country' ? this.countrySearch : this.fields[field]).setAttribute('aria-activedescendant', button.id);
             }
             const selected = menu.querySelector('[aria-selected="true"]');
-            selected?.scrollIntoView({ block: 'nearest' });
+            if (selected) {
+                if (selected.offsetTop < menu.scrollTop) menu.scrollTop = selected.offsetTop;
+                else if (selected.offsetTop + selected.offsetHeight > menu.scrollTop + menu.clientHeight) {
+                    menu.scrollTop = selected.offsetTop + selected.offsetHeight - menu.clientHeight;
+                }
+            }
         }
-        showPicker(field) {
+        positionPicker(field) {
+            const menu = this.root.querySelector('#arrive-discovery-' + field + '-options');
+            if (menu.hidden) return;
+            const input = field === 'country' ? this.countrySearch : this.fields.city;
+            const rect = input.getBoundingClientRect(), viewport = window.visualViewport;
+            const documentRect = document.documentElement.getBoundingClientRect();
+            const top = Math.max(0, (viewport?.offsetTop || 0) + Math.min(0, documentRect.top + (window.scrollY || 0)));
+            const bottom = top + (viewport?.height || window.innerHeight);
+            const control = input.closest('.arrive-destination-control').getBoundingClientRect();
+            const below = bottom - rect.bottom - 18, above = control.top - top - 12;
+            const useAbove = field === 'city' && below < 180 && above > below;
+            const available = useAbove ? above : below;
+            if (field === 'city') {
+                menu.style.top = useAbove ? 'auto' : 'calc(100% + 4px)';
+                menu.style.bottom = useAbove ? 'calc(100% + 4px)' : 'auto';
+            }
+            menu.style.maxHeight = `${Math.max(0, Math.min(field === 'city' ? 250 : 220, available))}px`;
+            const visible = available >= 60 && rect.bottom > top && rect.top < bottom;
+            menu.style.visibility = visible ? 'visible' : 'hidden';
+            input.setAttribute('aria-expanded', String(visible));
+        }
+        async showPicker(field) {
             const input = field === 'country' ? this.countrySearch : this.fields[field];
             const menu = this.root.querySelector('#arrive-discovery-' + field + '-options');
-            const query = text(input.value);
+            const query = text(input.value), country = this.store.state.preferences.country;
+            const request = ++this.pickerRequest[field];
             const matches = field === 'country' ? matchingCountries(this.countries, query)
-                : !this.store.state.preferences.country ? []
+                : !country ? []
                     : this.cityOptions.filter(city => !query || fold(city).includes(fold(query))).slice(0, query ? 30 : 70);
+            this.renderPicker(field, matches);
+            if (!window.SIXO_LOCATION_AUTOCOMPLETE || (field === 'country' && (matches.length || query.length < 2)) || (field === 'city' && !country)) return;
+            try {
+                const anchor = this.cityAnchor?.country === country ? this.cityAnchor : null;
+                const locations = await window.SIXO_LOCATION_AUTOCOMPLETE.search(query, field === 'country'
+                    ? { type: 'city', limit: 24 }
+                    : { type: 'city', country, nearCity: anchor?.city || '', nearRegion: anchor?.region || '', limit: 24 });
+                if (!this.store.current() || request !== this.pickerRequest[field] || menu.hidden
+                    || text(input.value) !== query || this.store.state.preferences.country !== country) return;
+                const suggestions = field === 'country'
+                    ? locations.map(location => ({ name: location.label, location }))
+                    : [...new Set([...locations.map(location => location.city), ...matches])].slice(0, 70);
+                this.renderPicker(field, suggestions);
+            } catch { /* Existing countries and locally known cities remain selectable. */ }
+        }
+        renderPicker(field, matches) {
+            const input = field === 'country' ? this.countrySearch : this.fields[field];
+            const menu = this.root.querySelector('#arrive-discovery-' + field + '-options');
             this.menuItems[field] = matches; this.activeOption[field] = 0;
             menu.innerHTML = matches.length ? matches.map((item, index) => {
                 const name = field === 'country' ? item.name : item;
-                const extra = field === 'country' && item.code ? '<small>' + escape(item.code) + '</small>' : '';
+                const extra = field === 'country' ? '<small>' + escape(item.location ? 'City in ' + item.location.country : item.code || '') + '</small>' : '';
                 return '<button type="button" role="option" class="arrive-destination-option" data-arrive-option="' + escape(name) +
                     '" id="arrive-' + field + '-option-' + index + '" aria-selected="' + (index === 0) + '"><span>' + escape(name) + '</span>' + extra + '</button>';
-            }).join('') : '<p class="arrive-destination-empty">' + (field === 'country' ? 'No matching country.' : this.store.state.preferences.country ? 'No matching city. You can type a city manually.' : 'Choose a country first.') + '</p>';
+            }).join('') : '<p class="arrive-destination-empty">' + (field === 'country' ? 'No matching destination.' : this.store.state.preferences.country ? 'No matching city. You can type a city manually.' : 'Choose a country first.') + '</p>';
             if (field === 'country') this.root.querySelector('#arrive-discovery-country-picker').hidden = false;
             menu.hidden = false; input.setAttribute('aria-expanded', 'true');
             if (matches.length) this.highlightOption(field, 0);
+            this.positionPicker(field);
         }
-        selectDestination(field, value) {
+        selectDestination(field, value, { advanceToCity = false, location = null } = {}) {
             const prefs = this.store.state.preferences, chosen = text(value);
-            if (!chosen) return;
+            if (!chosen || !this.store.current()) return;
             if (field === 'country') {
-                const country = this.countries.find(item => item.name === chosen);
+                location ||= this.menuItems.country.find(item => item.name === chosen)?.location;
+                const country = location ? { name: location.country } : this.countries.find(item => item.name === chosen);
                 if (!country) return;
-                const changed = countryKey(this.app, prefs.country) !== countryKey(this.app, chosen);
-                prefs.country = chosen; this.fields.country.value = chosen; this.countrySearch.value = '';
-                if (changed) { prefs.city = ''; this.fields.city.value = ''; this.cityLoadKey = ''; }
+                this.cityAnchor = location;
+                const changed = countryKey(this.app, prefs.country) !== countryKey(this.app, country.name);
+                prefs.country = country.name; this.fields.country.value = country.name; this.countrySearch.value = '';
+                prefs.city = ''; this.fields.city.value = '';
+                if (changed || location) this.cityLoadKey = '';
                 this.loadCitiesForCountry();
             } else {
                 prefs.city = chosen; this.fields.city.value = chosen;
+                this.cityAnchor = { city: chosen, country: prefs.country };
             }
             this.hidePicker(field);
             prefs.updatedAt = this.stamp(); this.tab = 'discover'; this.limit = 24; this.signature = '';
             this.syncLegacy(); this.render(); this.store.save();
+            if (field === 'country' && (advanceToCity || document.activeElement === this.fields.city)) {
+                if (advanceToCity) this.fields.city.focus();
+                this.showPicker('city');
+            }
         }
-        settleCountryText() {
-            const raw = fold(this.countrySearch.value);
+        async settleCountryText({ advanceToCity = false } = {}) {
+            const query = text(this.countrySearch.value), raw = fold(query);
             const match = this.countries.find(item => [item.name, item.code, ...(item.aliases || [])].some(alias => fold(alias) === raw));
-            if (match) this.selectDestination('country', match.name);
-            else if (!this.root.querySelector('#arrive-discovery-country-options').contains(document.activeElement)) this.hidePicker('country');
+            if (match) { this.selectDestination('country', match.name, { advanceToCity }); return; }
+            if (query && window.SIXO_LOCATION_AUTOCOMPLETE) {
+                try {
+                    const locations = await window.SIXO_LOCATION_AUTOCOMPLETE.search(query, { type: 'city' });
+                    if (!this.store.current() || text(this.countrySearch.value) !== query) return;
+                    const location = locations.find(item => item.exact);
+                    if (location) { this.selectDestination('country', location.country, { advanceToCity, location }); return; }
+                } catch { /* Keep the draft available for retry. */ }
+            }
+            if (!this.root.querySelector('#arrive-discovery-country-options').contains(document.activeElement)) this.hidePicker('country');
         }
         bind() {
             const options = { signal: this.abort.signal };
+            const position = () => { this.positionPicker('country'); this.positionPicker('city'); };
+            window.addEventListener('resize', position, options);
+            window.addEventListener('scroll', position, { ...options, capture: true });
+            window.visualViewport?.addEventListener('resize', position, options);
+            window.visualViewport?.addEventListener('scroll', position, options);
             const update = event => {
                 const field = Object.keys(this.fields).find(key => this.fields[key] === event.target);
                 const checklist = event.target.matches('#arrive-plus-checklist input[type="checkbox"]');
@@ -444,8 +514,8 @@
                 } else if (event.key === 'Enter') {
                     event.preventDefault();
                     const selected = this.menuItems.country[this.activeOption.country];
-                    if (!menu.hidden && selected) this.selectDestination('country', selected.name);
-                    else this.settleCountryText();
+                    if (!menu.hidden && selected) this.selectDestination('country', selected.name, { advanceToCity: true });
+                    else this.settleCountryText({ advanceToCity: true });
                 } else if (event.key === 'Escape') {
                     event.preventDefault(); this.countrySearch.value = ''; this.hidePicker('country');
                 }
@@ -459,10 +529,13 @@
             }, options);
             this.root.querySelector('#arrive-discovery-country-options').addEventListener('click', event => {
                 const choice = event.target.closest('[data-arrive-option]');
-                if (choice) this.selectDestination('country', choice.dataset.arriveOption);
+                if (choice) this.selectDestination('country', choice.dataset.arriveOption, { advanceToCity: true });
             }, options);
             const cityInput = this.fields.city, cityMenu = this.root.querySelector('#arrive-discovery-city-options');
-            cityInput.addEventListener('focus', () => this.showPicker('city'), options);
+            cityInput.addEventListener('focus', async () => {
+                if (this.countrySearch.value.trim()) await this.settleCountryText();
+                if (this.store.current() && document.activeElement === cityInput) this.showPicker('city');
+            }, options);
             cityInput.addEventListener('input', () => this.showPicker('city'), options);
             cityInput.addEventListener('keydown', event => {
                 if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {

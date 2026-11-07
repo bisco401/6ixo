@@ -14,7 +14,7 @@
         let matches = [], active = -1, generation = 0, timer, restoringFocus = false;
         let baseline, baselineValue = '', baselineAuto, applying = null, submitting = null, composing = false;
         const search = query => window.SIXO_LOCATION_AUTOCOMPLETE.search(query, {
-            regions: Array.from(new Set(app.getRegionAliasMap?.().values() || []))
+            regions: Array.from(new Set(app.getRegionAliasMap?.().values() || [])), includeNearby: true, limit: 24
         });
         const remember = () => {
             baseline = app.getHomeSearchLocationSelection();
@@ -23,14 +23,19 @@
         const position = () => {
             if (panel.hidden || !field.getBoundingClientRect) return;
             const rect = field.getBoundingClientRect(), viewport = window.visualViewport;
-            const top = viewport?.offsetTop || 0;
+            const documentRect = document.documentElement.getBoundingClientRect();
+            const top = Math.max(0, (viewport?.offsetTop || 0) + Math.min(0, documentRect.top + (window.scrollY || 0)));
             let bottom = top + (viewport?.height || window.innerHeight);
             const nav = document.querySelector('.bottom-nav')?.getBoundingClientRect();
             if (nav?.height && nav.top > rect.bottom) bottom = Math.min(bottom, nav.top);
             const below = bottom - rect.bottom - 12;
             const above = rect.top - top - 12;
             const useAbove = below < 180 && above > below;
-            const height = Math.max(80, Math.min(420, useAbove ? above : below));
+            const available = useAbove ? above : below;
+            const visible = available >= 72 && rect.bottom > top && rect.top < bottom;
+            panel.style.visibility = visible ? 'visible' : 'hidden';
+            field.setAttribute('aria-expanded', String(visible));
+            const height = Math.max(0, Math.min(420, available));
             panel.style.top = useAbove ? 'auto' : 'calc(100% + 8px)';
             panel.style.bottom = useAbove ? 'calc(100% + 8px)' : 'auto';
             panel.style.maxHeight = `${height}px`;
@@ -119,6 +124,7 @@
             });
             status.textContent = results.length ? (query ? 'Select a location' : 'Type a city or select a country')
                 : (Array.from(query.trim()).length < 2 ? 'Type at least 2 letters for city suggestions.' : 'No matching locations. Try more letters or add a country.');
+            position();
         };
         const refresh = async (query, token) => {
             try {
@@ -144,7 +150,7 @@
         };
         const open = () => {
             if (restoringFocus || !panel.hidden) return;
-            request(app.homeLocationDraft ? field.value : '');
+            request(app.homeLocationDraft || app.getHomeSearchLocationSelection()?.country ? field.value : '');
         };
         app.resolveHomeLocationAutocomplete = async () => {
             if (composing) return false;

@@ -92,3 +92,22 @@ assert.equal((await search('Kumasi'))[0].label, 'Kumasi, Ghana', 'Failed request
 assert.ok(requests.every(url => !url.includes('Atla') && !url.includes('Atlanta')), 'Full queries are not sent in data URLs');
 console.log('City autocomplete passed: Atlanta prefix, population ranking, regions/countries, accents, typed qualifiers, country fallback, local-only shards, caching and retries.');
 console.log('Nearby cities passed: UAE aliases, Dubai/Sharjah/Ajman order, Hamilton, country isolation and cache preservation.');
+for (const country of ['Ghana', 'Canada', 'United Arab Emirates', 'United States', 'United Kingdom', 'Jamaica', 'China', 'Nigeria', 'Kenya', 'Guyana', 'France', 'India']) {
+    const suggestions = await search(country, { includeNearby: true, limit: 24 });
+    assert.equal(suggestions[0].type, 'country');
+    assert.equal(suggestions[0].country, country);
+    assert.ok(suggestions.length > 1, `${country}: combined searches offer its cities`);
+    assert.ok(suggestions.slice(1).every(row => row.type === 'city' && row.country === country));
+}
+for (const [query, city, country] of [['Dubai', 'Dubai', 'United Arab Emirates'], ['Accra', 'Accra', 'Ghana'], ['Toronto', 'Toronto', 'Canada'], ['Nairobi', 'Nairobi', 'Kenya'], ['London, United Kingdom', 'London', 'United Kingdom']]) {
+    const suggestions = await search(query, { includeNearby: true, limit: 24 });
+    assert.equal(suggestions[0].city, city, 'Enter still resolves to the typed city');
+    assert.ok(suggestions.length > 1 && suggestions.every(row => row.country === country));
+    assert.equal(suggestions.filter(row => row.city === city && row.region === suggestions[0].region).length, 1, 'Do not repeat the anchor city');
+}
+assert.equal((await search('Dubai, Ghana', { includeNearby: true })).length, 0, 'Nearby suggestions never ignore an invalid country qualifier');
+failKey = '/ES.json';
+assert.equal((await search('Spain', { includeNearby: true }))[0].country, 'Spain', 'A city-data outage does not block country selection');
+failKey = '';
+assert.ok((await search('Spain', { includeNearby: true })).length > 1, 'Nearby lookup retries after an outage');
+console.log('Combined location searches passed: cities in 12 countries, nearby cities in five countries, exact selection, qualifiers and offline recovery.');

@@ -163,3 +163,24 @@ await new Promise(resolve => setTimeout(resolve, 180));
 assert.equal(lookupCount, 1);
 assert.equal(composition.field.value, 'New ');
 console.log('Manual typing passed: pending listing loads preserve newer edits and composition defers autocomplete.');
+
+// Exercise the Home picker with the real same-origin geography data.
+const nearbyHome = fixture();
+vm.runInNewContext(readFileSync(new URL('location-autocomplete.js', root), 'utf8'), {
+    window: nearbyHome.window, AbortController, setTimeout, clearTimeout,
+    fetch: async url => ({ ok: true, json: async () => JSON.parse(readFileSync(new URL(url.slice(1).split('?')[0], root), 'utf8')) })
+});
+const homeOptions = () => nearbyHome.elements['area-picker-countries'].children;
+for (const [query, expected] of [['Ghana', 'Accra, Ghana'], ['Canada', ', Canada'], ['Dubai', 'Sharjah, United Arab Emirates']]) {
+    nearbyHome.field.value = query; nearbyHome.field.events.input();
+    await new Promise(resolve => setTimeout(resolve, 180));
+    assert.ok(homeOptions().some(option => option.children[0].textContent.endsWith(expected)), `${query}: Home offers matching or nearby cities`);
+}
+homeOptions().find(option => option.children[0].textContent === 'Ajman, United Arab Emirates').events.click();
+await new Promise(setImmediate);
+assert.equal(nearbyHome.app.manualDiscoveryLocation.country, 'United Arab Emirates');
+assert.equal(nearbyHome.app.manualDiscoveryLocation.city, 'Ajman');
+nearbyHome.field.value = 'Dubai';
+await nearbyHome.app.submitHomeSearch();
+assert.equal(nearbyHome.app.manualDiscoveryLocation.city, 'Dubai', 'Home Search keeps the exact city ahead of nearby options');
+console.log('Home nearby search passed: country cities, Dubai/Sharjah/Ajman selection and exact-city Search.');

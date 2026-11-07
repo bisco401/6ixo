@@ -129,6 +129,19 @@ for (const [country, city] of groups) {
         assert.ok(nearbyOptions.some(option => option.children[0].textContent === 'Ajman, United Arab Emirates'));
     } else {
         assert.equal(elements.get(city).dataset.locationCountry, 'United Kingdom', 'Standalone location fields retain qualified worldwide search');
+        input.value = 'Ghana'; input.focus(); await settle();
+        let options = document.body.children[0].children[1].children;
+        assert.equal(options[0].children[0].textContent, 'Ghana');
+        assert.ok(options.some(option => option.children[0].textContent === 'Accra, Ghana'));
+        input.value = 'Dubai'; input.dispatchEvent(new Event('input')); enter(input); await settle();
+        assert.equal(elements.get(city).value, 'Dubai');
+        assert.equal(elements.get(city).dataset.locationCountry, 'United Arab Emirates');
+        input.focus(); await settle();
+        options = document.body.children[0].children[1].children;
+        assert.ok(options.some(option => option.children[0].textContent === 'Sharjah, United Arab Emirates'));
+        options.find(option => option.children[0].textContent === 'Ajman, United Arab Emirates').dispatchEvent(new Event('click'));
+        assert.equal(elements.get(city).value, 'Ajman');
+        assert.equal(elements.get(city).dataset.locationCountry, 'United Arab Emirates');
     }
 }
 

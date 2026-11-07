@@ -163,10 +163,14 @@
             // Paired fields each have one role, including an empty city search.
             if (!control.group.country) {
                 const country = selectedCountry(control);
-                const matches = await root.SIXO_LOCATION_AUTOCOMPLETE.search(query);
-                if (!country || !query.trim() || query.includes(',')) return matches;
-                const cities = await root.SIXO_LOCATION_AUTOCOMPLETE.search(`${query}, ${country}`);
-                return [...matches.filter(result => result.type === 'country'), ...cities];
+                const options = { includeNearby: true, limit: 24 };
+                if (country && !query.trim()) return root.SIXO_LOCATION_AUTOCOMPLETE.search('', {
+                    type: 'city', country, nearCity: clean(control.source.value), limit: 24
+                });
+                const matches = await root.SIXO_LOCATION_AUTOCOMPLETE.search(query, options);
+                if (!country || query.includes(',') || matches[0]?.type === 'country' && matches[0].exact) return matches;
+                const cities = await root.SIXO_LOCATION_AUTOCOMPLETE.search(query, { ...options, country, type: 'city' });
+                return cities.length ? [...matches.filter(result => result.type === 'country'), ...cities] : matches;
             }
             if (control.field === 'country') {
                 const countries = await root.SIXO_LOCATION_AUTOCOMPLETE.search(query, { type: 'country' });

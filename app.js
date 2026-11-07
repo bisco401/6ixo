@@ -179,7 +179,7 @@ function createListingIntegrity() {
     // Buying physical goods is a buying service, not financial/legal advice.
     if (/\b(?:cash (?:for|4) (?:gold|silver|platinum|diamonds?|jewell?ery)|(?:gold|silver|platinum|gift cards?).{0,50}buyers?)\b/.test(t)) return route('services', 'other', 'title_intent');
     if (/\bbuy.{0,25}sell crypto\b/.test(t)) return route('services', 'financial', 'title_intent');
-    if (/\b(scrap (?:cars?|metal) (?:removal|pick.?up)|cash.{0,15}(?:scrap cars?|for cars)|cash 4 cars)\b/.test(t)) return route('services', 'other', 'title_intent');
+    if (/\b(scrap (?:cars?|metal) (?:removal|pick.?up)|cash.{0,15}scrap cars?|cash\s*(?:for|4)\s*(?:(?:any|all|your|scrap|junk|old)\s+)?(?:cars?|vehicles?|suvs?|vans?|trucks?)|get\s+top\s*\$*\s*cash\s*\$*\s*for)\b/.test(t)) return route('services', 'other', 'title_intent');
     if (/\b(?:hiring|help wanted|job vacancy|now recruiting)\b/.test(t)) return route('jobs', 'other', 'title_intent');
     if (/\b(?:motorcycle|car|auto|vehicle).{0,25}(?:detailing|car wash)\b/.test(t)) return route('vehicles', 'detailing', 'title_intent');
     if (/\b(?:hair|makeup|henna|massage).{0,40}(?:available|service)|\b(?:hair makeup|hair salon)\b/.test(t)) return route('services', 'health_beauty', 'title_intent');
@@ -215,7 +215,7 @@ function createListingIntegrity() {
         && !/\b(?:parts|shine|cover|caps?|spacer|sticker|strips?|changer|balancer|fender|lathe|straightener|repair|tools)\b/.test(t0)) return route('vehicles', 'tires_rims', 'product_type');
     if (/\b(?:mortgages?|bookkeeping|tax preparation|legal services|court documents)\b/.test(t0) && !/\b(?:house|condo|apartment|property) for sale\b/.test(t0)) return route('services', 'financial', 'title_intent');
     if (/\b(?:buying|we buy)\s+(?:all\s+)?(?:iphones?|phones?|macbooks?|ps[45])\b/.test(t0)) return route('services', 'other', 'title_intent');
-    if (/\b(?:we (?:buy|pay cash for).{0,45}(?:cars?|vehicles)|scrap your car|sell your.{0,30}(?:honda|car).{0,20}cash)\b/.test(t0)) return route('services', 'other', 'title_intent');
+    if (/\b(?:we (?:buy|pay (?:cash|top\s*\$*|more) for).{0,45}(?:cars?|vehicles)|scrap your car|sell your.{0,30}(?:honda|car).{0,20}cash)\b/.test(t0)) return route('services', 'other', 'title_intent');
     if (/\b(?:automotive.{0,50}repair|mobile window tinting|car key (?:&|and) fob)\b/.test(t0)) return route('vehicles', 'repairs', 'title_intent');
     if (/\b(?:hospital equipment.{0,40}(?:repair|installation)|biomedical engineering|furnace.{0,20}(?:repair|install)|plumb(?:ing|er)|renovations?|handy\s?man|demolition services)\b/.test(t0)) return route('services', 'skilled_trades', 'title_intent');
     if (/\b(?:mold removal|pest control|exhauster services|gutter cleaning|pool closings?|garage door.{0,25}(?:repair|services?)|appliance installation)\b/.test(t0)) return route('services', 'home_services', 'title_intent');

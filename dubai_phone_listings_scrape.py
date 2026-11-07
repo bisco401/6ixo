@@ -101,7 +101,7 @@ def main():
         working = []
         for image in row['image_urls'].split('|'):
             try:
-                req=urllib.request.Request(image,method='HEAD')
+                req=urllib.request.Request(image,method='GET')
                 with urllib.request.urlopen(req,timeout=30) as response:
                     if response.status==200 and response.headers.get('Content-Type','').startswith('image/'):
                         working.append(image)

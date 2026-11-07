@@ -3,6 +3,9 @@ const fs = require('node:fs');
 const vm = require('node:vm');
 const integrity = require('./lib/listing-integrity.cjs');
 assert.equal(integrity.classify({ title: 'Looking To Sell A Car? Get Cash And Towing FREE!', source_url: 'https://www.kijiji.ca/v-other-auto-parts-and-accessories/hamilton/cash/1745000000', app_category: 'vehicles', app_subcategory: 'auto_parts' }).app_category, 'services', 'Vehicle buying and towing ads do not enter parts inventory');
+for (const title of ['$300-$8000 WE PAY TOP $ FOR ANY CARS ✅CALL NOW!!', 'We pay top $$ for vehicles', 'We pay more for cars', 'GET TOP $$CASH$$ FOR FORD BMW TOYOTA', 'BEST CASH4CARS - (SUV-VANS-TRUCKS) OPEN 24/7', 'Cash for Any Vehicle CASH TODAY']) {
+ assert.equal(integrity.classify({ title, app_category: 'vehicles', app_subcategory: 'auto_parts' }).app_category, 'services', 'Car buying offers stay in services');
+}
 assert.equal(integrity.classify({ title: '2015 Toyota Corolla - cash offers only', app_category: 'vehicles', app_subcategory: 'vehicles' }).app_category, 'vehicles', 'A vehicle asking for cash offers remains inventory');
 for (const description of ['ENGINE INSTALLATION ONLY. We source the engine.', 'WE DONT SELL ENGINES ALONE.', 'FRONT LABOUR FEE $120. BRING US YOUR BRAKE PARTS.']) {
  const row = { title: 'NISSAN ENGINE / BRAKE PARTS', source_url: 'https://www.kijiji.ca/v-engines-and-engine-parts/city-of-toronto/engine/123', app_category: 'vehicles', app_subcategory: 'auto_parts', description };

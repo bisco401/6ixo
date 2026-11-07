@@ -1,4 +1,4 @@
-/* Paired Home fields share the existing committed location and GPS lifecycle. */
+/* Home location dropdown shares the committed location and GPS lifecycle. */
 (function (root) {
     'use strict';
     root.SIXO_HOME_LOCATION_SEARCH = { setup(app) {
@@ -10,19 +10,75 @@
         const list = document.getElementById('area-picker-countries');
         const status = document.getElementById('area-picker-status');
         const retry = document.getElementById('area-picker-retry');
-        if (!country || !city || !source || !group || !panel || !root.SIXO_LOCATION_AUTOCOMPLETE) return false;
+        const dropdown = document.getElementById('home-location-panel');
+        const toggle = document.getElementById('home-location-toggle');
+        const summary = document.getElementById('home-location-summary');
+        const apply = document.getElementById('home-location-apply');
+        const container = toggle?.closest('.home-location-pair');
+        if (!country || !city || !source || !group || !panel || !dropdown || !toggle || !root.SIXO_LOCATION_AUTOCOMPLETE) return false;
         if (source.dataset.boundAreaPicker) return true;
         source.dataset.boundAreaPicker = source.dataset.boundInput = source.dataset.boundEnter = '1';
         let active = null, matches = [], selected = -1, request = 0, revision = 0, timer;
         let dirty = false, composing = false, applying = null, anchor = null;
         let searchPointerDown = false;
         let committed = { country: '', city: '', region: '', text: '' };
+        let summaryKey = '';
+        const regions = new Map(), pendingRegions = new Map();
         const clean = value => String(value || '').trim();
         const same = (a, b) => clean(a).toLocaleLowerCase() === clean(b).toLocaleLowerCase();
         const hasEdits = () => dirty || !same(country.value, committed.country) || !same(city.value, committed.city);
+        const keyFor = location => `${clean(location.country).toLocaleLowerCase()}|${clean(location.city).toLocaleLowerCase()}`;
+        function format(location) {
+            const countryName = /^(?:united states(?: of america)?|usa|us)$/i.test(clean(location.country)) ? 'USA' : clean(location.country);
+            const alias = app.getRegionAlias?.(location.region);
+            const region = alias && same(alias.country, location.country) ? alias.abbr : clean(location.region);
+            return location.city ? `${location.city}${region || countryName ? ', ' : ''}${[region, countryName].filter(Boolean).join(' ')}`
+                : [region, countryName].filter(Boolean).join(', ') || 'Choose location';
+        }
+        function updateSummary(location) {
+            const key = keyFor(location);
+            summaryKey = key;
+            if (location.region) regions.set(key, location.region);
+            const paint = region => {
+                const text = format({ ...location, region });
+                summary.textContent = text;
+                toggle.setAttribute('aria-label', `Location: ${text}`);
+            };
+            paint(location.region || regions.get(key) || '');
+            if (!location.city || !location.country || location.region || regions.has(key) || pendingRegions.has(key)) return;
+            // Old saved selections may only contain city and country. Enrich
+            // their label without changing their browsing scope or GPS state.
+            const lookup = async (attempt = 0) => {
+                try {
+                    const results = await root.SIXO_LOCATION_AUTOCOMPLETE.search(location.city, { type: 'city', country: location.country, limit: 50 });
+                    const exact = results.filter(result => same(result.city, location.city));
+                    const unique = new Set(exact.map(result => result.region));
+                    if (regions.has(key)) return; // A newer explicit selection owns its region.
+                    const region = unique.size === 1 ? exact[0].region : '';
+                    regions.set(key, region);
+                    if (summaryKey === key) paint(region);
+                } catch {
+                    // Busy startup connections can time out before the small
+                    // geography shard loads. Retry the current label only.
+                    if (attempt < 2 && summaryKey === key && !regions.has(key)) {
+                        await new Promise(resolve => setTimeout(resolve, 1000 * (attempt + 1)));
+                        if (summaryKey === key && !regions.has(key)) await lookup(attempt + 1);
+                    }
+                }
+            };
+            pendingRegions.set(key, lookup().finally(() => pendingRegions.delete(key)));
+        }
+        function hideDropdown({ focus = false } = {}) {
+            close(); dropdown.hidden = true; toggle.setAttribute('aria-expanded', 'false');
+            if (focus) toggle.focus({ preventScroll: true });
+        }
+        function openDropdown({ focus = false } = {}) {
+            sync(); dropdown.hidden = false; toggle.setAttribute('aria-expanded', 'true');
+            if (focus) (country.value ? city : country).focus();
+        }
         function position() {
             if (panel.hidden) return;
-            const rect = group.getBoundingClientRect(), viewport = root.visualViewport;
+            const rect = (active || group).getBoundingClientRect(), viewport = root.visualViewport;
             const documentRect = document.documentElement.getBoundingClientRect();
             const top = Math.max(0, (viewport?.offsetTop || 0) + Math.min(0, documentRect.top + (root.scrollY || 0)));
             let bottom = top + (viewport?.height || root.innerHeight);
@@ -44,6 +100,7 @@
         function sync({ force = false } = {}) {
             if (!force && (hasEdits() || app.homeLocationDraft)) return;
             const next = app.getHomeSearchLocationSelection();
+            updateSummary(next);
             const changed = !same(committed.country, next.country) || !same(committed.city, next.city);
             committed = { ...next };
             country.value = next.country || ''; city.value = next.city || '';
@@ -57,9 +114,10 @@
             country.removeAttribute('aria-invalid'); city.removeAttribute('aria-invalid');
             if (input === country) { city.value = ''; anchor = null; }
         }
-        function cancel() {
-            revision++; dirty = false; app.homeLocationDraft = null; close();
-            sync({ force: true }); app.updateHomeCurrentLocationDisplay(); sync();
+        function cancel({ focus = false } = {}) {
+            revision++; dirty = false; anchor = null; app.homeLocationDraft = null; close();
+            for (const input of [country, city]) input.removeAttribute('aria-invalid');
+            sync({ force: true }); app.updateHomeCurrentLocationDisplay(); sync(); hideDropdown({ focus });
         }
         async function countryScope() {
             const query = clean(country.value);
@@ -105,12 +163,15 @@
         }
         async function commit(result) {
             const token = ++revision;
+            // Region identifies the city in the label. Keep the existing city
+            // scope compatible with listings that do not store a province.
             const location = { country: result.country, city: result.city || '', region: '' };
             dirty = false; app.homeLocationDraft = null;
             for (const input of [country, city]) input.removeAttribute('aria-invalid');
             committed = { ...location, text: [location.city, location.country].filter(Boolean).join(', ') };
             country.value = location.country; city.value = location.city;
-            close();
+            updateSummary({ ...location, region: result.region || regions.get(keyFor(location)) || '' });
+            hideDropdown({ focus: dropdown.contains(document.activeElement) });
             let loading;
             try { loading = Promise.resolve(app.applyManualDiscoveryLocation(location)); }
             catch (error) { loading = Promise.reject(error); }
@@ -119,6 +180,7 @@
                 sync(); return true;
             }).catch(() => {
                 if (token === revision) {
+                    openDropdown();
                     panel.hidden = false; list.replaceChildren();
                     status.textContent = 'Listings could not load. Search again to retry.'; retry.hidden = true;
                 }
@@ -141,7 +203,12 @@
                 close();
                 return Promise.resolve(true);
             }
-            return commit(result);
+            if (!dirty) app.homeLocationDraft = { ...committed };
+            dirty = true; revision++;
+            country.value = result.country; city.value = result.city || '';
+            for (const field of [country, city]) field.removeAttribute('aria-invalid');
+            close(); apply.focus({ preventScroll: true });
+            return Promise.resolve(true);
         }
         async function resolveCountry() {
             const query = clean(country.value), token = revision;
@@ -158,6 +225,7 @@
             if (!hasEdits()) {
                 if (applying) return applying;
                 if (app.manualDiscoveryLocation && !app.deviceLocationFeedsReady) return commit(committed);
+                hideDropdown({ focus: dropdown.contains(document.activeElement) });
                 return true; // A live GPS label remains a device location.
             }
             if (!dirty) { app.homeLocationDraft = { ...committed }; dirty = true; revision++; }
@@ -169,6 +237,7 @@
                     country.setAttribute('aria-invalid', 'true'); show(country); return false;
                 }
                 if (!clean(cityQuery)) return commit({ country: scope.country, city: '' });
+                if (anchor && same(anchor.country, scope.country) && same(anchor.city, cityQuery)) return commit(anchor);
                 const results = await root.SIXO_LOCATION_AUTOCOMPLETE.search(cityQuery, { country: scope.country, type: 'city' });
                 if (token !== revision || country.value !== countryQuery || city.value !== cityQuery) return false;
                 if (results.length) { anchor = results[0]; return commit(results[0]); }
@@ -187,7 +256,7 @@
                     const option = document.createElement('button');
                     option.type = 'button'; option.tabIndex = -1; option.id = `home-location-option-${index}`;
                     option.setAttribute('role', 'option'); option.setAttribute('aria-selected', 'false');
-                    const title = document.createElement('span'); title.textContent = result.label;
+                    const title = document.createElement('span'); title.textContent = result.type === 'city' ? format(result) : result.label;
                     const detail = document.createElement('small');
                     detail.textContent = result.allCities ? 'Countrywide' : result.type === 'country' ? 'Country'
                         : input === country ? `City in ${result.country}` : result.region;
@@ -206,6 +275,8 @@
         function show(input, delay = 0) {
             request++; clearTimeout(timer); matches = []; selected = -1;
             if (active && active !== input) active.setAttribute('aria-expanded', 'false');
+            dropdown.hidden = false; toggle.setAttribute('aria-expanded', 'true');
+            input.closest('label').after(panel);
             active = input; panel.hidden = false; retry.hidden = true;
             input.setAttribute('aria-expanded', 'true'); input.removeAttribute('aria-activedescendant');
             list.setAttribute('aria-busy', 'true'); list.setAttribute('aria-label', input === country ? 'Countries' : 'Cities');
@@ -225,11 +296,11 @@
                 if (composing || event.isComposing || event.keyCode === 229) return;
                 if (!['ArrowDown', 'ArrowUp', 'Enter', 'Escape'].includes(event.key)) return;
                 event.preventDefault(); event.stopPropagation();
-                if (event.key === 'Escape') { cancel(); return; }
+                if (event.key === 'Escape') { cancel({ focus: true }); return; }
                 if (event.key === 'Enter') {
                     if (active === input && selected >= 0 && matches[selected]) void choose(input, matches[selected]);
                     else if (input === country) void resolveCountry();
-                    else void resolve().then(ok => { if (ok) { close(); app.submitHomeSearch({ scrollToResults: true }); } });
+                    else void resolve();
                     return;
                 }
                 if (panel.hidden) { show(input); return; }
@@ -238,16 +309,15 @@
             input.addEventListener('blur', () => setTimeout(() => {
                 const target = document.activeElement;
                 // Keep the in-flow menu stable until Search receives its click.
-                if (!searchPointerDown && target?.id !== 'home-search-btn' && ![country, city].includes(target) && !panel.contains(target)) close();
+                if (!searchPointerDown && target?.id !== 'home-search-btn' && !dropdown.contains(target)) close();
             }, 0));
         }
         document.addEventListener('pointerdown', event => {
-            searchPointerDown = Boolean(event.target.closest?.('#home-search-btn'));
-            if (group.contains(event.target) || panel.contains(event.target)) return;
+            searchPointerDown = Boolean(event.target.closest?.('#home-search-btn, #home-location-apply'));
+            if (container.contains(event.target)) return;
             // Hiding this menu on pointerdown would move Search before pointerup.
             if (searchPointerDown) return;
-            if (event.target.closest?.('#home-search-what')) { close(); return; }
-            if (dirty) cancel(); else close();
+            if (dirty) cancel(); else hideDropdown();
         });
         // Safari can blur the input without focusing the pressed button.
         // Release this guard after the click has had a chance to run.
@@ -257,6 +327,16 @@
             document.getElementById(id)?.addEventListener('click', () => { anchor = null; cancel(); }, true);
         }
         retry.addEventListener('click', () => show(active || city));
+        toggle.addEventListener('click', () => dropdown.hidden ? openDropdown() : cancel({ focus: true }));
+        apply.addEventListener('click', () => { void resolve(); });
+        document.getElementById('home-location-cancel').addEventListener('click', () => cancel({ focus: true }));
+        dropdown.addEventListener('keydown', event => {
+            if (event.key === 'Escape') { event.preventDefault(); event.stopPropagation(); cancel({ focus: true }); }
+        });
+        container.addEventListener('focusout', () => setTimeout(() => {
+            if (!dropdown.hidden && !searchPointerDown && !container.contains(document.activeElement)
+                && document.activeElement?.id !== 'home-search-btn') cancel();
+        }, 0));
         root.addEventListener('resize', position);
         root.addEventListener('scroll', position, true);
         root.visualViewport?.addEventListener('resize', position);
@@ -266,8 +346,8 @@
             configurable: true, get() { return descriptor.get.call(this); },
             set(value) { descriptor.set.call(this, value); Promise.resolve().then(sync); }
         });
-        source.focus = options => (country.value ? city : country).focus(options);
-        source.scrollIntoView = options => group.scrollIntoView(options);
+        source.focus = () => openDropdown({ focus: true });
+        source.scrollIntoView = options => toggle.scrollIntoView(options);
         app.resolveHomeLocationAutocomplete = resolve;
         sync({ force: true }); return true;
     } };

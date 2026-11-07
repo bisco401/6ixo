@@ -333,7 +333,7 @@
 <link rel="stylesheet" href="/assets/seo-navigation.css?v=20261010">
     <link rel="stylesheet" href="assets/home-tight-layout.css?v=20261102-featured-details-1">
     <link rel="stylesheet" href="assets/desktop-search-toolbar.css?v=20261104-unified-1">
-    <link rel="stylesheet" href="assets/home-location-search.css?v=20261107-home-country-city-1">
+    <link rel="stylesheet" href="assets/home-location-search.css?v=20261107-location-dropdown-1">
     <link rel="stylesheet" href="assets/desktop-marketplace-filters.css?v=20261104-compact-1">
     <link rel="stylesheet" href="assets/mobile-marketplace-filters.css?v=20261106-compact-1">
     <script defer src="assets/mobile-marketplace-filters.js?v=20261106-compact-1"></script>
@@ -716,8 +716,14 @@
 	                        <div id="home-smart-suggestions" class="home-smart-suggestions hidden" role="listbox" aria-label="Search suggestions"></div>
 	                    </div>
                         <div class="home-location-pair">
+                            <button id="home-location-toggle" type="button" aria-expanded="false" aria-controls="home-location-panel" aria-label="Location: Choose location">
+                                <i class="fas fa-location-dot" aria-hidden="true"></i>
+                                <span id="home-location-summary">Choose location</span>
+                                <i class="fas fa-chevron-down" aria-hidden="true"></i>
+                            </button>
+                            <div id="home-location-panel" role="region" aria-labelledby="home-location-heading" hidden>
                             <div class="home-location-toolbar">
-                                <span>Location</span>
+                                <span id="home-location-heading">Choose location</span>
                                 <button type="button" id="home-use-location" aria-label="Use my location"><i class="fas fa-location-arrow" aria-hidden="true"></i><span>Use my location</span></button>
                             </div>
                             <div id="home-location-fields" class="home-location-fields">
@@ -733,6 +739,11 @@
                                 <p id="area-picker-status" role="status"></p>
                                 <div id="area-picker-countries" role="listbox" aria-label="Cities and countries"></div>
                                 <button type="button" id="area-picker-retry" hidden>Try again</button>
+                            </div>
+                            <div class="home-location-actions">
+                                <button type="button" id="home-location-cancel">Cancel</button>
+                                <button type="button" id="home-location-apply">Apply location</button>
+                            </div>
                             </div>
 	                    </div>
                     <div class="home-search-field home-search-category-field">
@@ -7239,7 +7250,7 @@
             <script src="coming-soon-config.js?v=20260911-public-launch-1"></script>
 	    <script src="local-geography.js?v=20260929-stable-location-refresh-1"></script>
         <script src="location-autocomplete.js?v=20261107-all-location-searches-1"></script>
-        <script src="home-location-search.js?v=20261107-home-optional-city-2"></script>
+        <script src="home-location-search.js?v=20261107-location-dropdown-1"></script>
         <script src="area-picker.js?v=20261107-home-country-city-1"></script>
         <script src="screen-location-search.js?v=20261107-all-location-searches-1"></script>
         <script src="device-geocoder.js?v=20260929-worldwide-location-1"></script>

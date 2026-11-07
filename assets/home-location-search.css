@@ -146,7 +146,7 @@
     }
     html #main-app #home-content.home-tight-layout #area-picker-countries { overflow-y: auto; overscroll-behavior: contain; }
     html #main-app #home-content.home-tight-layout #area-picker-countries button { min-height: 44px; }
-    html #main-app #home-content.home-tight-layout .home-location-actions { display: flex; gap: 10px; margin-top: 16px; }
+    html #main-app #home-content.home-tight-layout .home-location-actions { display: flex; gap: 10px; margin-top: 16px !important; }
     html #main-app #home-content.home-tight-layout .home-location-actions button {
         min-height: 44px; padding: 10px 14px !important; border: 1px solid #d6e1ef; border-radius: 10px;
         background: #fff; color: #13233d; font-family: inherit; font-size: 14px; font-weight: 600; cursor: pointer;

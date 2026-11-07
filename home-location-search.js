@@ -135,14 +135,16 @@
                 dirty = true; revision++;
                 country.value = result.country; city.value = '';
                 for (const field of [country, city]) field.removeAttribute('aria-invalid');
-                close(); city.focus(); if (active !== city) show(city);
+                // City is optional. Keep focus here and wait for the visitor
+                // to open City or search the whole country.
+                close();
                 return Promise.resolve(true);
             }
             return commit(result);
         }
         async function resolveCountry() {
             const query = clean(country.value), token = revision;
-            if (!query) { city.focus(); show(city); return false; }
+            if (!query) { show(country); return false; }
             try {
                 const results = await search(country, query);
                 if (token !== revision || clean(country.value) !== query) return false;

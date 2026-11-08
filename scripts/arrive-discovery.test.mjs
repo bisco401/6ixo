@@ -187,3 +187,68 @@ test('events appear without dates or a trip submission and are refined when date
     assert.deepEqual(plain(model.discover({}, records, prefs).map(x => x.id)), ['event', 'unknown-date']);
     assert.deepEqual(plain(model.discover({}, records, { ...prefs, startDate: '2026-11-06' }).map(x => x.id)), ['event']);
 });
+
+test('existing marketplace ads match every checklist interest without promotion or a trip request', () => {
+    const { model } = fixture();
+    const cases = [
+        ['Restaurants', { category: 'services', service: { category: 'food' } }],
+        ['Car rental', { category: 'vehicles', vehicle: { category: 'rentals' } }],
+        ['Airport pickup', { category: 'community', subcategory: 'rideshare', title: 'Pearson and Buffalo Airport runs' }],
+        ['Events', { category: 'community', subcategory: 'events' }],
+        ['Short stays', { category: 'real_estate', realestate: { listingType: 'for_rent_short' } }],
+        ['City tours', { category: 'services', service: { role: 'Local guide for city tours' } }],
+        ['Gym', { category: 'community', subcategory: 'classes_lessons', title: 'Yoga classes' }],
+        ['Nightlife', { category: 'community', subcategory: 'events', title: 'Live music concert' }],
+        ['Beach day', { category: 'services', service: { category: 'travel' }, title: 'Beach day experience' }],
+        ['Shopping', { category: 'electronics' }],
+        ['Spa & Beauty', { category: 'services', service: { category: 'health_beauty' } }],
+        ['Excursions', { category: 'community', subcategory: 'travel', title: 'Guided day trip' }],
+        ['Private driver', { category: 'services', title: 'Dadu private transportation services', description: 'Book your personal driver now.' }]
+    ];
+    for (const [interest, raw] of cases) {
+        const app = { marketplaceItems: [{ id: interest, title: interest, country: 'Canada', city: 'Hamilton', ...raw }] };
+        const matches = model.discover(app, model.collect(app), { country: 'Canada', city: 'Hamilton', categories: [interest] });
+        assert.equal(matches.length, 1, interest);
+        assert.equal(matches[0].kind, 'marketplace');
+    }
+});
+
+test('community airport rides and private drivers use their original listing and are not duplicated', () => {
+    const { model } = fixture();
+    const original = { id: 178979759, title: 'Pearson and Buffalo Airport runs', category: 'community', subcategory: 'rideshare', country: 'Canada', city: 'Hamilton', description: 'Rides to and from Toronto Pearson Airport.' };
+    const community = { id: 'marketplace-community-' + original.id, marketplaceItemId: original.id, title: original.title, category: 'rideshare', summary: original.description, location: { country: 'Canada', city: 'Hamilton' } };
+    const app = { marketplaceItems: [original], getCommunityFeedPosts: () => [community] };
+    const records = model.collect(app);
+    assert.equal(records.length, 1);
+    assert.equal(records[0].kind, 'community');
+    assert.equal(records[0].raw.marketplaceItemId, original.id);
+    assert.deepEqual(plain(records[0].categories), ['Airport pickup']);
+    assert.equal(model.discover(app, records, { country: 'Canada', city: 'Hamilton', categories: ['Private driver'] }).length, 0);
+    original.status = 'draft';
+    assert.equal(model.collect(app).length, 0, 'A projection must not bypass the original publication status');
+    original.status = 'published'; original.sourceAvailability = 'sold';
+    assert.equal(model.collect(app).length, 0, 'Published but sold listings remain excluded');
+});
+
+test('full existing listing details remain searchable after a long summary and survive section projections', () => {
+    const { model } = fixture();
+    const original = { id: 'driver', country: 'Jamaica', city: 'Saint James', category: 'services', title: 'Transportation service', description: 'Reliable service. '.repeat(30), fullDescription: 'Book your personal driver for your trip.', service: { category: 'travel' } };
+    const projected = { id: original.id, title: original.title, category: 'travel', country: original.country, city: original.city, desc: 'Reliable service.' };
+    const records = model.collect({ marketplaceItems: [original], serviceProfiles: [projected] });
+    assert.equal(records.length, 1);
+    assert.equal(records[0].kind, 'service');
+    assert.deepEqual(plain(records[0].categories), ['Private driver']);
+    assert.deepEqual(plain(model.categoriesFor('service', { category: 'other', description: 'Details. '.repeat(60) + ' Airport shuttle available.' })), ['Airport pickup']);
+});
+
+test('unrelated existing ads cannot fill a travel checkbox just because their text mentions an amenity', () => {
+    const { model } = fixture();
+    const cases = [
+        ['marketplace', { category: 'jobs', title: 'Hiring airport shuttle driver' }],
+        ['vehicle', { category: 'vehicles', title: 'Car for sale with private driver history' }],
+        ['marketplace', { category: 'real_estate', realestate: { listingType: 'for_rent_long' }, title: 'Apartment near gym and beach' }],
+        ['service', { category: 'other', title: 'Restaurant kitchen equipment for sale' }],
+        ['community', { category: 'rideshare', title: 'Daily Ottawa to Toronto rideshare' }]
+    ];
+    for (const [kind, raw] of cases) assert.deepEqual(plain(model.categoriesFor(kind, raw)), [], raw.title);
+});

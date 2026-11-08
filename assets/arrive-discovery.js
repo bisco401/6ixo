@@ -4,7 +4,7 @@
     const CATEGORIES = ['Restaurants', 'Car rental', 'Airport pickup', 'Events', 'Short stays', 'City tours', 'Gym', 'Nightlife', 'Beach day', 'Shopping', 'Spa & Beauty', 'Excursions', 'Private driver'];
     const text = (value, limit = 300) => String(value ?? '').trim().slice(0, limit);
     const escape = value => text(value, 4000).replace(/[&<>"']/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]));
-    const fold = value => text(value).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+    const fold = value => text(value, 12000).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
     // Search by names, country codes and familiar alternatives without changing saved country values.
     const ARRIVE_COUNTRY_SEEDS = [
         { name: 'Canada', code: 'CA' },
@@ -128,43 +128,68 @@
         }
     }
     function categoriesFor(kind, raw) {
-        const category = fold(raw.category), subcategory = fold(raw.subcategory || raw.serviceCategory);
-        const words = fold([raw.name, raw.title, raw.description, raw.desc, raw.summary, raw.specialty, ...(Array.isArray(raw.tags) ? raw.tags : [])].filter(Boolean).join(' '));
+        const category = fold(raw.category);
+        const labels = [raw.category, raw.subcategory, raw.serviceCategory, raw.listingType,
+            raw.service?.category, raw.vehicle?.category, raw.realestate?.listingType,
+            ...(Array.isArray(raw.categories) ? raw.categories : [])].map(fold);
+        const hasLabel = (...values) => values.some(value => labels.includes(value));
         const selected = new Set();
-        if (kind === 'vehicle') {
-            if (['rentals', 'rental', 'car rental', 'vehicle rental'].includes(category) || raw.listingType === 'vehicle_rental') selected.add('Car rental');
-        }
-        if (kind === 'realestate') {
-            if ((raw.categories || []).includes('short_term') || raw.listingType === 'short_term' || category === 'short term') selected.add('Short stays');
-        }
-        if (kind === 'community' && ['events', 'event', 'nightlife'].includes(category)) selected.add('Events');
+        const isService = kind === 'service' || kind === 'marketplace' && category === 'services';
+        const isCommunity = kind === 'community' || kind === 'marketplace' && category === 'community';
+        const isRental = (kind === 'vehicle' || kind === 'marketplace' && category === 'vehicles')
+            && hasLabel('rentals', 'rental', 'car rental', 'vehicle rental');
+        if (isRental) selected.add('Car rental');
+        if ((kind === 'realestate' || kind === 'marketplace' && category === 'real estate')
+            && hasLabel('short term', 'for rent short', 'short stay', 'short stays', 'vacation rental')) selected.add('Short stays');
+        if (isCommunity && hasLabel('events', 'event', 'nightlife')) selected.add('Events');
         if (kind === 'marketplace' && ['clothing', 'fashion', 'electronics', 'other', 'sports'].includes(category)) selected.add('Shopping');
-        if (kind === 'marketplace' && category === 'community' && ['events', 'event'].includes(subcategory)) selected.add('Events');
-        if (kind === 'service' || kind === 'marketplace' && category === 'services') {
-            if (['food', 'restaurant', 'restaurants', 'food restaurants'].includes(category) || ['food', 'restaurant', 'restaurants'].includes(subcategory)) selected.add('Restaurants');
-            if (category === 'fitness' || subcategory === 'fitness' || /\b(gym|personal trainer|fitness|yoga|pilates)\b/.test(words)) selected.add('Gym');
-            if (['health beauty', 'beauty', 'spa'].includes(category) || ['health beauty', 'beauty', 'spa'].includes(subcategory) || /\b(spa|massage|salon|facial|barber)\b/.test(words)) selected.add('Spa & Beauty');
-            if (/\b(airport (pickup|pick up|transfer|shuttle)|airport transport)\b/.test(words)) selected.add('Airport pickup');
-            if (/\b(private driver|chauffeur|chauffeured)\b/.test(words)) selected.add('Private driver');
-            if (/\b(city tour|city tours|walking tour|local guide|sightseeing)\b/.test(words)) selected.add('City tours');
-            if (/\b(excursion|excursions|day tour|day trip)\b/.test(words)) selected.add('Excursions');
-            if (/\b(beach|beachfront)\b/.test(words) && ['travel', 'entertainment', 'events services', 'other'].includes(category)) selected.add('Beach day');
+        const isActivity = isService || isCommunity && hasLabel('events', 'event', 'nightlife', 'travel', 'classes lessons', 'meetups');
+        const isTransport = isService || isRental || isCommunity && hasLabel('rideshare', 'travel');
+        if (!isActivity && !isTransport) return CATEGORIES.filter(category => selected.has(category));
+        // Existing ads use both section-specific records and marketplace payloads.
+        // Search each field independently so a long description cannot hide its tags or role.
+        const words = [raw.name, raw.title, raw.description, raw.fullDescription, raw.desc, raw.summary,
+            raw.specialty, raw.role, raw.service?.role, raw.service?.highlightLine,
+            raw.vehicle?.description, ...(Array.isArray(raw.tags) ? raw.tags : []),
+            ...(Array.isArray(raw.labels) ? raw.labels : [])]
+            .filter(Boolean).map(fold).join(' ');
+        if (isService) {
+            if (hasLabel('food', 'restaurant', 'restaurants', 'food restaurants')) selected.add('Restaurants');
+            if (hasLabel('fitness', 'gym')) selected.add('Gym');
+            if (hasLabel('health beauty', 'beauty', 'spa')) selected.add('Spa & Beauty');
+            if (/\b(car rental|car rentals|rent a car|car hire|vehicle rental)\b/.test(words)) selected.add('Car rental');
         }
-        if ((kind === 'service' || kind === 'community') && /\b(nightclub|night club|nightlife|live music|jazz|concert|dj night)\b/.test(words)) selected.add('Nightlife');
-        return [...selected];
+        // Community rides and activities already advertised on 6ixo can fulfil a trip interest.
+        if (isActivity) {
+            if (/\b(gym|personal trainer|fitness|yoga|pilates)\b/.test(words)) selected.add('Gym');
+            if (/\b(spa|massage|salon|facial|barber)\b/.test(words)) selected.add('Spa & Beauty');
+            if (/\b(city tours?|walking tours?|local guide|sightseeing)\b/.test(words)) selected.add('City tours');
+            if (/\b(excursions?|day tours?|day trips?)\b/.test(words)) selected.add('Excursions');
+            if (/\b(beach|beachfront)\b/.test(words) && (isCommunity || hasLabel('travel', 'entertainment', 'events services', 'other'))) selected.add('Beach day');
+            if (/\b(nightclub|night club|nightlife|live music|jazz|concert|dj night)\b/.test(words)) selected.add('Nightlife');
+        }
+        if (isTransport) {
+            if (/\bairport\b/.test(words) && /\b(pickup|pick up|transfer|shuttle|transport|transportation|rides?|runs?|drop off|taxi)\b/.test(words)) selected.add('Airport pickup');
+            if (/\b((private|personal) (driver|rides?|transportation|taxi)|chauffeur|chauffeured)\b/.test(words)) selected.add('Private driver');
+        }
+        return CATEGORIES.filter(category => selected.has(category));
     }
     function collect(app) {
-        const records = new Map();
-        const add = (kind, raw) => {
-            if (!raw || raw.id == null || raw.isDemo || raw.demo || raw.placeholder || raw.sold === true || raw.available === false) return;
-            const status = fold(raw.status || raw.sourceAvailability || raw.source_availability);
-            if (['sold', 'unavailable', 'gone', 'draft', 'paused', 'archived', 'rejected', 'deleted', 'expired'].includes(status)) return;
-            if (app.isImportedListingPublishable && !app.isImportedListingPublishable(raw)) return;
-            const categories = categoriesFor(kind, raw);
+        const records = new Map(), represented = new Set();
+        const originals = new Map((app.marketplaceItems || []).map(raw => [String(raw.id), raw]));
+        const eligible = raw => {
+            if (!raw || raw.id == null || raw.isDemo || raw.demo || raw.placeholder || raw.sold === true || raw.available === false) return false;
+            if ([raw.status, raw.sourceAvailability, raw.source_availability].some(value =>
+                ['sold', 'unavailable', 'gone', 'draft', 'pending', 'paused', 'archived', 'rejected', 'deleted', 'expired'].includes(fold(value)))) return false;
+            return !app.isImportedListingPublishable || app.isImportedListingPublishable(raw);
+        };
+        const add = (kind, raw, original) => {
+            if (!eligible(raw) || original && !eligible(original)) return;
+            const categories = [...new Set([...categoriesFor(kind, raw), ...(original ? categoriesFor('marketplace', original) : [])])];
             if (!categories.length) return;
             if (kind === 'realestate' && app.isRealestateShortTermListing && !app.isRealestateShortTermListing(raw)) return;
             const location = kind === 'community' ? app.getCommunityPostLocation?.(raw) || raw.location || {} : raw.location || {};
-            const country = text(raw.country || location.country), city = text(raw.city || location.city);
+            const country = text(raw.country || location.country || original?.country), city = text(raw.city || location.city || original?.city);
             if (!country) return;
             let price = text(raw.priceText || raw.priceLabel || raw.rateLabel || (typeof raw.price === 'string' && !Number.isFinite(Number(raw.price)) ? raw.price : ''));
             const amount = raw.dailyRate ?? raw.rentalDailyRate ?? raw.price ?? raw.rate;
@@ -173,18 +198,17 @@
                 if (price && kind === 'vehicle') price += ' / day';
             }
             const photos = [...(Array.isArray(raw.images) ? raw.images : []), ...(Array.isArray(raw.photos) ? raw.photos : [])];
-            const value = snapshot({ kind, id: raw.id, title: raw.title || raw.name || 'Listing', country, city, categories, price: price || 'Contact for price', image: photos[0] || raw.image || raw.photo || raw.logo, eventDate: categories.includes('Events') ? app.inferArrivePlusEventDate?.(raw) || raw.eventDate || raw.event_date : '' });
+            const value = snapshot({ kind, id: raw.id, title: raw.title || raw.name || 'Listing', country, city, categories, price: price || 'Contact for price', image: photos[0] || raw.image || raw.photo || raw.logo, eventDate: categories.includes('Events') ? app.inferArrivePlusEventDate?.(original || raw) || raw.eventDate || raw.event_date : '' });
             if (!value) return;
             if (!records.has(value.key)) records.set(value.key, { ...value, raw, postedAt: Date.parse(raw.postedDate || raw.postedAt || raw.createdAt || '') || 0 });
+            if (original) represented.add(String(original.id));
         };
-        (app.serviceProfiles || []).forEach(raw => add('service', raw));
-        (app.realestateListings || []).forEach(raw => add('realestate', raw));
-        (app.vehicleListings || []).forEach(raw => add('vehicle', raw));
-        (app.getCommunityFeedPosts?.() || app.communityPosts || []).forEach(raw => add('community', raw));
+        (app.serviceProfiles || []).forEach(raw => add('service', raw, originals.get(String(raw.id))));
+        (app.realestateListings || []).forEach(raw => add('realestate', raw, originals.get(String(raw.id))));
+        (app.vehicleListings || []).forEach(raw => add('vehicle', raw, originals.get(String(raw.id))));
+        (app.getCommunityFeedPosts?.() || app.communityPosts || []).forEach(raw => add('community', raw, originals.get(String(raw.marketplaceItemId))));
         (app.marketplaceItems || []).forEach(raw => {
-            if (raw.category === 'services' && records.has('service:' + raw.id)) return;
-            if (raw.category === 'community' && [...records.values()].some(item => String(item.raw.marketplaceItemId) === String(raw.id))) return;
-            add('marketplace', raw);
+            if (!represented.has(String(raw.id))) add('marketplace', raw);
         });
         return [...records.values()];
     }

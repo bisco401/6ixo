@@ -27432,6 +27432,8 @@ class DatingApp {
 	    openVehicleModal(item) {
 	        const modal = document.getElementById('vehicle-modal');
 	        if (!modal) return;
+        // Cards can open from Home, search or Arrive before the Vehicles feed initializes.
+        this.bindVehicleModal();
 	        this.closeVehicleDescriptionDialog({ restoreFocus: false });
 	        this.enforceMobileFullscreenModal(modal, '.vehicle-modal');
 	        const titleEl = document.getElementById('vehicle-modal-title');
@@ -33211,7 +33213,8 @@ class DatingApp {
             'service-modal-image',
             'luxury-ad-image',
             'seller-profile-luxury-image',
-            'profile-modal-photo'
+            'profile-modal-photo',
+            'demo-profile-photo'
         ].includes(String(img.id || ''))) return;
         img.dataset.sitewideImageSwipeBound = '1';
         img.draggable = false;
@@ -40359,6 +40362,8 @@ class DatingApp {
 	    openRealestateModal(listing) {
 	        const modal = document.getElementById('realestate-modal');
 	        if (!modal || !listing) return;
+        // Opening a card must not depend on first visiting its category feed.
+        this.bindRealestateModal();
         this.restoreShortTermSignatureProfile();
 	        this.enforceMobileFullscreenModal(modal, '.realestate-modal');
 	        const imgEl = document.getElementById('realestate-modal-image');
@@ -46305,6 +46310,12 @@ class DatingApp {
     openDemoProfileObject(profile) {
         const modal = document.getElementById('demo-profile-modal');
         if (!profile || !modal) return;
+        const galleryPhoto = document.getElementById('demo-profile-photo');
+        this.bindModalSwipeSurface(galleryPhoto, {
+            modalId: 'demo-profile-modal',
+            onPrevious: () => this.stepStandaloneSwipeableImage(galleryPhoto, -1),
+            onNext: () => this.stepStandaloneSwipeableImage(galleryPhoto, 1)
+        });
         const categoryKey = String(profile?.datingSurface || '').trim().toLowerCase();
         if (this.activeScreen === 'dating' && !this.requireDatingInteractionAuth({ reason: 'view Dating profile details', categoryKey })) return;
         const categoryMeta = this.resolveCompanionshipProfileCategory(profile);

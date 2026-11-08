@@ -292,6 +292,16 @@ test('generated photo labels do not grow on repeated photo selections', () => {
     assert.equal(img.attributes.get('aria-label'), 'View Land in Ghana photo 1 of 2 full screen');
 });
 
+test('profile gallery photos do not also bind feed image gestures', () => {
+    const app = createApp();
+    for (const id of ['vehicle-modal-image', 'realestate-modal-image', 'service-modal-image',
+        'luxury-ad-image', 'seller-profile-luxury-image', 'profile-modal-photo', 'demo-profile-photo']) {
+        const img = createImage({ id });
+        app.bindStandaloneSwipeableImage(img);
+        assert.equal(img.listeners.size, 0, `${id}: modal controls own the gesture and its direction`);
+    }
+});
+
 test('vertical touch gestures remain available for page scrolling', () => {
     const app = createApp();
     const img = createImage();

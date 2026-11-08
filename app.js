@@ -29176,7 +29176,11 @@ class DatingApp {
         const modal = document.getElementById('luxury-ad-modal');
         if (!modal?.classList.contains('native-sponsored-profile')) return;
         const track = document.getElementById('luxury-ad-photo-track');
-        if (track) track.style.transform = `translate3d(calc(${-100 * (this.luxuryAdIndex || 0)}% + ${offset}px), 0, 0)`;
+        if (track) {
+            // A left drag reveals the previous photo while the image follows the finger.
+            track.style.flexDirection = 'row-reverse';
+            track.style.transform = `translate3d(calc(${100 * (this.luxuryAdIndex || 0)}% + ${offset}px), 0, 0)`;
+        }
     }
 
     syncNativeSponsoredProfile() {
@@ -32392,8 +32396,8 @@ class DatingApp {
             const dy = y - state.y;
             if (Math.abs(dx) < thresholdPx || Math.abs(dx) <= Math.abs(dy) * axisBias) return;
             surface.dataset.modalSwipeSuppressClickUntil = String(Date.now() + 420);
-            if (dx < 0) onNext();
-            else onPrevious();
+            if (dx < 0) onPrevious();
+            else onNext();
         };
 
         // Touch has its own lifecycle: Safari may cancel a pointer while its touch continues.
@@ -32406,6 +32410,7 @@ class DatingApp {
 
         surface.addEventListener('touchmove', (event) => {
             if (start?.kind !== 'touch') return;
+            // Yield only if another handler has already claimed this gesture.
             if (event.defaultPrevented) { cancelDrag(); return; }
             if (event.touches?.length !== 1) { cancelDrag(); return; }
             const touch = Array.from(event.touches).find((item) => item.identifier === start.inputId);
@@ -32517,6 +32522,8 @@ class DatingApp {
 
     bindTouchSwipeToCarouselTrack(track) {
         if (!track) return;
+        // Modal galleries move their own photo strip; feed scrolling must not also move it.
+        if (track.id === 'marketplace-item-track' || track.dataset.modalSwipeSurfaceBound === '1') return;
         if (track.dataset.touchSwipeBound === '1') return;
         this.bindGlobalMobileCarouselSwipe();
         track.dataset.touchSwipeBound = '1';
@@ -33986,6 +33993,7 @@ class DatingApp {
 	            if (carousel.dataset.bound) return;
 	            const track = carousel.querySelector('.carousel-track');
 	            if (!track) return;
+                if (track.id === 'marketplace-item-track' || track.dataset.modalSwipeSurfaceBound === '1') return;
                 this.bindTouchSwipeToCarouselTrack(track);
 	            const prev = carousel.querySelector('.carousel-btn.prev');
 	            const next = carousel.querySelector('.carousel-btn.next');
@@ -46498,6 +46506,12 @@ class DatingApp {
         let suppressClickUntil = 0;
         const thresholdPx = 80;
         const axisBias = 1.35;
+        const gallerySelector = [
+            'img', 'picture', 'video', '[data-modal-swipe-surface-bound="1"]',
+            '.cb-profile-hero', '.marketplace-item-hero', '.luxury-ad-hero',
+            '.vehicle-modal-media', '.realestate-modal-media', '.service-modal-media',
+            '.profile-modal-media', '.seller-profile-luxury-hero'
+        ].join(', ');
         const reset = () => { start = null; };
         const updateDirection = (touch) => {
             if (!start || start.direction) return;
@@ -46508,7 +46522,7 @@ class DatingApp {
             else if (Math.abs(dx) > dy * axisBias) start.direction = dx > 0 ? 'right' : 'left';
         };
         const reserveGesture = (event) => {
-            // Capture runs before the photo gallery; it yields when default is prevented.
+            // Only gestures that start outside the photo area can dismiss the card.
             if (event.cancelable) event.preventDefault();
             suppressClickUntil = Date.now() + 420;
         };
@@ -46517,6 +46531,9 @@ class DatingApp {
             reset();
             suppressClickUntil = 0;
             if (!this.isModalOpen(modalId) || event.touches?.length !== 1) return;
+            // Keep the entire image area separate, including overlays, padding and loading images.
+            // Decide at touchstart so moving off an image cannot turn its swipe into dismissal.
+            if (event.target?.closest?.(gallerySelector)) return;
             if (event.target?.closest?.('button, a, input, select, textarea, video, [role="slider"], [contenteditable]:not([contenteditable="false"]), .cb-profile-thumbnails, .gt-thumbnails, .carousel-track:not([data-modal-swipe-surface-bound])')) return;
             const touch = event.touches[0];
             start = { x: touch.clientX, y: touch.clientY, id: touch.identifier, direction: null };
@@ -47244,7 +47261,10 @@ class DatingApp {
 
     positionMarketplaceItemModalGallery(offset = 0) {
         const strip = document.querySelector('#marketplace-item-track .gt-photo-track');
-        if (strip) strip.style.transform = `translate3d(calc(${-100 * (this.marketplaceModalIndex || 0)}% + ${offset}px),0,0)`;
+        if (strip) {
+            strip.style.flexDirection = 'row-reverse';
+            strip.style.transform = `translate3d(calc(${100 * (this.marketplaceModalIndex || 0)}% + ${offset}px),0,0)`;
+        }
     }
 
     renderMarketplaceItemModalCurrentPhoto() {

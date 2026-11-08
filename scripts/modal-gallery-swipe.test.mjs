@@ -31,12 +31,12 @@ emit('touchmove', { touches: [touch(130, 55)] });
 assert.equal(prevented, true, 'horizontal swipe must reserve the gesture');
 end();
 emit('pointerup', { pointerType: 'touch', pointerId: 5, clientX: 100, clientY: 50 });
-assert.equal(index, 1, 'dual event streams advance exactly once');
+assert.equal(index, -1, 'left swipe goes to the previous photo exactly once with dual event streams');
 prevented = false;
 emit('click');
 assert.equal(prevented, true, 'swiping must not open fullscreen');
 start(100); end(200);
-assert.equal(index, 0, 'right swipe returns to previous photo');
+assert.equal(index, 0, 'right swipe goes to the next photo');
 start(); end(190);
 assert.equal(index, 0, 'tap or short movement does not change photos');
 start(); prevented = false;
@@ -56,9 +56,30 @@ emit('pointerdown', { pointerType: 'mouse', button: 0, pointerId: 8, clientX: 20
 emit('pointerup', { pointerType: 'mouse', pointerId: 9, clientX: 100, clientY: 50 });
 assert.equal(index, 0, 'unrelated pointers cannot finish a drag');
 emit('pointerup', { pointerType: 'mouse', pointerId: 8, clientX: 100, clientY: 50 });
-assert.equal(index, 1, 'mouse dragging still navigates');
+assert.equal(index, -1, 'left mouse drag goes to the previous photo');
 console.log('Modal gallery swipe tests passed.');
 
 prevented = false;
 emit('click', { target: button });
 assert.equal(prevented, false, 'gallery controls remain clickable immediately after a swipe');
+
+app.bindGlobalMobileCarouselSwipe = () => assert.fail('feed swipe handlers must not bind to modal photo tracks');
+for (const track of [
+    { id: 'marketplace-item-track', dataset: {} },
+    { id: 'custom-gallery', dataset: { modalSwipeSurfaceBound: '1' } }
+]) {
+    app.bindTouchSwipeToCarouselTrack(track);
+    assert.equal(track.dataset.touchSwipeBound, undefined, 'only the modal owns its gallery gesture');
+}
+
+// Generic feed setup must also leave modal arrow buttons and alignment alone.
+app.bindFeaturedAdStripScrollers = () => {};
+app.isCompactFeedCarousel = () => false;
+context.document.querySelectorAll = () => [{
+    dataset: {}, classList: { toggle() {} },
+    querySelector(selector) {
+        assert.equal(selector, '.carousel-track', 'feed setup must not bind modal arrow buttons');
+        return { id: 'marketplace-item-track', dataset: {} };
+    }
+}];
+app.bindImageCarousels();

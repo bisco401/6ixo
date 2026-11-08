@@ -98,8 +98,8 @@ test('drag callbacks follow horizontal touch movement and restore on cancel', ()
     const classes = new Set();
     const surface = { dataset: {}, style: { setProperty() {} }, classList: { add: value => classes.add(value), remove: value => classes.delete(value) }, addEventListener: (name, fn) => listeners.set(name, fn) };
     app.isModalOpen = () => true;
-    let offset = 0, advances = 0, restores = 0;
-    app.bindModalSwipeSurface(surface, { onNext: () => advances++, onPrevious() {}, onDrag: value => { offset = value; }, onDragEnd: () => { offset = 0; restores++; } });
+    let offset = 0, index = 0, restores = 0;
+    app.bindModalSwipeSurface(surface, { onNext: () => index++, onPrevious: () => index--, onDrag: value => { offset = value; }, onDragEnd: () => { offset = 0; restores++; } });
     const emit = (name, values = {}) => listeners.get(name)({ target: { closest: () => null }, cancelable: true, preventDefault() {}, ...values });
     const touch = x => ({ clientX: x, clientY: 50, identifier: 1 });
     emit('touchstart', { touches: [touch(250)] });
@@ -108,12 +108,12 @@ test('drag callbacks follow horizontal touch movement and restore on cancel', ()
     assert.ok(classes.has('dragging'));
     emit('touchcancel');
     assert.equal(offset, 0);
-    assert.equal(advances, 0);
+    assert.equal(index, 0);
     assert.ok(!classes.has('dragging'));
     emit('touchstart', { touches: [touch(250)] });
     emit('touchmove', { touches: [touch(130)] });
     emit('touchend', { changedTouches: [touch(130)] });
-    assert.equal(advances, 1);
+    assert.equal(index, -1, 'left drag reveals the previous photo');
     assert.ok(restores >= 2);
 });
 

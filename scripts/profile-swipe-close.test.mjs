@@ -7,7 +7,7 @@ const source = fs.readFileSync(new URL('../app.js', import.meta.url), 'utf8');
 const context = { window: {}, document: {}, console };
 vm.runInNewContext(`${source.slice(0, source.indexOf('// Initialize the app when the page loads'))}\nglobalThis.App = DatingApp;`, context);
 
-function fixture() {
+function fixture({ onGallery = false, originSelector = onGallery ? '[data-modal-swipe-surface-bound="1"]' : '' } = {}) {
     const app = Object.create(context.App.prototype);
     const makeSurface = () => ({
         dataset: {}, style: { setProperty() {} }, listeners: new Map(),
@@ -37,16 +37,17 @@ function fixture() {
     app.bindProfileCloseButton(button, close, 'profile-modal');
     app.bindProfileSwipeClose(modal, close, 'profile-modal');
     app.bindModalSwipeSurface(gallery, { modalId: 'profile-modal', onPrevious: () => photo--, onNext: () => photo++ });
+    const target = { closest: selector => originSelector && selector.split(',').map(part => part.trim()).includes(originSelector) ? gallery : null };
     const touch = (x, y = 100, identifier = 1) => ({ clientX: x, clientY: y, identifier });
     const emit = (type, data = {}) => {
         const event = {
-            target: { closest: () => null }, cancelable: true, defaultPrevented: false,
+            target, cancelable: true, defaultPrevented: false,
             preventDefault() { this.defaultPrevented = true; },
             stopPropagation() {}, stopImmediatePropagation() { this.stopped = true; },
             ...data
         };
         modal.listeners.get(type)?.(event);
-        if (!event.stopped) gallery.listeners.get(type)?.(event);
+        if (onGallery && !event.stopped) gallery.listeners.get(type)?.(event);
         return event;
     };
     return {
@@ -57,7 +58,7 @@ function fixture() {
     };
 }
 
-test('right swipe closes once without changing photos, even with cancelled touch pointers', () => {
+test('right swipe outside the gallery closes once, even with cancelled touch pointers', () => {
     const f = fixture();
     f.emit('pointerdown', { pointerType: 'touch', pointerId: 1 });
     f.start();
@@ -73,16 +74,56 @@ test('right swipe closes once without changing photos, even with cancelled touch
     assert.equal(f.state().closes, 2, 'a rapidly reopened profile can be dismissed');
 });
 
-test('left swipe still advances the photo and mouse drag still browses backwards', () => {
-    const f = fixture();
+test('left swipe shows the previous photo and right mouse drag shows the next', () => {
+    const f = fixture({ onGallery: true });
     f.start(240);
     assert.equal(f.move(160).defaultPrevented, true, 'gallery owns left swipe');
     f.end(80);
-    assert.deepEqual(f.state(), { open: true, closes: 0, history: 0, photo: 2 });
+    assert.deepEqual(f.state(), { open: true, closes: 0, history: 0, photo: 0 });
     f.emit('pointerdown', { pointerType: 'mouse', pointerId: 3, button: 0, clientX: 80, clientY: 100 });
     f.emit('pointerup', { pointerType: 'mouse', pointerId: 3, clientX: 240, clientY: 100 });
     assert.equal(f.state().photo, 1);
     assert.equal(f.state().open, true);
+});
+
+test('finger swipes browse the gallery in both directions without dismissing the listing', () => {
+    const f = fixture({ onGallery: true, originSelector: 'img' });
+    f.start(240);
+    f.move(160);
+    f.end(80);
+    assert.deepEqual(f.state(), { open: true, closes: 0, history: 0, photo: 0 });
+    f.start(80);
+    assert.equal(f.move(160).defaultPrevented, true, 'gallery owns right swipe');
+    f.end(240);
+    assert.deepEqual(f.state(), { open: true, closes: 0, history: 0, photo: 1 });
+    f.start(80);
+    f.end(240);
+    assert.deepEqual(f.state(), { open: true, closes: 0, history: 0, photo: 2 });
+    assert.equal(f.emit('click').defaultPrevented, true, 'swiping must not also open fullscreen');
+});
+
+test('images and the full gallery area never start profile dismissal, even before swipe binding', () => {
+    for (const originSelector of [
+        'img', 'picture', '.cb-profile-hero', '.marketplace-item-hero', '.luxury-ad-hero',
+        '.vehicle-modal-media', '.realestate-modal-media', '.service-modal-media',
+        '.profile-modal-media', '.seller-profile-luxury-hero'
+    ]) {
+        const f = fixture({ originSelector });
+        f.start();
+        assert.equal(f.move(160).defaultPrevented, false, `${originSelector} must not reserve dismissal`);
+        f.end(260);
+        assert.deepEqual(f.state(), { open: true, closes: 0, history: 0, photo: 1 }, originSelector);
+        assert.equal(f.emit('click').defaultPrevented, false, 'dismissal must not suppress image taps');
+    }
+});
+
+test('a swipe that starts on an image cannot become dismissal when the finger leaves the image', () => {
+    const f = fixture({ originSelector: 'img', onGallery: true });
+    f.start();
+    const outside = { closest: () => null };
+    f.emit('touchmove', { target: outside, touches: [f.touch(160)] });
+    f.emit('touchend', { target: outside, changedTouches: [f.touch(260)] });
+    assert.deepEqual(f.state(), { open: true, closes: 0, history: 0, photo: 2 });
 });
 
 test('vertical scrolling stays native even if the gesture later drifts right', () => {

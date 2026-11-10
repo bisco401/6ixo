@@ -65,6 +65,28 @@ function createHarness({ startRequest = true, native = false, supported = true, 
 
 const position = { coords: { latitude: 43.65, longitude: -79.38, accuracy: 15 }, timestamp: Date.now() };
 
+for (const connected of [false, true]) {
+  const visit = createHarness({ startRequest: true });
+  const entry = visit.window.SIXO_LOCATION_ENTRY;
+  const pending = entry.pendingRequest;
+  let opened = 0;
+  if (connected) entry.setManualLocationHandler(() => { opened++; });
+  visit.panels[0].querySelector('[data-location-entry-manual]').listeners.get('click')();
+  assert.equal((await pending).cancelled, true, 'Choosing a city retires an unanswered device request');
+  assert.equal(visit.panels[0].hidden, true);
+  if (!connected) {
+    assert.equal(opened, 0);
+    entry.setManualLocationHandler(() => { opened++; });
+  }
+  assert.equal(opened, 1, 'The picker opens once, including a tap before the app loads');
+  entry.setManualLocationHandler(() => { opened++; });
+  assert.equal(opened, 1, 'A completed early choice is not replayed');
+  visit.requests[0].success(position);
+  let applied = 0;
+  entry.connect(() => { applied++; });
+  assert.equal(applied, 0, 'A late GPS response cannot replace a manual browsing choice');
+}
+
 for (const hash of ['#realestate', '#shortstays', '#realestate?category=for_sale']) {
   const visit = createHarness({ startRequest: false, hash });
   const entry = visit.window.SIXO_LOCATION_ENTRY;
@@ -357,11 +379,11 @@ assert.equal(earlyApp.appliedSamples, 1);
 assert.equal(earlyAllow.requests.length, 1);
 console.log('QR entry popup passed: immediate choice, all saved/browser permission combinations, dismissal, synchronous Allow and early app handoff.');
 
-// Preserve the original two-button popup while repairing the Allow action.
+// Keep the permission choices alongside the new manual browsing path.
 assert.match(entrySource, /“6ixo.com” Would Like to Use Your Location/);
 assert.match(entrySource, />Don’t Allow<\/button>/);
 assert.match(entrySource, />Allow<\/button>/);
-assert.ok(!entrySource.includes('data-location-entry-manual'));
+assert.match(entrySource, /data-location-entry-manual>Choose city instead/);
 
 // An explicit second Allow must replace an unanswered user request, not
 // silently reuse it. Old callbacks must not win over the new button action.

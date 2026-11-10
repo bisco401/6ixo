@@ -43,6 +43,8 @@
 
     let requestHandler = null;
     let dismissHandler = null;
+    let manualLocationHandler = null;
+    let manualLocationRequested = false;
     let fallbackTimer = null;
     let panel = null;
     let dismissed = false;
@@ -118,12 +120,14 @@
             panel.innerHTML = `
                 <h2 id="location-entry-title">“6ixo.com” Would Like to Use Your Location</h2>
                 <p data-location-entry-message role="status"></p>
+                <p data-location-entry-browser class="location-entry-browser-help" hidden>If this link opened inside another app, open 6ixo.com directly in Safari or Chrome to use device location.</p>
                 <p data-location-entry-check hidden><a href="/location-check/" target="_blank" rel="noopener noreferrer">Check browser location</a></p>
                 <p data-location-entry-provider class="location-provider-disclosure">Your coordinates may be sent to BigDataCloud to name your city. It also uses GPS/IP data to improve its service. <a href="/privacy/#sharing" target="_blank" rel="noopener noreferrer">Privacy details</a></p>
                 <div class="location-entry-actions">
                     <button type="button" data-location-entry-dismiss>Don’t Allow</button>
                     <button type="button" data-location-entry-allow>Allow</button>
-                </div>`;
+                </div>
+                <button type="button" class="location-entry-manual" data-location-entry-manual>Choose city instead</button>`;
             panel.querySelector('[data-location-entry-allow]').addEventListener('click', () => {
                 dismissed = false;
                 pauseAutomaticRequests = false;
@@ -137,6 +141,14 @@
                 void (requestHandler ? requestHandler() : request({ userInitiated: true }));
             });
             panel.querySelector('[data-location-entry-dismiss]').addEventListener('click', dismiss);
+            panel.querySelector('[data-location-entry-manual]').addEventListener('click', () => {
+                dismiss();
+                manualLocationRequested = true;
+                if (manualLocationHandler) {
+                    manualLocationRequested = false;
+                    manualLocationHandler();
+                }
+            });
             document.body.appendChild(panel);
         }
         const unsupported = !navigator.geolocation || window.isSecureContext === false;
@@ -156,6 +168,7 @@
                     : '“6ixo.com” uses your device location to show nearby listings. Would you like to allow access to your location?';
         const button = panel.querySelector('[data-location-entry-allow]');
         panel.querySelector('[data-location-entry-check]').hidden = !error && !unsupported;
+        panel.querySelector('[data-location-entry-browser]').hidden = !error && !unsupported;
         button.disabled = unsupported;
         button.textContent = error ? 'Try again' : 'Allow';
         panel.hidden = false;
@@ -275,6 +288,13 @@
         get pendingRequest() { return pending; },
         setRequestHandler(handler) { requestHandler = handler; },
         setDismissHandler(handler) { dismissHandler = handler; },
+        setManualLocationHandler(handler) {
+            manualLocationHandler = handler;
+            if (manualLocationRequested && handler) {
+                manualLocationRequested = false;
+                handler();
+            }
+        },
         dismiss,
         hidePrompt,
         showPrompt,

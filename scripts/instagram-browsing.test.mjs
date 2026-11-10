@@ -6,6 +6,9 @@ const elements = {
   'main-app': { dataset: {}, querySelectorAll: () => [] },
   'browsing-location-recovery': { hidden: true },
   'browsing-location-choose': { dataset: {}, addEventListener(_, handler) { this.click = handler; } },
+  'home-location-recovery': { hidden: true },
+  'home-location-recovery-message': { textContent: '' },
+  'home-location-choose': { dataset: {}, addEventListener(_, handler) { this.click = handler; } },
   'home-search-location': { focus() { this.focused = true; } }
 };
 let dismissals = 0;
@@ -31,6 +34,20 @@ for (const screen of ['home', 'profile', 'premium', 'personal', 'realestate']) {
 }
 app.switchScreen('electronics');
 app.setupHomeLocationRetry();
+app.switchScreen('home');
+assert.equal(elements['home-location-recovery'].hidden, false, 'A first visit must explain the hidden inventory and offer a city choice');
+app.locationPermissionState = 'denied';
+app.updateDeviceLocationUi();
+assert.match(elements['home-location-recovery-message'].textContent, /Location access is off/);
+app.locationPermissionState = 'unknown';
+app.locationRequestInFlight = true;
+app.updateDeviceLocationUi();
+assert.match(elements['home-location-recovery-message'].textContent, /Waiting for your device location/);
+elements['home-location-choose'].click();
+assert.equal(elements['home-search-location'].focused, true, 'Home recovery opens the same country/city picker');
+app.locationRequestInFlight = false;
+dismissals = 0;
+app.switchScreen('electronics');
 elements['browsing-location-choose'].click();
 assert.equal(app.activeScreen, 'home');
 assert.equal(elements['home-search-location'].focused, true);
@@ -39,6 +56,7 @@ await app.applyManualDiscoveryLocation({ country: 'Canada', city: 'Toronto' });
 assert.equal(app.activeScreen, 'electronics', 'Choosing an area returns to the intended category');
 assert.equal(elements['main-app'].dataset.deviceLocationReady, 'true');
 assert.equal(elements['browsing-location-recovery'].hidden, true);
+assert.equal(elements['home-location-recovery'].hidden, true, 'Successful manual selection removes the fallback');
 assert.equal(app.browsingLocationReturnScreen, null);
 app.deviceLocationFeedsReady = false;
 app.updateDeviceLocationUi();

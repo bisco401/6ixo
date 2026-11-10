@@ -47,6 +47,36 @@
 .location-entry-actions button:active { background: rgba(89, 97, 119, .38); }
 .location-entry-actions button:focus-visible { outline: 3px solid #1d4ed8; outline-offset: 3px; }
 .location-entry-actions button:disabled { opacity: .5; cursor: default; }
+.location-entry-manual,
+.home-location-recovery button {
+    min-height: 44px;
+    padding: 10px 12px;
+    border: 0;
+    border-radius: 10px;
+    background: transparent;
+    color: #174b88;
+    font: inherit;
+    font-weight: 600;
+    text-decoration: underline;
+    cursor: pointer;
+}
+.location-entry-manual { display: block; width: 100%; margin-top: 8px; }
+.location-entry-manual:focus-visible,
+.home-location-recovery button:focus-visible { outline: 3px solid #1d4ed8; outline-offset: 2px; }
+.home-location-recovery {
+    margin: 0 0 12px;
+    padding: 12px;
+    border-radius: 12px;
+    background: #eef4fb;
+    color: #263d5b;
+    font-size: 14px;
+    line-height: 1.45;
+}
+.home-location-recovery[hidden] { display: none; }
+.home-location-recovery p { margin: 0; }
+.location-entry-prompt p.location-entry-browser-help { margin-bottom: 12px; font-size: 13px; }
+.home-location-browser-help { display: block; margin-top: 8px; font-size: 12px; line-height: 1.4; }
+.home-location-recovery button { margin-top: 4px; padding-left: 0; text-align: left; }
 @media (prefers-reduced-transparency: reduce) {
     .location-entry-prompt { background: #e4e8f0; -webkit-backdrop-filter: none; backdrop-filter: none; }
 }

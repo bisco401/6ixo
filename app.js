@@ -16418,16 +16418,21 @@ class DatingApp {
 
     setupHomeLocationRetry() {
         window.SIXO_AREA_PICKER?.setup(this);
-        const chooseArea = document.getElementById('browsing-location-choose');
-        if (chooseArea && !chooseArea.dataset.bound) {
-            chooseArea.addEventListener('click', () => {
-                this.browsingLocationReturnScreen = this.activeScreen;
-                window.SIXO_LOCATION_ENTRY?.dismiss?.();
-                this.switchScreen('home');
-                document.getElementById('home-search-location')?.focus();
-            });
+        const chooseLocation = () => {
+            this.browsingLocationReturnScreen = this.activeScreen;
+            window.SIXO_LOCATION_ENTRY?.dismiss?.();
+            this.switchScreen('home');
+            const field = document.getElementById('home-search-location');
+            field?.focus();
+            field?.scrollIntoView?.({ block: 'center' });
+        };
+        ['browsing-location-choose', 'home-location-choose'].forEach(id => {
+            const chooseArea = document.getElementById(id);
+            if (!chooseArea || chooseArea.dataset.bound) return;
+            chooseArea.addEventListener('click', chooseLocation);
             chooseArea.dataset.bound = '1';
-        }
+        });
+        window.SIXO_LOCATION_ENTRY?.setManualLocationHandler?.(chooseLocation);
         ['home-use-location', 'site-use-location'].forEach((id) => {
             const button = document.getElementById(id);
             if (!button || button.dataset.boundLocationRetry) return;
@@ -16466,8 +16471,22 @@ class DatingApp {
             if (ready) main.dataset.deviceLocationInitialized = 'true';
             main.dataset.deviceLocationReady = ready ? 'true' : 'false';
             main.dataset.deviceLocationRefreshing = refreshing ? 'true' : 'false';
-            const sections = main.querySelectorAll?.('.content-screen:not(#home-content):not(#profile-content):not(#premium-content):not(#personal-content):not(#realestate-content):not(#shortstays-content):not(#arrive-content):not(.dating-coming-soon-locked #dating-content), #home-content > section:not(.home-search):not(.home-brand-artwork)') || [];
+            const sections = main.querySelectorAll?.('.content-screen:not(#home-content):not(#profile-content):not(#premium-content):not(#personal-content):not(#realestate-content):not(#shortstays-content):not(#arrive-content):not(.dating-coming-soon-locked #dating-content), #home-content > section:not(.home-search):not(.home-brand-artwork):not(.home-seo-hub)') || [];
             sections.forEach((section) => { section.inert = !usablePage; });
+        }
+        const homeRecovery = document.getElementById('home-location-recovery');
+        if (homeRecovery) {
+            homeRecovery.hidden = usablePage;
+            const message = document.getElementById('home-location-recovery-message');
+            if (message) message.textContent = this.manualDiscoveryLocation
+                ? 'Loading listings for your selected area…'
+                : this.locationPermissionState === 'denied'
+                    ? 'Location access is off. Choose a city or country to see listings.'
+                    : this.locationRequestInFlight || window.SIXO_LOCATION_ENTRY?.pendingRequest
+                        ? 'Waiting for your device location. You can choose a city and keep browsing.'
+                        : this.hasUsableCurrentLocation()
+                            ? 'Finding your city from your device location. You can also choose it below.'
+                            : 'Use your device location or choose a city or country to see listings.';
         }
         const recovery = document.getElementById('browsing-location-recovery');
         if (recovery) {

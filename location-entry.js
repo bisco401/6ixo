@@ -120,14 +120,14 @@
             panel.setAttribute('role', 'dialog');
             panel.setAttribute('aria-labelledby', 'location-entry-title');
             panel.innerHTML = `
-                <h2 id="location-entry-title">“6ixo.com” Would Like to Use Your Location</h2>
+                <h2 id="location-entry-title">Find listings near you</h2>
                 <p data-location-entry-message role="status"></p>
                 <p data-location-entry-browser class="location-entry-browser-help" hidden>If this link opened inside another app, open 6ixo.com directly in Safari or Chrome to use device location.</p>
                 <p data-location-entry-check hidden><a href="/location-check/" target="_blank" rel="noopener noreferrer">Check browser location</a></p>
                 <p data-location-entry-provider class="location-provider-disclosure">Your coordinates may be sent to BigDataCloud to name your city. It also uses GPS/IP data to improve its service. <a href="/privacy/#sharing" target="_blank" rel="noopener noreferrer">Privacy details</a></p>
                 <div class="location-entry-actions">
-                    <button type="button" data-location-entry-dismiss>Don’t Allow</button>
-                    <button type="button" data-location-entry-allow>Allow</button>
+                    <button type="button" data-location-entry-dismiss>Not now</button>
+                    <button type="button" data-location-entry-allow>Use my device location</button>
                 </div>
                 <button type="button" class="location-entry-manual" data-location-entry-manual>Choose city instead</button>`;
             panel.querySelector('[data-location-entry-allow]').addEventListener('click', () => {
@@ -159,8 +159,8 @@
         panel.setAttribute('data-location-state', blocked ? 'blocked' : error ? 'unavailable' : 'prompt');
         panel.querySelector('#location-entry-title').textContent = blocked
             ? 'Location access is blocked'
-            : '“6ixo.com” Would Like to Use Your Location';
-        panel.querySelector('[data-location-entry-dismiss]').textContent = blocked ? 'Not now' : 'Don’t Allow';
+            : 'Find listings near you';
+        panel.querySelector('[data-location-entry-dismiss]').textContent = 'Not now';
         const isMacSafari = /Macintosh/i.test(navigator.userAgent || '')
             && /Version\/[^ ]+.*Safari\//i.test(navigator.userAgent || '')
             && Number(navigator.maxTouchPoints || 0) === 0;
@@ -173,12 +173,12 @@
                 ? 'Your browser is blocking location. Retrying cannot turn permission on. Choose a city to browse now, or enable location in your browser and device settings before retrying.'
                 : error
                     ? `Your browser has not provided a device location.${macHelp} Then try again, or choose your city in the search bar.`
-                    : '“6ixo.com” uses your device location to show nearby listings. Would you like to allow access to your location?';
+                    : 'Tap Use my device location, then allow location in your phone or browser if asked. 6ixo will use your device’s location to show nearby listings.';
         const button = panel.querySelector('[data-location-entry-allow]');
         panel.querySelector('[data-location-entry-check]').hidden = !error && !unsupported;
         panel.querySelector('[data-location-entry-browser]').hidden = !error && !unsupported;
         button.disabled = unsupported;
-        button.textContent = blocked ? 'Retry after enabling' : error ? 'Try again' : 'Allow';
+        button.textContent = blocked ? 'Retry after enabling' : error ? 'Try again' : 'Use my device location';
         // The visitor already chose Allow. A denied, timed-out or unanswered
         // request must not put a blocking popup back over the marketplace.
         panel.hidden = Boolean(error || pending);
@@ -204,7 +204,11 @@
 
     function canRequestAutomatically(state = observedPermission) {
         if (promptSuppressed && state !== 'granted') return false;
-        if (pauseAutomaticRequests) return false;
+        // A visitor who requested location can enable it in phone/browser
+        // settings after a denial. Honor that new grant without a reload,
+        // while still respecting Not now and a deliberate manual city choice.
+        if (pauseAutomaticRequests && !(state === 'granted' && entryPromptAnswered
+            && !dismissed && choice === 'denied')) return false;
         if (state === 'granted') return true;
         // The browser owns permission, including permission expiry and Settings
         // changes. Saved onboarding choices must never suppress a fresh device

@@ -80,6 +80,10 @@ const output = process.env.LOCATION_TEST_OUTPUT;
         await page.locator('.bottom-nav [data-screen="home"]').click();
       };
       const retryLocation = async () => {
+        if (await page.locator('#home-device-location-retry').isVisible()) {
+          await page.locator('#home-device-location-retry').click();
+          return;
+        }
         if (!await page.locator('#home-location-panel').isVisible()) await page.locator('#home-location-toggle').click();
         await page.locator('#home-use-location').click();
       };

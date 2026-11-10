@@ -16436,7 +16436,7 @@ class DatingApp {
             chooseArea.dataset.bound = '1';
         });
         window.SIXO_LOCATION_ENTRY?.setManualLocationHandler?.(chooseLocation);
-        ['home-use-location', 'site-use-location'].forEach((id) => {
+        ['home-use-location', 'site-use-location', 'home-device-location-retry'].forEach((id) => {
             const button = document.getElementById(id);
             if (!button || button.dataset.boundLocationRetry) return;
             button.addEventListener('click', () => {
@@ -16480,18 +16480,26 @@ class DatingApp {
         }
         const homeRecovery = document.getElementById('home-location-recovery');
         if (homeRecovery) {
+            const requesting = Boolean(this.locationRequestInFlight || window.SIXO_LOCATION_ENTRY?.pendingRequest);
             homeRecovery.hidden = ready || !(this.locationRequestInFlight || window.SIXO_LOCATION_ENTRY?.pendingRequest
                 || this.locationPermissionState === 'denied' || /unavailable|timed out/i.test(this.deviceLocationStatus || ''));
             const message = document.getElementById('home-location-recovery-message');
             if (message) message.textContent = this.manualDiscoveryLocation
                 ? 'Loading listings for your selected area…'
                 : this.locationPermissionState === 'denied'
-                    ? 'Location access is off. You can browse all listings or choose a city for local results.'
+                    ? 'Location permission was not granted by your phone or browser. Enable it, then try device location again to load nearby listings.'
                     : this.locationRequestInFlight || window.SIXO_LOCATION_ENTRY?.pendingRequest
-                        ? 'Finding your location in the background. You can browse all listings now.'
+                        ? 'Finding your device location. If your phone asks, allow access for nearby listings. You can browse all listings now.'
                         : this.hasUsableCurrentLocation()
                             ? 'Finding your city in the background. All listings remain available.'
-                            : 'Device location is unavailable. Browse all listings or choose a city for local results.';
+                            : 'Your phone has not provided a location. Check Location Services, then try device location again.';
+            const retry = document.getElementById('home-device-location-retry');
+            if (retry) {
+                retry.disabled = requesting;
+                retry.textContent = requesting ? 'Waiting for your phone…' : 'Use my device location';
+            }
+            const permissionHelp = document.getElementById('home-location-permission-help');
+            if (permissionHelp) permissionHelp.hidden = ready || requesting;
         }
         const recovery = document.getElementById('browsing-location-recovery');
         if (recovery) recovery.hidden = true;
@@ -18074,6 +18082,7 @@ class DatingApp {
                         this.locationRequestUserInitiated = false;
                         this.locationRequestPromise = null;
                         this.cancelLocationRequest = null;
+                        this.updateDeviceLocationUi();
                     }
                 });
             this.locationRequestInFlight = true;
@@ -18114,6 +18123,7 @@ class DatingApp {
                 this.locationRequestUserInitiated = false;
                 this.locationRequestPromise = null;
                 this.cancelLocationRequest = null;
+                this.updateDeviceLocationUi();
             }
             resolveRequest(Boolean(result));
         };
@@ -19162,7 +19172,9 @@ class DatingApp {
             && window.SIXO_LOCATION_ENTRY?.showPrompt?.(error, { force: announce });
         if (announce && !recoveryShown) {
             this.showNotification(
-                'Device location is unavailable. You can keep browsing or choose a city for local results.',
+                denied
+                    ? 'Location permission was not granted. Check your phone or browser settings, then try again.'
+                    : 'Your phone could not provide a location. Check Location Services, then try again.',
                 { type: 'warn', force: true }
             );
         }

@@ -38,7 +38,7 @@ app.switchScreen('home');
 assert.equal(elements['home-location-recovery'].hidden, true, 'A first visit shows inventory without requiring a location choice');
 app.locationPermissionState = 'denied';
 app.updateDeviceLocationUi();
-assert.match(elements['home-location-recovery-message'].textContent, /Location access is off/);
+assert.match(elements['home-location-recovery-message'].textContent, /Location permission was not granted/);
 app.locationPermissionState = 'unknown';
 app.locationRequestInFlight = true;
 app.updateDeviceLocationUi();

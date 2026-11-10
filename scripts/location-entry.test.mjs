@@ -226,6 +226,11 @@ assert.equal(deniedVisit.panels[0].querySelector('#location-entry-title').textCo
 assert.equal(deniedVisit.panels[0].querySelector('[data-location-entry-allow]').textContent, 'Retry after enabling');
 assert.equal((await deniedVisit.window.SIXO_LOCATION_ENTRY.request()).skipped, true);
 assert.equal(deniedVisit.timers.size, 0);
+assert.equal(deniedVisit.window.SIXO_LOCATION_ENTRY.canRequestAutomatically('granted'), true,
+  'A new browser permission grant must resume the location the visitor requested');
+deniedVisit.window.SIXO_LOCATION_ENTRY.dismiss();
+assert.equal(deniedVisit.window.SIXO_LOCATION_ENTRY.canRequestAutomatically('granted'), false,
+  'Not now still stops requests even if the browser later grants permission');
 
 for (const options of [{ supported: false }, { secure: false }]) {
   const unavailable = createHarness(options);
@@ -383,9 +388,10 @@ assert.equal(earlyAllow.requests.length, 1);
 console.log('QR entry popup passed: immediate choice, all saved/browser permission combinations, dismissal, synchronous Allow and early app handoff.');
 
 // Keep the permission choices alongside the new manual browsing path.
-assert.match(entrySource, /“6ixo.com” Would Like to Use Your Location/);
-assert.match(entrySource, />Don’t Allow<\/button>/);
-assert.match(entrySource, />Allow<\/button>/);
+assert.match(entrySource, /Find listings near you/);
+assert.match(entrySource, /then allow location in your phone or browser if asked/);
+assert.match(entrySource, />Not now<\/button>/);
+assert.match(entrySource, />Use my device location<\/button>/);
 assert.match(entrySource, /data-location-entry-manual>Choose city instead/);
 
 // An explicit second Allow must replace an unanswered user request, not

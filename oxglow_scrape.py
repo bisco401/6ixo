@@ -68,7 +68,11 @@ def full_size_image_url(base_url: str, maybe_url: str) -> str:
 
 
 def image_download_candidates(base_url: str, maybe_url: str) -> list[str]:
-    """Return real Oxglow image variants without inventing an original URL."""
+    """Try the full-detail photo first, keeping the displayed file as fallback.
+
+    Candidates are downloaded and checked before they become local listing
+    photos. A missing original must never replace a working medium image.
+    """
     url = absolute_url(base_url, maybe_url)
     candidates: list[str] = []
 
@@ -76,6 +80,9 @@ def image_download_candidates(base_url: str, maybe_url: str) -> list[str]:
         if candidate and candidate not in candidates:
             candidates.append(candidate)
 
+    if urlparse(url).hostname == "oxglow.com.gh" and "/uploads/medium/" in url:
+        original = url.replace("/uploads/medium/", "/uploads/original/", 1)
+        add(re.sub(r"-medium(?=\.(?:jpe?g|png|webp)(?:\?|$))", "", original, flags=re.I))
     add(url)
     if "/uploads/original/" in url:
         medium = url.replace("/uploads/original/", "/uploads/medium/", 1)

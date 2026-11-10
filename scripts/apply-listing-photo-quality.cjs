@@ -17,7 +17,8 @@ function reviewGallery(row, measurements) {
         const thumbnailWidth = /data\/pigiame-clean-images\//.test(url)
             ? Number(source.match(/listing-thumb-(\d+)w\//)?.[1] || 0) : 0;
         const longest = thumbnailWidth || Math.max(measured?.width || 0, measured?.height || 0);
-        if ((longest && longest < 600) || /\/awaiting_car[^/]*\.(?:gif|png|jpe?g)$/i.test(url)) removed.push(url);
+        const unavailable = measured?.attempts >= 2 && /^HTTP Error (400|404|410):/.test(measured.error || '');
+        if ((longest && longest < 600) || unavailable || /\/awaiting_car[^/]*\.(?:gif|png|jpe?g)$/i.test(url)) removed.push(url);
         else { kept.push(url); if (!longest) unknown.push(url); }
     });
     // Never suppress a listing just because an audit request timed out.
@@ -34,7 +35,8 @@ function main() {
     const missing = rows.flatMap(row => row.image_urls.split('|')).filter(url => url && !measurements.has(url));
     if (missing.length) throw new Error(`Audit incomplete: ${new Set(missing).size} photos have not been checked`);
     const filename = 'data/listing-integrity-repairs.json';
-    const repairs = JSON.parse(fs.readFileSync(filename, 'utf8'));
+    const originalRepairs = fs.readFileSync(filename, 'utf8');
+    const repairs = JSON.parse(originalRepairs);
     const checkedAt = new Date().toISOString();
     const changes = [], countries = {};
     for (const row of rows) {
@@ -58,7 +60,7 @@ function main() {
         changes.push({ id: row.id, title: row.title, country: row.country, sourceUrl: row.source_url,
             hidden: review.hold, removed: review.removed, retained: review.kept });
     }
-    fs.writeFileSync(filename, JSON.stringify(repairs, null, 2) + '\n');
+    fs.writeFileSync(filename, JSON.stringify(repairs, null, /^\{\s*\n/.test(originalRepairs) ? 2 : undefined) + '\n');
     const changedSources = new Set(changes.map(change => integrity.key(change.sourceUrl)));
     const feeds = ['scraped-listings', 'kenya-listings', 'jamaica-listings', 'dubai-listings', 'guyana-listings',
         'kijiji-gta-recent-with-phones', 'oxglow-electronics-recent', 'oxglow-real-estate-recent', 'oxglow-auto-parts-accessories-recent'];

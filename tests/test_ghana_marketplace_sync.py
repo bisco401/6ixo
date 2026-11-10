@@ -221,6 +221,14 @@ class GhanaMarketplaceSyncTests(unittest.TestCase):
         self.assertIn("https://oxglow.com.gh/uploads/medium/example-123-0.jpg", candidates)
         self.assertIn("https://oxglow.com.gh/uploads/medium/example-123-0-medium.jpg", candidates)
 
+    def test_medium_download_checks_original_before_keeping_thumbnail(self):
+        medium = "https://oxglow.com.gh/uploads/medium/own-0-medium.jpg"
+        self.assertEqual(image_download_candidates("https://oxglow.com.gh/listing/own", medium), [
+            "https://oxglow.com.gh/uploads/original/own-0.jpg", medium,
+        ])
+        foreign = "https://example.com/uploads/medium/own-0-medium.jpg"
+        self.assertEqual(image_download_candidates("https://example.com/listing/own", foreign), [foreign])
+
     def test_attributes_are_scoped_to_the_current_listing_and_survive_csv_export(self):
         source_html = '''<li><strong>Brand:</strong>Wrong outside item</li>
             <div class="features-area"><h2>Attributes</h2><div>

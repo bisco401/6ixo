@@ -55,7 +55,7 @@ def read_image(url, full=False):
                     chunks.append(chunk)
                     try:
                         parser.feed(chunk)
-                    except (OSError, ValueError):
+                    except (OSError, ValueError, RuntimeError):
                         # Some WebP/AVIF decoders need the complete file.
                         chunks.append(response.read(MAX_BYTES + 1 - sum(map(len, chunks))))
                         break
@@ -89,15 +89,16 @@ def main():
     cache = json.loads(manifest.read_text())
     urls = sorted({u for r in rows for u in r.get('image_urls', '').split('|') if u})
     prior = {}
+    attempted = {}
     if args.resume and args.report.exists():
-        prior = {r['url']: r for line in args.report.read_text().splitlines()
-                 for r in [json.loads(line)] if not r.get('error')}
+        attempted = {r['url']: r for line in args.report.read_text().splitlines() for r in [json.loads(line)]}
+        prior = {url: r for url, r in attempted.items() if not r.get('error')}
     urls = [u for u in urls if u not in prior]
 
     def inspect(url):
-        result = {'url': url}
+        result = {'url': url, 'attempts': attempted.get(url, {}).get('attempts', 1 if url in attempted else 0) + 1}
         try:
-            before, _ = read_image(cache.get(url, url))
+            before, _ = read_image(cache.get(url, url), full=bool(attempted.get(url, {}).get('error')))
             result.update(before)
             for candidate in candidates(url):
                 try:
@@ -135,7 +136,7 @@ def main():
             report.write(json.dumps(result) + '\n')
             report.flush()
             if len(results) % 100 == 0:
-                print(f'{len(results)}/{len(urls)} gallery photos verified', flush=True)
+                print(f'{len(results)}/{len(urls) + len(prior)} gallery photos verified', flush=True)
     additions = {r['url']: r['local'] for r in results if r.get('local')}
     if args.write:
         cache.update(additions)

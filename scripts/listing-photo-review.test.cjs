@@ -20,6 +20,14 @@ test('temporary source failures do not remove listings', () => {
     assert.deepEqual(result.kept,['offline']);
     assert.deepEqual(result.unknown,['offline']);
 });
+test('repeated missing-image responses are excluded without treating timeouts as proof', () => {
+    const result = reviewGallery({image_urls:'missing|timeout'},new Map([
+        ['missing',{error:'HTTP Error 404: Not Found',attempts:2}],['timeout',{error:'timed out',attempts:2}]
+    ]));
+    assert.deepEqual(result.removed,['missing']);
+    assert.deepEqual(result.kept,['timeout']);
+    assert.equal(result.hold,false);
+});
 test('photo exclusions survive a newer import without weakening source identity', () => {
     const url='https://example.com/listing/own';
     const row={source_url:url,title:'Own listing',status:'published',phone:'4165550123',image_urls:'https://example.com/tiny.jpg|https://example.com/clear.jpg',

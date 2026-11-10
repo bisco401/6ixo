@@ -83,6 +83,8 @@ def main():
     parser.add_argument('--report', type=Path, required=True)
     parser.add_argument('--write', action='store_true')
     parser.add_argument('--resume', action='store_true')
+    parser.add_argument('--cache-max-bytes', type=int, default=250_000,
+                        help='Cache smaller originals; serve larger verified originals directly without recompression.')
     args = parser.parse_args()
     rows = json.loads(args.inventory.read_text())
     manifest = ROOT / 'data/listing-image-cache.json'
@@ -114,7 +116,7 @@ def main():
                     if not extension:
                         continue
                     local = '/data/listing-image-cache/' + hashlib.sha256(data).hexdigest()[:20] + '.' + extension
-                    if args.write:
+                    if args.write and len(data) <= args.cache_max_bytes:
                         (ROOT / local.lstrip('/')).write_bytes(data)
                     result.update(upgraded=candidate, local=local, originalSize=[before['width'], before['height']], **after)
                     break
@@ -137,7 +139,12 @@ def main():
             report.flush()
             if len(results) % 100 == 0:
                 print(f'{len(results)}/{len(urls) + len(prior)} gallery photos verified', flush=True)
-    additions = {r['url']: r['local'] for r in results if r.get('local')}
+    additions = {}
+    for result in results:
+        if not result.get('local'):
+            continue
+        file = ROOT / result['local'].lstrip('/')
+        additions[result['url']] = result['local'] if file.exists() and file.stat().st_size <= args.cache_max_bytes else result['upgraded']
     if args.write:
         cache.update(additions)
         manifest.write_text(json.dumps(cache, indent=2) + '\n')

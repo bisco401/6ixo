@@ -60,11 +60,13 @@ jobs:
           npm run seo:refresh
           npm run test:seo
       - name: Save refreshed pages
+        id: pages
         run: |
           git add -u
           git add listing listings apartments-for-rent phones-for-sale cars-for-sale events data/generated-listing-pages.json data/seo-page-state.json
           if git diff --cached --quiet; then
             echo 'No searchable page changes.'
+            echo 'changed=false' >> "$GITHUB_OUTPUT"
             exit 0
           fi
           git config user.name 'github-actions[bot]'
@@ -72,8 +74,11 @@ jobs:
           git commit -m 'Refresh crawlable marketplace inventory and sitemap'
           git pull --rebase origin main
           git push origin HEAD:main
+          echo 'changed=true' >> "$GITHUB_OUTPUT"
       # Commits made with GITHUB_TOKEN do not automatically start a Pages build.
+      # A direct push already starts one; a duplicate request cancels its upload.
       - name: Request publication through the existing GitHub Pages setup
+        if: github.event_name != 'push' || steps.pages.outputs.changed == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
         run: gh api --method POST "repos/${GITHUB_REPOSITORY}/pages/builds"

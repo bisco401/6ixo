@@ -38,12 +38,27 @@ test('unrelated providers, signed query strings and local photos retain their id
     assert.equal(normalizeSource('/data/real-photo.jpg', 'https://6ixo.com/listing/item/'), 'https://6ixo.com/data/real-photo.jpg');
     assert.equal(normalizeSource('https://via.placeholder.com/600?text=Listing'), 'https://6ixo.com/assets/listing-photo-unavailable.svg');
 });
-test('all cached cover mappings point to shipped images', () => {
+test('photo mappings use shipped files or exact original renditions', () => {
     const root = path.resolve(__dirname, '..');
     const cache = JSON.parse(fs.readFileSync(path.join(root, 'data/listing-image-cache.json')));
     assert.ok(Object.keys(cache).length >= 46);
     for (const [source, local] of Object.entries(cache)) {
         assert.match(source, /^https:\/\//);
+        if (local.startsWith('https://')) {
+            // Large originals stay at the provider to keep publication small.
+            // Every URL must identify a rendition of the exact same photo.
+            const original = new URL(source);
+            const target = new URL(local);
+            assert.equal(target.origin, original.origin);
+            assert.equal(target.search, original.search);
+            let expected = original.pathname;
+            if (original.hostname === 'oxglow.com.gh') expected = expected.replace('/uploads/medium/', '/uploads/original/').replace('-medium.', '.');
+            else if (expected.includes('/wp-content/uploads/')) expected = expected.replace(/-\d{2,4}x\d{2,4}(?=\.[^.]+$)/, '');
+            else if (expected.includes('/cdn/shop/')) expected = expected.replace(/_\d+x\d*(?=\.[^.]+$)/, '');
+            assert.equal(target.pathname, expected);
+            assert.notEqual(local, source);
+            continue;
+        }
         assert.match(local, /^\/data\/listing-image-cache\/[a-f0-9]+\.(jpg|png|webp)$/);
         const bytes = fs.readFileSync(path.join(root, local));
         assert.ok(bytes.length > 1024);

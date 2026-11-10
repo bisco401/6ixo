@@ -17,6 +17,12 @@
         if (!value) return '';
         try {
             const url = new URL(value, base);
+            if (url.hostname === 'media.kijiji.ca') {
+                url.searchParams.set('rule', 'kijijica-1600-webp');
+            }
+            if (url.hostname === 'images.craigslist.org') {
+                url.pathname = url.pathname.replace(/_(?:50x50c|300x300|600x450)(?=\.)/i, '_1200x900');
+            }
             if (url.hostname === 'storage.albacars.ae' && url.pathname.startsWith('/vehicles/')) {
                 // The unbounded originals are 6000px; explicit JPEG avoids format negotiation on iOS.
                 url.searchParams.set('width', '1600');
@@ -30,6 +36,7 @@
         module.exports = { normalizeSource };
         return;
     }
+    window.ListingImageQuality = { normalizeSource };
     const states = new WeakMap();
     let cache = {};
     const absolute = value => { try { return new URL(value, document.baseURI).href; } catch { return ''; } };
@@ -40,7 +47,7 @@
         if (url.hostname === 'storage.albacars.ae') url.search = '';
         return url.href;
     };
-    const cached = value => { try { return cache[cacheKey(value)] || ''; } catch { return ''; } };
+    const cached = value => { try { return cache[absolute(value)] || cache[cacheKey(value)] || ''; } catch { return ''; } };
     const src = image => absolute(image.getAttribute('src') || '');
     function stateFor(image) {
         let state = states.get(image);
@@ -89,7 +96,9 @@
         }
         state.attempted.add(current);
         const candidates = [state.original, ...gallery(image)]
-            .flatMap(value => [cached(value), normalized(value)])
+            // A larger CDN rendition can be unavailable even while the original
+            // stored URL still works. Preserve that exact-photo fallback.
+            .flatMap(value => [cached(value), normalized(value), absolute(value)])
             .filter(Boolean).concat(absolute(fallback));
         const next = candidates.map(absolute).find(value => !state.attempted.has(value));
         if (!next) return;
@@ -122,6 +131,6 @@
         }
     }).observe(document.documentElement, { childList: true, subtree: true, attributes: true, attributeFilter: ['src'] });
     visit(document);
-    fetch('/data/listing-image-cache.json?v=20261107-nigeria-1', { cache: 'no-cache' }).then(response => response.ok ? response.json() : {})
+    fetch('/data/listing-image-cache.json?v=20261109-quality-1', { cache: 'no-cache' }).then(response => response.ok ? response.json() : {})
         .then(value => { cache = value; visit(document); }).catch(() => {});
 })();

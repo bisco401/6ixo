@@ -56,6 +56,17 @@ const root = path.resolve(__dirname, '../..');
         });
         await page.waitForFunction(() => document.querySelector('#blocked').naturalWidth === 800);
         assert.equal(requests.length, 2, 'one retry, then a local fallback');
+        // Prefer the high-resolution rendition, with the exact original photo
+        // as fallback when that rendition is unavailable.
+        await page.route('https://images.craigslist.org/quality_*.jpg', route => route.request().url().includes('1200x900')
+            ? route.fulfill({status:404,body:''})
+            : route.fulfill({contentType:'image/svg+xml',body:'<svg xmlns="http://www.w3.org/2000/svg" width="600" height="450"></svg>'}));
+        await page.evaluate(() => {
+            const image=document.createElement('img'); image.id='quality-fallback'; image.className='home-card-img';
+            image.src='https://images.craigslist.org/quality_600x450.jpg'; document.body.append(image);
+        });
+        await page.waitForFunction(() => document.querySelector('#quality-fallback')?.naturalWidth === 600);
+        assert.ok((await page.locator('#quality-fallback').getAttribute('src')).endsWith('quality_600x450.jpg'));
         // Cached covers stay available even when the original provider is completely offline.
         await page.route('https://storage.albacars.ae/**', route => route.abort());
         await page.evaluate(() => {

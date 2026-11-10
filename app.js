@@ -52655,11 +52655,9 @@ class DatingApp {
 
     getHighResolutionImageSrc(src = '') {
         const value = String(src || '').trim();
-        if (!value || !/media\.kijiji\.ca/i.test(value)) return value;
-        return value.replace(
-            /([?&]rule=)kijijica-200-jpg(?=(&|$))/i,
-            '$1kijijica-640-webp'
-        );
+        if (!value) return value;
+        if (window.ListingImageQuality) return window.ListingImageQuality.normalizeSource(value, window.location.href);
+        return value;
     }
 
     buildLightboxItems(sources, defaultLabel = '') {
@@ -61149,15 +61147,9 @@ class DatingApp {
     }
 
     getListingPreviewImageUrl(src = '') {
-        // Keep the original in data-images for the full-screen gallery.
-        try {
-            const url = new URL(src, window.location.href);
-            if (url.hostname === 'media.kijiji.ca') {
-                url.searchParams.set('rule', 'kijijica-640-webp');
-                return url.href;
-            }
-        } catch {}
-        return src;
+        // Retina cards need the same source detail as the gallery. Deferred
+        // loading and releasing offscreen images still bound memory usage.
+        return this.getHighResolutionImageSrc(src);
     }
 
     releaseOtherFeedImages() {

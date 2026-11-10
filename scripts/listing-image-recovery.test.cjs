@@ -3,6 +3,14 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
 const { normalizeSource } = require('../assets/listing-image-recovery.js');
+test('listing cards and galleries request the highest supported CDN rendition', () => {
+    const kijiji = 'https://media.kijiji.ca/api/v1/images/own?rule=kijijica-640-webp';
+    assert.equal(new URL(normalizeSource(kijiji)).searchParams.get('rule'), 'kijijica-1600-webp');
+    const craigslist = 'https://images.craigslist.org/own_600x450.jpg';
+    assert.equal(normalizeSource(craigslist), 'https://images.craigslist.org/own_1200x900.jpg');
+    assert.equal(normalizeSource(normalizeSource(craigslist)), normalizeSource(craigslist));
+    assert.equal(normalizeSource('https://images.craigslist.org.evil.test/own_600x450.jpg'), 'https://images.craigslist.org.evil.test/own_600x450.jpg');
+});
 test('dealer originals use bounded, iOS-compatible renditions', () => {
     for (const query of ['', '?format=auto', '?width=6000&format=avif']) {
         const result = new URL(normalizeSource('https://storage.albacars.ae/vehicles/drafts/2332/1.jpg' + query));
@@ -36,9 +44,9 @@ test('all cached cover mappings point to shipped images', () => {
     assert.ok(Object.keys(cache).length >= 46);
     for (const [source, local] of Object.entries(cache)) {
         assert.match(source, /^https:\/\//);
-        assert.match(local, /^\/data\/listing-image-cache\/[a-f0-9]+\.(jpg|png)$/);
+        assert.match(local, /^\/data\/listing-image-cache\/[a-f0-9]+\.(jpg|png|webp)$/);
         const bytes = fs.readFileSync(path.join(root, local));
         assert.ok(bytes.length > 1024);
-        assert.ok(bytes[0] === 0xff || bytes[0] === 0x89);
+        assert.ok(bytes[0] === 0xff || bytes[0] === 0x89 || (bytes.toString('ascii', 0, 4) === 'RIFF' && bytes.toString('ascii', 8, 12) === 'WEBP'));
     }
 });

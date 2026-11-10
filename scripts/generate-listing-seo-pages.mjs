@@ -3,6 +3,7 @@ import path from 'node:path';
 import crypto from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import integrity from './lib/listing-integrity.cjs';
+import photoQuality from '../assets/listing-image-recovery.js';
 import { ORIGIN, ROBOTS, clean, decode, escapeHtml as esc, jsonLd, truncate, slugify, httpUrl, pageFile, parseCsv, writeChanged } from './lib/seo.mjs';
 import { searchGroups, countryGroups } from './lib/marketplace-search.mjs';
 import { equipCategoryChapters } from './equip-category-chapters.mjs';
@@ -116,11 +117,14 @@ export async function generate(root = ROOT) {
     if (keys.some(key => seen.has(key))) continue;
     const imageUrls = [];
     for (const raw of clean(row.image_files || row.image_urls).split('|')) {
-      const image = (imageCache[raw.trim()] || raw.trim()).replace(/^\.\//, '').replace(/^\//, '');
+      const value = raw.trim();
+      if (/placeholder|photoapparat|map\d*\.craigslist\.org|\{\{/i.test(value)) continue;
+      const resolved = imageCache[value] || imageCache[`${ORIGIN}/${value.replace(/^\//, '')}`] || photoQuality.normalizeSource(value, `${ORIGIN}/`);
+      const image = resolved.replace(`${ORIGIN}/`, '').replace(/^\.\//, '').replace(/^\//, '');
       if (/placeholder|photoapparat|map\d*\.craigslist\.org|\{\{/i.test(image)) continue;
       if (image.startsWith('data/') && !image.split('/').includes('..')) {
         try { const stat = await fs.stat(path.join(root, image)); if (stat.isFile() && stat.size > 1024) imageUrls.push(`${ORIGIN}/${image.split('/').map(encodeURIComponent).join('/')}`); } catch {}
-      } else { const url = httpUrl(raw) || httpUrl(raw.startsWith('//') ? `https:${raw}` : ''); if (url) imageUrls.push(url); }
+      } else { const url = httpUrl(resolved); if (url) imageUrls.push(url); }
     }
     if (!imageUrls.length) continue;
     keys.forEach(key => seen.add(key));

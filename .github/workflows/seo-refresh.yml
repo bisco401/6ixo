@@ -8,6 +8,7 @@ on:
       - 'data/listing-availability.json'
       - 'data/listing-integrity-repairs.json'
       - 'data/listing-image-cache.json'
+      - 'data/listing-image-cache.json'
       - 'scripts/*seo*.mjs'
       - 'scripts/generate-sitemap.mjs'
       - 'scripts/lib/seo.mjs'

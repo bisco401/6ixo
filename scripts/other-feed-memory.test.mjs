@@ -34,7 +34,7 @@ assert.equal(app.getOtherListingPage([...inventory, { id: 'local', postedDate: -
 app.shouldPrioritizeMarketplaceLocalListings = () => false;
 
 const fullImage = 'https://media.kijiji.ca/api/v1/images/example?rule=kijijica-1600-webp';
-assert.match(app.getListingPreviewImageUrl(fullImage), /rule=kijijica-640-webp/);
+assert.match(app.getListingPreviewImageUrl(fullImage), /rule=kijijica-1600-webp/);
 assert.match(fullImage, /1600/, 'gallery source stays unchanged');
 assert.equal(app.getListingPreviewImageUrl('https://example.com/photo.jpg'), 'https://example.com/photo.jpg');
 assert.equal(app.getListingPreviewImageUrl('assets/photo.jpg'), 'assets/photo.jpg');

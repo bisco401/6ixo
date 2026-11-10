@@ -48,7 +48,7 @@ assert.match(grid.innerHTML, /Toronto abroad/);
 assert.doesNotMatch(grid.innerHTML, /Toronto apartment|Toronto basement/);
 
 // A first-time visitor must be able to browse and select a destination while
-// GPS is pending or denied, without relaxing the other feeds' location policy.
+// GPS is pending or denied. Other public feeds now have the same behavior.
 app.strictDeviceLocation = true;
 app.didApplyEntryLocationDefaults = false;
 app.getCurrentLocationDisplayText = () => '';
@@ -57,7 +57,7 @@ city.value = '';
 country.value = '';
 app.renderRealestateFeed('all');
 assert.equal(count.textContent, '4 results', 'Properties load before GPS resolves.');
-assert.equal(app.matchesListingLocationScope(app.realestateListings[0]), false, 'Other feeds still require their browsing location.');
+assert.equal(app.matchesListingLocationScope(app.realestateListings[0]), true, 'Public feeds also browse without device location.');
 country.value = 'Canada';
 app.renderRealestateFeed('all');
 assert.equal(count.textContent, '3 results', 'An explicit country works without device permission.');

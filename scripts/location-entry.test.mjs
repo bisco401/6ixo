@@ -158,7 +158,7 @@ firstVisit.requests[1].error({ code: 1, message: 'Permission revoked' });
 assert.equal(await refresh, false);
 assert.equal(app.locationPermissionState, 'denied');
 assert.equal(app.userLocation, null);
-assert.equal(firstVisit.panels.filter(panel => !panel.hidden).length, 1, 'An explicit denied retry must explain the blocked device permission.');
+assert.equal(firstVisit.panels.filter(panel => !panel.hidden).length, 0, 'A denied request must not reopen a blocking popup.');
 const retry = app.requestLocationPermission({ announce: true });
 firstVisit.requests[2].success(position);
 assert.equal(await retry, true);
@@ -219,7 +219,7 @@ assert.equal(revokedApp.userLocation, null);
 const deniedVisit = createHarness();
 deniedVisit.requests[0].error({ code: 1, message: 'Browser permission denied' });
 assert.equal(deniedVisit.requests.length, 1, 'A denial must not trigger repeated automatic prompts.');
-assert.equal(deniedVisit.panels.filter(panel => !panel.hidden).length, 1);
+assert.equal(deniedVisit.panels.filter(panel => !panel.hidden).length, 0);
 assert.match(deniedVisit.panels[0].querySelector('[data-location-entry-message]').textContent, /browser.*blocking location/);
 assert.match(deniedVisit.panels[0].querySelector('[data-location-entry-message]').textContent, /Retrying cannot turn permission on/);
 assert.equal(deniedVisit.panels[0].querySelector('#location-entry-title').textContent, 'Location access is blocked');
@@ -241,10 +241,10 @@ const preferenceKey = 'sixo_location_onboarding_v1';
 const allowAgain = createHarness({ storage: firstVisit.storage });
 assert.equal(allowAgain.requests.length, 1, 'Allowed returning visitors must automatically obtain fresh device coordinates');
 for (const timer of allowAgain.timers.values()) timer.callback();
-assert.equal(allowAgain.panels.filter(panel => !panel.hidden).length, 1, 'Returning visitors need recovery when GPS times out');
+assert.equal(allowAgain.panels.filter(panel => !panel.hidden).length, 0, 'GPS timeout must leave returning visitors free to browse');
 allowAgain.requests[0].error({ code: 1 });
-assert.equal(allowAgain.panels.filter(panel => !panel.hidden).length, 1, 'A failed return visit must not leave location silently blank');
-assert.equal(allowAgain.window.SIXO_LOCATION_ENTRY.showPrompt({ code: 1 }, { force: true }), true);
+assert.equal(allowAgain.panels.filter(panel => !panel.hidden).length, 0, 'A failed request does not reopen the dialog');
+assert.equal(allowAgain.window.SIXO_LOCATION_ENTRY.showPrompt({ code: 1 }, { force: true }), false);
 
 for (const savedChoice of ['denied', 'dismissed']) {
   const returning = createHarness({ storage: new Map([[preferenceKey, savedChoice]]) });
@@ -273,7 +273,7 @@ assert.equal(permissionChanged.panels.filter(panel => !panel.hidden).length, 0);
 
 const legacy = createHarness({ storage: new Map([['sixo_app_build_version', 'old-build']]) });
 for (const timer of legacy.timers.values()) timer.callback();
-assert.equal(legacy.panels.filter(panel => !panel.hidden).length, 1, 'Old visitors also need a recovery button when no location is available');
+assert.equal(legacy.panels.filter(panel => !panel.hidden).length, 0, 'Old visitors can browse after a failed location request');
 
 const cookieVisit = createHarness({ storageUnavailable: true });
 cookieVisit.requests[0].error({ code: 1 });
@@ -286,7 +286,7 @@ assert.equal(unanswered.storage.get(preferenceKey), 'requested');
 const unansweredAgain = createHarness({ storage: unanswered.storage });
 assert.equal(unansweredAgain.requests.length, 1, 'An unanswered first visit must not disable device location on future visits');
 for (const timer of unansweredAgain.timers.values()) timer.callback();
-assert.equal(unansweredAgain.panels.filter(panel => !panel.hidden).length, 1, 'An unanswered browser prompt must have a visible fallback on reload');
+assert.equal(unansweredAgain.panels.filter(panel => !panel.hidden).length, 0, 'An unanswered browser prompt must not cover listings after Allow');
 
 for (const savedChoice of ['seen', 'allowed']) {
   const safariReturning = createHarness({ storage: new Map([[preferenceKey, savedChoice]]) });
@@ -333,7 +333,7 @@ const suppressedApp = connectApp(suppressed);
 await suppressedApp.requestLocationPermissionOnLoad();
 [...suppressed.timers.values()].find(timer => timer.delay === 1500).callback();
 const recovery = suppressed.panels[0];
-assert.equal(recovery.hidden, false, 'If browser permission UI is suppressed, display a direct location button');
+assert.equal(recovery.hidden, true, 'A suppressed browser request must not reopen the permission popup');
 recovery.querySelector('[data-location-entry-allow]').listeners.get('click')();
 assert.equal(suppressed.requests.length, 2, 'The fallback must reach geolocation synchronously during the tap');
 suppressed.requests[0].success(position);
@@ -348,8 +348,8 @@ closed.panels[0].querySelector('[data-location-entry-dismiss]').listeners.get('c
 closed.requests[0].error({ code: 1 });
 assert.equal(closed.panels[0].hidden, true, 'Not now stays dismissed after the pending request fails');
 assert.equal(closed.requests.length, 1, 'Dismissing recovery must not trigger further automatic requests');
-assert.equal(closed.window.SIXO_LOCATION_ENTRY.showPrompt({ code: 1 }, { force: true }), true, 'An explicit pin retry may reopen recovery');
-console.log('Suppressed prompt recovery passed: visible fallback, synchronous tap, stale callback isolation, success closure and dismissal.');
+assert.equal(closed.window.SIXO_LOCATION_ENTRY.showPrompt({ code: 1 }, { force: true }), false, 'Pin failures remain nonblocking');
+console.log('Suppressed prompt recovery passed: nonblocking failure, synchronous tap, stale callback isolation, success closure and dismissal.');
 
 // Real page-entry behavior: no request or disappearance until the visitor acts.
 for (const savedChoice of ['', 'seen', 'allowed', 'denied', 'dismissed']) {
@@ -359,7 +359,7 @@ for (const savedChoice of ['', 'seen', 'allowed', 'denied', 'dismissed']) {
     const entryApp = connectApp(visit);
     await entryApp.requestLocationPermissionOnLoad();
     assert.equal(visit.requests.length, 0, 'Page entry must wait for Allow, regardless of a saved choice or browser permission');
-    assert.equal(visit.panels.filter(panel => !panel.hidden).length, 1, 'QR entry must immediately show a visible location choice');
+    assert.equal(visit.panels.filter(panel => !panel.hidden).length, permissionState === 'denied' ? 0 : 1, 'A known denial must not cover the public listings');
     visit.panels[0].querySelector('[data-location-entry-dismiss]').listeners.get('click')();
     await entryApp.refreshLocationPermissionState({ requestIfAllowed: true });
     assert.equal(visit.requests.length, 0, 'Dismissal must stop background requests even for granted browser permission');

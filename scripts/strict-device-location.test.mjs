@@ -51,12 +51,13 @@ function makeApp() {
 const app=makeApp();
 app.updateHomeCurrentLocationDisplay();
 assert.equal(elements['main-app'].dataset.deviceLocationReady,'false');
-assert.equal(elements['main-app'].dataset.deviceLocationRefreshing,'false', 'Initial GPS acquisition must not reveal unscoped listings');
-assert.equal(displayedSections[0].inert,true);
-for(const options of [{},{city:'Saved city',country:'Saved country'},{useDefaultCountry:false},{useGoogleFallback:true}]) {
+assert.equal(elements['main-app'].dataset.deviceLocationRefreshing,'false', 'Initial GPS acquisition is separate from refreshing an existing location');
+assert.equal(displayedSections[0].inert,false, 'Browsing must remain interactive without GPS');
+for(const options of [{},{useDefaultCountry:false},{useGoogleFallback:true}]) {
  const scope=app.getEffectiveListingLocationScope(options);
- assert.equal(scope.pending,true);
- assert.equal(app.matchesListingLocationScope({city:'Saved city',country:'Saved country'},scope),false);
+ assert.equal(Boolean(scope.pending),false);
+ assert.equal(scope.active,false, 'No GPS means worldwide browsing, not a guessed profile location');
+ assert.equal(app.matchesListingLocationScope({city:'Saved city',country:'Saved country'},scope),true);
 }
 app.applyPreciseBrowserLocation(fix());
 await app.locationDefaultsPromise;
@@ -98,12 +99,12 @@ app.handleLocationError({code:2});
 assert.equal(elements['main-app'].dataset.deviceLocationReady,'false');
 assert.equal(elements['main-app'].dataset.deviceLocationRefreshing,'true', 'Temporary GPS loss must retain the already displayed listings');
 assert.equal(displayedSections[0].inert,false);
-assert.equal(app.getEffectiveListingLocationScope(foreign).pending,true);
+assert.equal(app.getEffectiveListingLocationScope(foreign).source,'user', 'Explicit country/city searches work without GPS');
 assert.match(elements['site-device-location-status'].textContent,/Last confirmed: Nairobi/);
 app.handleLocationError({code:1});
 assert.equal(app.lastConfirmedDeviceLocation,null);
 assert.equal(elements['main-app'].dataset.deviceLocationRefreshing,'false', 'Revoking GPS must end the previous display state');
-assert.equal(displayedSections[0].inert,true);
+assert.equal(displayedSections[0].inert,false, 'Browsing must remain interactive without GPS');
 assert.match(elements['site-device-location-status'].textContent,/Location access is off/);
 app.reverseGeocodeLatLng=async()=>local;
 app.applyPreciseBrowserLocation(fix()); await app.locationDefaultsPromise;
@@ -120,7 +121,7 @@ finishRender(); await awaitingRender;
 assert.equal(elements['main-app'].dataset.deviceLocationReady,'true');
 assert.match(html,/id="main-app"[^>]*data-device-location-ready="false"/);
 assert.ok(!html.includes('id="site-device-location-status"'));
-assert.match(css,/data-device-location-ready="false"/);
+assert.doesNotMatch(css,/data-device-location-ready="false"/, 'CSS must never gate inventory on location');
 assert.match(css,/device-location-excluded/);
 console.log('Strict device location passed: first paint, stored-profile isolation, country-wide filters/deals/featured cards, movement, render ordering, expiration, denial and recovery.');
 
@@ -158,7 +159,7 @@ assert.equal(elements['main-app'].dataset.deviceLocationReady,'false');
 assert.equal(elements['main-app'].dataset.deviceLocationInitialized,'true');
 assert.equal(elements['main-app'].dataset.deviceLocationRefreshing,'true', 'Vehicle movement must retain the displayed page while its next city resolves');
 assert.equal(displayedSections[0].inert,false, 'A background GPS lookup must not disable the displayed listings');
-assert.equal(scrolling.getDeviceListingLocationScope().pending,true, 'Keeping cards visible must not turn an old city into a current GPS scope');
+assert.equal(scrolling.getDeviceListingLocationScope().source,'worldwide', 'An old city must not be presented as a current GPS scope');
 assert.deepEqual(featured.map(c=>c.excluded),exclusionsBefore,'Pending GPS must not collapse featured card layout');
 assert.equal(prematureRefreshes,0,'Pending GPS must not empty results against an unresolved city');
 finishSameCity(local);

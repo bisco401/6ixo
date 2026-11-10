@@ -48,6 +48,7 @@
     let fallbackTimer = null;
     let panel = null;
     let dismissed = false;
+    let entryPromptAnswered = false;
     let confirmed = false;
     // Direct property links must be usable before the main app has loaded.
     let promptSuppressed = /^#(?:realestate|shortstays)(?:[/?]|$)/i.test(window.location?.hash || '');
@@ -98,6 +99,7 @@
         if (panel) panel.hidden = true;
     };
     const dismiss = () => {
+        entryPromptAnswered = true;
         dismissed = true;
         pauseAutomaticRequests = true;
         remember('dismissed');
@@ -129,6 +131,7 @@
                 </div>
                 <button type="button" class="location-entry-manual" data-location-entry-manual>Choose city instead</button>`;
             panel.querySelector('[data-location-entry-allow]').addEventListener('click', () => {
+                entryPromptAnswered = true;
                 dismissed = false;
                 pauseAutomaticRequests = false;
                 remember('requested');
@@ -176,8 +179,11 @@
         panel.querySelector('[data-location-entry-browser]').hidden = !error && !unsupported;
         button.disabled = unsupported;
         button.textContent = blocked ? 'Retry after enabling' : error ? 'Try again' : 'Allow';
-        panel.hidden = false;
-        return true;
+        // The visitor already chose Allow. A denied, timed-out or unanswered
+        // request must not put a blocking popup back over the marketplace.
+        panel.hidden = Boolean(error || pending);
+        if (error) entryPromptAnswered = true;
+        return !panel.hidden;
     };
 
     function recordPermission(state) {
@@ -211,6 +217,7 @@
         if (pending && (!userInitiated || pendingUserInitiated)) return pending;
         if (!userInitiated && !canRequestAutomatically()) return Promise.resolve({ skipped: true });
         if (userInitiated) {
+            entryPromptAnswered = true;
             dismissed = false;
             pauseAutomaticRequests = false;
             remember('requested');
@@ -333,7 +340,7 @@
     // This runs on the QR landing page, including the coming-soon screen,
     // before the marketplace bundle or its remote dependencies finish loading.
     const showEntryPrompt = () => {
-        if (!dismissed && pauseAutomaticRequests) showPrompt();
+        if (!dismissed && !entryPromptAnswered && pauseAutomaticRequests) showPrompt();
     };
     if (document.body) showEntryPrompt();
     else document.addEventListener('DOMContentLoaded', showEntryPrompt, { once: true });

@@ -26,7 +26,7 @@ const app = Object.assign(Object.create(context.App.prototype), {
 });
 for (const screen of ['marketplace', 'electronics', 'clothing', 'jobs', 'vehicles', 'services', 'community', 'rewards', 'other', 'dating']) {
   app.switchScreen(screen);
-  assert.equal(elements['browsing-location-recovery'].hidden, false, `${screen} needs a manual browsing path when GPS is unavailable`);
+  assert.equal(elements['browsing-location-recovery'].hidden, true, `${screen} must browse immediately without a location gate`);
 }
 for (const screen of ['home', 'profile', 'premium', 'personal', 'realestate']) {
   app.switchScreen(screen);
@@ -35,14 +35,14 @@ for (const screen of ['home', 'profile', 'premium', 'personal', 'realestate']) {
 app.switchScreen('electronics');
 app.setupHomeLocationRetry();
 app.switchScreen('home');
-assert.equal(elements['home-location-recovery'].hidden, false, 'A first visit must explain the hidden inventory and offer a city choice');
+assert.equal(elements['home-location-recovery'].hidden, true, 'A first visit shows inventory without requiring a location choice');
 app.locationPermissionState = 'denied';
 app.updateDeviceLocationUi();
 assert.match(elements['home-location-recovery-message'].textContent, /Location access is off/);
 app.locationPermissionState = 'unknown';
 app.locationRequestInFlight = true;
 app.updateDeviceLocationUi();
-assert.match(elements['home-location-recovery-message'].textContent, /Waiting for your device location/);
+assert.match(elements['home-location-recovery-message'].textContent, /browse all listings now/);
 elements['home-location-choose'].click();
 assert.equal(elements['home-search-location'].focused, true, 'Home recovery opens the same country/city picker');
 app.locationRequestInFlight = false;
@@ -60,7 +60,7 @@ assert.equal(elements['home-location-recovery'].hidden, true, 'Successful manual
 assert.equal(app.browsingLocationReturnScreen, null);
 app.deviceLocationFeedsReady = false;
 app.updateDeviceLocationUi();
-assert.equal(elements['browsing-location-recovery'].hidden, false, 'GPS refresh failure must retain the browsing recovery path');
+assert.equal(elements['browsing-location-recovery'].hidden, true, 'GPS refresh failure must not replace inventory with a location gate');
 app.browsingLocationReturnScreen = 'electronics';
 app.switchScreen('profile');
 await app.applyManualDiscoveryLocation({ country: 'Kenya' });

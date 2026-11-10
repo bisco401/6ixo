@@ -15887,6 +15887,9 @@ class DatingApp {
 
     getDeviceListingLocationScope() {
         const ready = Boolean(this.getCurrentLocationDisplayText());
+        // Location personalizes browsing; a missing/blocked device fix must
+        // never prevent a shared link from showing the public marketplace.
+        if (!ready) return { active: false, pending: false, city: '', region: '', country: '', text: '', source: 'worldwide' };
         const location = ready ? this.getDiscoveryLocationLabelParts() : {};
         return {
             active: true,
@@ -15900,7 +15903,7 @@ class DatingApp {
     }
 
     getEffectiveListingLocationScope({ city = '', region = '', state = '', province = '', country = '', text = '', useGoogleFallback = false, useDefaultCountry = true } = {}) {
-        if (this.strictDeviceLocation && (!this.getCurrentLocationDisplayText() || !this.didApplyEntryLocationDefaults)) {
+        if (this.strictDeviceLocation && this.getCurrentLocationDisplayText() && !this.didApplyEntryLocationDefaults) {
             return this.getDeviceListingLocationScope();
         }
         const explicitCity = this.normalizeLocationText(city);
@@ -16466,47 +16469,45 @@ class DatingApp {
         const refreshing = !ready && Boolean(main?.dataset.deviceLocationInitialized === 'true')
             && Boolean(this.lastConfirmedDeviceLocation)
             && !this.manualDiscoveryLocation && this.locationPermissionState !== 'denied';
-        const usablePage = ready || refreshing;
+        // Inventory is public and always usable. These location flags describe
+        // personalization only; they must not disable any page or category.
         if (main) {
             if (ready) main.dataset.deviceLocationInitialized = 'true';
             main.dataset.deviceLocationReady = ready ? 'true' : 'false';
             main.dataset.deviceLocationRefreshing = refreshing ? 'true' : 'false';
             const sections = main.querySelectorAll?.('.content-screen:not(#home-content):not(#profile-content):not(#premium-content):not(#personal-content):not(#realestate-content):not(#shortstays-content):not(#arrive-content):not(.dating-coming-soon-locked #dating-content), #home-content > section:not(.home-search):not(.home-brand-artwork):not(.home-seo-hub)') || [];
-            sections.forEach((section) => { section.inert = !usablePage; });
+            sections.forEach((section) => { section.inert = false; });
         }
         const homeRecovery = document.getElementById('home-location-recovery');
         if (homeRecovery) {
-            homeRecovery.hidden = usablePage;
+            homeRecovery.hidden = ready || !(this.locationRequestInFlight || window.SIXO_LOCATION_ENTRY?.pendingRequest
+                || this.locationPermissionState === 'denied' || /unavailable|timed out/i.test(this.deviceLocationStatus || ''));
             const message = document.getElementById('home-location-recovery-message');
             if (message) message.textContent = this.manualDiscoveryLocation
                 ? 'Loading listings for your selected area…'
                 : this.locationPermissionState === 'denied'
-                    ? 'Location access is off. Choose a city or country to see listings.'
+                    ? 'Location access is off. You can browse all listings or choose a city for local results.'
                     : this.locationRequestInFlight || window.SIXO_LOCATION_ENTRY?.pendingRequest
-                        ? 'Waiting for your device location. You can choose a city and keep browsing.'
+                        ? 'Finding your location in the background. You can browse all listings now.'
                         : this.hasUsableCurrentLocation()
-                            ? 'Finding your city from your device location. You can also choose it below.'
-                            : 'Use your device location or choose a city or country to see listings.';
+                            ? 'Finding your city in the background. All listings remain available.'
+                            : 'Device location is unavailable. Browse all listings or choose a city for local results.';
         }
         const recovery = document.getElementById('browsing-location-recovery');
-        if (recovery) {
-            const gatedScreen = ['marketplace', 'electronics', 'clothing', 'jobs', 'vehicles', 'services', 'community', 'rewards', 'other'].includes(this.activeScreen)
-                || (this.activeScreen === 'dating' && window.SIXO_DATING_COMING_SOON_LOCKED !== true);
-            recovery.hidden = usablePage || !gatedScreen;
-        }
+        if (recovery) recovery.hidden = true;
         const status = document.getElementById('site-device-location-status');
         if (status) status.textContent = this.getDeviceLocationStatusText();
         const help = document.getElementById('site-device-location-help');
-        if (help) help.hidden = Boolean(usablePage);
+        if (help) help.hidden = ready;
         this.filterFeaturedCardsForDeviceLocation();
     }
 
     filterFeaturedCardsForDeviceLocation() {
         if (!this.strictDeviceLocation || !document.querySelectorAll) return;
         const scope = this.getDeviceListingLocationScope();
-        // The location gate hides pending results without removing their layout.
-        // Do not collapse every featured card while a fresh city lookup is pending.
-        if (scope.pending) return;
+        // Keep already displayed cards stable during a temporary GPS refresh.
+        // A first visit or denied permission always permits worldwide browsing.
+        if (scope.source === 'worldwide' && this.lastConfirmedDeviceLocation && this.locationPermissionState !== 'denied') return;
         document.querySelectorAll('#main-app .featured-ad-card').forEach((card) => {
             if (card.dataset.servicePromotion === '1' || card.closest?.('#realestate-featured-ads-strip, #home-featured-ads-strip')) {
                 card.classList.toggle('device-location-excluded', false);
@@ -16850,7 +16851,6 @@ class DatingApp {
     }
 
     matchesListingLocationScope({ city = '', region = '', state = '', province = '', country = '', label = '', metro = '' } = {}, scope = null) {
-        if (this.strictDeviceLocation && scope?.source !== 'destination' && !this.getCurrentLocationDisplayText()) return false;
         const resolved = scope && typeof scope === 'object'
             ? scope
             : this.getEffectiveListingLocationScope();
@@ -19162,8 +19162,7 @@ class DatingApp {
             && window.SIXO_LOCATION_ENTRY?.showPrompt?.(error, { force: announce });
         if (announce && !recoveryShown) {
             this.showNotification(
-                denied ? 'Location is blocked in your browser or device settings. Allow location for 6ixo.com, then tap the location pin again.'
-                    : 'Your current location could not be determined. Please try again.',
+                'Device location is unavailable. You can keep browsing or choose a city for local results.',
                 { type: 'warn', force: true }
             );
         }
@@ -64223,51 +64222,68 @@ class DatingApp {
             if (!(date instanceof Date) || Number.isNaN(date.getTime())) return 'unknown';
             return date.toISOString().slice(0, 10);
         };
-        const grouped = sorted.reduce((acc, item) => {
-            const date = this.normalizeActivityDate(item.postedDate);
-            const key = toDayKey(date);
-            if (!acc[key]) acc[key] = [];
-            acc[key].push(item);
-            return acc;
-        }, {});
-        const getGroupLocalPriority = (key) => Math.max(
-            0,
-            ...(grouped[key] || []).map((item) => this.getListingLocalPriority({
-                city: item.city || '',
-                country: item.country || '',
-                label: item.location || [item.city, item.country].filter(Boolean).join(', ')
-            }, localPriorityScope))
-        );
-        const groupKeys = Object.keys(grouped).sort((a, b) => {
-            if (shouldPrioritizeLocal) {
-                const localPriorityDiff = getGroupLocalPriority(b) - getGroupLocalPriority(a);
-                if (localPriorityDiff !== 0) return localPriorityDiff;
+        // Shared links can browse thousands of listings before GPS is known.
+        // Keep the first render small enough for an in-app mobile browser.
+        const pageSize = 48;
+        const renderPage = (limit) => {
+            const grouped = sorted.slice(0, limit).reduce((acc, item) => {
+                const date = this.normalizeActivityDate(item.postedDate);
+                const key = toDayKey(date);
+                if (!acc[key]) acc[key] = [];
+                acc[key].push(item);
+                return acc;
+            }, {});
+            const getGroupLocalPriority = (key) => Math.max(
+                0,
+                ...(grouped[key] || []).map((item) => this.getListingLocalPriority({
+                    city: item.city || '',
+                    country: item.country || '',
+                    label: item.location || [item.city, item.country].filter(Boolean).join(', ')
+                }, localPriorityScope))
+            );
+            const groupKeys = Object.keys(grouped).sort((a, b) => {
+                if (shouldPrioritizeLocal) {
+                    const localPriorityDiff = getGroupLocalPriority(b) - getGroupLocalPriority(a);
+                    if (localPriorityDiff !== 0) return localPriorityDiff;
+                }
+                if (a === 'unknown') return 1;
+                if (b === 'unknown') return -1;
+                return b.localeCompare(a);
+            });
+
+            container.innerHTML = groupKeys.map((key) => {
+                const groupItems = grouped[key] || [];
+                const label = key === 'unknown'
+                    ? 'Unknown'
+                    : (this.formatFeedHeaderDate(new Date(`${key}T00:00:00`)) || 'Unknown');
+                const countLabel = `${groupItems.length} ${groupItems.length === 1 ? 'listing' : 'listings'}`;
+                return `
+                    <div class="vehicles-feed-group marketplace-feed-group">
+                        <div class="vehicles-feed-header">
+                            <h4>${this.escapeHtml(label)}</h4>
+                            <span>${countLabel}</span>
+                        </div>
+                        <div class="marketplace-feed-day-list">
+                            ${groupItems.map((item) => this.renderMarketplaceFeedCard(item, { deferImages })).join('')}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            if (sorted.length > limit) {
+                container.insertAdjacentHTML('beforeend', `<div class="marketplace-load-more" style="text-align:center;padding:20px">
+                    <button type="button" class="btn-primary" data-feed-load-more>Show more listings (${Math.min(limit, sorted.length)} of ${sorted.length})</button>
+                </div>`);
+                container.querySelector('[data-feed-load-more]')?.addEventListener('click', () => {
+                    const restoreScroll = this.captureLocationRefreshScroll();
+                    renderPage(limit + pageSize);
+                    restoreScroll();
+                });
             }
-            if (a === 'unknown') return 1;
-            if (b === 'unknown') return -1;
-            return b.localeCompare(a);
-        });
-
-        container.innerHTML = groupKeys.map((key) => {
-            const groupItems = grouped[key] || [];
-            const label = key === 'unknown'
-                ? 'Unknown'
-                : (this.formatFeedHeaderDate(new Date(`${key}T00:00:00`)) || 'Unknown');
-            const countLabel = `${groupItems.length} ${groupItems.length === 1 ? 'listing' : 'listings'}`;
-            return `
-                <div class="vehicles-feed-group marketplace-feed-group">
-                    <div class="vehicles-feed-header">
-                        <h4>${this.escapeHtml(label)}</h4>
-                        <span>${countLabel}</span>
-                    </div>
-                    <div class="marketplace-feed-day-list">
-                        ${groupItems.map((item) => this.renderMarketplaceFeedCard(item, { deferImages })).join('')}
-                    </div>
-                </div>
-            `;
-        }).join('');
-
-        this.bindMarketplaceItemCarousels(container);
+            container.dataset.feedVisibleCount = String(Math.min(limit, sorted.length));
+            this.bindMarketplaceItemCarousels(container);
+        };
+        renderPage(pageSize);
     }
 
     renderMarketplaceCategoryGrid(category, { containerId, countId, titleId, label } = {}) {

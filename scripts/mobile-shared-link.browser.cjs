@@ -13,10 +13,10 @@ const output = process.env.LOCATION_TEST_OUTPUT;
   try {
     const scenarios = process.env.LOCATION_SCENARIOS?.split(',') || ['granted', 'worldwide', 'denied', 'silent', 'unsupported', 'dismissed', 'early-choice'];
     for (const scenario of scenarios) {
-      const mode = ['whatsapp', 'settings-retry'].includes(scenario) ? 'denied' : scenario === 'snapchat' ? 'silent' : scenario;
+      const mode = ['whatsapp', 'instagram', 'settings-retry'].includes(scenario) ? 'denied' : ['snapchat', 'tiktok'].includes(scenario) ? 'silent' : scenario;
       const device = safari ? devices['iPhone 13'] : devices['Pixel 7'];
       const page = await browser.newPage({ ...device,
-        userAgent: device.userAgent + (scenario === 'whatsapp' ? ' WhatsApp/2.26.1' : scenario === 'snapchat' ? ' Snapchat/13.0' : ''),
+        userAgent: device.userAgent + (scenario === 'whatsapp' ? ' WhatsApp/2.26.1' : scenario === 'snapchat' ? ' Snapchat/13.0' : scenario === 'instagram' ? ' Instagram 360.0' : scenario === 'tiktok' ? ' BytedanceWebview TikTok/40.0' : ''),
         viewport: { width: scenario === 'unsupported' ? 320 : 390, height: 844 } });
       const errors = [];
       page.on('pageerror', error => errors.push(error.message));
@@ -56,21 +56,44 @@ const output = process.env.LOCATION_TEST_OUTPUT;
       }
       await navigation;
       await page.waitForFunction(() => window.app && document.getElementById('home-search-location').dataset.boundAreaPicker === '1');
+      const assertPublicBrowsing = async () => {
+        await page.waitForFunction(() => document.querySelectorAll('#home-listings-grid .home-card-item').length > 0);
+        assert.equal(await page.locator('.location-entry-prompt').isVisible(), false, 'GPS must not reopen a popup over listings');
+        assert.equal(await page.locator('#home-listings-grid').isVisible(), true, 'real inventory is visible before any city selection');
+        assert.equal(await page.locator('#home-listings-grid').evaluate(el => !!el.closest('[inert]')), false);
+        assert.equal(await page.locator('#home-location-summary').innerText(), 'All locations');
+        assert.equal(await page.evaluate(() => app.getDeviceListingLocationScope().source), 'worldwide');
+        assert.equal(await page.evaluate(() => app.manualDiscoveryLocation == null), true, 'browsing does not invent a selected city');
+        await page.locator('[data-home-category="electronics"]').click();
+        await page.waitForFunction(() => app.activeScreen === 'electronics' && document.querySelectorAll('#electronics-items [data-id]').length > 0);
+        assert.equal(await page.locator('#electronics-items').isVisible(), true, 'category browsing works without GPS');
+        assert.ok(Number(await page.locator('#electronics-items').getAttribute('data-feed-visible-count')) <= 48, 'the first mobile render is bounded');
+        if (scenario === 'whatsapp' && await page.locator('#electronics-items [data-feed-load-more]').count()) {
+          await page.locator('#electronics-items [data-feed-load-more]').click();
+          await page.waitForFunction(() => Number(document.getElementById('electronics-items').dataset.feedVisibleCount) > 48);
+        }
+        if (output) {
+          fs.mkdirSync(output, { recursive: true });
+          await page.locator('#electronics-items').scrollIntoViewIfNeeded();
+          await page.screenshot({ path: path.join(output, `${safari ? 'safari' : 'chrome'}-${scenario}-without-gps.png`) });
+        }
+        await page.locator('.bottom-nav [data-screen="home"]').click();
+      };
+      const retryLocation = async () => {
+        if (!await page.locator('#home-location-panel').isVisible()) await page.locator('#home-location-toggle').click();
+        await page.locator('#home-use-location').click();
+      };
       if (scenario === 'settings-retry') {
         await page.locator('[data-location-entry-allow]').click();
         await page.waitForFunction(() => app.locationPermissionState === 'denied');
-        assert.equal(await page.locator('#location-entry-title').innerText(), 'Location access is blocked');
-        assert.equal(await page.locator('[data-location-entry-allow]').innerText(), 'Retry after enabling');
         assert.equal(await page.evaluate(() => testLocationCallbacks.length), 1, 'denial does not trigger an automatic retry loop');
-        if (output) {
-          fs.mkdirSync(output, { recursive: true });
-          await page.screenshot({ path: path.join(output, `${safari ? 'safari' : 'chrome'}-blocked.png`) });
-        }
-        await page.locator('[data-location-entry-allow]').click();
-        await page.waitForFunction(() => testLocationCallbacks.length === 2 && !app.locationRequestInFlight);
+        await assertPublicBrowsing();
+        const requestsBeforeRetry = await page.evaluate(() => testLocationCallbacks.length);
+        await retryLocation();
+        await page.waitForFunction(before => testLocationCallbacks.length === before + 1 && !app.locationRequestInFlight, requestsBeforeRetry);
         assert.equal(await page.evaluate(() => app.locationPermissionState), 'denied', 'another tap cannot grant browser permission');
         await page.evaluate(() => { window.testLocationMode = 'granted'; });
-        await page.locator('[data-location-entry-allow]').click();
+        await retryLocation();
         await page.waitForFunction(() => app.deviceLocationFeedsReady && !app.locationRequestInFlight);
         assert.match(await page.locator('#home-location-summary').innerText(), /Toronto/);
         assert.equal(await page.locator('.location-entry-prompt').isVisible(), false);
@@ -87,25 +110,25 @@ const output = process.env.LOCATION_TEST_OUTPUT;
           await page.locator('[data-location-entry-allow]').click();
           if (mode === 'denied') {
             await page.waitForFunction(() => app.locationPermissionState === 'denied');
-            await page.locator('[data-location-entry-manual]').click();
           } else {
             await page.waitForFunction(() => app.locationRequestInFlight);
-            assert.match(await page.locator('#home-location-recovery-message').innerText(), /Waiting/);
+            assert.match(await page.locator('#home-location-recovery-message').innerText(), /browse all listings now/);
             assert.equal(await page.locator('.home-seo-hub').evaluate(element => element.inert), false, 'public category and country links remain usable without GPS');
             if (output) {
               fs.mkdirSync(output, { recursive: true });
               await page.locator('#home-location-recovery').scrollIntoViewIfNeeded();
               await page.screenshot({ path: path.join(output, `${safari ? 'safari' : 'chrome'}-waiting.png`) });
             }
-            await page.locator('#home-location-choose').click();
           }
         } else if (scenario === 'dismissed') {
           await page.locator('[data-location-entry-dismiss]').click();
-          assert.equal(await page.locator('#home-location-recovery').isVisible(), true);
-          await page.locator('#home-location-choose').click();
         } else if (scenario === 'unsupported') {
           assert.equal(await page.locator('[data-location-entry-allow]').isDisabled(), true);
-          await page.locator('[data-location-entry-manual]').click();
+          await page.locator('[data-location-entry-dismiss]').click();
+        }
+        if (scenario !== 'early-choice') {
+          await assertPublicBrowsing();
+          await page.locator('#home-location-toggle').click();
         }
         assert.equal(await page.locator('#home-location-panel').isVisible(), true, `${scenario}: opens country/city fields`);
         await page.locator('#home-location-country').fill('Canada');

@@ -33,7 +33,7 @@
             const alias = app.getRegionAlias?.(location.region);
             const region = alias && same(alias.country, location.country) ? alias.abbr : clean(location.region);
             return location.city ? `${location.city}${region || countryName ? ', ' : ''}${[region, countryName].filter(Boolean).join(' ')}`
-                : [region, countryName].filter(Boolean).join(', ') || 'Choose location';
+                : [region, countryName].filter(Boolean).join(', ') || 'All locations';
         }
         function updateSummary(location) {
             const key = keyFor(location);

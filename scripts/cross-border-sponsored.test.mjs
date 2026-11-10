@@ -96,6 +96,7 @@ assert.ok(preview.includes('On its way to Guyana'));
 
 const fields = {
     'item-category': { value: 'electronics' },
+    'item-sponsored-arrival': { checked: true, setAttribute() {} },
     'item-destination-country': { value: 'Jamaica' },
     'item-transit-status': { value: 'shipping_soon' },
     'item-target-country': { value: '' },
@@ -104,8 +105,10 @@ const fields = {
 };
 context.document.getElementById = (id) => fields[id] || null;
 app.syncCrossBorderSponsoredFields('item-destination-country');
-assert.equal(fields['item-target-country'].value, 'Jamaica');
-assert.equal(fields['item-placement'].value, 'electronics_featured');
-assert.equal(fields['item-featured'].checked, true);
+assert.equal(app.getPostItemPromotionTarget().country, 'Jamaica');
+assert.equal(fields['item-destination-country'].required, true);
+assert.equal(fields['item-transit-status'].required, true);
+assert.equal(fields['item-placement'].value, 'market');
+assert.equal(fields['item-featured'].checked, false);
 
 console.log('Cross-border sponsored test passed: paid gating, targeting, form, labels, colors, placement, and offer data are wired.');

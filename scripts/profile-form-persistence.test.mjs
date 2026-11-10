@@ -33,3 +33,46 @@ test('opening profile restores the account email and saved country, region and c
 test('a guest profile never displays null years old',()=>{
  const {app,elements}=fixture();app.isSignedIn=false;app.currentUser.age=null;app.loadUserProfile();assert.doesNotMatch(elements['profile-age'].textContent,/null|undefined/);
 });
+
+test('public seller contact and interests require explicit choices and can be removed', async () => {
+  const { app, elements, writes } = fixture();
+  elements['profile-phone'].value = '+1 416 555 0100';
+  elements['profile-public-phone'] = { value: '+1 416 555 0111' };
+  elements['profile-public-interests'] = { checked: true };
+  app.currentUser.interests = ['Gardening'];
+  await app.saveProfile();
+  const [publicWrite, privateWrite] = writes;
+  assert.equal(publicWrite.row.public_phone, '+1 416 555 0111');
+  assert.deepEqual(Array.from(publicWrite.row.public_interests), ['Gardening']);
+  assert.equal(publicWrite.row.phone, undefined);
+  assert.equal(publicWrite.row.full_name, undefined);
+  assert.equal(privateWrite.row.phone, '+1 416 555 0100');
+  assert.equal(app.currentUser.location.city, 'Toronto');
+  elements['profile-public-phone'].value = '';
+  elements['profile-public-interests'].checked = false;
+  await app.saveProfile();
+  assert.equal(writes[2].row.public_phone, null);
+  assert.equal(writes[2].row.public_interests, null);
+});
+
+test('a viewer receives the saved seller identity without replacing the ad location or description', () => {
+  const { app } = fixture();
+  const publicProfile = {
+    display_name: 'Updated seller', city: 'Ottawa', country: 'Canada', bio: 'Updated profile bio',
+    photo_urls: ['https://example.test/profile.jpg'], profile_video_url: 'https://example.test/profile.mp4'
+  };
+  const listing = app.normalizeSupabaseMarketplaceListingRow({
+    id: 'listing-1', user_id: 'seller-account', city: 'Toronto', description: 'Ad description',
+    listing_payload: { seller: 'Old seller', sellerUserId: 'forged-owner' }
+  }, publicProfile);
+  const card = app.applyPublicSellerProfile({ name: 'Old seller' }, listing.sellerProfile);
+  assert.equal(listing.sellerUserId, 'seller-account');
+  assert.equal(listing.seller, 'Updated seller');
+  assert.equal(listing.city, 'Toronto');
+  assert.equal(listing.description, 'Ad description');
+  assert.equal(card.name, 'Updated seller');
+  assert.equal(card.location, 'Ottawa, Canada');
+  assert.equal(card.bio, 'Updated profile bio');
+  assert.equal(card.photo, 'https://example.test/profile.jpg');
+  assert.equal(card.profileVideo, 'https://example.test/profile.mp4');
+});

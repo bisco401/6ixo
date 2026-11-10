@@ -130,7 +130,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
     <link rel="preload" href="assets/fonts/sora-latin.3902474d3ece.woff2" as="font" type="font/woff2" crossorigin>
-    <link rel="stylesheet" href="styles.css?v=20261101-search-suggestions-2">
+    <link rel="stylesheet" href="styles.css?v=20261110-form-card-1">
     <link rel="stylesheet" href="assets/arrive-discovery.css?v=20261106-live-matches-1">
     <link rel="stylesheet" href="assets/shortstay-signature.css?v=20261018-signature-1">
     <link rel="stylesheet" href="assets/stay-host-application.css?v=20261019-host-proof-checks-1">
@@ -4770,29 +4770,35 @@
 	                            <p class="profile-field-note">Shown to viewers on your profile, listings, reviews, and messages.</p>
 	                        </div>
 	                        <div class="profile-input-group">
-	                            <label for="profile-email">Email</label>
-	                            <input type="email" id="profile-email" placeholder="you@example.com">
+	                            <label for="profile-email">Sign-in email <span class="profile-name-status is-private">Private</span></label>
+	                            <input type="email" id="profile-email" readonly aria-describedby="profile-email-note">
+                            <p id="profile-email-note" class="profile-field-note">This is your sign-in email.</p>
 	                        </div>
 	                        <div class="profile-input-group">
-	                            <label for="profile-phone">Phone</label>
+	                            <label for="profile-phone">Account phone <span class="profile-name-status is-private">Private</span></label>
 	                            <input type="tel" id="profile-phone" placeholder="+1 (555) 123-4567">
 	                        </div>
 	                        <div class="profile-input-group">
-	                            <label for="profile-country">Country</label>
+	                            <label for="profile-public-phone">Public seller phone (optional)</label>
+                            <input type="tel" id="profile-public-phone" maxlength="60" aria-describedby="profile-public-phone-note">
+                            <p id="profile-public-phone-note" class="profile-field-note">Viewers can use this number to reach you from your seller profile.</p>
+                        </div>
+                        <div class="profile-input-group">
+                            <label for="profile-country">Public country</label>
 	                            <input type="text" id="profile-country" placeholder="Country">
 	                        </div>
                         <div class="profile-input-group">
-                            <label for="profile-region">State / Province</label>
+                            <label for="profile-region">Public state / province</label>
                             <input type="text" id="profile-region" placeholder="State or province">
                         </div>
 	                        <div class="profile-input-group">
-	                            <label for="profile-city">City</label>
+	                            <label for="profile-city">Public city</label>
 	                            <input type="text" id="profile-city" placeholder="City">
 	                        </div>
 	                        <div class="profile-input-group profile-map-toggle" style="grid-column: 1 / -1;">
 	                            <label class="map-toggle">
 	                                <input type="checkbox" id="profile-map-visible">
-	                                Visible on world map (approx city only)
+	                                Show my public profile in map links (city only)
 	                            </label>
 	                        </div>
 	                    </div>
@@ -4861,6 +4867,7 @@
                             <!-- Interest tags will be added here -->
                         </div>
                         <input type="text" id="interest-input" placeholder="Add an interest...">
+                        <label><input type="checkbox" id="profile-public-interests"> Show my interests on my public profile</label>
                     </div>
                     <div class="wallet-card" aria-label="Stripe host payouts">
                         <div class="wallet-row">
@@ -5015,7 +5022,8 @@
                         <div id="profile-arrive-trips-list" class="profile-arrive-trips-list" aria-live="polite"></div>
                     </section>
                     <button id="open-admin-dashboard" class="btn-secondary small" type="button">Admin dashboard</button>
-                    <button class="btn-primary" id="save-profile">Save Changes</button>
+                    <button class="btn-secondary" id="profile-viewer-preview" type="button">Preview public profile</button>
+                    <button class="btn-primary" id="save-profile" type="button" data-save-profile>Save Changes</button>
 			                    </div>
 			                </div>
 			            </div>
@@ -5341,6 +5349,8 @@
                     </div>
                 </div>
                 <p id="seller-profile-bio" class="seller-profile-bio"></p>
+                <p id="seller-profile-interests" class="seller-profile-bio" hidden></p>
+                <video id="seller-profile-video" class="seller-profile-video" aria-label="Seller profile video" playsinline controls preload="metadata" hidden></video>
                 <div class="seller-profile-stats">
                     <div class="seller-profile-stat">
                         <span>Listings</span>
@@ -6203,6 +6213,11 @@
 		                        <div id="item-category-badge-options" class="service-label-options"></div>
 		                    </fieldset>
 		                    <input type="hidden" id="item-category-badges" value="">
+                            <div class="post-item-viewer-review">
+                                <h5>Badges on your listing card</h5>
+                                <div id="post-item-viewer-badges" aria-live="polite"></div>
+                                <button class="btn-secondary small" type="button" data-open-listing-viewer-preview>Open viewer card</button>
+                            </div>
 		                    <input type="hidden" id="item-tags" value="">
 		                </div>
 	                <div id="fashion-fields" class="realestate-fields hidden">
@@ -7004,6 +7019,8 @@
 	                                <p class="preview-eyebrow">Live preview</p>
                                 <h5 id="post-item-preview-title">Preview modes</h5>
                                 <p id="post-item-preview-subtitle">Switch between feed, featured, and profile layouts.</p>
+                                <button class="btn-secondary small" type="button" data-open-listing-viewer-preview>Open viewer card</button>
+                                <button class="btn-secondary small" type="button" data-open-listing-viewer-preview="featured">Open sponsored viewer card</button>
 	                            </div>
                             <div class="post-item-preview-toolbar">
                                 <div class="post-item-preview-tabs" role="tablist" aria-label="Preview mode">
@@ -7048,9 +7065,7 @@
                                                     </div>
                                                 </div>
                                                 <span id="post-item-featured-meta" class="luxury-profile-tagline">Featured summary appears here.</span>
-                                                <div id="post-item-featured-tags" class="luxury-profile-tags">
-                                                    <span><i class="fas fa-circle-check" aria-hidden="true"></i> Verified</span>
-                                                </div>
+                                                <div id="post-item-featured-tags" class="luxury-profile-tags"></div>
                                                 <p id="post-item-featured-note" class="post-item-featured-note">Turn on Featured or choose a featured placement to publish in premium strips.</p>
                                             </div>
                                         </article>
@@ -7264,7 +7279,7 @@
     <link rel="stylesheet" href="assets/auth-captcha.css?v=20261109-turnstile-1">
     <script src="turnstile-config.js?v=20261109-turnstile-1"></script>
     <script src="assets/auth-captcha.js?v=20261109-turnstile-1"></script>
-    <script src="app.js?v=20261109-photo-quality-1"></script>
+    <script src="app.js?v=20261110-form-card-1"></script>
         <script src="rental-finance-ui.js?v=20260930-stay-booking-ready-1"></script>
         <script src="vehicle-rental-flow.js?v=20260914-host-insurance-1"></script>
 			</body>

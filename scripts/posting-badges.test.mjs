@@ -100,3 +100,39 @@ test('AI flags an electrician ad filed under Buy n Sell before generating unrela
     assert.equal(fields['item-description'].value, '');
     assert.match(notices[0], /Use Jobs/);
 });
+
+test('a saved vehicle ad keeps its form specs and selected badges in the Vehicles viewer', () => {
+    const { app } = fixture();
+    const saved = app.normalizeSupabaseMarketplaceListingRow({
+        id: 'vehicle-ad', user_id: 'owner-id', category: 'vehicles', subcategory: 'auto_parts',
+        listing_payload: {
+            categoryBadges: ['Warranty'],
+            vehicle: { category: 'auto_parts', make: 'Honda', model: 'Civic', year: 2020, mileage: 12000, color: 'Blue' }
+        }
+    });
+    const viewer = app.buildVehicleFeedEntryFromMarketplaceItem(saved);
+    assert.equal(viewer.category, 'auto_parts');
+    assert.equal(viewer.sellerUserId, 'owner-id');
+    assert.equal(viewer.make, 'Honda');
+    assert.equal(viewer.mileageKm, 12000);
+    assert.equal(viewer.color, 'Blue');
+    assert.ok(viewer.categoryBadges.includes('Warranty'));
+});
+
+test('service provider cards retain published address, labels, availability and video', () => {
+    const { app } = fixture();
+    const saved = app.normalizeSupabaseMarketplaceListingRow({
+        id: 'service-ad', user_id: 'owner-id', category: 'services', city: 'Toronto',
+        listing_payload: {
+            priceText: 'CAD 90', video: 'https://example.test/service.mp4',
+            service: { category: 'beauty', address: '123 Example Street', duration: '60 min', availabilityWindow: 'Saturday', labels: ['By appointment'] }
+        }
+    });
+    const viewer = app.buildServiceProfileEntryFromMarketplaceItem(saved);
+    assert.equal(viewer.location, '123 Example Street');
+    assert.equal(viewer.price, 'CAD 90');
+    assert.equal(viewer.priceNote, '60 min');
+    assert.equal(viewer.availability[0], 'Saturday');
+    assert.equal(viewer.video, 'https://example.test/service.mp4');
+    assert.deepEqual(Array.from(viewer.tags), Array.from(app.getMarketplaceCategoryBadges(saved)));
+});

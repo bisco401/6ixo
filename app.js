@@ -3413,6 +3413,7 @@ class DatingApp {
                 .filter(Boolean)
                 .join(' ')
                 .trim();
+            const location = this.currentUser.marketplaceProfileLocation || this.currentUser.location;
             const profile = {
                 id: user.id,
                 first_name: this.currentUser?.firstName || null,
@@ -3423,9 +3424,9 @@ class DatingApp {
                 phone: this.currentUser?.phone || null,
                 photo_url: this.getPhotoEntrySrc(this.currentUser?.marketplacePhoto) || null,
                 interests: Array.isArray(this.currentUser?.interests) ? this.currentUser.interests.filter(Boolean) : [],
-                city: this.currentUser?.location?.city || null,
-                region: this.currentUser?.location?.region || null,
-                country: this.currentUser?.location?.country || null,
+                city: location?.city || null,
+                region: location?.region || null,
+                country: location?.country || null,
                 map_visible: this.currentUser?.mapVisible === true
             };
             const { error } = await this.supabase
@@ -3477,6 +3478,11 @@ class DatingApp {
 	                this.currentUser.marketplaceUsername = displayName;
 	                this.currentUser.marketplaceName = displayName;
 	            }
+            this.currentUser.marketplaceProfileLocation = { city: data.city || '', region: data.region || '', country: data.country || '' };
+            this.currentUser.publicProfilePhone = String(data.public_phone || '');
+            this.currentUser.showProfileInterests = Array.isArray(data.public_interests);
+            this.currentUser.hadPublicProfileInterests = this.currentUser.showProfileInterests;
+            this.currentUser.hasPublicProfilePhone = Boolean(data.public_phone);
             this.currentUser.profileVideoUrl = /^https:\/\//i.test(data.profile_video_url || '') ? data.profile_video_url : '';
             this.currentUser.marketplaceBio = String(data.bio || '').trim();
             this.currentUser.bio = this.currentUser.marketplaceBio;
@@ -3509,16 +3515,25 @@ class DatingApp {
         }
         try {
             const publicName = this.getMarketplaceUsername();
+            const location = this.currentUser.marketplaceProfileLocation || this.currentUser.location;
+            const extras = {};
+            if (this.currentUser.publicProfilePhone || this.currentUser.hasPublicProfilePhone) {
+                extras.public_phone = this.currentUser.publicProfilePhone || null;
+            }
+            if (this.currentUser.showProfileInterests || this.currentUser.hadPublicProfileInterests) {
+                extras.public_interests = this.currentUser.showProfileInterests ? this.getProfileInterestLabels() : null;
+            }
             const payload = {
+                ...extras,
                 user_id: this.currentUser.id,
                 display_name: publicName || '6ixo member',
                 photo_url: this.getPhotoEntrySrc(this.currentUser?.marketplacePhoto) || null,
                 photo_urls: (this.currentUser?.marketplacePhotos || []).map((entry) => this.getPhotoEntrySrc(entry)).filter(Boolean),
                 ...(Object.prototype.hasOwnProperty.call(this.currentUser, 'profileVideoUrl') ? { profile_video_url: this.currentUser.profileVideoUrl || null } : {}),
                 bio: this.getMarketplaceProfileBio() || null,
-                city: this.currentUser?.location?.city || null,
-                region: this.currentUser?.location?.region || null,
-                country: this.currentUser?.location?.country || null,
+                city: location?.city || null,
+                region: location?.region || null,
+                country: location?.country || null,
                 map_visible: this.currentUser?.mapVisible === true
             };
             const { data, error } = await this.supabase
@@ -4048,7 +4063,20 @@ class DatingApp {
         }
     }
 
-    normalizeSupabaseMarketplaceListingRow(row = {}) {
+    async readMarketplaceSellerProfiles(ownerIds) {
+        if (!this.supabase || !ownerIds.length) return new Map();
+        try {
+            const { data, error } = await this.supabase.from('marketplace_profiles')
+                .select('*').in('user_id', ownerIds);
+            if (error) throw error;
+            return new Map((data || []).map(profile => [profile.user_id, profile]));
+        } catch (error) {
+            console.warn('Public seller profiles could not be loaded:', error);
+            return new Map();
+        }
+    }
+
+    normalizeSupabaseMarketplaceListingRow(row = {}, sellerProfile = null) {
         const payload = (row?.listing_payload && typeof row.listing_payload === 'object' && !Array.isArray(row.listing_payload))
             ? { ...row.listing_payload }
             : {};
@@ -4074,7 +4102,8 @@ class DatingApp {
             sourceRowId: String(row?.id || '').trim(),
             sourceTable: 'marketplace_listings',
             serverBacked: true,
-            sellerUserId: String(row?.user_id || payload?.sellerUserId || '').trim(),
+            sellerUserId: String(row?.user_id || '').trim(),
+            sellerProfile,
             userId: String(row?.user_id || payload?.userId || '').trim(),
             category: String(row?.category || payload?.category || '').trim().toLowerCase(),
             subcategory: String(row?.subcategory || payload?.subcategory || '').trim().toLowerCase(),
@@ -4089,7 +4118,8 @@ class DatingApp {
             featuredUntil: String(row?.featured_until || '').trim(),
             images,
             image: images[0] || '',
-            seller: String(payload?.seller || payload?.provider || '6ixo member').trim() || '6ixo member',
+            seller: String((String(row.category || payload.category) === 'jobs' ? '' : sellerProfile?.display_name) || payload?.seller || payload?.provider || '6ixo member').trim() || '6ixo member',
+            sellerPhoto: sellerProfile ? sellerProfile.photo_url || '' : payload.sellerPhoto || '',
             postedDate: row?.created_at || payload?.postedDate || new Date().toISOString(),
             status: String(row?.status || payload?.status || 'published').trim().toLowerCase() || 'published',
             sold: String(row?.status || '').trim().toLowerCase() === 'sold' || payload?.sold === true
@@ -4106,8 +4136,11 @@ class DatingApp {
                 .order('created_at', { ascending: false })
                 .limit(250);
             if (error) throw error;
-            const listings = (Array.isArray(data) ? data : [])
-                .map((row) => this.normalizeSupabaseMarketplaceListingRow(row))
+            const rows = Array.isArray(data) ? data : [];
+            const ownerIds = [...new Set(rows.map(row => row.user_id).filter(Boolean))];
+            const sellerProfiles = await this.readMarketplaceSellerProfiles(ownerIds);
+            const listings = rows
+                .map(row => this.normalizeSupabaseMarketplaceListingRow(row, sellerProfiles.get(row.user_id)))
                 .filter((entry) => {
                     if (!entry) return false;
                     return !(entry.category === 'vehicles' && entry.subcategory === 'rentals');
@@ -4153,6 +4186,22 @@ class DatingApp {
                 this.realestateListings.unshift(realestateEntries[index]);
             }
 
+            const services = listings.filter(item => item.category === 'services')
+                .map(item => this.buildServiceProfileEntryFromMarketplaceItem(item)).filter(Boolean);
+            this.serviceProfiles = [
+                ...services,
+                ...(this.serviceProfiles || []).filter(service => service.sourceTable !== 'marketplace_listings')
+            ];
+            const vehicles = listings.filter(item => item.category === 'vehicles')
+                .map(item => this.buildVehicleFeedEntryFromMarketplaceItem(item));
+            this.vehicleListings = [
+                ...vehicles,
+                ...(this.vehicleListings || []).filter(vehicle => vehicle.sourceTable !== 'marketplace_listings' || vehicle.category === 'rentals')
+            ];
+            if (this.activeScreen === 'services') this.renderServicesFeed();
+            if (this.activeScreen === 'vehicles') {
+                this.renderVehiclesFeed(document.querySelector('.vehicles-chip.active')?.dataset.category || 'all');
+            }
             if (['realestate', 'shortstays'].includes(this.activeScreen)) {
                 this.renderRealestateFeed(this.getActiveRealestateCategory());
             }
@@ -4241,6 +4290,8 @@ class DatingApp {
             throw new Error('Vehicle rentals must use the approved-host listing flow.');
         }
         const payload = JSON.parse(JSON.stringify(item || {}));
+        delete payload.sellerProfile;
+        delete payload.preview;
         payload.currency = this.getListingCurrency(payload.priceText || payload.price, payload) || 'USD';
         const mediaUrls = Array.isArray(payload.images)
             ? payload.images.map((value) => String(value || '').trim()).filter(Boolean)
@@ -5649,9 +5700,13 @@ class DatingApp {
         const city = String(item.city || '').trim();
         const region = String(item.region || item.state || item.province || '').trim();
         const country = String(item.country || '').trim();
+        const address = String(service.address || '').trim() || [city, region, country].filter(Boolean).join(', ');
         return {
             id: item.id,
             sourceRowId: item.sourceRowId,
+            serverBacked: item.serverBacked === true,
+            sellerUserId: item.sellerUserId,
+            sellerProfile: item.sellerProfile,
             sourceTable: item.sourceTable,
             title: String(item.title || 'Service').trim() || 'Service',
             category: this.resolveServiceCategoryKey(item),
@@ -5665,8 +5720,19 @@ class DatingApp {
             state: region,
             province: region,
             country,
-            address: [city, region, country].filter(Boolean).join(', '),
-            phone: String(service.phone || item.contactPhone || '').trim(),
+            address,
+            location: address,
+            avatar: String(service.avatar || item.sellerPhoto || '').trim(),
+            rating: Number.isFinite(service.rating) ? service.rating : null,
+            reviews: Number.isFinite(service.reviews) ? service.reviews : null,
+            priceNote: String(service.duration || '').trim(),
+            meta: String(service.highlightLine || '').trim(),
+            highlights: Array.isArray(service.highlights) ? service.highlights : [],
+            availability: [service.availabilityWindow, service.responseTime].filter(Boolean),
+            video: item.video || '',
+            storyText: item.storyText || '',
+            contact: item.contact,
+            phone: String(service.phone || item.contact?.phone || item.contactPhone || '').trim(),
             source: item.source || null,
             sourceUrl: String(item?.source?.url || item.sourceUrl || '').trim(),
             desc: String(item.description || '').trim(),
@@ -14714,6 +14780,7 @@ class DatingApp {
 
 	        // Profile events
 	        document.getElementById('save-profile').addEventListener('click', () => this.saveProfile());
+        document.getElementById('profile-viewer-preview')?.addEventListener('click', () => this.openPublicProfilePreview());
         const datingProfileEditorBtn = document.getElementById('open-dating-profile-editor');
         if (datingProfileEditorBtn && !datingProfileEditorBtn.dataset.bound) {
             datingProfileEditorBtn.addEventListener('click', () => this.openDatingProfileEditor());
@@ -25468,6 +25535,29 @@ class DatingApp {
         };
     }
 
+    buildVehicleFeedEntryFromMarketplaceItem(item) {
+        const vehicle = item.vehicle || {};
+        const category = vehicle.category || item.subcategory || 'other';
+        const shipping = this.getCrossBorderShipping(item);
+        return {
+            ...item,
+            ...shipping,
+            category,
+            make: vehicle.make || '',
+            model: vehicle.model || '',
+            year: vehicle.year,
+            mileageKm: vehicle.mileage,
+            condition: vehicle.condition || item.condition,
+            transmission: vehicle.transmission,
+            fuel: vehicle.fuel,
+            color: vehicle.color,
+            vin: vehicle.vin,
+            contactPhone: vehicle.contactPhone || item.contact?.phone,
+            description: vehicle.description || item.description,
+            categoryBadges: this.getMarketplaceCategoryBadges(item)
+        };
+    }
+
     getVehicleSearchDataset() {
         return (Array.isArray(this.vehicleListings) ? this.vehicleListings : [])
             .map((item) => this.normalizeVehicleSearchListing(item))
@@ -27447,6 +27537,7 @@ class DatingApp {
 	    openVehicleModal(item) {
 	        const modal = document.getElementById('vehicle-modal');
 	        if (!modal) return;
+        this.setViewerCardPreview(modal, item.preview);
         // Cards can open from Home, search or Arrive before the Vehicles feed initializes.
         this.bindVehicleModal();
 	        this.closeVehicleDescriptionDialog({ restoreFocus: false });
@@ -27553,9 +27644,11 @@ class DatingApp {
         ]
             .map((value) => String(value || '').trim())
             .filter(Boolean);
-        const statusChips = Array.from(new Set(statusTokens)).slice(0, 4);
+        const statusChips = isRental
+            ? Array.from(new Set(statusTokens)).slice(0, 4)
+            : (item.categoryBadges || []).slice(0, 6);
         if (statusEl) {
-            const showStatus = isRental && statusChips.length > 0;
+            const showStatus = statusChips.length > 0;
             statusEl.classList.toggle('hidden', !showStatus);
             statusEl.innerHTML = showStatus
                 ? statusChips.map((chip) => `<span class="vehicle-status-chip">${this.escapeHtml(chip)}</span>`).join('')
@@ -27804,7 +27897,10 @@ class DatingApp {
 	            .filter(Boolean);
 	        if (!listing || !photos.length) return;
 	        const index = Math.min(Math.max(Number(this.vehicleModalIndex) || 0, 0), photos.length - 1);
-	        this.openMediaLightbox(photos, listing.title || 'Vehicle', index);
+        const gallery = listing.video
+            ? [...photos, { src: listing.video, type: 'video', label: listing.storyText || 'Listing video' }]
+            : photos;
+        this.openMediaLightbox(gallery, listing.title || 'Vehicle', index);
 	    }
 
 	    renderVehicleModalThumbs(container) {
@@ -28456,7 +28552,9 @@ class DatingApp {
         const sellerName = this.getImportedListingSellerName(item, 'Seller');
         const sellerKey = this.normalizeSellerKey(sellerName);
         const listings = (this.marketplaceItems || [])
-            .filter(entry => this.normalizeSellerKey(this.getImportedListingSellerName(entry, 'Seller')) === sellerKey)
+            .filter(entry => item.serverBacked && item.sellerUserId
+                ? entry.serverBacked && entry.sellerUserId === item.sellerUserId
+                : !entry.serverBacked && this.normalizeSellerKey(this.getImportedListingSellerName(entry, 'Seller')) === sellerKey)
             .slice(0, 4);
         const primaryPhone = String(
             item.contactPhone
@@ -28506,6 +28604,8 @@ class DatingApp {
             trustMetrics,
             trustProfile,
             ...this.getSellerProfileEvidence(item, storedReviews),
+            sellerProfile: item.sellerProfile,
+            sellerUserId: item.serverBacked ? item.sellerUserId : '',
             source: { type: 'marketplace', id: item.id }
         };
     }
@@ -29491,6 +29591,7 @@ class DatingApp {
     openServiceModal(data = {}) {
         const modal = document.getElementById('service-modal');
         if (!modal) return;
+        this.setViewerCardPreview(modal, data.preview);
         this.enforceMobileFullscreenModal(modal, '.service-profile-modal');
         const imageEl = document.getElementById('service-modal-image');
         const titleEl = document.getElementById('service-modal-title');
@@ -29644,6 +29745,7 @@ class DatingApp {
     openLuxuryAdModal(data = {}) {
         const modal = document.getElementById('luxury-ad-modal');
         if (!modal) return;
+        this.setViewerCardPreview(modal, data.preview);
         data = this.prepareNativeSponsoredData(data);
         modal.classList.toggle('native-sponsored-profile', data.sourceType !== 'companionship');
         if (data.sourceType === 'companionship') window.configureListingGalleryTabs?.(this, modal, { enabled:false });
@@ -30072,7 +30174,11 @@ class DatingApp {
                 const photos = Array.isArray(this.serviceModalPhotos) ? this.serviceModalPhotos.filter(Boolean) : [];
                 if (!photos.length) return;
                 const startIndex = Math.min(Math.max(this.serviceModalIndex || 0, 0), photos.length - 1);
-                this.openMediaLightbox(photos, title, startIndex);
+                const service = this.activeServiceProfile;
+                const gallery = service?.video
+                    ? [...photos, { src: service.video, type: 'video', label: service.storyText || 'Listing video' }]
+                    : photos;
+                this.openMediaLightbox(gallery, title, startIndex);
             });
             galleryBtn.dataset.bound = '1';
         }
@@ -36143,6 +36249,8 @@ class DatingApp {
             checkOutTime: String(realestate.checkOutTime || '').trim(),
             houseRules: String(realestate.houseRules || '').trim(),
             images: Array.isArray(item.images) ? item.images.slice() : [item.image].filter(Boolean),
+            video: item.video || '',
+            storyText: item.storyText || '',
             categories,
             listingType,
             furnished: Boolean(realestate.furnished),
@@ -40377,6 +40485,7 @@ class DatingApp {
 	    openRealestateModal(listing) {
 	        const modal = document.getElementById('realestate-modal');
 	        if (!modal || !listing) return;
+        this.setViewerCardPreview(modal, listing?.preview);
         // Opening a card must not depend on first visiting its category feed.
         this.bindRealestateModal();
         this.restoreShortTermSignatureProfile();
@@ -47508,9 +47617,93 @@ class DatingApp {
         document.removeEventListener('keydown', this.boundProfileModalKeydown);
     }
 
+    openPublicProfilePreview() {
+        const value = id => String(document.getElementById(id)?.value || '').trim();
+        const name = this.normalizeMarketplaceHandle(value('profile-public-name'), '') || '6ixo member';
+        const mediaChoice = document.querySelector('input[name="profile-media-choice"]:checked')?.value;
+        const photoUrls = (this.currentUser?.marketplacePhotos || []).map(photo => this.getPhotoEntrySrc(photo)).filter(Boolean);
+        const ownListings = (this.marketplaceItems || []).filter(item =>
+            item.serverBacked && item.sellerUserId === this.currentUser?.id).slice(0, 4);
+        this.openSellerProfileModal({
+            ...(ownListings.length ? this.buildSellerProfileData(ownListings[0]) : {}),
+            name, preview: true, listings: ownListings, responseLabel: 'Response time varies',
+            sellerProfile: {
+                display_name: name,
+                bio: this.normalizeProfileText(value('profile-bio'), 500),
+                city: value('profile-city'), region: value('profile-region'), country: value('profile-country'),
+                photo_urls: photoUrls,
+                profile_video_url: mediaChoice === 'photo' ? '' : this.currentUser?.profileVideoUrl,
+                public_phone: value('profile-public-phone'),
+                public_interests: document.getElementById('profile-public-interests')?.checked ? this.getProfileInterestLabels() : []
+            }
+        });
+    }
+
+    setViewerCardPreview(modal, preview = false) {
+        modal.toggleAttribute('data-viewer-preview', preview);
+        if (modal.dataset.previewGuard) return;
+        modal.dataset.previewGuard = '1';
+        modal.addEventListener('click', event => {
+            if (!modal.hasAttribute('data-viewer-preview')) return;
+            const control = event.target.closest('button, a, [role="button"]');
+            if (!control) return;
+            const allowed = /(?:close|prev|next|gallery|thumbnail|expand|back|photo|details)(?:-button|-btn)?$/.test(control.id)
+                || control.matches('[aria-expanded], [role="tab"], [data-gallery-action], .listing-gallery-tab')
+                || control.closest('.marketplace-item-thumbs, .seller-profile-luxury-thumbs');
+            if (allowed) return;
+            event.preventDefault();
+            event.stopImmediatePropagation();
+        }, true);
+    }
+
+    getProfileInterestLabels() {
+        return (this.currentUser?.interests || []).map(label => String(label).trim().slice(0, 60)).filter(Boolean).slice(0, 12);
+    }
+
+    applyPublicSellerProfile(data, profile) {
+        if (!profile) return data;
+        const galleryImages = (profile.photo_urls?.length ? profile.photo_urls : [profile.photo_url])
+            .filter(url => /^(https?:|blob:)/i.test(String(url || '')));
+        const name = profile.display_name || data.name;
+        return {
+            ...data,
+            name,
+            initials: this.getInitials(name),
+            photo: galleryImages[0] || '',
+            galleryImages,
+            heroImage: galleryImages[0] || '',
+            bio: profile.bio || '',
+            location: [profile.city, profile.region, profile.country].filter(Boolean).join(', '),
+            phone: profile.public_phone || data.phone,
+            publicProfilePhone: profile.public_phone || '',
+            profileVideo: /^https:\/\//i.test(profile.profile_video_url || '') ? profile.profile_video_url : '',
+            interests: Array.isArray(profile.public_interests) ? profile.public_interests : []
+        };
+    }
+
     openSellerProfileModal(data = {}) {
+        const source = data.source || {};
+        const sourceCategories = { vehicle: 'vehicles', service: 'services', realestate: 'real_estate' };
+        const category = sourceCategories[source.type];
+        const listing = data.preview ? null : this.resolveSellerChatListing(source)
+            || (category && (this.marketplaceItems || []).find(item =>
+                item.serverBacked && item.category === category && String(item.id) === String(source.id)));
+        const ownerId = data.preview ? null : data.sellerUserId || listing?.sellerUserId;
+        this.renderSellerProfileModal(this.applyPublicSellerProfile({ ...data }, data.sellerProfile || listing?.sellerProfile));
+        const opened = this.activeSellerProfile;
+        if (!ownerId || !opened) return;
+        void this.readMarketplaceSellerProfiles([ownerId]).then(profiles => {
+            const profile = profiles.get(ownerId);
+            if (profile && this.activeSellerProfile === opened) {
+                this.renderSellerProfileModal(this.applyPublicSellerProfile(data, profile));
+            }
+        });
+    }
+
+    renderSellerProfileModal(data = {}) {
 	        const modal = document.getElementById('seller-profile-modal');
 	        if (!modal) return;
+        this.setViewerCardPreview(modal, data.preview);
         this.enforceMobileFullscreenModal(modal, '.seller-profile-modal');
         this.lastSellerProfileModalPayload = data;
         this.activeSellerProfile = data;
@@ -47526,7 +47719,7 @@ class DatingApp {
                 ...(Array.isArray(item?.images) ? item.images : [])
             ]) : [])
         ].map((src) => String(src || '').trim()).filter(Boolean)));
-        const hasProfileGallery = isLuxury || profileGalleryImages.length > 1;
+        const hasProfileGallery = isLuxury || profileGalleryImages.length > 1 || Boolean(data.galleryImages?.length);
         modal.classList.toggle('luxury', hasProfileGallery);
         const hero = document.getElementById('seller-profile-luxury-hero');
         const heroTier = document.getElementById('seller-profile-luxury-tier');
@@ -47661,6 +47854,18 @@ class DatingApp {
         if (bioEl) {
             bioEl.textContent = data.bio || '';
             bioEl.classList.toggle('hidden', !data.bio);
+        }
+
+        const media = document.getElementById('seller-profile-video');
+        if (media) {
+            media.hidden = !data.profileVideo;
+            if (data.profileVideo) media.src = data.profileVideo;
+            else media.removeAttribute('src');
+        }
+        const interests = document.getElementById('seller-profile-interests');
+        if (interests) {
+            interests.hidden = !data.interests?.length;
+            interests.textContent = data.interests?.join(' · ') || '';
         }
 
         const listingCountEl = document.getElementById('seller-profile-listing-count');
@@ -48058,6 +48263,11 @@ class DatingApp {
         if (heroThumbs) {
             heroThumbs.classList.add('hidden');
             heroThumbs.innerHTML = '';
+        }
+        const video = document.getElementById('seller-profile-video');
+        if (video) {
+            video.pause();
+            video.removeAttribute('src');
         }
         this.sellerProfileLuxuryGallery = null;
         this.activeSellerProfile = null;
@@ -53399,10 +53609,30 @@ class DatingApp {
         };
         const area = this.getCurrentLocationDisplayText();
         if (area) addLink(`Open ${area} in Google Maps`, area);
-        this.getNearbyFilteredUsers().slice(0, 30).forEach(user => {
+        this.getNearbyFilteredUsers().filter(user => user.mapVisible === true).slice(0, 30).forEach(user => {
             const city = this.getUserCityQuery(user);
             if (city) addLink(`${user.name || 'Profile'} · ${city}`, city);
         });
+        if (this.supabase) {
+            void this.loadPublicProfileMapLinks(mapEl, heading, addLink);
+        }
+    }
+
+    async loadPublicProfileMapLinks(mapEl, heading, addLink) {
+        try {
+            let query = this.supabase.from('marketplace_profiles')
+                .select('display_name,city,country').eq('map_visible', true).not('city', 'is', null);
+            if (this.nearbyCountryFilter) query = query.ilike('country', this.nearbyCountryFilter);
+            const { data, error } = await query.order('display_name').limit(30);
+            if (error || !mapEl.contains(heading)) return;
+            for (const profile of data || []) {
+                if (!profile.city) continue;
+                const city = [profile.city, profile.country].filter(Boolean).join(', ');
+                addLink(`${profile.display_name || '6ixo member'} · ${city}`, city);
+            }
+        } catch (error) {
+            console.warn('Public profile map locations could not be loaded:', error);
+        }
     }
 
     scheduleNearbyMapRefresh() { this.renderNearbyMapLinks(); }
@@ -53716,7 +53946,11 @@ class DatingApp {
 	        if (phone) phone.value = this.currentUser.phone || '';
         const profileEmail = document.getElementById('profile-email');
         if (profileEmail) profileEmail.value = this.currentUser.email || '';
-        const profileLocation = this.currentUser.location || {};
+        const publicPhone = document.getElementById('profile-public-phone');
+        if (publicPhone) publicPhone.value = this.currentUser.publicProfilePhone || '';
+        const publicInterests = document.getElementById('profile-public-interests');
+        if (publicInterests) publicInterests.checked = this.currentUser.showProfileInterests === true;
+        const profileLocation = this.currentUser.marketplaceProfileLocation || this.currentUser.location || {};
         for (const field of ['country', 'region', 'city']) {
             const input = document.getElementById(`profile-${field}`);
             if (input) input.value = String(profileLocation[field] || '');
@@ -55565,10 +55799,16 @@ class DatingApp {
 	        if (!this.currentUser.location || typeof this.currentUser.location !== 'object') {
             this.currentUser.location = { distance: 0 };
         }
+        const profileLocation = {};
         for (const field of ['country', 'region', 'city']) {
             const input = document.getElementById(`profile-${field}`);
-            if (input) this.currentUser.location[field] = String(input.value || '').trim();
+            profileLocation[field] = String(input?.value || '').trim();
         }
+        this.currentUser.marketplaceProfileLocation = profileLocation;
+        const publicPhone = document.getElementById('profile-public-phone');
+        if (publicPhone) this.currentUser.publicProfilePhone = publicPhone.value.trim().slice(0, 60);
+        const publicInterests = document.getElementById('profile-public-interests');
+        if (publicInterests) this.currentUser.showProfileInterests = publicInterests.checked;
         const mapVisible = document.getElementById('profile-map-visible');
 	        if (mapVisible) {
 	            this.currentUser.mapVisible = Boolean(mapVisible.checked);
@@ -55583,6 +55823,8 @@ class DatingApp {
         }
 	        await this.persistMarketplaceProfilePhotos();
         await this.upsertSupabaseMarketplaceProfile({ throwOnError: true });
+        this.currentUser.hasPublicProfilePhone = Boolean(this.currentUser.publicProfilePhone);
+        this.currentUser.hadPublicProfileInterests = this.currentUser.showProfileInterests === true;
         await this.upsertSupabaseProfile({ throwOnError: true });
         this.saveUserPreferences();
         this.updateMapMarkers();
@@ -62134,6 +62376,11 @@ class DatingApp {
             button.addEventListener('click', () => this.setPostItemEditorView(button.dataset.postEditorView));
         });
         modal?.classList.add('has-mobile-preview-controls');
+        modal?.querySelectorAll('[data-open-listing-viewer-preview]').forEach(button => {
+            button.addEventListener('click', () => this.renderPostItemLivePreview({
+                openViewer: button.dataset.openListingViewerPreview || 'listing'
+            }));
+        });
         document.querySelectorAll('[data-post-preview-mode]').forEach((button) => {
             button.addEventListener('click', () => {
                 const mode = String(button.dataset.postPreviewMode || 'feed').trim().toLowerCase();
@@ -62269,6 +62516,7 @@ class DatingApp {
             'item-contact-email',
             'item-link',
             'item-tags',
+            'item-story-text',
             'fashion-market-mode',
             'fashion-style-chip',
             'fashion-audience',
@@ -62379,10 +62627,29 @@ class DatingApp {
         this.renderPostItemLivePreview();
     }
 
-    renderPostItemLivePreview() {
+    renderPostItemViewerBadges(item, { stay = false } = {}) {
+        const host = document.getElementById('post-item-viewer-badges');
+        if (!host) return;
+        if (stay) {
+            host.innerHTML = item ? this.buildShortTermListingBadgesMarkup(item, { profile: true }) : '';
+            return;
+        }
+        const badges = item?.category ? this.getMarketplaceCategoryBadges(item) : [];
+        host.innerHTML = badges.map(badge =>
+            `<span class="marketplace-item-tag">${this.escapeHtml(badge)}</span>`).join('');
+    }
+
+    renderPostItemLivePreview({ openViewer = '' } = {}) {
         this.syncPostItemCategoryBadge();
-        if (this.isShortTermHostPosting()) {
+        const shortStay = this.isShortTermHostPosting();
+        const sponsoredPreview = document.querySelector('[data-open-listing-viewer-preview="featured"]');
+        if (sponsoredPreview) sponsoredPreview.hidden = shortStay;
+        if (shortStay) {
             this.renderRealestateShortTermComposerPreview();
+            this.renderPostItemViewerBadges(this.shortTermPreviewListing, { stay: true });
+            if (openViewer && this.shortTermPreviewListing) {
+                this.openRealestateModal({ ...this.shortTermPreviewListing, preview: true });
+            }
             return;
         }
         const stage = document.getElementById('post-item-preview-stage');
@@ -62573,12 +62840,17 @@ class DatingApp {
             title,
             category,
             price: Number.isFinite(priceNumber) ? priceNumber : 0,
+            priceText: priceInputText,
+            currency: this.getListingCurrency(priceInputText, { country }) || 'USD',
             city,
             country,
             description: description || bodyCopy,
             seller: sellerName,
+            sellerPhoto: this.getPhotoEntrySrc(this.currentUser?.marketplacePhoto),
             postedDate: new Date(),
             images: previewImages,
+            video: this.postItemStoryVideoOk ? this.postItemStoryPreviewUrl : '',
+            storyText: getValue('item-story-text'),
             condition: conditionKey,
             brand,
             model,
@@ -62623,6 +62895,8 @@ class DatingApp {
                 provider: serviceProvider,
                 role: serviceRole,
                 avatar: serviceAvatar,
+                phone: contactPhone,
+                experience: getNumber('service-experience'),
                 badge: serviceBadge,
                 rating: Number.isFinite(serviceRatingValue) ? serviceRatingValue : null,
                 reviews: Number.isFinite(serviceReviewsValue) ? serviceReviewsValue : null,
@@ -62654,6 +62928,10 @@ class DatingApp {
                 category: getValue('vehicle-category') || getValue('item-subcategory'),
                 transmission: getValue('vehicle-transmission'),
                 fuel: getValue('vehicle-fuel'),
+                color: getValue('vehicle-color'),
+                vin: getValue('vehicle-vin'),
+                contactPhone: getValue('vehicle-contact'),
+                description: getValue('vehicle-description'),
                 destinationCountry,
                 transitStatus,
                 expectedArrival
@@ -62684,8 +62962,8 @@ class DatingApp {
                 role: serviceRole,
                 avatar: serviceAvatar,
                 badge: serviceBadge,
-                rating: Number.isFinite(serviceRatingValue) ? serviceRatingValue : 4.8,
-                reviews: Number.isFinite(serviceReviewsValue) ? serviceReviewsValue : 18,
+                rating: Number.isFinite(serviceRatingValue) ? serviceRatingValue : null,
+                reviews: Number.isFinite(serviceReviewsValue) ? serviceReviewsValue : null,
                 desc: description || servicePreviewData?.bodyFallback || 'Add your service details to preview the feed card.',
                 meta: servicePreviewData?.highlightLine || metaText,
                 highlights: servicePreviewData?.secondaryLine ? servicePreviewData.secondaryLine.split(' · ').filter(Boolean) : [],
@@ -62751,6 +63029,61 @@ class DatingApp {
                 fashionSize
             })
             : null;
+        const viewerItem = fashionPreviewItem && (liveBiddingEnabled || fashionMarketMode === 'bidding')
+            ? { ...previewItem, liveAuction: fashionPreviewItem.liveAuction, topBid: fashionPreviewItem.topBid,
+                lowestAsk: fashionPreviewItem.lowestAsk, lastSale: fashionPreviewItem.lastSale, tags: fashionPreviewItem.tags }
+            : previewItem;
+        this.renderPostItemViewerBadges(viewerItem);
+        const jobFeaturedValue = id => category === 'jobs' ? getValue(id) : '';
+        const featuredTitle = jobFeaturedValue('job-featured-headline') || getValue('featured-ad-title') || getValue('service-featured-title') || title;
+        const featuredPrice = jobFeaturedValue('job-featured-pay') || getValue('featured-ad-price') || getValue('service-featured-price') || priceLabel;
+        const featuredMeta = jobFeaturedValue('job-featured-highlight') || getValue('featured-ad-meta')
+            || getValue('service-featured-highlight') || (isCrossBorderPreview
+                ? [transitLabel, arrivalLabel ? `ETA ${arrivalLabel}` : ''].filter(Boolean).join(' · ')
+                : '') || this.truncateText(description || metaText, 72);
+        const featuredTag = jobFeaturedValue('job-featured-badge') || getValue('service-featured-tag')
+            || (category === 'real_estate' ? realestateBadge : '')
+            || (isCrossBorderPreview ? 'Sponsored arrival' : '')
+            || (category === 'real_estate' ? 'Sponsored' : 'Featured');
+        const featuredLocation = isCrossBorderPreview && routeLabel ? routeLabel : getValue('featured-ad-location') || location;
+        const featuredStatus = isCrossBorderPreview ? this.getVehicleTransitBadgeText(transitStatus, destinationCountry)
+            : getValue('featured-ad-availability') || availability;
+        if (openViewer) {
+            if (!category) {
+                this.showNotification('Choose a main category to preview your listing.', { force: true, type: 'warn' });
+                return;
+            }
+            const draft = { ...viewerItem, preview: true };
+            if (openViewer === 'featured') {
+                const details = this.buildFeaturedAdDetailRows(draft, {
+                    priceText: featuredPrice, availability: featuredStatus, sellerName,
+                    overrides: {
+                        category: getValue('featured-ad-category'), location: featuredLocation,
+                        condition: getValue('featured-ad-condition'), delivery: getValue('featured-ad-delivery'),
+                        seller: getValue('featured-ad-seller')
+                    }
+                });
+                this.openLuxuryAdModal({
+                    preview: true, sourceType: 'marketplace', category,
+                    title: featuredTitle, price: featuredPrice, location: featuredLocation, summary: featuredMeta,
+                    desc: getValue('featured-ad-summary') || description, tier: featuredTag, sellerName,
+                    details, photos: previewImages,
+                    tags: this.getMarketplaceCategoryBadges(draft, { limit: 4 }),
+                    perks: this.parseTagInput(getValue('featured-ad-perks'))
+                });
+            } else if (category === 'real_estate') {
+                const listing = this.buildRealestateFeedEntryFromMarketplaceItem(draft);
+                if (listing) this.openRealestateModal({ ...listing, preview: true });
+                else this.openMarketplaceItemModal(draft);
+            } else if (category === 'services') {
+                this.openServiceModal({ ...this.buildServiceProfileEntryFromMarketplaceItem(draft), preview: true });
+            } else if (category === 'vehicles') {
+                this.openVehicleModal(this.buildVehicleFeedEntryFromMarketplaceItem(draft));
+            } else {
+                this.openMarketplaceItemModal(draft);
+            }
+            return;
+        }
         this.renderPostItemFashionBiddingPreview({
             category,
             profilePreviewEl: fashionProfilePreview,
@@ -62796,26 +63129,12 @@ class DatingApp {
                 previewItem,
                 showFeaturedPreview,
                 title,
-                featuredTitle: getValue('featured-ad-title') || getValue('service-featured-title') || title,
-                featuredPrice: getValue('featured-ad-price') || getValue('service-featured-price') || (priceLabel || '$0'),
-                featuredMeta: getValue('featured-ad-meta')
-                    || getValue('service-featured-highlight')
-                    || (isCrossBorderPreview
-                        ? [transitLabel, arrivalLabel ? `ETA ${arrivalLabel}` : ''].filter(Boolean).join(' · ')
-                        : '')
-                    || this.truncateText(description || metaText, 72),
-                featuredStatus: showFeaturedPreview
-                    ? (isCrossBorderPreview
-                        ? this.getVehicleTransitBadgeText(transitStatus, destinationCountry)
-                        : (getValue('featured-ad-availability') || availability || 'Available now'))
-                    : 'Featured placement preview',
-                featuredLocation: isCrossBorderPreview && routeLabel
-                    ? routeLabel
-                    : (getValue('featured-ad-location') || location),
-	                featuredTag: getValue('service-featured-tag')
-	                    || (category === 'real_estate' ? realestateBadge : '')
-	                    || (isCrossBorderPreview ? 'Sponsored arrival' : '')
-	                    || (category === 'real_estate' ? 'Sponsored' : 'Featured'),
+                featuredTitle,
+                featuredPrice,
+                featuredMeta,
+                featuredStatus: showFeaturedPreview ? featuredStatus : 'Featured placement preview',
+                featuredLocation,
+                featuredTag,
                 imageSources: previewImages,
                 tagList: this.getMarketplaceCategoryBadges(previewItem, { limit: 4 }),
                 serviceFeedPreviewItem
@@ -62844,7 +63163,7 @@ class DatingApp {
             return '<p class="vehicle-composer-preview-empty">Choose a main category to preview the featured card.</p>';
         }
         const noteText = showFeaturedPreview
-            ? 'Featured placement is active. This matches the promoted card layout.'
+            ? 'This is how the ad will look after its promotion is activated.'
             : 'Turn on Featured or choose a featured placement to publish in premium strips.';
         const body = safeCategory === 'jobs'
             ? this.renderJobsFeaturedCard({
@@ -62906,7 +63225,7 @@ class DatingApp {
     } = {}) {
         const safeImages = Array.isArray(images) && images.length ? images : ['assets/ad-placeholder.svg'];
         const tagIcons = ['fa-circle-check', 'fa-clock', 'fa-gem'];
-        const tagHtml = (Array.isArray(tagList) && tagList.length ? tagList : ['Verified'])
+        const tagHtml = (Array.isArray(tagList) ? tagList : [])
             .slice(0, 3)
             .map((token, idx) => `<span><i class="fas ${tagIcons[idx % tagIcons.length]}" aria-hidden="true"></i> ${this.escapeHtml(String(token || ''))}</span>`)
             .join('');
@@ -64440,6 +64759,7 @@ class DatingApp {
     openMarketplaceItemModal(item, openOptions = {}) {
 	        const modal = document.getElementById('marketplace-item-modal');
 	        if (!item || !modal) return;
+        this.setViewerCardPreview(modal, item.preview);
         this.lastMarketplaceItemModalPayload = item;
 	        this.activeMarketplaceItem = item;
         this.syncCardCallButton('marketplace-item', item);
@@ -64907,7 +65227,12 @@ class DatingApp {
             trustPanelEl.innerHTML = this.renderMarketplaceTrustPanel(trustProfile);
             trustPanelEl.classList.toggle('hidden', !trustProfile.badges?.length);
         }
-        if (sellerAvatar) sellerAvatar.textContent = this.getInitials(seller) || '•';
+        if (sellerAvatar) {
+            const photo = String(item.sellerPhoto || '').trim();
+            sellerAvatar.textContent = this.getInitials(seller) || '•';
+            sellerAvatar.style.backgroundImage = /^https?:\/\//i.test(photo) ? `url(${JSON.stringify(photo)})` : '';
+            if (sellerAvatar.style.backgroundImage) sellerAvatar.textContent = '';
+        }
         if (sellerName) sellerName.innerHTML = `<span class="seller-name-text">${this.escapeHtml(seller)}</span>`;
         if (sellerLocation) sellerLocation.textContent = [item.city, item.country].filter(Boolean).join(', ') || 'Location not listed';
         if (sellerRating) sellerRating.innerHTML = `<i class="fas fa-star" aria-hidden="true"></i> ${this.escapeHtml(sellerReviewMeta.ratingText)} · ${this.escapeHtml(this.formatReviewCountLabel(sellerReviewMeta.reviewCount))}`;
@@ -65327,7 +65652,7 @@ class DatingApp {
         let link = String(pick(entry => entry.contact?.link || entry.sourceUrl || entry.source_url || entry.source?.url || entry.sourceRecordUrl)).trim();
         if (method === 'instagram' && !link && handle) link = this.getInstagramContactDetails(handle).url;
         return {
-            phone: String(pick(entry => entry.contact?.phone || entry.contactPhone || entry.phone || entry.service?.phone || entry.vehicle?.contactPhone || entry.realestate?.contactPhone)).split(/\s*[|;,]\s*/)[0].trim(),
+            phone: String(record.publicProfilePhone || pick(entry => entry.contact?.phone || entry.contactPhone || entry.phone || entry.service?.phone || entry.vehicle?.contactPhone || entry.realestate?.contactPhone)).split(/\s*[|;,]\s*/)[0].trim(),
             email: String(pick(entry => entry.contact?.email || entry.contactEmail || entry.email)).trim(),
             method,
             link,
@@ -66144,11 +66469,17 @@ class DatingApp {
 	        if (modal) this.setupFormTextareaAutoGrow(modal);
             window.SixoPostingAccordion?.attach(this)?.open();
 
-	        // Pre-fill city if user location is available and no draft/city value exists.
-	        const cityInput = document.getElementById('item-city');
-	        if (cityInput && this.userLocation && !String(cityInput.value || '').trim()) {
-	            cityInput.value = 'San Francisco'; // Default for demo
-	        }
+        const cityInput = document.getElementById('item-city');
+        const countryInput = document.getElementById('item-country');
+        const defaults = this.getCurrentLocationDefaultParts();
+        if (cityInput && countryInput && this.shouldApplyCityCountryDefault({
+            cityValue: cityInput.value, countryValue: countryInput.value,
+            targetCity: defaults.city, targetCountry: defaults.country
+        })) {
+            if (!cityInput.value.trim()) cityInput.value = defaults.city;
+            if (!countryInput.value.trim()) countryInput.value = defaults.country;
+            this.renderPostItemLivePreview();
+        }
 
 	        if (!this.isApplyingUiState && options.pushState !== false) {
 	            const payload = {};
@@ -68299,10 +68630,6 @@ class DatingApp {
 	            const canReusePreview = Boolean(this.postItemStoryVideoOk && this.postItemStoryFile === storyFile && this.postItemStoryPreviewUrl);
 	            if (canReusePreview) {
 	                storyVideoUrl = this.postItemStoryPreviewUrl;
-	                // Preserve the blob URL for the posted item (do not revoke on close/reset).
-	                this.postItemStoryPreviewUrl = '';
-	                this.postItemStoryFile = null;
-	                this.postItemStoryVideoOk = false;
 	            } else {
 	                const result = await this.validateShortVideo(storyFile, 5, 10);
 	                if (!result.ok) {
@@ -68450,7 +68777,7 @@ class DatingApp {
                         const previousStoryUrl = storyVideoUrl;
                         storyVideoUrl = storyUpload.publicUrls[0];
                         uploadedMarketplacePaths.push(...storyUpload.uploadedPaths);
-                        if (String(previousStoryUrl || '').startsWith('blob:')) {
+                        if (previousStoryUrl !== this.postItemStoryPreviewUrl && String(previousStoryUrl || '').startsWith('blob:')) {
                             try { URL.revokeObjectURL(previousStoryUrl); } catch {}
                         }
                     }
@@ -68745,86 +69072,6 @@ class DatingApp {
                 publishItems.push(clone);
             });
         }
-        if (isShortTermRealestate) {
-            try {
-                for (let i = 0; i < publishItems.length; i += 1) {
-                    const serverRow = await this.createSupabaseShortTermListing(publishItems[i]);
-                    const normalizedServerItem = this.normalizeSupabaseShortTermListingRow(serverRow);
-                    if (!normalizedServerItem) {
-                        throw new Error('Short-term listing insert returned an invalid row.');
-                    }
-                    Object.assign(publishItems[i], normalizedServerItem, {
-                        realestate: normalizedServerItem.realestate
-                    });
-                }
-            } catch (err) {
-                console.warn('Short-term listing create failed:', err);
-                await this.removeMarketplaceListingMedia(uploadedMarketplacePaths);
-                this.showNotification('Unable to publish the short-term rental right now.', { type: 'error', force: true });
-                return;
-            }
-        } else {
-            try {
-                for (let i = 0; i < publishItems.length; i += 1) {
-                    const serverRow = await this.createSupabaseMarketplaceListing(publishItems[i]);
-                    if (serverRow?.id) createdMarketplaceRowIds.push(String(serverRow.id));
-                    const normalizedServerItem = this.normalizeSupabaseMarketplaceListingRow(serverRow);
-                    if (!normalizedServerItem) {
-                        throw new Error('Marketplace listing insert returned an invalid row.');
-                    }
-                    Object.assign(publishItems[i], normalizedServerItem);
-                }
-            } catch (err) {
-                console.warn('Marketplace listing create failed:', err);
-                if (createdMarketplaceRowIds.length) {
-                    try {
-                        await this.supabase.from('marketplace_listings').delete().in('id', createdMarketplaceRowIds);
-                    } catch {}
-                }
-                await this.removeMarketplaceListingMedia(uploadedMarketplacePaths);
-                const message = err instanceof Error ? err.message : 'Unable to publish this listing right now.';
-                this.showNotification(message, { type: 'error', force: true });
-                return;
-            }
-        }
-	        if (showInMarketplace) {
-            for (let i = publishItems.length - 1; i >= 0; i -= 1) {
-	                this.marketplaceItems.unshift(publishItems[i]);
-            }
-	        }
-        if (category === 'real_estate') {
-            if (!Array.isArray(this.realestateListings)) this.realestateListings = [];
-            for (let i = publishItems.length - 1; i >= 0; i -= 1) {
-                const entry = this.buildRealestateFeedEntryFromMarketplaceItem(publishItems[i]);
-                if (entry) this.realestateListings.unshift(entry);
-            }
-        }
-        publishItems.forEach((entry) => {
-            const normalized = this.normalizeAuctionEntry(entry?.liveAuction, entry);
-            if (!normalized) return;
-            entry.liveAuction = normalized;
-            entry.topBid = normalized.topBid;
-            entry.lowestAsk = normalized.lowestAsk;
-            entry.lastSale = normalized.lastSale;
-            this.auctionsByItem[String(entry.id)] = normalized;
-        });
-        this.saveAuctionsState();
-        this.syncAllAuctionStatuses({ notify: false });
-        if (isShortTermRealestate) {
-            await this.loadSupabaseShortTermListings();
-            await this.loadHostRentalListings({ force: true });
-        }
-
-	        const listingLocation = [city, country].filter(Boolean).join(', ');
-	        const sellerLocation = this.buildLocationFromInput(listingLocation);
-		            const listingTypeValue = document.getElementById('realestate-listing-type')?.value || '';
-		            let listingType = 'sale';
-		            if (category === 'services' || category === 'jobs') listingType = 'service';
-		            if (category === 'real_estate') {
-		                if (listingTypeValue.startsWith('for_rent')) listingType = 'rent';
-		                else if (listingTypeValue === 'for_sale') listingType = 'sale';
-		                else if (listingTypeValue === 'commercial') listingType = 'rent';
-		            }
             const priceTerm = document.getElementById('realestate-price-term')?.value || '';
             const priceSuffixMap = {
                 per_month: '/ mo',
@@ -68840,7 +69087,6 @@ class DatingApp {
 		                : [city, country].filter(Boolean).join(', ');
 	            const fallbackCondition = this.marketplaceConditionLabel(newItem.condition || newItem.vehicle?.condition || '');
 	            const fallbackDelivery = this.marketplaceDeliveryLabel(newItem.delivery);
-            let activateFeaturedPlacement = null;
             if (isFeatured) {
 	                const detailOverrides = {
 	                    category: featuredAdCategory,
@@ -68899,12 +69145,11 @@ class DatingApp {
                         };
                 if (detailRows.length) featuredAd.detailRows = detailRows;
                 if (adDetails) featuredAd.adDetails = adDetails;
-                const featuredAdByItemId = new Map();
                 publishItems.forEach((entry) => {
                     const entryLocation = category === 'services'
                         ? (entry.service?.address || [entry.city, entry.country].filter(Boolean).join(', '))
                         : [entry.city, entry.country].filter(Boolean).join(', ');
-                    featuredAdByItemId.set(String(entry.id), {
+                    entry.featuredAd = {
                         ...featuredAd,
                         details: {
                             ...(featuredAd.details || {}),
@@ -68915,19 +69160,107 @@ class DatingApp {
                         detailRows: Array.isArray(featuredAd.detailRows)
                             ? featuredAd.detailRows.map((row) => ({ ...row }))
                             : []
-                    });
+                    };
                 });
-                activateFeaturedPlacement = () => {
-                    publishItems.forEach((entry) => {
-                        entry.featured = true;
-                        entry.placement = requestedPlacement || publishPlacement || entry.placement || 'market';
-                        if (newItem.featuredUntil) entry.featuredUntil = newItem.featuredUntil;
-                        const activatedFeaturedAd = featuredAdByItemId.get(String(entry.id));
-                        if (activatedFeaturedAd) entry.featuredAd = activatedFeaturedAd;
-                        if (String(entry?.sourceTable || '').trim() === 'marketplace_listings') {
-                            void this.persistSupabaseMarketplaceListingState(entry, { quiet: false });
-                        }
+            }
+        if (isShortTermRealestate) {
+            try {
+                for (let i = 0; i < publishItems.length; i += 1) {
+                    const serverRow = await this.createSupabaseShortTermListing(publishItems[i]);
+                    const normalizedServerItem = this.normalizeSupabaseShortTermListingRow(serverRow);
+                    if (!normalizedServerItem) {
+                        throw new Error('Short-term listing insert returned an invalid row.');
+                    }
+                    Object.assign(publishItems[i], normalizedServerItem, {
+                        realestate: normalizedServerItem.realestate
                     });
+                }
+            } catch (err) {
+                console.warn('Short-term listing create failed:', err);
+                await this.removeMarketplaceListingMedia(uploadedMarketplacePaths);
+                this.showNotification('Unable to publish the short-term rental right now.', { type: 'error', force: true });
+                return;
+            }
+        } else {
+            try {
+                for (let i = 0; i < publishItems.length; i += 1) {
+                    const serverRow = await this.createSupabaseMarketplaceListing(publishItems[i]);
+                    if (serverRow?.id) createdMarketplaceRowIds.push(String(serverRow.id));
+                    const normalizedServerItem = this.normalizeSupabaseMarketplaceListingRow(serverRow);
+                    if (!normalizedServerItem) {
+                        throw new Error('Marketplace listing insert returned an invalid row.');
+                    }
+                    Object.assign(publishItems[i], normalizedServerItem);
+                }
+            } catch (err) {
+                console.warn('Marketplace listing create failed:', err);
+                if (createdMarketplaceRowIds.length) {
+                    try {
+                        await this.supabase.from('marketplace_listings').delete().in('id', createdMarketplaceRowIds);
+                    } catch {}
+                }
+                await this.removeMarketplaceListingMedia(uploadedMarketplacePaths);
+                const message = err instanceof Error ? err.message : 'Unable to publish this listing right now.';
+                this.showNotification(message, { type: 'error', force: true });
+                return;
+            }
+        }
+	        if (showInMarketplace) {
+            for (let i = publishItems.length - 1; i >= 0; i -= 1) {
+	                this.marketplaceItems.unshift(publishItems[i]);
+            }
+	        }
+        if (category === 'vehicles') {
+            const vehicles = publishItems.map(item => this.buildVehicleFeedEntryFromMarketplaceItem(item));
+            this.vehicleListings = [...vehicles, ...(this.vehicleListings || [])];
+            if (this.activeScreen === 'vehicles') {
+                this.renderVehiclesFeed(document.querySelector('.vehicles-chip.active')?.dataset.category || 'all');
+            }
+        }
+        if (category === 'services') {
+            const services = publishItems.map(item => this.buildServiceProfileEntryFromMarketplaceItem(item)).filter(Boolean);
+            this.serviceProfiles = [...services, ...(this.serviceProfiles || [])];
+            if (this.activeScreen === 'services') this.renderServicesFeed();
+        }
+        if (category === 'real_estate') {
+            if (!Array.isArray(this.realestateListings)) this.realestateListings = [];
+            for (let i = publishItems.length - 1; i >= 0; i -= 1) {
+                const entry = this.buildRealestateFeedEntryFromMarketplaceItem(publishItems[i]);
+                if (entry) this.realestateListings.unshift(entry);
+            }
+        }
+        publishItems.forEach((entry) => {
+            const normalized = this.normalizeAuctionEntry(entry?.liveAuction, entry);
+            if (!normalized) return;
+            entry.liveAuction = normalized;
+            entry.topBid = normalized.topBid;
+            entry.lowestAsk = normalized.lowestAsk;
+            entry.lastSale = normalized.lastSale;
+            this.auctionsByItem[String(entry.id)] = normalized;
+        });
+        this.saveAuctionsState();
+        this.syncAllAuctionStatuses({ notify: false });
+        if (isShortTermRealestate) {
+            await this.loadSupabaseShortTermListings();
+            await this.loadHostRentalListings({ force: true });
+        }
+
+	        const listingLocation = [city, country].filter(Boolean).join(', ');
+	        const sellerLocation = this.buildLocationFromInput(listingLocation);
+		            const listingTypeValue = document.getElementById('realestate-listing-type')?.value || '';
+		            let listingType = 'sale';
+		            if (category === 'services' || category === 'jobs') listingType = 'service';
+		            if (category === 'real_estate') {
+		                if (listingTypeValue.startsWith('for_rent')) listingType = 'rent';
+		                else if (listingTypeValue === 'for_sale') listingType = 'sale';
+		                else if (listingTypeValue === 'commercial') listingType = 'rent';
+		            }
+            let activateFeaturedPlacement = null;
+            if (isFeatured) {
+                activateFeaturedPlacement = () => {
+                    // The payment entitlement activates exactly one saved listing.
+                    newItem.featured = true;
+                    newItem.placement = requestedPlacement || publishPlacement || newItem.placement || 'market';
                     if (String(requestedPlacement || publishPlacement || '').trim().toLowerCase() === 'marketplace_featured') {
                         this.renderMarketplaceSponsoredAds();
                     } else {
@@ -69141,22 +69474,14 @@ class DatingApp {
 	            targetCategory: promotionTargetCategory
             });
             if (payment?.paid) {
+                let activation;
                 try {
-                    const activation = await this.activatePaidListingPromotion({
+                    activation = await this.activatePaidListingPromotion({
                         payment,
                         listingType: listingPromotionType,
                         listingPublicId,
                         placement: feePlacement
                     });
-                    if (activation?.featuredUntil) {
-                        newItem.featuredUntil = activation.featuredUntil;
-                        publishItems.forEach((entry) => { entry.featuredUntil = activation.featuredUntil; });
-                    }
-                    if (typeof activateFeaturedPlacement === 'function') {
-                        activateFeaturedPlacement();
-                    }
-                    this.renderHomeTodayDeals();
-                    window.setTimeout(() => void this.loadActiveAdCampaigns(), 1800);
                 } catch (err) {
                     console.warn('Paid listing promotion activation failed:', err);
                     try { await this.refundPromotionPayment(payment); } catch {}
@@ -69164,7 +69489,12 @@ class DatingApp {
                         force: true,
                         type: 'error'
                     });
+                    return;
                 }
+                if (activation?.featuredUntil) newItem.featuredUntil = activation.featuredUntil;
+                activateFeaturedPlacement?.();
+                this.renderHomeTodayDeals();
+                window.setTimeout(() => void this.loadActiveAdCampaigns(), 1800);
             } else {
                 this.showNotification('Listing posted. Featured placement was not activated because payment was not completed.', {
                     force: true,

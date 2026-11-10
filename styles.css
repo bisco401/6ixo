@@ -42618,3 +42618,47 @@ html.home-filter-dialog-open { overflow: hidden; }
     #home-content .home-filter-toolbar { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     #home-content .home-filter-category-control { grid-column: 1 / -1; }
 }
+
+/* The draft uses the same card as the viewer, with transaction actions guarded. */
+.modal[data-viewer-preview] {
+    z-index: 101000 !important;
+}
+
+.modal[data-viewer-preview] > .modal-content::before {
+    content: "Viewer preview";
+    display: block;
+    padding: 6px 12px;
+    background: #e9f1ff;
+    color: #153a70;
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-align: center;
+}
+
+.post-item-viewer-review {
+    display: grid;
+    gap: 8px;
+    justify-items: start;
+    margin-block: 12px;
+}
+
+#post-item-viewer-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+#post-item-viewer-badges:empty {
+    display: none;
+}
+
+.seller-profile-video {
+    width: min(100%, 540px);
+    max-height: 45vh;
+    border-radius: 12px;
+    background: #0f172a;
+}
+
+body:has(.modal[data-viewer-preview]:not(.hidden)) :is(#media-lightbox, #vehicle-description-dialog) {
+    z-index: 101010 !important;
+}

@@ -471,7 +471,12 @@ test('Stripe webhook persists the paid campaign artwork for cross-device deliver
   const ts = readFileSync(new URL('../supabase/functions/stripe-webhook/index.ts',import.meta.url),'utf8');
   const start = ts.indexOf('async function syncAdCampaignFromIntent('), end = ts.indexOf('async function syncConnectedAccount(',start);
   let saved;
-  const db = { from: () => ({select:()=>({eq:()=>({maybeSingle:async()=>({data:null})})}),upsert:async row=>{saved=row;return {error:null};}}) };
+  const db = { from: table => ({
+    select: () => ({ eq: () => ({ maybeSingle: async () => ({
+      data: table === 'payment_entitlements' ? { id: 'paid-entitlement', status: 'paid' } : null
+    }) }) }),
+    upsert: async row => { saved = row; return { error: null }; }
+  }) };
   const context = {supabaseAdmin:db,toText:v=>v||null,toCurrency:v=>v?.toUpperCase(),PROMOTION_DURATION_HOURS:{home:24},campaignKindForPlacement:()=> 'banner'};
   vm.runInNewContext(stripTypeScriptTypes(ts.slice(start,end),{mode:'transform'}),context);
   await context.syncAdCampaignFromIntent({id:'pi_test',status:'succeeded',amount_received:1200,currency:'usd',metadata:{user_id:'account-a',placement:'home',creative_image_url:'https://test.supabase.co/ad.jpg',creative_title:'Actual paid ad'}});

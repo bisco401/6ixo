@@ -13,7 +13,7 @@ function fixture(fields = {}) {
     value, checked: value === true, disabled: false, textContent: '', classList: { add() {}, remove() {}, toggle() {} }, focus() {},
   }]));
   const document = { title: 'Test', getElementById: id => elements[id] || null, querySelector: () => null, querySelectorAll: () => [], addEventListener() {}, removeEventListener() {} };
-  const context = { console: { warn() {}, log() {}, error() {} }, document, window: { setTimeout, clearTimeout }, localStorage: { getItem() { return null; }, setItem() {}, removeItem() {} }, URL, URLSearchParams, Date, Set, Map, Promise, setTimeout, clearTimeout };
+  const context = { console: { warn() {}, log() {}, error() {} }, document, window: { setTimeout, clearTimeout, SixoAuthCaptcha: { getOptions: async () => ({ captchaToken: 'fixture-token' }) } }, localStorage: { getItem() { return null; }, setItem() {}, removeItem() {} }, URL, URLSearchParams, Date, Set, Map, Promise, setTimeout, clearTimeout };
   vm.runInNewContext(`${source.slice(0, end)}\nglobalThis.App = DatingApp;`, context);
   const notices = [];
   const app = Object.assign(Object.create(context.App.prototype), {
@@ -165,7 +165,8 @@ test('auth callback errors with literal percent signs are shown and URL secrets 
 test('password recovery rejects repeat requests while the first email is pending', async () => {
   const f = fixture({ email: 'test@example.test' }); const gate = deferred(); let calls = 0;
   Object.assign(f.app, { getAuthEmailCooldownRemaining: () => 0, getPasswordResetRedirectTo: () => undefined, markAuthEmailSent() {}, supabase: { auth: { resetPasswordForEmail: async () => { calls++; await gate.promise; return {}; } } } });
-  const first = f.app.handleForgotPassword(f.event); const second = f.app.handleForgotPassword(f.event); const observedCalls = calls;
+  const first = f.app.handleForgotPassword(f.event); const second = f.app.handleForgotPassword(f.event);
+  await new Promise(setImmediate); const observedCalls = calls;
   gate.resolve(); await Promise.all([first, second]); assert.equal(observedCalls, 1); assert.equal(f.app.forgotPasswordBusy, false);
 });
 
@@ -174,7 +175,7 @@ test('verification resend is single-flight and recovers from failure', async () 
   Object.assign(f.app, { getAuthRedirectTo: () => 'https://6ixo.com/', supabase: { auth: { resend: async () => { calls++; await gate.promise; return {error:new Error('Offline')}; } } } });
   const first = f.app.resendSupabaseSignupConfirmation('test@example.test');
   const second = f.app.resendSupabaseSignupConfirmation('test@example.test');
-  const observedCalls = calls; gate.resolve();
+  await new Promise(setImmediate); const observedCalls = calls; gate.resolve();
   const outcomes = await Promise.allSettled([first, second]);
   assert.equal(outcomes[0].status, 'rejected'); assert.equal(observedCalls, 1); assert.equal(f.app.verificationResendBusy, false);
 });
@@ -580,3 +581,48 @@ test('onboarding stays open and reports failure when either profile cannot be sa
     assert.match(f.notices[0].message, /could not be saved/);
   }
 });
+
+for (const action of ['signup', 'login', 'recovery', 'resend']) {
+  for (const mode of ['verified', 'rejected', 'missing-module']) {
+    test(`Turnstile ${action}: ${mode} cannot bypass token enforcement`, async () => {
+      const f = fixture({ email: 'captcha@example.test', password: 'ExamplePassword1!',
+        'signup-first-name': 'Test', 'signup-last-name': 'Member', 'signup-email': 'captcha@example.test',
+        'signup-email-confirm': 'captcha@example.test', 'signup-age': '25', 'signup-password': 'ExamplePassword1!',
+        'signup-terms-accepted': true });
+      f.app.isSignedIn = false;
+      f.app.getAuthRedirectTo = f.app.getPasswordResetRedirectTo = () => 'https://6ixo.com/';
+      f.app.handleSupabaseAuthRedirect = async () => {};
+      f.app.getAuthEmailCooldownRemaining = () => 0;
+      f.app.markAuthEmailSent = () => {};
+      f.app.savePendingSignupProfile = () => {};
+      f.app.bindPendingSignupProfileToUser = () => {};
+      f.app.showEmailVerificationScreen = () => {};
+      let requests = 0, challenges = 0;
+      f.context.window.SixoAuthCaptcha = mode === 'missing-module' ? undefined : {
+        getOptions: async challengeAction => {
+          challenges++;
+          assert.equal(challengeAction, action);
+          if (mode === 'rejected') throw new Error('Security check failed');
+          return { captchaToken: `verified-${action}` };
+        }
+      };
+      const check = (options) => { requests++; assert.equal(options.captchaToken, `verified-${action}`); };
+      f.app.supabase = { auth: {
+        getSession: async () => ({ data: { session: null } }),
+        signUp: async payload => { check(payload.options); return { data: { user: { id: 'test-user', identities: [{}] } } }; },
+        signInWithPassword: async payload => { check(payload.options); return { error: new Error('Invalid login credentials') }; },
+        resetPasswordForEmail: async (email, options) => { check(options); return {}; },
+        resend: async payload => { check(payload.options); return {}; }
+      } };
+      const run = () => action === 'signup' ? f.app.handleSignup(f.event)
+        : action === 'login' ? f.app.handleLogin(f.event)
+        : action === 'recovery' ? f.app.handleForgotPassword()
+        : f.app.resendSupabaseSignupConfirmation('captcha@example.test');
+      if (action === 'resend' && mode !== 'verified') await assert.rejects(run);
+      else await run();
+      assert.equal(requests, mode === 'verified' ? 1 : 0);
+      assert.equal(challenges, mode === 'missing-module' ? 0 : 1);
+      assert.equal(Boolean(f.app.signupBusy || f.app.loginBusy || f.app.forgotPasswordBusy || f.app.verificationResendBusy), false);
+    });
+  }
+}

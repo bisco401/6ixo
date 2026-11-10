@@ -70,6 +70,10 @@ with check (auth.uid() = id);
 ```
 
 Important: only use the anon key in the browser; keep RLS enabled.
+Authentication uses Cloudflare Turnstile in Managed mode. `turnstile-config.js` contains only the public site key; store its matching secret exclusively in Supabase Auth's CAPTCHA settings with provider `turnstile`. Publish and verify the frontend before enabling backend CAPTCHA enforcement. Signup, password login, password recovery, and confirmation resend obtain a fresh token from `assets/auth-captcha.js` before contacting Supabase. Failed checks prevent submission and allow retries; ordinary browsing does not load Turnstile. Keep email confirmation and existing rate limits enabled.
+
+Validate authentication with `node --test --test-name-pattern='Turnstile|signup|login|password|verification|auth|onboarding' scripts/website-flows.test.mjs`. `node scripts/auth-captcha.browser.cjs` checks token expiry, retries, cancellation, and mobile layout using Playwright (set `PLAYWRIGHT_MODULE` to an installed module path when needed). Production acceptance must confirm that Supabase rejects missing/invalid tokens and accepts a real widget token before ordinary credential validation. Never publish Cloudflare's testing keys.
+
 In the app, Login/Signup use Supabase auth, and Profile → `Save Changes` upserts into `profiles` (Profile → `Sign out` signs out).
 
 Example query (DevTools console after login):

@@ -2836,6 +2836,10 @@ class DatingApp {
     getSupabaseAuthErrorMessage(error, fallback = 'Could not complete sign in. Please try again.') {
         const raw = String(error?.message || error?.error_description || error || '').trim();
         const lower = raw.toLowerCase();
+        if (error?.code === 'client_captcha_failed') return raw;
+        if (lower.includes('captcha') || error?.code === 'captcha_failed') {
+            return 'The security check could not be verified. Please try again.';
+        }
         if (lower.includes('email not confirmed')) {
             return 'Your email is not confirmed yet. Check your inbox for the confirmation link.';
         }
@@ -2991,6 +2995,13 @@ class DatingApp {
         }
     }
 
+    async getAuthCaptchaOptions(action) {
+        if (typeof window.SixoAuthCaptcha?.getOptions !== 'function') {
+            throw new Error('The security check could not load. Please refresh and try again.');
+        }
+        return window.SixoAuthCaptcha.getOptions(action);
+    }
+
     async resendSupabaseSignupConfirmation(email) {
         if (this.verificationResendBusy) return false;
         const safeEmail = this.normalizeAuthEmail(email);
@@ -3006,7 +3017,7 @@ class DatingApp {
         try {
             const { error } = await this.supabase.auth.resend({
                 type: 'signup', email: safeEmail,
-                options: { emailRedirectTo: this.getAuthRedirectTo() }
+                options: { emailRedirectTo: this.getAuthRedirectTo(), ...await this.getAuthCaptchaOptions('resend') }
             });
             if (error) throw error;
             this.markAuthEmailSent('signup', safeEmail);
@@ -19325,7 +19336,9 @@ class DatingApp {
 
             if (!session) {
                 try {
-                    const { data, error } = await this.supabase.auth.signInWithPassword({ email, password });
+                    const { data, error } = await this.supabase.auth.signInWithPassword({
+                        email, password, options: await this.getAuthCaptchaOptions('login')
+                    });
                     if (error) {
                         if (this.isSupabaseEmailNotConfirmedError(error)) {
                             this.showEmailVerificationScreen(email, { unconfirmed: true });
@@ -19389,7 +19402,8 @@ class DatingApp {
         }
         try {
             const { error } = await this.supabase.auth.resetPasswordForEmail(email, {
-                redirectTo: this.getPasswordResetRedirectTo()
+                redirectTo: this.getPasswordResetRedirectTo(),
+                ...await this.getAuthCaptchaOptions('recovery')
             });
             if (error) {
                 this.showNotification(this.getSupabaseAuthErrorMessage(error, 'Could not send password reset email.'), { type: 'error', force: true });
@@ -19398,7 +19412,7 @@ class DatingApp {
             this.showNotification('Password reset email sent. Open the link to create your new password.', { type: 'success', force: true });
         } catch (err) {
             console.warn('Password reset email failed:', err);
-            this.showNotification('Could not send password reset email. Please try again.', { type: 'error', force: true });
+            this.showNotification(this.getSupabaseAuthErrorMessage(err, 'Could not send password reset email. Please try again.'), { type: 'error', force: true });
         }
             } finally { this.forgotPasswordBusy = false; }
     }
@@ -19516,6 +19530,7 @@ class DatingApp {
                     password,
                     options: {
                         ...(emailRedirectTo ? { emailRedirectTo } : {}),
+                        ...await this.getAuthCaptchaOptions('signup'),
                         data: {
                             first_name: trimmedFirst,
                             last_name: trimmedLast,
@@ -19526,7 +19541,7 @@ class DatingApp {
                     }
                 });
                 if (error) {
-                    this.showNotification(error.message || 'Signup failed.', { type: 'error', force: true });
+                    this.showNotification(this.getSupabaseAuthErrorMessage(error, 'Signup failed.'), { type: 'error', force: true });
                     return;
                 }
                 if (data?.user && Array.isArray(data.user.identities) && data.user.identities.length === 0) {
@@ -19562,7 +19577,7 @@ class DatingApp {
                 return;
             } catch (err) {
                 console.warn('Supabase signup failed:', err);
-                this.showNotification('Signup failed. Please try again.', { type: 'error', force: true });
+                this.showNotification(this.getSupabaseAuthErrorMessage(err, 'Signup failed. Please try again.'), { type: 'error', force: true });
                 return;
             }
         }

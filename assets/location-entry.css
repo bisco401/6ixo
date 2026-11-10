@@ -61,6 +61,16 @@
     cursor: pointer;
 }
 .location-entry-manual { display: block; width: 100%; margin-top: 8px; }
+.location-entry-prompt[data-location-state="blocked"] { background: #e4e8f0; }
+.location-entry-prompt[data-location-state="blocked"] .location-entry-manual {
+    background: #174b88;
+    color: #fff;
+    text-decoration: none;
+}
+.location-entry-prompt[data-location-state="blocked"] [data-location-entry-allow] {
+    flex: 2;
+    font-size: 15px;
+}
 .location-entry-manual:focus-visible,
 .home-location-recovery button:focus-visible { outline: 3px solid #1d4ed8; outline-offset: 2px; }
 .home-location-recovery {

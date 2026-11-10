@@ -153,6 +153,11 @@
         }
         const unsupported = !navigator.geolocation || window.isSecureContext === false;
         const blocked = Number(error?.code) === 1;
+        panel.setAttribute('data-location-state', blocked ? 'blocked' : error ? 'unavailable' : 'prompt');
+        panel.querySelector('#location-entry-title').textContent = blocked
+            ? 'Location access is blocked'
+            : '“6ixo.com” Would Like to Use Your Location';
+        panel.querySelector('[data-location-entry-dismiss]').textContent = blocked ? 'Not now' : 'Don’t Allow';
         const isMacSafari = /Macintosh/i.test(navigator.userAgent || '')
             && /Version\/[^ ]+.*Safari\//i.test(navigator.userAgent || '')
             && Number(navigator.maxTouchPoints || 0) === 0;
@@ -162,7 +167,7 @@
         panel.querySelector('[data-location-entry-message]').textContent = unsupported
             ? 'Open https://6ixo.com in Safari or Chrome to use your device location.'
             : blocked
-                ? 'Your browser or device is blocking location. Allow location for 6ixo.com in your browser’s website settings and enable Location Services on your device, then try again.'
+                ? 'Your browser is blocking location. Retrying cannot turn permission on. Choose a city to browse now, or enable location in your browser and device settings before retrying.'
                 : error
                     ? `Your browser has not provided a device location.${macHelp} Then try again, or choose your city in the search bar.`
                     : '“6ixo.com” uses your device location to show nearby listings. Would you like to allow access to your location?';
@@ -170,7 +175,7 @@
         panel.querySelector('[data-location-entry-check]').hidden = !error && !unsupported;
         panel.querySelector('[data-location-entry-browser]').hidden = !error && !unsupported;
         button.disabled = unsupported;
-        button.textContent = error ? 'Try again' : 'Allow';
+        button.textContent = blocked ? 'Retry after enabling' : error ? 'Try again' : 'Allow';
         panel.hidden = false;
         return true;
     };

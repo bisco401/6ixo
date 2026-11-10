@@ -221,6 +221,9 @@ deniedVisit.requests[0].error({ code: 1, message: 'Browser permission denied' })
 assert.equal(deniedVisit.requests.length, 1, 'A denial must not trigger repeated automatic prompts.');
 assert.equal(deniedVisit.panels.filter(panel => !panel.hidden).length, 1);
 assert.match(deniedVisit.panels[0].querySelector('[data-location-entry-message]').textContent, /browser.*blocking location/);
+assert.match(deniedVisit.panels[0].querySelector('[data-location-entry-message]').textContent, /Retrying cannot turn permission on/);
+assert.equal(deniedVisit.panels[0].querySelector('#location-entry-title').textContent, 'Location access is blocked');
+assert.equal(deniedVisit.panels[0].querySelector('[data-location-entry-allow]').textContent, 'Retry after enabling');
 assert.equal((await deniedVisit.window.SIXO_LOCATION_ENTRY.request()).skipped, true);
 assert.equal(deniedVisit.timers.size, 0);
 

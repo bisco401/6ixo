@@ -13,7 +13,7 @@ const output = process.env.LOCATION_TEST_OUTPUT;
   try {
     const scenarios = process.env.LOCATION_SCENARIOS?.split(',') || ['granted', 'worldwide', 'denied', 'silent', 'unsupported', 'dismissed', 'early-choice'];
     for (const scenario of scenarios) {
-      const mode = scenario === 'whatsapp' ? 'denied' : scenario === 'snapchat' ? 'silent' : scenario;
+      const mode = ['whatsapp', 'settings-retry'].includes(scenario) ? 'denied' : scenario === 'snapchat' ? 'silent' : scenario;
       const device = safari ? devices['iPhone 13'] : devices['Pixel 7'];
       const page = await browser.newPage({ ...device,
         userAgent: device.userAgent + (scenario === 'whatsapp' ? ' WhatsApp/2.26.1' : scenario === 'snapchat' ? ' Snapchat/13.0' : ''),
@@ -31,13 +31,14 @@ const output = process.env.LOCATION_TEST_OUTPUT;
           countryCode: 'KE', countryName: 'Kenya', city: 'Nairobi', locality: 'Nairobi', principalSubdivision: 'Nairobi County' } });
       });
       await page.addInitScript(mode => {
+        window.testLocationMode = mode;
         const callbacks = window.testLocationCallbacks = [];
         const sample = () => ({ coords: { latitude: mode === 'worldwide' ? -1.2921 : 43.6532,
           longitude: mode === 'worldwide' ? 36.8219 : -79.3832, accuracy: 15 }, timestamp: Date.now() });
         const geo = { getCurrentPosition(success, error) {
           callbacks.push(() => success(sample()));
-          if (mode === 'granted' || mode === 'worldwide') setTimeout(() => success(sample()), 50);
-          else if (mode === 'denied') setTimeout(() => error({ code: 1, message: 'Location blocked' }), 50);
+          if (window.testLocationMode === 'granted' || window.testLocationMode === 'worldwide') setTimeout(() => success(sample()), 50);
+          else if (window.testLocationMode === 'denied') setTimeout(() => error({ code: 1, message: 'Location blocked' }), 50);
         }, watchPosition() { return 1; }, clearWatch() {} };
         Object.defineProperty(navigator, 'geolocation', { configurable: true, value: mode === 'unsupported' ? undefined : geo });
         // Cover browsers without the Permissions API, including older Safari.
@@ -55,7 +56,26 @@ const output = process.env.LOCATION_TEST_OUTPUT;
       }
       await navigation;
       await page.waitForFunction(() => window.app && document.getElementById('home-search-location').dataset.boundAreaPicker === '1');
-      if (scenario === 'granted' || scenario === 'worldwide') {
+      if (scenario === 'settings-retry') {
+        await page.locator('[data-location-entry-allow]').click();
+        await page.waitForFunction(() => app.locationPermissionState === 'denied');
+        assert.equal(await page.locator('#location-entry-title').innerText(), 'Location access is blocked');
+        assert.equal(await page.locator('[data-location-entry-allow]').innerText(), 'Retry after enabling');
+        assert.equal(await page.evaluate(() => testLocationCallbacks.length), 1, 'denial does not trigger an automatic retry loop');
+        if (output) {
+          fs.mkdirSync(output, { recursive: true });
+          await page.screenshot({ path: path.join(output, `${safari ? 'safari' : 'chrome'}-blocked.png`) });
+        }
+        await page.locator('[data-location-entry-allow]').click();
+        await page.waitForFunction(() => testLocationCallbacks.length === 2 && !app.locationRequestInFlight);
+        assert.equal(await page.evaluate(() => app.locationPermissionState), 'denied', 'another tap cannot grant browser permission');
+        await page.evaluate(() => { window.testLocationMode = 'granted'; });
+        await page.locator('[data-location-entry-allow]').click();
+        await page.waitForFunction(() => app.deviceLocationFeedsReady && !app.locationRequestInFlight);
+        assert.match(await page.locator('#home-location-summary').innerText(), /Toronto/);
+        assert.equal(await page.locator('.location-entry-prompt').isVisible(), false);
+        assert.equal(await page.evaluate(() => app.manualDiscoveryLocation), null);
+      } else if (scenario === 'granted' || scenario === 'worldwide') {
         await page.locator('[data-location-entry-allow]').click();
         await page.waitForFunction(() => app.deviceLocationFeedsReady, null, { timeout: 30000 });
         assert.match(await page.locator('#home-location-summary').innerText(), scenario === 'granted' ? /Toronto/ : /Nairobi/);

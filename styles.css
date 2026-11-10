@@ -34576,7 +34576,6 @@ body.media-lightbox-open { overflow: hidden; }
     }
 
     #vehicle-modal .vehicle-modal-body.is-standard-layout .vehicle-modal-seller,
-    #vehicle-modal .vehicle-modal-body.is-standard-layout .vehicle-modal-status,
     #vehicle-modal .vehicle-modal-body.is-standard-layout .vehicle-modal-trust,
     #vehicle-modal .vehicle-modal-body.is-standard-layout .vehicle-modal-reviews {
         display: none !important;
@@ -42648,6 +42647,16 @@ html.home-filter-dialog-open { overflow: hidden; }
     gap: 6px;
 }
 
+#post-item-viewer-badges > .marketplace-item-tag {
+    border: 1px solid #bdd0eb;
+    border-radius: 999px;
+    background: #eff6ff;
+    color: #204779;
+    padding: 0.3rem 0.65rem;
+    font-size: 0.8rem;
+    font-weight: 700;
+}
+
 #post-item-viewer-badges:empty {
     display: none;
 }
@@ -42661,4 +42670,14 @@ html.home-filter-dialog-open { overflow: hidden; }
 
 body:has(.modal[data-viewer-preview]:not(.hidden)) :is(#media-lightbox, #vehicle-description-dialog) {
     z-index: 101010 !important;
+}
+
+#seller-profile-modal .seller-profile-avatar.has-photo {
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+#seller-profile-modal #seller-profile-interests {
+    color: #334155;
 }

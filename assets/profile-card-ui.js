@@ -174,6 +174,9 @@
 
         const intro = create('div', 'cb-profile-intro', body);
         if (summary) intro.appendChild(summary);
+        // The shared vehicle layout hides the original overview.
+        const vehicleBadges = get('#vehicle-modal-status');
+        if (vehicleBadges) intro.appendChild(vehicleBadges);
         body.prepend(intro);
         const overview = create('section', 'cb-profile-description-section', body);
         const descriptionHeading = create('h4', 'cb-profile-section-title', overview);

@@ -388,10 +388,10 @@ assert.equal(earlyAllow.requests.length, 1);
 console.log('QR entry popup passed: immediate choice, all saved/browser permission combinations, dismissal, synchronous Allow and early app handoff.');
 
 // Keep the permission choices alongside the new manual browsing path.
-assert.match(entrySource, /Find listings near you/);
-assert.match(entrySource, /then allow location in your phone or browser if asked/);
-assert.match(entrySource, />Not now<\/button>/);
-assert.match(entrySource, />Use my device location<\/button>/);
+assert.match(entrySource, /“6ixo.com” Would Like to Use Your Location/);
+assert.match(entrySource, /uses your device location to show nearby listings/);
+assert.match(entrySource, />Don’t Allow<\/button>/);
+assert.match(entrySource, />Allow<\/button>/);
 assert.match(entrySource, /data-location-entry-manual>Choose city instead/);
 
 // An explicit second Allow must replace an unanswered user request, not

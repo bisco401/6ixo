@@ -252,3 +252,60 @@ test('unrelated existing ads cannot fill a travel checkbox just because their te
     ];
     for (const [kind, raw] of cases) assert.deepEqual(plain(model.categoriesFor(kind, raw)), [], raw.title);
 });
+
+test('a category preview uses only that category and destination while the full feed keeps other selected matches', () => {
+    const { model } = fixture();
+    const records = [
+        { ...entry({ id: 'food', categories: ['Restaurants'] }), postedAt: 100 },
+        { ...entry({ id: 'gym', categories: ['Gym'] }), postedAt: 1 },
+        { ...entry({ id: 'other-city', city: 'Kumasi', categories: ['Gym'] }), postedAt: 200 },
+        { ...entry({ id: 'other-country', country: 'Guyana', categories: ['Gym'] }), postedAt: 300 }
+    ];
+    const prefs = { country: 'Ghana', city: 'Accra', categories: ['Restaurants', 'Gym'], activeCategory: 'Gym' };
+    const preview = model.categoryPreview({}, records, prefs);
+    assert.equal(preview.category, 'Gym');
+    assert.deepEqual(plain(preview.items.map(x => x.id)), ['gym']);
+    assert.deepEqual(plain(model.discover({}, records, prefs).map(x => x.id)), ['gym', 'food']);
+    assert.equal(preview.countryCount, 0);
+    assert.equal(model.categoryPreview({}, records, { ...prefs, country: '' }).items.length, 0);
+});
+
+test('an empty selected category never borrows another category or silently broadens the destination', () => {
+    const { model } = fixture();
+    const records = [
+        { ...entry({ id: 'local-food' }), postedAt: 1 },
+        { ...entry({ id: 'elsewhere', city: 'Kumasi', categories: ['Gym'] }), postedAt: 2 },
+        { ...entry({ id: 'foreign', country: 'Canada', categories: ['Gym'] }), postedAt: 3 }
+    ];
+    const prefs = { country: 'Ghana', city: 'Accra', categories: ['Restaurants', 'Gym'], activeCategory: 'Gym' };
+    const preview = model.categoryPreview({}, records, prefs);
+    assert.equal(preview.items.length, 0);
+    assert.equal(preview.countryCount, 1, 'Only same-country matches may be offered for explicit expansion');
+    assert.deepEqual(plain(model.categoryPreview({}, records, { ...prefs, city: '' }).items.map(x => x.id)), ['elsewhere']);
+});
+
+test('active categories restore safely, fall back when unchecked, and remain empty after clearing all choices', () => {
+    const { model } = fixture();
+    const prefs = { country: 'Guyana', categories: ['Shopping', 'Gym'], activeCategory: 'Shopping', updatedAt: 7 };
+    assert.equal(model.normalize({ preferences: prefs }).preferences.activeCategory, 'Shopping');
+    assert.equal(model.normalize({ preferences: { ...prefs, categories: ['Gym'] } }).preferences.activeCategory, 'Gym');
+    const cleared = model.normalize({ preferences: { ...prefs, categories: [] } }).preferences;
+    assert.equal(cleared.activeCategory, '');
+    assert.equal(model.categoryPreview({}, [], cleared).category, '');
+    assert.equal(model.merge({ preferences: prefs }, { preferences: { categories: ['Restaurants'], activeCategory: 'Restaurants', updatedAt: 8 } }).preferences.activeCategory, 'Restaurants');
+});
+
+test('inline category previews refresh from eligible records and respect event travel dates', () => {
+    const { model } = fixture();
+    const app = { communityPosts: [] };
+    const prefs = { country: 'Guyana', categories: ['Events'], activeCategory: 'Events', startDate: '2026-11-20', endDate: '2026-11-24' };
+    assert.equal(model.categoryPreview(app, model.collect(app), prefs).items.length, 0);
+    app.communityPosts = [
+        { id: 'match', title: 'Community concert', category: 'events', country: 'Guyana', eventDate: '2026-11-21' },
+        { id: 'outside', title: 'Another concert', category: 'events', country: 'Guyana', eventDate: '2026-11-25' },
+        { id: 'draft', title: 'Draft concert', category: 'events', country: 'Guyana', eventDate: '2026-11-21', status: 'draft' }
+    ];
+    assert.deepEqual(plain(model.categoryPreview(app, model.collect(app), prefs).items.map(x => x.id)), ['match']);
+    app.communityPosts[0].sold = true;
+    assert.equal(model.categoryPreview(app, model.collect(app), prefs).items.length, 0);
+});

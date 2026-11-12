@@ -51,6 +51,7 @@
     }
     function normalize(raw) {
         const prefs = raw?.preferences || {};
+        const categories = [...new Set((Array.isArray(prefs.categories) ? prefs.categories : []).filter(x => CATEGORIES.includes(x)))];
         const entries = new Map();
         for (const value of Array.isArray(raw?.saved) ? raw.saved.slice(0, 2000) : []) {
             const listing = snapshot(value);
@@ -58,7 +59,7 @@
             const entry = { ...listing, updatedAt: timestamp(value.updatedAt), deleted: value.deleted === true };
             if (!entries.has(entry.key) || entries.get(entry.key).updatedAt <= entry.updatedAt) entries.set(entry.key, entry);
         }
-        return { version: 1, preferences: { country: text(prefs.country), city: text(prefs.city), startDate: dateKey(prefs.startDate), endDate: dateKey(prefs.endDate), categories: [...new Set((Array.isArray(prefs.categories) ? prefs.categories : []).filter(x => CATEGORIES.includes(x)))], updatedAt: timestamp(prefs.updatedAt) }, saved: [...entries.values()] };
+        return { version: 1, preferences: { country: text(prefs.country), city: text(prefs.city), startDate: dateKey(prefs.startDate), endDate: dateKey(prefs.endDate), categories, activeCategory: categories.includes(prefs.activeCategory) ? prefs.activeCategory : categories[categories.length - 1] || '', updatedAt: timestamp(prefs.updatedAt) }, saved: [...entries.values()] };
     }
     function merge(left, right) {
         const a = normalize(left), b = normalize(right);
@@ -234,7 +235,16 @@
                 if (!item.eventDate || start && end && end < start || start && item.eventDate < start || end && item.eventDate > end) return false;
             }
             return true;
-        }).sort((a, b) => b.postedAt - a.postedAt || a.title.localeCompare(b.title));
+        }).sort((a, b) => Number(b.categories.includes(preferences.activeCategory)) - Number(a.categories.includes(preferences.activeCategory)) || b.postedAt - a.postedAt || a.title.localeCompare(b.title));
+    }
+    function categoryPreview(app, records, preferences) {
+        const selected = preferences.categories || [];
+        const category = selected.includes(preferences.activeCategory) ? preferences.activeCategory : selected[selected.length - 1] || '';
+        const prefs = { ...preferences, categories: category ? [category] : [] };
+        const items = discover(app, records, prefs);
+        const countryCount = category && preferences.country && preferences.city && !items.length
+            ? discover(app, records, { ...prefs, city: '' }).length : 0;
+        return { category, items, countryCount };
     }
     class Discovery {
         constructor(app, root) {
@@ -248,6 +258,12 @@
                 startDate: root.querySelector('#dating-schedule-start'), endDate: root.querySelector('#dating-schedule-end')
             };
             this.countrySearch = root.querySelector('#arrive-discovery-country-search');
+            this.inlinePreview = document.createElement('section');
+            this.inlinePreview.id = 'arrive-inline-matches';
+            this.inlinePreview.className = 'arrive-inline-matches';
+            this.inlinePreview.setAttribute('aria-label', 'Matching category listings');
+            this.inlinePreview.hidden = true;
+            root.querySelector('#arrive-plus-checklist').appendChild(this.inlinePreview);
             this.setupDestinationClear();
             this.hydrate(); this.bind(); this.loadCountries(); this.render(); this.loadCitiesForCountry();
             this.store.ready.then(() => { if (this.store.current()) { this.hydrate(); this.render(); this.loadCitiesForCountry(); } });
@@ -300,7 +316,7 @@
             prefs.updatedAt = this.stamp(); this.tab = 'discover'; this.limit = 24; this.signature = '';
             this.syncLegacy(); this.updateDestinationClear(); this.render(); this.store.save();
         }
-        retire() { this.abort.abort(); window.clearTimeout(this.timer); this.store.retire(); }
+        retire() { this.abort.abort(); window.clearTimeout(this.timer); this.inlinePreview.remove(); this.store.retire(); }
         stamp() { return Math.max(Date.now(), this.store.state.preferences.updatedAt + 1, ...this.store.state.saved.map(x => x.updatedAt + 1)); }
         hydrate() {
             if (!this.store.current()) return;
@@ -498,6 +514,8 @@
             const options = { signal: this.abort.signal };
             const position = () => { this.positionPicker('country'); this.positionPicker('city'); };
             window.addEventListener('resize', position, options);
+            window.addEventListener('resize', () => this.positionInlinePreview(), options);
+            this.root.querySelector('.arrive-discovery-more-interests').addEventListener('toggle', () => this.positionInlinePreview(), options);
             window.addEventListener('scroll', position, { ...options, capture: true });
             window.visualViewport?.addEventListener('resize', position, options);
             window.visualViewport?.addEventListener('scroll', position, options);
@@ -508,7 +526,10 @@
                 if (field === 'country') return; // Search input is committed only when a country is selected.
                 const prefs = this.store.state.preferences;
                 if (field) prefs[field] = text(event.target.value);
-                if (checklist) prefs.categories = [...this.root.querySelectorAll('#arrive-plus-checklist input:checked')].map(x => x.value).filter(x => CATEGORIES.includes(x));
+                if (checklist) {
+                    prefs.categories = [...this.root.querySelectorAll('#arrive-plus-checklist input:checked')].map(x => x.value).filter(x => CATEGORIES.includes(x));
+                    prefs.activeCategory = event.target.checked ? event.target.value : prefs.categories.includes(prefs.activeCategory) ? prefs.activeCategory : prefs.categories[prefs.categories.length - 1] || '';
+                }
                 prefs.updatedAt = this.stamp(); this.tab = 'discover'; this.limit = 24; this.signature = '';
                 this.syncLegacy(); this.render();
                 window.clearTimeout(this.timer);
@@ -594,15 +615,22 @@
                 this.signature = ''; this.render();
                 this.root.querySelector('[data-arrive-tab="' + this.tab + '"]').focus();
             }, options);
-            this.root.querySelector('#arrive-plus-preview-list').addEventListener('click', event => {
+            this.root.addEventListener('click', event => {
                 if (event.target.closest('[data-arrive-expand-country]')) {
                     this.clearDestination('city');
                     this.root.querySelector('#arrive-discovery-title').focus({ preventScroll: true });
                     return;
                 }
+                if (event.target.closest('[data-arrive-view-results]')) {
+                    this.tab = 'discover'; this.signature = ''; this.render();
+                    const heading = this.root.querySelector('#arrive-discovery-title');
+                    heading.scrollIntoView({ block: 'start' });
+                    heading.focus({ preventScroll: true });
+                    return;
+                }
                 const save = event.target.closest('[data-arrive-save]');
                 const open = event.target.closest('[data-arrive-open]');
-                if (save) this.toggle(save.dataset.arriveSave);
+                if (save) this.toggle(save.dataset.arriveSave, save);
                 if (open) this.open(open.dataset.arriveOpen);
             }, options);
             this.root.querySelector('#arrive-discovery-more').addEventListener('click', () => { this.limit += 24; this.signature = ''; this.render(); }, options);
@@ -611,8 +639,9 @@
                 try { this.store.state = merge(this.store.state, JSON.parse(event.newValue)); this.hydrate(); this.signature = ''; this.render(); } catch {}
             }, options);
         }
-        toggle(key) {
+        toggle(key, trigger) {
             if (!this.store.current()) return;
+            const fromPreview = Boolean(trigger?.closest('.arrive-inline-matches'));
             const existing = this.store.state.saved.find(x => x.key === key);
             const live = this.records.find(x => x.key === key);
             if (!existing && !live) return;
@@ -622,8 +651,9 @@
             this.store.state.saved = [...this.store.state.saved.filter(x => x.key !== key), entry];
             const ok = this.store.save(); this.signature = ''; this.render();
             this.announce(ok ? deleted ? 'Listing removed from your itinerary.' : 'Saved to your itinerary. Open Saved itinerary to view it.' : 'This listing is kept while the page is open. Device storage is unavailable.');
-            const button = [...this.root.querySelectorAll('[data-arrive-save]')].find(x => x.dataset.arriveSave === key);
-            if (button) button.focus(); else this.root.querySelector('[data-arrive-tab="saved"]').focus();
+            const area = fromPreview ? this.inlinePreview : this.root.querySelector('#arrive-plus-preview-list');
+            const button = [...area.querySelectorAll('[data-arrive-save]')].find(x => x.dataset.arriveSave === key);
+            if (button) button.focus({ preventScroll: true }); else this.root.querySelector('[data-arrive-tab="saved"]').focus({ preventScroll: true });
         }
         announce(message) { this.root.querySelector('#arrive-discovery-status').textContent = message; }
         open(key) {
@@ -641,6 +671,53 @@
             else if (item.kind === 'community') this.app.openCommunityPostMarketplaceModal(raw.id);
             else this.app.openMarketplaceItemModal(raw);
         }
+        positionInlinePreview() {
+            if (this.inlinePreview.hidden) return;
+            const category = this.inlinePreview.dataset.category;
+            const input = [...this.root.querySelectorAll('#arrive-plus-checklist input')].find(input => input.value === category);
+            const label = input?.closest('.arrive-plus-check');
+            if (!label) return;
+            const grid = label.parentElement;
+            const labels = [...grid.children].filter(child => child.classList.contains('arrive-plus-check'));
+            const columns = Math.max(1, window.getComputedStyle(grid).gridTemplateColumns.split(/\s+/).filter(Boolean).length);
+            const rowEnd = Math.min(labels.length - 1, Math.floor(labels.indexOf(label) / columns) * columns + columns - 1);
+            const anchor = labels[rowEnd];
+            if (anchor && anchor.nextElementSibling !== this.inlinePreview) anchor.after(this.inlinePreview);
+        }
+        renderInlinePreview(saved) {
+            const prefs = this.store.state.preferences;
+            const { category, items, countryCount } = categoryPreview(this.app, this.records, prefs);
+            const status = this.root.querySelector('#arrive-inline-status');
+            const shown = this.tab === 'discover' && Boolean(category);
+            this.inlinePreview.hidden = !shown;
+            if (!shown) { if (status) status.textContent = ''; return; }
+            this.inlinePreview.dataset.category = category;
+            const destination = [prefs.city, prefs.country].filter(Boolean).join(', ');
+            const invalidDates = prefs.startDate && prefs.endDate && prefs.endDate < prefs.startDate;
+            const message = !prefs.country ? 'Choose a country to see ' + category.toLowerCase() + ' listings.'
+                : items.length ? items.length + (items.length === 1 ? ' matching listing' : ' matching listings') + ' for ' + category + ' in ' + destination + '.'
+                : invalidDates ? 'Check your travel dates. Departure must be on or after arrival.'
+                : 'No ' + category.toLowerCase() + ' listings match ' + destination + (prefs.startDate || prefs.endDate ? ' and your travel dates' : '') + ' yet.';
+            if (status && status.textContent !== message) status.textContent = message;
+            const signature = JSON.stringify([category, message, countryCount, items.slice(0, 2).map(item => [snapshot(item), saved.some(entry => entry.key === item.key)])]);
+            if (signature !== this.inlineSignature) {
+                this.inlineSignature = signature;
+                this.inlinePreview.innerHTML = '<div class="arrive-inline-heading"><h4>' + escape(category) + '</h4><p>' + escape(message) + '</p></div>' +
+                    (items.length ? '<div class="arrive-inline-list">' + items.slice(0, 2).map(item => {
+                        const isSaved = saved.some(entry => entry.key === item.key);
+                        return '<article class="arrive-inline-card" data-arrive-preview="' + escape(item.key) + '">' +
+                            '<img src="' + escape(item.image) + '" alt="" loading="lazy" decoding="async">' +
+                            '<div class="arrive-inline-copy"><h5>' + escape(item.title) + '</h5><p>' + escape([item.city, item.country].filter(Boolean).join(', ')) + '</p>' +
+                            '<strong>' + escape(item.price) + '</strong>' +
+                            (item.eventDate ? '<p>' + escape(this.app.formatScheduleDate(item.eventDate)) + '</p>' : '') +
+                            '<div class="arrive-inline-actions"><button type="button" data-arrive-open="' + escape(item.key) + '">View listing</button>' +
+                            '<button type="button" data-arrive-save="' + escape(item.key) + '" aria-pressed="' + isSaved + '" aria-label="' + (isSaved ? 'Remove ' : 'Save ') + escape(item.title) + (isSaved ? ' from itinerary' : ' to itinerary') + '"><i class="' + (isSaved ? 'fas' : 'far') + ' fa-bookmark" aria-hidden="true"></i> ' + (isSaved ? 'Saved' : 'Save') + '</button></div></div></article>';
+                    }).join('') + '</div><button type="button" class="arrive-inline-all" data-arrive-view-results>View all matching listings <i class="fas fa-arrow-down" aria-hidden="true"></i></button>'
+                    : countryCount ? '<button type="button" class="arrive-inline-all" data-arrive-expand-country>Search all of ' + escape(prefs.country) + ' (' + countryCount + ')</button>'
+                    : '<p class="arrive-inline-empty">' + escape(!prefs.country ? 'Your choices will stay selected while you pick a destination.' : invalidDates ? 'Update the dates above to see matching events.' : 'Try another category or destination. Existing listings will appear here when they match.') + '</p>');
+            }
+            this.positionInlinePreview();
+        }
         render() {
             if (!this.store.current()) return;
             this.updateDestinationClear();
@@ -654,6 +731,7 @@
             const saved = this.store.state.saved.filter(x => !x.deleted).sort((a, b) => b.updatedAt - a.updatedAt);
             const live = new Map(this.records.map(item => [item.key, item]));
             const items = this.tab === 'saved' ? saved.map(entry => ({ ...entry, ...(live.get(entry.key) || {}), unavailable: !live.has(entry.key) })) : discover(this.app, this.records, prefs);
+            this.renderInlinePreview(saved);
             this.root.querySelector('#arrive-discovery-count').textContent = saved.length;
             this.root.querySelector('#arrive-discovery-storage').textContent = this.store.status();
             const title = this.root.querySelector('#arrive-discovery-title');
@@ -715,7 +793,7 @@
         refresh(app) { if (app.activeScreen !== 'arrive') return false; return Boolean(this.mount(app)); },
         restore(app) { if (controller?.app === app && controller.store.current()) { controller.hydrate(); controller.render(); } },
         refreshIdentity(app) { if (controller && controller.app === app && !controller.store.current()) this.mount(app); },
-        model: Object.freeze({ CATEGORIES, fold, dateKey, snapshot, normalize, merge, Store, categoriesFor, collect, discover, matchesCity })
+        model: Object.freeze({ CATEGORIES, fold, dateKey, snapshot, normalize, merge, Store, categoriesFor, collect, discover, matchesCity, categoryPreview })
     };
     window.SIXO_ARRIVE_DISCOVERY = api;
 })(window, document);

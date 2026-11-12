@@ -20,6 +20,30 @@
 #arrive-content .arrive-discovery-checks .arrive-plus-check.checked { background: #eaf1fc; border-color: #365e91; }
 #arrive-content .arrive-discovery-checks input { accent-color: #365e91; width: 16px; height: 16px; margin: 0; flex: none; }
 #arrive-content .arrive-discovery-hint { font-size: 12px; color: #61738a; line-height: 1.6; margin: 12px 0 0; }
+/* Keep the response to a checkbox beside that choice, including on phones. */
+#arrive-content .arrive-inline-matches { grid-column: 1 / -1; min-width: 0; padding: 14px; border: 1px solid #b7cbe4; border-radius: 12px; background: #f1f6fd; color: #20344d; }
+#arrive-content .arrive-inline-heading h4 { margin: 0 0 5px; font-size: 14px; font-weight: 600; }
+#arrive-content .arrive-inline-heading p, #arrive-content .arrive-inline-empty { margin: 0; font-size: 12px; line-height: 1.6; color: #526780; overflow-wrap: anywhere; }
+#arrive-content .arrive-inline-empty { margin-top: 8px; }
+#arrive-content .arrive-inline-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-top: 12px; }
+#arrive-content .arrive-inline-card { display: flex; align-items: flex-start; gap: 12px; padding: 12px; min-width: 0; border: 1px solid #dce4ee; border-radius: 10px; background: #fff; }
+#arrive-content .arrive-inline-card > img { width: 76px; height: 76px; flex: none; object-fit: cover; border-radius: 8px; background: #e5edf7; }
+#arrive-content .arrive-inline-copy { flex: 1; min-width: 0; }
+#arrive-content .arrive-inline-copy h5 { margin: 0 0 6px; color: #20344d; font-size: 14px; font-weight: 600; line-height: 1.5; overflow-wrap: anywhere; }
+#arrive-content .arrive-inline-copy > p { margin: 0 0 5px; font-size: 12px; color: #61738a; line-height: 1.5; overflow-wrap: anywhere; }
+#arrive-content .arrive-inline-copy > strong { display: block; margin: 5px 0 0; font-size: 13px; font-weight: 600; overflow-wrap: anywhere; }
+#arrive-content .arrive-inline-actions { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 9px; }
+#arrive-content .arrive-inline-actions button, #arrive-content .arrive-inline-all { min-height: 44px; max-width: 100%; padding: 9px 11px; border: 1px solid #ccd8e8; border-radius: 8px; background: #fff; color: #365e91; font: inherit; font-size: 12px; font-weight: 600; cursor: pointer; white-space: normal; overflow-wrap: anywhere; }
+#arrive-content .arrive-inline-actions button[aria-pressed="true"] { background: #eaf1fc; border-color: #365e91; }
+#arrive-content .arrive-inline-all { margin-top: 12px; background: transparent; }
+#arrive-content .arrive-inline-matches button:focus-visible { outline: 2px solid #365e91; outline-offset: 3px; }
+@media (max-width: 760px) { #arrive-content .arrive-inline-list { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 380px) {
+    #arrive-content .arrive-inline-matches { padding: 10px; }
+    #arrive-content .arrive-inline-card { flex-direction: column; padding: 10px; }
+    #arrive-content .arrive-inline-card > img { width: 100%; height: 115px; }
+    #arrive-content .arrive-inline-copy { width: 100%; }
+}
 #arrive-content .arrive-discovery-feed { min-width: 0; color: #20344d; }
 #arrive-content .arrive-discovery-heading h3 { margin: 0 0 7px; font-size: 24px; font-weight: 600; overflow-wrap: anywhere; }
 #arrive-content .arrive-discovery-heading p { margin: 0; color: #61738a; font-size: 13px; line-height: 1.6; }

@@ -1,4 +1,11 @@
 #arrive-content .arrive-discovery-screen { padding: 22px; }
+#arrive-content #arrive-plus-schedule { background: #f5f7fb; border: 1px solid #dce4ee; border-radius: 20px; }
+#arrive-content .arrive-trip-hero { display: flex; align-items: center; justify-content: space-between; gap: 24px; min-height: 190px; margin: -22px -22px 24px; padding: 32px; border-radius: 19px 19px 0 0; color: #fff; background: linear-gradient(90deg, rgba(12,37,62,.93), rgba(12,37,62,.68) 55%, rgba(12,37,62,.3)), url('arrive-trip-coast.jpg') center 52% / cover; }
+#arrive-content .arrive-trip-hero .arrive-trip-eyebrow { margin: 0 0 12px; color: #d5e7fa; font-size: 11px; font-weight: 600; letter-spacing: 1.5px; }
+#arrive-content .arrive-trip-hero h3 { color: #fff; margin: 0 0 10px; font-size: 38px; font-weight: 600; line-height: 1.2; letter-spacing: -1.5px; }
+#arrive-content .arrive-trip-hero p { margin: 0; max-width: 420px; font-size: 14px; line-height: 1.6; color: #e7eef5; }
+#arrive-content .arrive-trip-hero-note { display: flex; gap: 16px; align-items: center; font-size: 13px; line-height: 1.7; }
+#arrive-content .arrive-trip-hero-note > i { font-size: 26px; }
 #arrive-content .arrive-discovery-layout { display: grid; grid-template-columns: minmax(0, 1fr); align-items: start; gap: 24px; }
 #arrive-content .arrive-discovery-preferences { min-width: 0; padding: 20px; border: 1px solid #dce4ee; border-radius: 16px; background: #fff; color: #20344d; }
 #arrive-content .arrive-discovery-preferences > h3 { margin: 0 0 8px; font-size: 18px; font-weight: 600; }
@@ -20,6 +27,76 @@
 #arrive-content .arrive-discovery-checks .arrive-plus-check.checked { background: #eaf1fc; border-color: #365e91; }
 #arrive-content .arrive-discovery-checks input { accent-color: #365e91; width: 16px; height: 16px; margin: 0; flex: none; }
 #arrive-content .arrive-discovery-hint { font-size: 12px; color: #61738a; line-height: 1.6; margin: 12px 0 0; }
+#arrive-content .arrive-trip-personalize { margin-top: 22px; padding-top: 20px; border-top: 1px solid #dce4ee; }
+#arrive-content .arrive-trip-personalize > h3 { font-size: 17px; margin: 0 0 12px; font-weight: 600; }
+#arrive-content .arrive-trip-types { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+#arrive-content .arrive-trip-types button { display: flex; align-items: center; gap: 12px; min-width: 0; min-height: 78px; padding: 15px; text-align: left; color: #20344d; background: #fff; border: 1px solid #dce4ee; border-radius: 13px; font: inherit; cursor: pointer; }
+#arrive-content .arrive-trip-types button > i { display: grid; place-items: center; width: 36px; height: 36px; flex: none; border-radius: 50%; background: #f0f4fa; color: #365e91; font-size: 17px; }
+#arrive-content .arrive-trip-types strong { display: block; font-size: 13px; font-weight: 600; }
+#arrive-content .arrive-trip-types small { display: block; margin-top: 4px; color: #61738a; font-size: 11px; }
+#arrive-content .arrive-trip-types button[aria-pressed="true"] { background: #eaf1fc; border-color: #365e91; box-shadow: inset 0 0 0 1px #365e91; }
+#arrive-content .arrive-trip-settings { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 20px; align-items: start; }
+#arrive-content .arrive-trip-party { min-width: 0; margin: 0; padding: 0; border: 0; }
+#arrive-content .arrive-trip-party legend { padding: 0; margin-bottom: 9px; font-size: 12px; color: #61738a; }
+#arrive-content .arrive-trip-party > div { display: flex; flex-wrap: wrap; gap: 16px; }
+#arrive-content .arrive-trip-party label { display: flex; align-items: center; gap: 8px; font-size: 13px; }
+#arrive-content .arrive-trip-party input { width: 65px; }
+#arrive-content .arrive-trip-settings :is(input[type="number"], select) { min-height: 44px; min-width: 0; border: 1px solid #dce4ee; border-radius: 8px; padding: 8px; font: inherit; font-size: 16px; color: #20344d; background: #fff; }
+#arrive-content .arrive-trip-budget > label { display: block; margin-bottom: 8px; font-size: 13px; }
+#arrive-content .arrive-trip-budget small { color: #61738a; font-size: 11px; margin-left: 5px; }
+#arrive-content .arrive-trip-budget-fields { display: flex; gap: 8px; }
+#arrive-content .arrive-trip-budget-fields select { flex: 0 0 86px; width: 86px; }
+#arrive-content .arrive-trip-budget-fields input { width: 100%; }
+#arrive-content #arrive-trip-budget-range { width: 100%; min-height: 28px; accent-color: #365e91; margin: 8px 0 0; }
+#arrive-content .arrive-trip-budget-filter { display: flex; flex-wrap: wrap; align-items: center; gap: 7px; min-height: 44px; margin: 8px 0 0; font-size: 12px; line-height: 1.5; }
+#arrive-content .arrive-trip-budget-filter input, #arrive-content .arrive-trip-essential-options input { accent-color: #365e91; flex: none; width: 17px; height: 17px; margin: 0; }
+#arrive-content .arrive-trip-budget-note { margin: 3px 0 0; color: #61738a; font-size: 11px; line-height: 1.6; }
+#arrive-content .arrive-trip-listing-fact { font-size: 11px; line-height: 1.5; color: #526780; margin: 0 0 10px; }
+#arrive-content .arrive-trip-day { margin: 24px 0 0; padding: 20px; border-radius: 15px; border: 1px solid #dce4ee; background: #edf3fc; }
+#arrive-content .arrive-trip-day-heading { display: flex; align-items: center; gap: 14px; }
+#arrive-content .arrive-trip-day-heading > i { font-size: 25px; color: #365e91; }
+#arrive-content .arrive-trip-day-heading > div { flex: 1; }
+#arrive-content .arrive-trip-day h3 { margin: 0 0 5px; color: #20344d; font-size: 17px; font-weight: 600; }
+#arrive-content .arrive-trip-day-heading p { margin: 0; color: #61738a; font-size: 12px; line-height: 1.6; }
+#arrive-content .arrive-trip-day button { min-height: 44px; padding: 10px 14px; max-width: 100%; border: 1px solid #365e91; border-radius: 9px; background: #365e91; color: #fff; font: inherit; font-size: 12px; font-weight: 600; cursor: pointer; }
+#arrive-content .arrive-trip-day button:disabled { opacity: .55; cursor: default; }
+#arrive-content #arrive-trip-day-plan { padding-top: 18px; margin-top: 18px; border-top: 1px solid #cbd8ea; }
+#arrive-content .arrive-trip-plan-note { margin: 0 0 16px; font-size: 12px; line-height: 1.6; color: #526780; }
+#arrive-content .arrive-trip-stops { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+#arrive-content .arrive-trip-stop { min-width: 0; padding: 15px; background: #fff; border: 1px solid #dce4ee; border-radius: 12px; }
+#arrive-content .arrive-trip-stop > span { font-size: 11px; color: #365e91; font-weight: 600; }
+#arrive-content .arrive-trip-stop h4 { font-size: 14px; font-weight: 600; line-height: 1.5; margin: 7px 0; color: #20344d; overflow-wrap: anywhere; }
+#arrive-content .arrive-trip-stop p { font-size: 12px; color: #61738a; line-height: 1.6; margin: 0; }
+#arrive-content .arrive-trip-stop strong { display: block; font-size: 12px; color: #20344d; margin-top: 10px; }
+#arrive-content .arrive-trip-stop button { background: #fff; color: #365e91; margin-top: 12px; }
+#arrive-content .arrive-trip-plan-footer { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 14px; margin-top: 16px; }
+#arrive-content .arrive-trip-plan-footer > span { font-size: 11px; color: #61738a; }
+#arrive-content .arrive-trip-essentials { margin: 24px 0 8px; }
+#arrive-content .arrive-trip-essentials > div:first-child { display: flex; justify-content: space-between; gap: 12px; align-items: center; margin-bottom: 12px; }
+#arrive-content .arrive-trip-essentials h3 { margin: 0; color: #20344d; font-size: 16px; font-weight: 600; }
+#arrive-content #arrive-trip-essential-count { color: #61738a; font-size: 12px; white-space: nowrap; }
+#arrive-content .arrive-trip-essential-options { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+#arrive-content .arrive-trip-essential-options label { display: flex; align-items: center; gap: 9px; padding: 12px; min-height: 48px; background: #fff; color: #20344d; border: 1px solid #dce4ee; border-radius: 10px; font-size: 12px; line-height: 1.5; }
+#arrive-content .arrive-trip-essential-options label:has(input:checked) { background: #eaf1fc; border-color: #365e91; }
+#arrive-content .arrive-trip-essentials > p { font-size: 11px; color: #61738a; line-height: 1.6; margin: 10px 0 0; }
+#arrive-content :is(.arrive-trip-personalize, .arrive-trip-day, .arrive-trip-essentials) :is(button, input, select):focus-visible { outline: 2px solid #365e91; outline-offset: 3px; }
+@media (min-width: 1000px) { #arrive-content .arrive-discovery-feed .arrive-discovery-list { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (max-width: 900px) { #arrive-content .arrive-trip-hero { margin: -16px -16px 20px; } }
+@media (max-width: 600px) {
+    #arrive-content .arrive-trip-hero { padding: 26px 20px; min-height: 180px; }
+    #arrive-content .arrive-trip-hero h3 { font-size: 32px; }
+    #arrive-content .arrive-trip-hero-note { display: none; }
+    #arrive-content .arrive-trip-types { gap: 7px; }
+    #arrive-content .arrive-trip-types button { flex-direction: column; text-align: center; gap: 8px; padding: 12px 5px; }
+    #arrive-content .arrive-trip-types small { display: none; }
+    #arrive-content .arrive-trip-types strong { font-size: 11px; }
+    #arrive-content .arrive-trip-settings { grid-template-columns: minmax(0, 1fr); gap: 16px; }
+    #arrive-content .arrive-trip-day { padding: 16px; }
+    #arrive-content .arrive-trip-day-heading { flex-wrap: wrap; }
+    #arrive-content .arrive-trip-day-heading button { width: 100%; }
+    #arrive-content .arrive-trip-stops { grid-template-columns: minmax(0, 1fr); }
+    #arrive-content .arrive-trip-essential-options { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
 /* Keep the response to a checkbox beside that choice, including on phones. */
 #arrive-content .arrive-inline-matches { grid-column: 1 / -1; min-width: 0; padding: 14px; border: 1px solid #b7cbe4; border-radius: 12px; background: #f1f6fd; color: #20344d; }
 #arrive-content .arrive-inline-heading h4 { margin: 0 0 5px; font-size: 14px; font-weight: 600; }

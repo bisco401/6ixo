@@ -131,7 +131,7 @@
     <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
     <link rel="preload" href="assets/fonts/sora-latin.3902474d3ece.woff2" as="font" type="font/woff2" crossorigin>
     <link rel="stylesheet" href="styles.css?v=20261110-form-card-2">
-    <link rel="stylesheet" href="assets/arrive-discovery.css?v=20261111-instant-category-matches-1">
+    <link rel="stylesheet" href="assets/arrive-discovery.css?v=20261111-complete-trip-screen-1">
     <link rel="stylesheet" href="assets/shortstay-signature.css?v=20261018-signature-1">
     <link rel="stylesheet" href="assets/stay-host-application.css?v=20261019-host-proof-checks-1">
     <link rel="stylesheet" href="assets/policy-links.css?v=20260930-site-policies-1">
@@ -4221,6 +4221,10 @@
                 </div>
             </header>
                 <section id="arrive-plus-schedule" class="dating-section dating-schedule arrive-discovery-screen" aria-label="Arrive+ trip discovery">
+                    <section class="arrive-trip-hero" aria-label="Trip inspiration">
+                        <div><p class="arrive-trip-eyebrow">YOUR TRIP. YOUR KIND OF GOOD TIME.</p><h3>Land with a plan.</h3><p>Find your stay, your ride, and your next great memory.</p></div>
+                        <div class="arrive-trip-hero-note"><i class="fas fa-plane-departure" aria-hidden="true"></i><span>Less searching.<br>More looking forward.</span></div>
+                    </section>
                     <div class="arrive-discovery-layout">
                         <aside class="arrive-discovery-preferences" aria-label="Trip preferences">
                             <h3>Choose your destination</h3>
@@ -4246,7 +4250,7 @@
                                     </div>
                                 </div>
                                 <input type="hidden" id="dating-schedule-destination">
-                                <details id="arrive-discovery-travel-dates" class="arrive-discovery-travel-dates">
+                                <details id="arrive-discovery-travel-dates" class="arrive-discovery-travel-dates" open>
                                     <summary>Travel dates (optional)</summary>
                                     <p class="arrive-discovery-hint">Add dates to filter events during your stay.</p>
                                     <div class="arrive-discovery-dates">
@@ -4271,6 +4275,27 @@
                                     <p>Optional. Pricing is shown before payment. No hotel or exact address is shared.</p>
                                 </details>
                             </form>
+                            <section class="arrive-trip-personalize" aria-labelledby="arrive-trip-type-title">
+                                <h3 id="arrive-trip-type-title">Who’s coming along?</h3>
+                                <div class="arrive-trip-types" role="group" aria-label="Trip type">
+                                    <button type="button" data-arrive-trip-type="solo" aria-pressed="true"><i class="fas fa-user" aria-hidden="true"></i><span><strong>Solo / personal</strong><small>Your plans. Your pace.</small></span></button>
+                                    <button type="button" data-arrive-trip-type="couple" aria-pressed="false"><i class="far fa-heart" aria-hidden="true"></i><span><strong>Couple</strong><small>A little time for two.</small></span></button>
+                                    <button type="button" data-arrive-trip-type="family" aria-pressed="false"><i class="fas fa-users" aria-hidden="true"></i><span><strong>Family</strong><small>Something for everyone.</small></span></button>
+                                </div>
+                                <div class="arrive-trip-settings">
+                                    <fieldset class="arrive-trip-party"><legend>Your group</legend><div>
+                                        <label for="arrive-trip-adults">Adults<input id="arrive-trip-adults" data-arrive-trip-field="adults" type="number" min="1" max="12" value="1" inputmode="numeric"></label>
+                                        <label id="arrive-trip-children-label" for="arrive-trip-children" hidden>Children<input id="arrive-trip-children" data-arrive-trip-field="children" type="number" min="0" max="10" value="0" inputmode="numeric"></label>
+                                    </div></fieldset>
+                                    <div class="arrive-trip-budget">
+                                        <label for="arrive-trip-budget">Budget guide <small>for your day</small></label>
+                                        <div class="arrive-trip-budget-fields"><select id="arrive-trip-currency" data-arrive-trip-field="currency" aria-label="Budget currency"><option value="USD">USD</option></select><input id="arrive-trip-budget" data-arrive-trip-field="budget" type="number" min="0" max="1000000" step="1" value="150" inputmode="decimal" aria-label="Budget amount"></div>
+                                        <input id="arrive-trip-budget-range" type="range" min="0" max="600" step="5" value="150" aria-label="Adjust budget guide">
+                                    </div>
+                                </div>
+                                <label class="arrive-trip-budget-filter"><input id="arrive-trip-budget-filter" data-arrive-trip-field="hideAboveBudget" type="checkbox">Hide listed prices above my guide <span id="arrive-trip-budget-currency-label">(USD)</span></label>
+                                <p class="arrive-trip-budget-note">Rates may be per night, person, or service. Confirm your group total. Other currencies and unpriced listings stay visible.</p>
+                            </section>
                             <fieldset class="arrive-discovery-interests">
                                 <legend>What would you like to explore?</legend>
                                 <div id="arrive-plus-checklist" class="arrive-discovery-checks" aria-label="Vacation checklist">
@@ -4312,6 +4337,20 @@
                             <p id="arrive-discovery-status" role="status" aria-live="polite"></p>
                         </section>
                     </div>
+                    <section class="arrive-trip-day" aria-labelledby="arrive-trip-day-title">
+                        <div class="arrive-trip-day-heading"><i class="far fa-sun" aria-hidden="true"></i><div><h3 id="arrive-trip-day-title">Make the day your own.</h3><p id="arrive-trip-day-subtitle">A few good ideas, at your own pace.</p></div><button type="button" id="arrive-trip-build-day" aria-expanded="false" aria-controls="arrive-trip-day-plan">Build my day</button></div>
+                        <div id="arrive-trip-day-plan" hidden></div>
+                    </section>
+                    <section class="arrive-trip-essentials" aria-labelledby="arrive-trip-essentials-title">
+                        <div><h3 id="arrive-trip-essentials-title">The little things, sorted.</h3><span id="arrive-trip-essential-count" role="status" aria-live="polite">0 of 4 ready</span></div>
+                        <div class="arrive-trip-essential-options">
+                            <label><input type="checkbox" data-arrive-essential="Airport ride">Airport ride</label>
+                            <label><input type="checkbox" data-arrive-essential="Place to stay">Place to stay</label>
+                            <label><input type="checkbox" data-arrive-essential="Mobile data">Mobile data</label>
+                            <label><input type="checkbox" data-arrive-essential="Travel essentials">Travel essentials</label>
+                        </div>
+                        <p>Check these off when you’ve arranged them. Saving an idea doesn’t make a booking.</p>
+                    </section>
                     <section id="arrive-plus-ad-slot" class="home-bottom-ad home-bottom-ad-image-only is-placeholder arrive-plus-ad-slot" aria-label="Sponsored ad">
                         <div class="home-bottom-ad-media">
                             <img decoding="async" id="arrive-plus-ad-image" data-ad-image src="assets/ad-placeholder.svg" alt="Sponsored ad" loading="lazy">
@@ -7287,7 +7326,8 @@
     <script defer src="assets/profile-source-brand-blur.js?v=20261106-1"></script>
         <link rel="stylesheet" href="assets/posting-accordion.css?v=20261012-property-categories-1">
     <script src="assets/posting-accordion.js?v=20261104-category-badges-1"></script>
-    <script src="assets/arrive-discovery.js?v=20261111-instant-category-matches-1"></script>
+    <script src="assets/arrive-trip-planner.js?v=20261111-complete-trip-screen-1"></script>
+    <script src="assets/arrive-discovery.js?v=20261111-complete-trip-screen-1"></script>
     <script src="assets/listing-image-recovery.js?v=20261109-quality-1"></script>
     <link rel="stylesheet" href="assets/auth-captcha.css?v=20261109-turnstile-1">
     <script src="turnstile-config.js?v=20261109-turnstile-1"></script>

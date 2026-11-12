@@ -59,7 +59,7 @@
             const entry = { ...listing, updatedAt: timestamp(value.updatedAt), deleted: value.deleted === true };
             if (!entries.has(entry.key) || entries.get(entry.key).updatedAt <= entry.updatedAt) entries.set(entry.key, entry);
         }
-        return { version: 1, preferences: { country: text(prefs.country), city: text(prefs.city), startDate: dateKey(prefs.startDate), endDate: dateKey(prefs.endDate), categories, activeCategory: categories.includes(prefs.activeCategory) ? prefs.activeCategory : categories[categories.length - 1] || '', updatedAt: timestamp(prefs.updatedAt) }, saved: [...entries.values()] };
+        return { version: 1, preferences: { country: text(prefs.country), city: text(prefs.city), startDate: dateKey(prefs.startDate), endDate: dateKey(prefs.endDate), categories, activeCategory: categories.includes(prefs.activeCategory) ? prefs.activeCategory : categories[categories.length - 1] || '', trip: window.SIXO_ARRIVE_TRIP?.normalize({ ...prefs.trip, interestsCustomized: prefs.trip?.interestsCustomized ?? categories.length > 0 }) || {}, updatedAt: timestamp(prefs.updatedAt) }, saved: [...entries.values()] };
     }
     function merge(left, right) {
         const a = normalize(left), b = normalize(right);
@@ -234,17 +234,19 @@
             if (item.categories.includes('Events') && (start || end)) {
                 if (!item.eventDate || start && end && end < start || start && item.eventDate < start || end && item.eventDate > end) return false;
             }
+            if (preferences.trip?.hideAboveBudget && window.SIXO_ARRIVE_TRIP?.aboveBudget(app, item, preferences.trip)) return false;
             return true;
-        }).sort((a, b) => Number(b.categories.includes(preferences.activeCategory)) - Number(a.categories.includes(preferences.activeCategory)) || b.postedAt - a.postedAt || a.title.localeCompare(b.title));
+        }).sort((a, b) => Number(b.categories.includes(preferences.activeCategory)) - Number(a.categories.includes(preferences.activeCategory)) || (preferences.trip && window.SIXO_ARRIVE_TRIP ? window.SIXO_ARRIVE_TRIP.score(b, preferences.trip) - window.SIXO_ARRIVE_TRIP.score(a, preferences.trip) : 0) || b.postedAt - a.postedAt || a.title.localeCompare(b.title));
     }
     function categoryPreview(app, records, preferences) {
         const selected = preferences.categories || [];
         const category = selected.includes(preferences.activeCategory) ? preferences.activeCategory : selected[selected.length - 1] || '';
         const prefs = { ...preferences, categories: category ? [category] : [] };
         const items = discover(app, records, prefs);
+        const aboveBudgetCount = prefs.trip?.hideAboveBudget ? discover(app, records, { ...prefs, trip: { ...prefs.trip, hideAboveBudget: false } }).length - items.length : 0;
         const countryCount = category && preferences.country && preferences.city && !items.length
             ? discover(app, records, { ...prefs, city: '' }).length : 0;
-        return { category, items, countryCount };
+        return { category, items, countryCount, aboveBudgetCount };
     }
     class Discovery {
         constructor(app, root) {
@@ -264,6 +266,7 @@
             this.inlinePreview.setAttribute('aria-label', 'Matching category listings');
             this.inlinePreview.hidden = true;
             root.querySelector('#arrive-plus-checklist').appendChild(this.inlinePreview);
+            this.planner = window.SIXO_ARRIVE_TRIP?.mount(this);
             this.setupDestinationClear();
             this.hydrate(); this.bind(); this.loadCountries(); this.render(); this.loadCitiesForCountry();
             this.store.ready.then(() => { if (this.store.current()) { this.hydrate(); this.render(); this.loadCitiesForCountry(); } });
@@ -529,6 +532,7 @@
                 if (checklist) {
                     prefs.categories = [...this.root.querySelectorAll('#arrive-plus-checklist input:checked')].map(x => x.value).filter(x => CATEGORIES.includes(x));
                     prefs.activeCategory = event.target.checked ? event.target.value : prefs.categories.includes(prefs.activeCategory) ? prefs.activeCategory : prefs.categories[prefs.categories.length - 1] || '';
+                    if (prefs.trip) prefs.trip.interestsCustomized = true;
                 }
                 prefs.updatedAt = this.stamp(); this.tab = 'discover'; this.limit = 24; this.signature = '';
                 this.syncLegacy(); this.render();
@@ -616,6 +620,11 @@
                 this.root.querySelector('[data-arrive-tab="' + this.tab + '"]').focus();
             }, options);
             this.root.addEventListener('click', event => {
+                if (event.target.closest('[data-arrive-clear-budget]')) {
+                    this.store.state.preferences.trip.hideAboveBudget = false;
+                    this.planner?.commit();
+                    return;
+                }
                 if (event.target.closest('[data-arrive-expand-country]')) {
                     this.clearDestination('city');
                     this.root.querySelector('#arrive-discovery-title').focus({ preventScroll: true });
@@ -686,7 +695,7 @@
         }
         renderInlinePreview(saved) {
             const prefs = this.store.state.preferences;
-            const { category, items, countryCount } = categoryPreview(this.app, this.records, prefs);
+            const { category, items, countryCount, aboveBudgetCount } = categoryPreview(this.app, this.records, prefs);
             const status = this.root.querySelector('#arrive-inline-status');
             const shown = this.tab === 'discover' && Boolean(category);
             this.inlinePreview.hidden = !shown;
@@ -697,9 +706,10 @@
             const message = !prefs.country ? 'Choose a country to see ' + category.toLowerCase() + ' listings.'
                 : items.length ? items.length + (items.length === 1 ? ' matching listing' : ' matching listings') + ' for ' + category + ' in ' + destination + '.'
                 : invalidDates ? 'Check your travel dates. Departure must be on or after arrival.'
+                : aboveBudgetCount ? aboveBudgetCount + (aboveBudgetCount === 1 ? ' matching listing is' : ' matching listings are') + ' above your budget guide.'
                 : 'No ' + category.toLowerCase() + ' listings match ' + destination + (prefs.startDate || prefs.endDate ? ' and your travel dates' : '') + ' yet.';
             if (status && status.textContent !== message) status.textContent = message;
-            const signature = JSON.stringify([category, message, countryCount, items.slice(0, 2).map(item => [snapshot(item), saved.some(entry => entry.key === item.key)])]);
+            const signature = JSON.stringify([category, message, countryCount, prefs.trip, items.slice(0, 2).map(item => [snapshot(item), saved.some(entry => entry.key === item.key)])]);
             if (signature !== this.inlineSignature) {
                 this.inlineSignature = signature;
                 this.inlinePreview.innerHTML = '<div class="arrive-inline-heading"><h4>' + escape(category) + '</h4><p>' + escape(message) + '</p></div>' +
@@ -709,10 +719,12 @@
                             '<img src="' + escape(item.image) + '" alt="" loading="lazy" decoding="async">' +
                             '<div class="arrive-inline-copy"><h5>' + escape(item.title) + '</h5><p>' + escape([item.city, item.country].filter(Boolean).join(', ')) + '</p>' +
                             '<strong>' + escape(item.price) + '</strong>' +
+                            (window.SIXO_ARRIVE_TRIP?.facts(this.app, item, prefs.trip) || []).map(label => '<p class="arrive-trip-listing-fact">' + escape(label) + '</p>').join('') +
                             (item.eventDate ? '<p>' + escape(this.app.formatScheduleDate(item.eventDate)) + '</p>' : '') +
                             '<div class="arrive-inline-actions"><button type="button" data-arrive-open="' + escape(item.key) + '">View listing</button>' +
                             '<button type="button" data-arrive-save="' + escape(item.key) + '" aria-pressed="' + isSaved + '" aria-label="' + (isSaved ? 'Remove ' : 'Save ') + escape(item.title) + (isSaved ? ' from itinerary' : ' to itinerary') + '"><i class="' + (isSaved ? 'fas' : 'far') + ' fa-bookmark" aria-hidden="true"></i> ' + (isSaved ? 'Saved' : 'Save') + '</button></div></div></article>';
                     }).join('') + '</div><button type="button" class="arrive-inline-all" data-arrive-view-results>View all matching listings <i class="fas fa-arrow-down" aria-hidden="true"></i></button>'
+                    : aboveBudgetCount ? '<button type="button" class="arrive-inline-all" data-arrive-clear-budget>Show all listed prices</button>'
                     : countryCount ? '<button type="button" class="arrive-inline-all" data-arrive-expand-country>Search all of ' + escape(prefs.country) + ' (' + countryCount + ')</button>'
                     : '<p class="arrive-inline-empty">' + escape(!prefs.country ? 'Your choices will stay selected while you pick a destination.' : invalidDates ? 'Update the dates above to see matching events.' : 'Try another category or destination. Existing listings will appear here when they match.') + '</p>');
             }
@@ -731,11 +743,12 @@
             const saved = this.store.state.saved.filter(x => !x.deleted).sort((a, b) => b.updatedAt - a.updatedAt);
             const live = new Map(this.records.map(item => [item.key, item]));
             const items = this.tab === 'saved' ? saved.map(entry => ({ ...entry, ...(live.get(entry.key) || {}), unavailable: !live.has(entry.key) })) : discover(this.app, this.records, prefs);
+            this.planner?.render(this.tab === 'saved' ? discover(this.app, this.records, prefs) : items, saved);
             this.renderInlinePreview(saved);
             this.root.querySelector('#arrive-discovery-count').textContent = saved.length;
             this.root.querySelector('#arrive-discovery-storage').textContent = this.store.status();
             const title = this.root.querySelector('#arrive-discovery-title');
-            title.textContent = this.tab === 'saved' ? 'Your saved itinerary' : 'Explore your destination';
+            title.textContent = this.tab === 'saved' ? 'Your saved itinerary' : window.SIXO_ARRIVE_TRIP?.MODES[prefs.trip?.mode]?.title || 'Explore your destination';
             this.root.querySelectorAll('[data-arrive-tab]').forEach(button => button.setAttribute('aria-selected', String(button.dataset.arriveTab === this.tab)));
             this.root.querySelector('#arrive-plus-preview-list').setAttribute('aria-labelledby', 'arrive-tab-' + this.tab);
             const datesInvalid = prefs.startDate && prefs.endDate && prefs.endDate < prefs.startDate;
@@ -759,10 +772,11 @@
             this.signature = signature;
             const list = this.root.querySelector('#arrive-plus-preview-list');
             if (!items.length) {
+                const aboveBudgetCount = this.tab === 'discover' && prefs.trip?.hideAboveBudget ? discover(this.app, this.records, { ...prefs, trip: { ...prefs.trip, hideAboveBudget: false } }).length : 0;
                 const heading = this.tab === 'saved' ? 'Keep the listings you like.' : !prefs.country ? 'Where are you heading?' : !prefs.categories.length ? 'What would you like to explore?' : 'No matches in ' + destination + ' yet.';
                 const detail = this.tab === 'saved' ? 'Tap Save to itinerary on a listing in Discover to find it here later.' : !prefs.country ? 'Choose a country, then add a city to narrow your search.' : !prefs.categories.length ? 'Choose one or more categories above. No trip submission is needed.' : datesInvalid ? 'Check your arrival and departure dates above.' : 'No listings match your selected categories' + (prefs.startDate || prefs.endDate ? ' and travel dates' : '') + '. Try another category or expand your destination.';
-                const expand = canExpand ? '<button type="button" class="btn-secondary" data-arrive-expand-country>Search all of ' + escape(prefs.country) + (countryMatches ? ' (' + countryMatches + ')' : '') + '</button>' : '';
-                list.innerHTML = '<div class="arrive-discovery-empty"><i class="fas fa-' + (this.tab === 'saved' ? 'bookmark' : 'compass') + '" aria-hidden="true"></i><h4>' + escape(heading) + '</h4><p>' + escape(detail) + '</p>' + expand + '</div>';
+                const expand = aboveBudgetCount ? '<button type="button" class="btn-secondary" data-arrive-clear-budget>Show all listed prices (' + aboveBudgetCount + ')</button>' : canExpand ? '<button type="button" class="btn-secondary" data-arrive-expand-country>Search all of ' + escape(prefs.country) + (countryMatches ? ' (' + countryMatches + ')' : '') + '</button>' : '';
+                list.innerHTML = '<div class="arrive-discovery-empty"><i class="fas fa-' + (this.tab === 'saved' ? 'bookmark' : 'compass') + '" aria-hidden="true"></i><h4>' + escape(aboveBudgetCount ? 'These listings are above your budget guide.' : heading) + '</h4><p>' + escape(aboveBudgetCount ? 'Raise your guide or show all listed prices to see the matching listings.' : detail) + '</p>' + expand + '</div>';
                 return;
             }
             list.innerHTML = items.slice(0, this.limit).map(item => {
@@ -775,6 +789,7 @@
                     '<p class="arrive-discovery-location"><i class="fas fa-location-dot" aria-hidden="true"></i> ' + escape([item.city, item.country].filter(Boolean).join(', ')) + '</p>' +
                     (item.eventDate ? '<p class="arrive-discovery-event">' + escape(this.app.formatScheduleDate(item.eventDate)) + '</p>' : '') +
                     '<p class="arrive-discovery-price">' + escape(item.unavailable ? 'Listing no longer available' : item.price) + '</p>' +
+                    (item.unavailable ? [] : window.SIXO_ARRIVE_TRIP?.facts(this.app, item, prefs.trip) || []).map(label => '<p class="arrive-trip-listing-fact">' + escape(label) + '</p>').join('') +
                     '<div class="arrive-discovery-actions"><button type="button" data-arrive-save="' + escape(item.key) + '" aria-pressed="' + isSaved + '" aria-label="' + (isSaved ? 'Remove ' : 'Save ') + escape(item.title) + (isSaved ? ' from itinerary' : ' to itinerary') + '"><i class="' + (isSaved ? 'fas' : 'far') + ' fa-bookmark" aria-hidden="true"></i> ' + (isSaved ? 'Saved ✓' : 'Save to itinerary') + '</button>' +
                     '<button type="button" data-arrive-open="' + escape(item.key) + '"' + (item.unavailable ? ' disabled' : '') + '>View listing</button></div></div></article>';
             }).join('');

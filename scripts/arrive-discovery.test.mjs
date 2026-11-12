@@ -6,6 +6,7 @@ const source = readFileSync(new URL('../assets/arrive-discovery.js', import.meta
 function fixture(seed = {}) {
     const values = new Map(Object.entries(seed));
     const window = { localStorage: { getItem: k => values.get(k) || null, setItem: (k, v) => values.set(k, v) }, setTimeout, clearTimeout };
+    vm.runInNewContext(readFileSync(new URL('../assets/arrive-trip-planner.js', import.meta.url), 'utf8'), { window });
     vm.runInNewContext(source, { window, document: {}, Date, Map, Set, AbortController });
     return { model: window.SIXO_ARRIVE_DISCOVERY.model, values };
 }

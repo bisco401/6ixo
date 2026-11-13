@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Add verified new dealer listings in Lagos, Johannesburg and London."""
+"""Add verified new dealer listings in Lagos, Johannesburg, London and Kampala."""
 import argparse
 import csv
 import hashlib
@@ -27,6 +27,10 @@ SOURCES = {
                          catalog='https://searchmyride.co.za/dealer/pre-owned-cars-573/', pattern=r'^/cars/[^/]+/?$'),
     'london': dict(name='Maslen Motors', country='United Kingdom', city='London', currency='GBP', code='44', digits=10,
                    catalog='https://maslenmotors.com/used-cars/', pattern=r'^/vehicle/name/[^/]+/?$'),
+    'kampala_ml': dict(name='ML Motors', country='Uganda', city='Kampala', currency='UGX', code='256', digits=9,
+                       catalog='https://www.mandelmotors.com/cars?condition=used', pattern=r'^/cars/[^/]+/?$'),
+    'kampala_sublime': dict(name='Sublime Motors', country='Uganda', city='Kampala', currency='UGX', code='256', digits=9,
+                            catalog='https://sublimemotorcars.com/stock/', pattern=r'^/vehicle/[^/]+/?$'),
 }
 
 
@@ -61,6 +65,12 @@ def parse_listing(source_id, body, url, checked, catalog_body=''):
     def kinds(entity):
         value = entity.get('@type', [])
         return set(value if isinstance(value, list) else [value])
+    if source_id == 'kampala_sublime':
+        year = soup.select_one('.veh-info .veh-year')
+        year = re.match(r'^(?:19|20)\d{2}\b', year.get_text(strip=True)) if year else None
+        if not year or not title:
+            raise ValueError('Missing exact model and year')
+        title = f'{year[0]} {title}'
     cars = [e for e in entities if kinds(e) & {'Car', 'Vehicle', 'Product'}
             and clean(e.get('name')).casefold() == title.casefold()
             and (not (e.get('url') or e.get('@id')) or key(e.get('url') or e['@id']) == key(url))]
@@ -97,7 +107,41 @@ def parse_listing(source_id, body, url, checked, catalog_body=''):
         images = [resolve(i).get('contentUrl') or resolve(i).get('url') if isinstance(i, dict) else i for i in images]
         dealer = resolve(offer.get('seller'))
         seller = source['name'] if source_id == 'lagos' else clean(dealer.get('name'))
-        if source_id == 'johannesburg':
+        if source['country'] == 'Uganda':
+            if str(car.get('itemCondition', '')).rsplit('/', 1)[-1] != 'UsedCondition':
+                raise ValueError('Only dealer-confirmed used cars are eligible')
+            seller = source['name']
+            if source_id == 'kampala_ml':
+                business = next((e for e in entities if 'AutomotiveBusiness' in kinds(e)
+                                 and e.get('name') == seller
+                                 and key(e.get('url', '')) == key(urljoin(source['catalog'], '/'))), {})
+                address = business.get('address') or {}
+                contact = phone(business.get('telephone'), source)
+                public_contacts = {phone(a['href'][4:], source) for a in soup.select('a[href^="tel:"]')}
+                if (dealer.get('name') != seller or address.get('addressCountry') != 'UG'
+                        or address.get('addressLocality') != 'Kampala, Uganda'
+                        or not contact or contact not in public_contacts):
+                    raise ValueError('ML Motors Kampala identity or public phone could not be confirmed')
+                phones = [contact]
+            else:
+                location = next((n.b.get_text(' ', strip=True) for n in soup.select('.specs-list li')
+                                 if n.span and n.b and n.span.get_text(strip=True) == 'Location'), '')
+                if (location != 'Kampala, Uganda'
+                        or dealer.get('@id') != 'https://sublimemotorcars.com/#dealer'):
+                    raise ValueError('Sublime Motors Kampala identity could not be confirmed')
+                phones = [phone(a['href'][4:], source) for a in soup.select('.veh-buy a[href^="tel:"]')]
+                total = soup.select_one('.veh-price .vp-in b')
+                total = re.fullmatch(r'UGX ([1-9]\d{0,2}(?:,\d{3})+)', total.get_text(' ', strip=True)) if total else None
+                if not total:
+                    raise ValueError('No published VAT-inclusive UGX price')
+                amount = total[1].replace(',', '')
+                if int(amount) < 1_000_000:
+                    raise ValueError('Source price appears incomplete')
+                facts['Price basis'] = 'Dealer-listed price including VAT'
+            photo_selector = '.veh-gallery img[src]' if source_id == 'kampala_sublime' else 'img[alt*=" photo "][src]'
+            visible_photos = {urljoin(url, n['src']) for n in soup.select(photo_selector)}
+            images = [i for i in images if isinstance(i, str) and urljoin(url, i) in visible_photos]
+        elif source_id == 'johannesburg':
             address = dealer.get('address') or {}
             if address.get('addressLocality') != source['city'] or address.get('addressCountry') != 'ZA':
                 raise ValueError('Seller address does not match Johannesburg')
@@ -140,6 +184,7 @@ def parse_listing(source_id, body, url, checked, catalog_body=''):
                 target_surface='marketplace', app_category='vehicles', app_subcategory='cars', title=title,
                 description=description[:1000], city=source['city'], country=source['country'],
                 seller=seller, phone=phones[0], source_site=source['name'], source_url=url,
+                condition='used' if source['country'] == 'Uganda' else '',
                 image_urls='|'.join(images), scraped_at=posted or checked, price_value=amount,
                 currency=source['currency'], price_text=f"{source['currency']} {float(amount):,.0f}",
                 source_availability='active', source_availability_checked_at=checked, source_last_seen_at=checked,

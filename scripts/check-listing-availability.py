@@ -92,6 +92,13 @@ def classify(row, status, body, resolved_url=""):
         return "gone", f"Exact source URL returned HTTP {status}"
     if not 200 <= status < 400:
         return "unknown", f"Unexpected HTTP {status}"
+    if host(original_parts) == "sublimemotorcars.com" and original_parts.path.startswith("/vehicle/"):
+        # The dealer's visible primary badge can mark a car sold while its schema says InStock.
+        canonical = soup.select_one('link[rel="canonical"]')
+        sold = soup.select_one('.veh-gallery .vg-main .sold-flag')
+        if (canonical and source_key(urljoin(original, canonical.get('href', ''))) == source_key(original)
+                and sold and sold.get_text(strip=True).casefold() == 'sold'):
+            return "sold", "Exact vehicle gallery displays the dealer's Sold badge"
     if host(original_parts) == "allsoppandallsopp.com":
         # The exact property's source state outranks its sometimes stale
         # InStock Product offer. Never read this from recommended properties.

@@ -80,7 +80,7 @@ jobs:
         id: china
         continue-on-error: true
         run: python scripts/refresh-china-supplier-listings.py --new-only
-      - name: Add new Lagos, Johannesburg and London dealer listings
+      - name: Add new Lagos, Johannesburg, London and Kampala dealer listings
         id: expansion
         continue-on-error: true
         run: python scripts/refresh-expansion-listings.py

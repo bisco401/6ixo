@@ -65,8 +65,9 @@ n8n schedule/manual trigger
 
 `.github/workflows/refresh-marketplace-listings.yml` owns automatic discovery for
 Canada, the United States (including Atlanta and Houston), Jamaica, Guyana, Ghana,
-Kenya, Ethiopia, China, the United Arab Emirates, Nigeria, South Africa and the
-United Kingdom. New country sources start in Lagos, Johannesburg and London. Each source
+Kenya, Ethiopia, China, the United Arab Emirates, Nigeria, South Africa, the
+United Kingdom and Uganda. Kampala discovery covers used dealer vehicles from ML Motors
+and Sublime Motors, with public dealer phones, matching photos and UGX prices. Each source
 group is searched at 01:17, 06:17, 11:17, 16:17 and 21:17 UTC. The 06:17 run
 also checks imported source URLs for removals. Source outcomes are tracked in
 `data/listing-discovery-state.json`. Failed groups retry on the next run.
@@ -93,7 +94,7 @@ Run summaries expose each source outcome; JSON source reports are retained as
 workflow artifacts for 14 days. This covers configured sources, not every country
 bordering Ghana or Kenya.
 
-The shared GitHub Actions workflow owns the five-times-daily discovery schedule for all twelve configured countries. Keep the legacy n8n writers deactivated; their previous schedules conflict with this policy. All CSV-writing workflows fall back to GitHub's blob API when the listing file is too large for inline Contents API data, and refuse to write if the existing CSV cannot be decoded. This prevents a single-country sync from erasing Ghana or any other country.
+The shared GitHub Actions workflow owns the five-times-daily discovery schedule for all thirteen configured countries. Keep the legacy n8n writers deactivated; their previous schedules conflict with this policy. All CSV-writing workflows fall back to GitHub's blob API when the listing file is too large for inline Contents API data, and refuse to write if the existing CSV cannot be decoded. This prevents a single-country sync from erasing Ghana or any other country.
 
 Ghana's `scraped_at` is the website's posting/sort date: use the source posting date when available, otherwise retain the existing first-import date. Rechecks update `source_last_seen_at` and `source_availability_checked_at` separately, so an undated older ad does not jump ahead of new inventory. The November 1, 2026 repair recovered first-seen dates for legacy auto-parts ads from their original import commit `9233d834553de57bffda94716c991cf1d72b4245`.
 

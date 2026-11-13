@@ -48,6 +48,48 @@ class ExpansionSourceTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             module.parse_listing('johannesburg', body, url, self.checked, '<a href="tel:27111111111">Other dealer</a>')
 
+    def test_kampala_sublime_uses_vat_inclusive_price_and_primary_sold_status(self):
+        url = 'https://sublimemotorcars.com/vehicle/hilux/'
+        image = 'https://sublimemotorcars.com/uploads/hilux.jpg'
+        car = {'@type': 'Car', 'name': '2023 Toyota Hilux', 'url': url,
+               'itemCondition': 'https://schema.org/UsedCondition', 'image': [image],
+               'offers': {'url': url, 'price': 100000000, 'priceCurrency': 'UGX',
+                          'availability': 'https://schema.org/InStock',
+                          'seller': {'@id': 'https://sublimemotorcars.com/#dealer'}}}
+        body = f'''<link rel="canonical" href="{url}">
+            <div class="veh-info"><span class="veh-year">2023 · Toyota</span><h1>Toyota Hilux</h1></div>
+            <div class="veh-gallery"><div class="vg-main"><img src="{image}"></div></div>
+            <div class="veh-price"><span class="vp-in"><b>UGX 118,000,000</b></span></div>
+            <ul class="specs-list"><li><span>Location</span><b>Kampala, Uganda</b></li></ul>
+            <div class="veh-buy"><a href="tel:+256754566777">Call</a></div>
+            <article class="rvc"><span class="sold-flag">Sold</span></article>
+            <script type="application/ld+json">{json.dumps(car)}</script>'''
+        row = module.parse_listing('kampala_sublime', body, url, self.checked)
+        self.assertEqual((row['country'], row['city'], row['price_value']), ('Uganda', 'Kampala', '118000000'))
+        sold = body.replace('<div class="vg-main">', '<div class="vg-main"><span class="sold-flag">Sold</span>')
+        self.assertEqual(module.availability.classify(row, 200, sold, url)[0], 'sold')
+        with self.assertRaises(ValueError):
+            module.parse_listing('kampala_sublime', sold, url, self.checked)
+
+    def test_kampala_ml_requires_used_stock_and_matching_public_phone(self):
+        url = 'https://www.mandelmotors.com/cars/forester'
+        image = 'https://mandelmotors.com/storage/forester.jpg'
+        car = {'@type': 'Car', 'name': '2016 Subaru Forester', 'image': [image],
+               'itemCondition': 'https://schema.org/UsedCondition',
+               'offers': {'url': url, 'price': 50000000, 'priceCurrency': 'UGX',
+                          'availability': 'https://schema.org/InStock', 'seller': {'name': 'ML Motors'}}}
+        business = {'@type': 'AutomotiveBusiness', 'name': 'ML Motors', 'url': 'https://www.mandelmotors.com',
+                    'telephone': '+256775636888', 'address': {'addressCountry': 'UG', 'addressLocality': 'Kampala, Uganda'}}
+        body = f'''<link rel="canonical" href="{url}"><h1>2016 Subaru Forester</h1>
+            <img alt="2016 Subaru Forester photo 1" src="{image}">
+            <a href="tel:+256775636888">Call</a>
+            <script type="application/ld+json">{json.dumps([car, business])}</script>'''
+        row = module.parse_listing('kampala_ml', body, url, self.checked)
+        self.assertEqual((row['currency'], row['phone']), ('UGX', '+256775636888'))
+        for invalid in (body.replace('tel:+256775636888', 'tel:+256755555555'), body.replace('UsedCondition', 'NewCondition')):
+            with self.assertRaises(ValueError):
+                module.parse_listing('kampala_ml', invalid, url, self.checked)
+
     def test_london_ignores_related_sold_car_and_uses_primary_price(self):
         url = 'https://maslenmotors.com/vehicle/name/range-rover/'
         body = f'''<title>Land Rover Range Rover | Maslen Motors</title><link rel="canonical" href="{url}">

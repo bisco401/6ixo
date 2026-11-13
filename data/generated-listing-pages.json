@@ -1,6 +1,356 @@
 {
-  "count": 6162,
+  "count": 6193,
   "listings": [
+    {
+      "id": "category-8205b307de6c168832",
+      "slug": "iphone-duo-256gb-de6c168832",
+      "url": "https://6ixo.com/listing/iphone-duo-256gb-de6c168832/",
+      "images": [
+        "https://gadgetcraze.ug/web/image/product.product/4557/image_1920?unique=4254cd6",
+        "https://gadgetcraze.ug/web/image/product.product/4558/image_1920?unique=4254cd6"
+      ],
+      "categoryKey": "electronics"
+    },
+    {
+      "id": "category-054f698a6e2984236a",
+      "slug": "samsung-galaxy-s26-ultra-256gb-6e2984236a",
+      "url": "https://6ixo.com/listing/samsung-galaxy-s26-ultra-256gb-6e2984236a/",
+      "images": [
+        "https://gadgetcraze.ug/web/image/product.product/4019/image_1920?unique=3b60734",
+        "https://gadgetcraze.ug/web/image/product.product/4020/image_1920?unique=e77e198",
+        "https://gadgetcraze.ug/web/image/product.product/4021/image_1920?unique=e77e198"
+      ],
+      "categoryKey": "electronics"
+    },
+    {
+      "id": "category-053b40b60fa96621de",
+      "slug": "macbook-air-13inch-m5-chip-512gb-0fa96621de",
+      "url": "https://6ixo.com/listing/macbook-air-13inch-m5-chip-512gb-0fa96621de/",
+      "images": [
+        "https://gadgetcraze.ug/web/image/product.product/4092/image_1920?unique=f5325e2",
+        "https://gadgetcraze.ug/web/image/product.product/4518/image_1920?unique=47e6638",
+        "https://gadgetcraze.ug/web/image/product.product/4519/image_1920?unique=f5325e2"
+      ],
+      "categoryKey": "electronics"
+    },
+    {
+      "id": "category-ed07defc9a07da1beb",
+      "slug": "google-pixel-10-pro-256gb-9a07da1beb",
+      "url": "https://6ixo.com/listing/google-pixel-10-pro-256gb-9a07da1beb/",
+      "images": [
+        "https://gadgetcraze.ug/web/image/product.product/3414/image_1920?unique=3dc771a",
+        "https://gadgetcraze.ug/web/image/product.product/4490/image_1920?unique=3dc771a"
+      ],
+      "categoryKey": "electronics"
+    },
+    {
+      "id": "category-2fb4160f07e234a0c4",
+      "slug": "oneplus-15-512gb-07e234a0c4",
+      "url": "https://6ixo.com/listing/oneplus-15-512gb-07e234a0c4/",
+      "images": [
+        "https://gadgetcraze.ug/web/image/product.product/3805/image_1920?unique=e3b3a0d",
+        "https://gadgetcraze.ug/web/image/product.product/3887/image_1920?unique=e3b3a0d",
+        "https://gadgetcraze.ug/web/image/product.product/4489/image_1920?unique=e3b3a0d"
+      ],
+      "categoryKey": "electronics"
+    },
+    {
+      "id": "category-540dbf93bafc3b30a8",
+      "slug": "iphone-17-air-256gb-bafc3b30a8",
+      "url": "https://6ixo.com/listing/iphone-17-air-256gb-bafc3b30a8/",
+      "images": [
+        "https://gadgetcraze.ug/web/image/product.product/3432/image_1920?unique=ab5170b",
+        "https://gadgetcraze.ug/web/image/product.product/3433/image_1920?unique=ab5170b",
+        "https://gadgetcraze.ug/web/image/product.product/3434/image_1920?unique=e77e198",
+        "https://gadgetcraze.ug/web/image/product.product/3435/image_1920?unique=e77e198"
+      ],
+      "categoryKey": "electronics"
+    },
+    {
+      "id": "category-b0efaf3eaec24c1c39",
+      "slug": "google-pixel-10-pro-fold-256gb-aec24c1c39",
+      "url": "https://6ixo.com/listing/google-pixel-10-pro-fold-256gb-aec24c1c39/",
+      "images": [
+        "https://gadgetcraze.ug/web/image/product.product/3788/image_1920?unique=27b66f5"
+      ],
+      "categoryKey": "electronics"
+    },
+    {
+      "id": "category-d32d2e668c33a1f7df",
+      "slug": "3-bedroom-furnished-apartment-for-rent-in-bugolobi-2-500-m-8c33a1f7df",
+      "url": "https://6ixo.com/listing/3-bedroom-furnished-apartment-for-rent-in-bugolobi-2-500-m-8c33a1f7df/",
+      "images": [
+        "https://www.juhaproperties.com/uploads/properties/prop_182_1784628453_498_6a5f44e5da669.webp",
+        "https://www.juhaproperties.com/uploads/properties/prop_182_1784628450_721_6a5f44e225a50.webp",
+        "https://www.juhaproperties.com/uploads/properties/prop_182_1784628451_883_6a5f44e3e8845.webp",
+        "https://www.juhaproperties.com/uploads/properties/prop_182_1784628455_161_6a5f44e7e2d6b.webp"
+      ],
+      "categoryKey": "real-estate"
+    },
+    {
+      "id": "category-d18bcbf3c5ba253c8b",
+      "slug": "furnished-5-bedroom-penthouse-for-rent-in-nakasero-5-000-c5ba253c8b",
+      "url": "https://6ixo.com/listing/furnished-5-bedroom-penthouse-for-rent-in-nakasero-5-000-c5ba253c8b/",
+      "images": [
+        "https://www.juhaproperties.com/uploads/properties/prop_205_1794377458_535_6af406f2c9ff4.webp",
+        "https://www.juhaproperties.com/uploads/properties/prop_205_1794377451_265_6af406eb3bc03.webp",
+        "https://www.juhaproperties.com/uploads/properties/prop_205_1794377452_886_6af406ec4edba.webp",
+        "https://www.juhaproperties.com/uploads/properties/prop_205_1794377456_941_6af406f04a8f8.webp"
+      ],
+      "categoryKey": "real-estate"
+    },
+    {
+      "id": "category-85e7464e0af51654d3",
+      "slug": "serviced-apartments-for-rent-in-nakasero-kampala-3-000-0af51654d3",
+      "url": "https://6ixo.com/listing/serviced-apartments-for-rent-in-nakasero-kampala-3-000-0af51654d3/",
+      "images": [
+        "https://www.juhaproperties.com/uploads/properties/prop_204_1794376685_102_6af403edbcde2.webp",
+        "https://www.juhaproperties.com/uploads/properties/prop_204_1794376685_355_6af403ed35315.webp",
+        "https://www.juhaproperties.com/uploads/properties/prop_204_1794376686_895_6af403ee62c39.webp",
+        "https://www.juhaproperties.com/uploads/properties/prop_204_1794376682_839_6af403ea9ff7c.webp"
+      ],
+      "categoryKey": "real-estate"
+    },
+    {
+      "id": "category-49d77b9a2d94a696e9",
+      "slug": "brand-new-3-bedroom-apartments-for-rent-in-bugolobi-1-600-2d94a696e9",
+      "url": "https://6ixo.com/listing/brand-new-3-bedroom-apartments-for-rent-in-bugolobi-1-600-2d94a696e9/",
+      "images": [
+        "https://www.juhaproperties.com/uploads/properties/prop_202_1793882997_340_6aec7b757db93.webp",
+        "https://www.juhaproperties.com/uploads/properties/prop_202_1793882998_420_6aec7b7679d40.webp",
+        "https://www.juhaproperties.com/uploads/properties/prop_202_1793882999_124_6aec7b7782eb2.webp",
+        "https://www.juhaproperties.com/uploads/properties/prop_202_1793883000_401_6aec7b78568d0.webp"
+      ],
+      "categoryKey": "real-estate"
+    },
+    {
+      "id": "category-2d14823007290c6527",
+      "slug": "3-bedroom-townhouse-for-rent-in-kololo-kampala-2-500-07290c6527",
+      "url": "https://6ixo.com/listing/3-bedroom-townhouse-for-rent-in-kololo-kampala-2-500-07290c6527/",
+      "images": [
+        "https://www.juhaproperties.com/uploads/properties/prop_201_1793882663_646_6aec7a27bf44e.webp",
+        "https://www.juhaproperties.com/uploads/properties/prop_201_1793882664_128_6aec7a2851a85.webp",
+        "https://www.juhaproperties.com/uploads/properties/prop_201_1793882664_568_6aec7a28cff21.webp",
+        "https://www.juhaproperties.com/uploads/properties/prop_201_1793882665_526_6aec7a296ed57.webp"
+      ],
+      "categoryKey": "real-estate"
+    },
+    {
+      "id": "category-5540e7fffc3ad99cc9",
+      "slug": "3-bedroom-furnished-apartment-for-rent-in-nakasero-2-500-fc3ad99cc9",
+      "url": "https://6ixo.com/listing/3-bedroom-furnished-apartment-for-rent-in-nakasero-2-500-fc3ad99cc9/",
+      "images": [
+        "https://www.juhaproperties.com/uploads/properties/prop_200_1793882413_423_6aec792d775fc.webp",
+        "https://www.juhaproperties.com/uploads/properties/prop_200_1793882414_151_6aec792e6fcc8.webp",
+        "https://www.juhaproperties.com/uploads/properties/prop_200_1793882415_897_6aec792f58e5f.webp",
+        "https://www.juhaproperties.com/uploads/properties/prop_200_1793882416_180_6aec79303fa0e.webp"
+      ],
+      "categoryKey": "real-estate"
+    },
+    {
+      "id": "category-b23a4bb064609fd1c5",
+      "slug": "1-bedroom-apartment-for-rent-in-ntinda-kampala-900-64609fd1c5",
+      "url": "https://6ixo.com/listing/1-bedroom-apartment-for-rent-in-ntinda-kampala-900-64609fd1c5/",
+      "images": [
+        "https://www.juhaproperties.com/uploads/properties/prop_199_1792680296_2_6ada216894a60.webp",
+        "https://www.juhaproperties.com/uploads/properties/prop_199_1792680296_0_6ada216871023.webp",
+        "https://www.juhaproperties.com/uploads/properties/prop_199_1792680296_1_6ada2168814c3.webp",
+        "https://www.juhaproperties.com/uploads/properties/prop_199_1792680296_3_6ada2168a402f.webp"
+      ],
+      "categoryKey": "real-estate"
+    },
+    {
+      "id": "category-38c5ca6a8ebcd3c874",
+      "slug": "2-bedroom-apartment-for-rent-in-nakasero-with-gym-and-pool-8ebcd3c874",
+      "url": "https://6ixo.com/listing/2-bedroom-apartment-for-rent-in-nakasero-with-gym-and-pool-8ebcd3c874/",
+      "images": [
+        "https://www.juhaproperties.com/uploads/properties/prop_197_1792565618_773_6ad86172b3be3.webp",
+        "https://www.juhaproperties.com/uploads/properties/prop_197_1792565763_934_6ad8620378586.webp",
+        "https://www.juhaproperties.com/uploads/properties/prop_197_1792565682_889_6ad861b2eb729.webp",
+        "https://www.juhaproperties.com/uploads/properties/prop_197_1792565620_212_6ad861746482b.webp"
+      ],
+      "categoryKey": "real-estate"
+    },
+    {
+      "id": "category-e5b86e26d6ea209c3f",
+      "slug": "furnished-4-bedroom-penthouse-for-rent-in-kololo-4-500-d6ea209c3f",
+      "url": "https://6ixo.com/listing/furnished-4-bedroom-penthouse-for-rent-in-kololo-4-500-d6ea209c3f/",
+      "images": [
+        "https://www.juhaproperties.com/uploads/properties/prop_196_1792493512_116_6ad747c80768c.webp",
+        "https://www.juhaproperties.com/uploads/properties/prop_196_1792493513_592_6ad747c9acd5d.webp",
+        "https://www.juhaproperties.com/uploads/properties/prop_196_1792493514_141_6ad747cac6fe7.webp",
+        "https://www.juhaproperties.com/uploads/properties/prop_196_1792493516_191_6ad747cc0a51f.webp"
+      ],
+      "categoryKey": "real-estate"
+    },
+    {
+      "id": "category-a6cedf6e11086691af",
+      "slug": "3-bedroom-furnished-apartment-for-rent-in-naguru-2-000-11086691af",
+      "url": "https://6ixo.com/listing/3-bedroom-furnished-apartment-for-rent-in-naguru-2-000-11086691af/",
+      "images": [
+        "https://www.juhaproperties.com/uploads/properties/prop_194_1791185194_345_6ac3512a8790f.webp",
+        "https://www.juhaproperties.com/uploads/properties/prop_194_1791185193_165_6ac351298c137.webp",
+        "https://www.juhaproperties.com/uploads/properties/prop_194_1791185192_652_6ac35128745e4.webp",
+        "https://www.juhaproperties.com/uploads/properties/prop_194_1791185190_464_6ac35126969c8.webp"
+      ],
+      "categoryKey": "real-estate"
+    },
+    {
+      "id": "category-3b68bb385a2590ea83",
+      "slug": "3-bedroom-furnished-apartment-for-rent-in-nakasero-3-800-5a2590ea83",
+      "url": "https://6ixo.com/listing/3-bedroom-furnished-apartment-for-rent-in-nakasero-3-800-5a2590ea83/",
+      "images": [
+        "https://www.juhaproperties.com/uploads/properties/prop_193_1789727419_933_6aad12bb00f53.webp",
+        "https://www.juhaproperties.com/uploads/properties/prop_193_1789727414_703_6aad12b611d46.webp",
+        "https://www.juhaproperties.com/uploads/properties/prop_193_1789727415_473_6aad12b71b9bf.webp",
+        "https://www.juhaproperties.com/uploads/properties/prop_193_1789727416_818_6aad12b825bec.webp"
+      ],
+      "categoryKey": "real-estate"
+    },
+    {
+      "id": "category-c65b6a565309166632",
+      "slug": "2-bedroom-furnished-apartment-for-rent-in-nakasero-3-200-5309166632",
+      "url": "https://6ixo.com/listing/2-bedroom-furnished-apartment-for-rent-in-nakasero-3-200-5309166632/",
+      "images": [
+        "https://www.juhaproperties.com/uploads/properties/prop_192_1789726910_821_6aad10bec165b.webp",
+        "https://www.juhaproperties.com/uploads/properties/prop_192_1789726911_993_6aad10bf9bad8.webp",
+        "https://www.juhaproperties.com/uploads/properties/prop_192_1789726912_511_6aad10c09fbea.webp",
+        "https://www.juhaproperties.com/uploads/properties/prop_192_1789726913_838_6aad10c1af23b.webp"
+      ],
+      "categoryKey": "real-estate"
+    },
+    {
+      "id": "category-97c842db58e6ccb4f6",
+      "slug": "4-bedroom-house-for-sale-in-najjera-kampala-17-decimals-re-58e6ccb4f6",
+      "url": "https://6ixo.com/listing/4-bedroom-house-for-sale-in-najjera-kampala-17-decimals-re-58e6ccb4f6/",
+      "images": [
+        "https://www.juhaproperties.com/uploads/properties/prop_177_1783583815_264_6a4f544791948.webp",
+        "https://www.juhaproperties.com/uploads/properties/prop_177_1783583778_723_6a4f54229c58c.webp",
+        "https://www.juhaproperties.com/uploads/properties/prop_177_1783583781_139_6a4f542534122.webp",
+        "https://www.juhaproperties.com/uploads/properties/prop_177_1783583783_113_6a4f542751e6d.webp"
+      ],
+      "categoryKey": "real-estate"
+    },
+    {
+      "id": "category-ea8f76cf169ea013a3",
+      "slug": "off-plan-apartments-for-sale-in-bugolobi-from-124-000-169ea013a3",
+      "url": "https://6ixo.com/listing/off-plan-apartments-for-sale-in-bugolobi-from-124-000-169ea013a3/",
+      "images": [
+        "https://www.juhaproperties.com/uploads/properties/prop_203_1793884255_839_6aec805f6f535.webp",
+        "https://www.juhaproperties.com/uploads/properties/prop_203_1793884257_771_6aec80613df48.webp",
+        "https://www.juhaproperties.com/uploads/properties/prop_203_1793884259_574_6aec80631637b.webp",
+        "https://www.juhaproperties.com/uploads/properties/prop_203_1793884260_200_6aec8064c0c1d.webp"
+      ],
+      "categoryKey": "real-estate"
+    },
+    {
+      "id": "category-068dd91a364afe0ef6",
+      "slug": "3-bedroom-apartment-for-sale-in-kololo-with-golf-course-vi-364afe0ef6",
+      "url": "https://6ixo.com/listing/3-bedroom-apartment-for-sale-in-kololo-with-golf-course-vi-364afe0ef6/",
+      "images": [
+        "https://www.juhaproperties.com/uploads/properties/prop_198_1792679322_353_6ada1d9ad6a7c.webp",
+        "https://www.juhaproperties.com/uploads/properties/prop_198_1792679323_889_6ada1d9b74b54.webp",
+        "https://www.juhaproperties.com/uploads/properties/prop_198_1792679324_260_6ada1d9c2b7e2.webp",
+        "https://www.juhaproperties.com/uploads/properties/prop_198_1792679324_373_6ada1d9ca836c.webp"
+      ],
+      "categoryKey": "real-estate"
+    },
+    {
+      "id": "category-336ce93770f2d72618",
+      "slug": "new-condominium-apartments-for-sale-in-naguru-hill-with-la-70f2d72618",
+      "url": "https://6ixo.com/listing/new-condominium-apartments-for-sale-in-naguru-hill-with-la-70f2d72618/",
+      "images": [
+        "https://www.juhaproperties.com/uploads/properties/prop_165_1778782252_548_6a06102c03fd6.webp",
+        "https://www.juhaproperties.com/uploads/properties/prop_165_1778782089_432_6a060f89552ab.webp",
+        "https://www.juhaproperties.com/uploads/properties/prop_165_1778782100_663_6a060f9458936.webp",
+        "https://www.juhaproperties.com/uploads/properties/prop_165_1778782111_244_6a060f9f14219.webp"
+      ],
+      "categoryKey": "real-estate"
+    },
+    {
+      "id": "category-6e8e52b8bc37e7586a",
+      "slug": "3-bedroom-apartment-for-sale-in-naguru-280-000-bc37e7586a",
+      "url": "https://6ixo.com/listing/3-bedroom-apartment-for-sale-in-naguru-280-000-bc37e7586a/",
+      "images": [
+        "https://www.juhaproperties.com/uploads/properties/prop_159_1777581915_899_69f3bf5b729ed.webp",
+        "https://www.juhaproperties.com/uploads/properties/prop_159_1777581798_691_69f3bee63ad16.webp",
+        "https://www.juhaproperties.com/uploads/properties/prop_159_1777581809_662_69f3bef103c2f.webp",
+        "https://www.juhaproperties.com/uploads/properties/prop_159_1777581819_192_69f3befb902cc.webp"
+      ],
+      "categoryKey": "real-estate"
+    },
+    {
+      "id": "category-8d82da272fd7a06a02",
+      "slug": "4-bedroom-luxury-house-for-sale-in-muyenga-kampala-650-000-2fd7a06a02",
+      "url": "https://6ixo.com/listing/4-bedroom-luxury-house-for-sale-in-muyenga-kampala-650-000-2fd7a06a02/",
+      "images": [
+        "https://www.juhaproperties.com/uploads/properties/prop_139_1776716952_19_69e68c98b5530.webp",
+        "https://www.juhaproperties.com/uploads/properties/prop_139_1776716951_1_69e68c978c072.webp",
+        "https://www.juhaproperties.com/uploads/properties/prop_139_1776716951_2_69e68c979b419.webp",
+        "https://www.juhaproperties.com/uploads/properties/prop_139_1776716951_3_69e68c97a8899.webp"
+      ],
+      "categoryKey": "real-estate"
+    },
+    {
+      "id": "category-423f1728ad4ed7d685",
+      "slug": "3-bedroom-luxury-apartment-for-sale-in-kololo-kampala-ad4ed7d685",
+      "url": "https://6ixo.com/listing/3-bedroom-luxury-apartment-for-sale-in-kololo-kampala-ad4ed7d685/",
+      "images": [
+        "https://www.juhaproperties.com/uploads/properties/prop_129_1775895304_2_69da030834188.webp",
+        "https://www.juhaproperties.com/uploads/properties/prop_129_1775895304_0_69da030813a8e.webp",
+        "https://www.juhaproperties.com/uploads/properties/prop_129_1775895304_1_69da030829f99.webp",
+        "https://www.juhaproperties.com/uploads/properties/prop_129_1775895304_3_69da030846137.webp"
+      ],
+      "categoryKey": "real-estate"
+    },
+    {
+      "id": "category-7a99cf0000b2667a0c",
+      "slug": "refined-3-bedroom-all-ensuite-apartment-for-sale-in-kololo-00b2667a0c",
+      "url": "https://6ixo.com/listing/refined-3-bedroom-all-ensuite-apartment-for-sale-in-kololo-00b2667a0c/",
+      "images": [
+        "https://www.juhaproperties.com/uploads/properties/prop_121_1775815641_11_69d8cbd9472f0.webp",
+        "https://www.juhaproperties.com/uploads/properties/prop_121_1775815640_0_69d8cbd86974e.webp",
+        "https://www.juhaproperties.com/uploads/properties/prop_121_1775815640_1_69d8cbd87d66f.webp",
+        "https://www.juhaproperties.com/uploads/properties/prop_121_1775815640_2_69d8cbd88f781.webp"
+      ],
+      "categoryKey": "real-estate"
+    },
+    {
+      "id": "category-cc837fbe4bf86900d6",
+      "slug": "luxury-apartments-for-sale-in-kololo-kampala-embassy-distr-4bf86900d6",
+      "url": "https://6ixo.com/listing/luxury-apartments-for-sale-in-kololo-kampala-embassy-distr-4bf86900d6/",
+      "images": [
+        "https://www.juhaproperties.com/uploads/properties/prop_115_1775397997_0.jpeg",
+        "https://www.juhaproperties.com/uploads/properties/prop_115_1775397997_1.jpeg",
+        "https://www.juhaproperties.com/uploads/properties/prop_115_1775397997_2.jpeg",
+        "https://www.juhaproperties.com/uploads/properties/prop_115_1775397997_3.jpeg"
+      ],
+      "categoryKey": "real-estate"
+    },
+    {
+      "id": "category-b82d45743774620c77",
+      "slug": "1-2-bedroom-luxury-apartments-for-sale-in-nakasero-kampala-3774620c77",
+      "url": "https://6ixo.com/listing/1-2-bedroom-luxury-apartments-for-sale-in-nakasero-kampala-3774620c77/",
+      "images": [
+        "https://www.juhaproperties.com/uploads/properties/prop_114_1775395494_10.jpg",
+        "https://www.juhaproperties.com/uploads/properties/prop_114_1775395493_0.jpeg",
+        "https://www.juhaproperties.com/uploads/properties/prop_114_1775395493_1.jpg",
+        "https://www.juhaproperties.com/uploads/properties/prop_114_1775395493_2.jpeg"
+      ],
+      "categoryKey": "real-estate"
+    },
+    {
+      "id": "category-3e22a4ccf15551b415",
+      "slug": "4-bedroom-house-for-sale-in-naguru-kampala-2-lounges-garde-f15551b415",
+      "url": "https://6ixo.com/listing/4-bedroom-house-for-sale-in-naguru-kampala-2-lounges-garde-f15551b415/",
+      "images": [
+        "https://www.juhaproperties.com/uploads/properties/prop_107_1775250649_3.jpg",
+        "https://www.juhaproperties.com/uploads/properties/prop_107_1775250649_0.jpg",
+        "https://www.juhaproperties.com/uploads/properties/prop_107_1775250649_1.jpg",
+        "https://www.juhaproperties.com/uploads/properties/prop_107_1775250649_2.jpg"
+      ],
+      "categoryKey": "real-estate"
+    },
     {
       "id": "dealer-646b4a03c92e284ea3",
       "slug": "2016-forester-subaru-c92e284ea3",
@@ -65973,6 +66323,18 @@
       "categoryKey": "buy-and-sell"
     },
     {
+      "id": "category-b083424a3d5cd025cb",
+      "slug": "dell-latitude-3310-2-in-1-refurbished-laptop-3d5cd025cb",
+      "url": "https://6ixo.com/listing/dell-latitude-3310-2-in-1-refurbished-laptop-3d5cd025cb/",
+      "images": [
+        "https://net-cart.com/wp-content/uploads/2026/08/ChatGPT-Image-Aug-16-2026-11_32_00-PM.png",
+        "https://net-cart.com/wp-content/uploads/2026/08/ChatGPT-Image-Aug-16-2026-01_04_07-PM.png",
+        "https://net-cart.com/wp-content/uploads/2026/08/ChatGPT-Image-Aug-16-2026-01_12_59-PM.png",
+        "https://net-cart.com/wp-content/uploads/2026/08/ChatGPT-Image-Aug-16-2026-01_04_11-PM.png"
+      ],
+      "categoryKey": "electronics"
+    },
+    {
       "id": "dealer-097ef2e7243729fd45",
       "slug": "valeo-715720-cabin-air-filter-for-vw-audi-5q0819669-243729fd45",
       "url": "https://6ixo.com/listing/valeo-715720-cabin-air-filter-for-vw-audi-5q0819669-243729fd45/",
@@ -74199,6 +74561,9 @@
       "url": "https://6ixo.com/listings/page/172/"
     },
     {
+      "url": "https://6ixo.com/listings/page/173/"
+    },
+    {
       "url": "https://6ixo.com/listings/electronics/"
     },
     {
@@ -75294,7 +75659,16 @@
       "url": "https://6ixo.com/listings/country/south-africa/"
     },
     {
+      "url": "https://6ixo.com/listings/country/uganda/electronics/"
+    },
+    {
+      "url": "https://6ixo.com/listings/country/uganda/real-estate/"
+    },
+    {
       "url": "https://6ixo.com/listings/country/uganda/"
+    },
+    {
+      "url": "https://6ixo.com/listings/country/uganda/page/2/"
     },
     {
       "url": "https://6ixo.com/listings/country/united-arab-emirates/real-estate/"
@@ -75645,6 +76019,9 @@
       "url": "https://6ixo.com/apartments-for-rent/page/9/"
     },
     {
+      "url": "https://6ixo.com/apartments-for-rent/page/10/"
+    },
+    {
       "url": "https://6ixo.com/apartments-for-rent/canada/"
     },
     {
@@ -75667,6 +76044,12 @@
     },
     {
       "url": "https://6ixo.com/apartments-for-rent/guyana/"
+    },
+    {
+      "url": "https://6ixo.com/apartments-for-rent/uganda/"
+    },
+    {
+      "url": "https://6ixo.com/apartments-for-rent/uganda/kampala/"
     },
     {
       "url": "https://6ixo.com/apartments-for-rent/united-arab-emirates/"
@@ -75745,6 +76128,12 @@
     },
     {
       "url": "https://6ixo.com/phones-for-sale/kenya/nairobi/"
+    },
+    {
+      "url": "https://6ixo.com/phones-for-sale/uganda/"
+    },
+    {
+      "url": "https://6ixo.com/phones-for-sale/uganda/kampala/"
     },
     {
       "url": "https://6ixo.com/phones-for-sale/united-states/"

@@ -1,6 +1,6 @@
 {
   "https://6ixo.com/": {
-    "hash": "c38c19740e3834be3a2de8f7024be0cb86dd6cd24f01065e54105a9da5d2bee6",
+    "hash": "a221b368f42540fbae509099dfb762694bb3e1a5f9dd7c6971fcdf76865fd386",
     "lastmod": "2026-11-13"
   },
   "https://6ixo.com/about/": {
@@ -12,7 +12,7 @@
     "lastmod": "2026-10-08"
   },
   "https://6ixo.com/apartments-for-rent/": {
-    "hash": "13615be09cd1ee7cb3a2825cbc96bc0086c2d595197f7cfdb8dc95623a96d1af",
+    "hash": "463e612a4e9f3f2978cf2d5b6b30be45e9a064066240e582d5c4540d59e64334",
     "lastmod": "2026-11-13"
   },
   "https://6ixo.com/apartments-for-rent/canada/": {
@@ -38,6 +38,14 @@
   "https://6ixo.com/apartments-for-rent/guyana/": {
     "hash": "3023f606c3280da93bae290f4c832321d9a3bf5c8354d25e302ec10def2ddee2",
     "lastmod": "2026-11-09"
+  },
+  "https://6ixo.com/apartments-for-rent/uganda/": {
+    "hash": "9afb648650949665f275fbd10d94285fd9d60e1768abf9ef0abcfb833bdd0c31",
+    "lastmod": "2026-11-13"
+  },
+  "https://6ixo.com/apartments-for-rent/uganda/kampala/": {
+    "hash": "c3094fafed6859b1e87f3632f44e25fdbb5fcba6d7fe5c68e629457dff75d4cb",
+    "lastmod": "2026-11-13"
   },
   "https://6ixo.com/apartments-for-rent/united-arab-emirates/": {
     "hash": "8e5a7f58f109f972b70d87f02898a437d362194072d39290e1f0052ffa640e24",
@@ -184,7 +192,7 @@
     "lastmod": "2026-11-11"
   },
   "https://6ixo.com/electronics/": {
-    "hash": "e08655540abe8345836661b3901ea46368a18879acf49dfb2d1d0e8cd969360b",
+    "hash": "b56e772a2c71e91496647ff3b0515918c4af93a74cde27604dd485163b0d4e26",
     "lastmod": "2026-11-13"
   },
   "https://6ixo.com/events/": {
@@ -217,6 +225,10 @@
   },
   "https://6ixo.com/listing/1-1-for-rent-in-mxbjgupu3t/": {
     "hash": "b41b76255dc8c47fd30457522868f6fbd4b7b6c8df870175b19885ab9f1d5d42",
+    "lastmod": "2026-11-13"
+  },
+  "https://6ixo.com/listing/1-2-bedroom-luxury-apartments-for-sale-in-nakasero-kampala-3774620c77/": {
+    "hash": "743bf7b042494ab366906c44cc60714367b6135d943fb79a9a366e2ccfc55a90",
     "lastmod": "2026-11-13"
   },
   "https://6ixo.com/listing/1-2-mi-train-in-apartment-building-jrhimzbktx/": {
@@ -414,6 +426,10 @@
   "https://6ixo.com/listing/1-bedroom-apartment-for-rent-in-hamilton-1744254372/": {
     "hash": "4ed62ea0cc63b1b53a9eabe36079838a92e2c6f4c7f6a36daf388adfbdf1b661",
     "lastmod": "2026-11-11"
+  },
+  "https://6ixo.com/listing/1-bedroom-apartment-for-rent-in-ntinda-kampala-900-64609fd1c5/": {
+    "hash": "5736917ea786dcc6cc573ad86ec1673d2cbfc94fb8b4fedeeae8914117c1258c",
+    "lastmod": "2026-11-13"
   },
   "https://6ixo.com/listing/1-bedroom-apartment-for-rent-in-west-edmonton-1745787308/": {
     "hash": "3cdbd7bb6c6b3ef54e347fb493eb683f4cb15c80293e97b0fa685ee59dd31851",
@@ -1603,6 +1619,10 @@
     "hash": "9b9a21a4b57b67e7b51c2c86abc857de4909cf8f28628768c920804fcfc1e0e8",
     "lastmod": "2026-11-13"
   },
+  "https://6ixo.com/listing/2-bedroom-apartment-for-rent-in-nakasero-with-gym-and-pool-8ebcd3c874/": {
+    "hash": "9e6859c97c8a9f0a3ad3f5d3649b0675110fec4f823f6bc6318e5b5b12c26524",
+    "lastmod": "2026-11-13"
+  },
   "https://6ixo.com/listing/2-bedroom-apartment-for-rent-iris-blue-iris-blue-dubai-mar-idub191276/": {
     "hash": "0a526f67917e17c1fea1a885f8bdcadddfb6b388ed3b581c00588154ab2ac90d",
     "lastmod": "2026-11-13"
@@ -1746,6 +1766,10 @@
   "https://6ixo.com/listing/2-bedroom-fenced-and-gated-for-sale-d46f0bedef/": {
     "hash": "71e7e1ba5d48014d33a3cffab5758015b5c963552413732bde5560140155487b",
     "lastmod": "2026-11-09"
+  },
+  "https://6ixo.com/listing/2-bedroom-furnished-apartment-for-rent-in-nakasero-3-200-5309166632/": {
+    "hash": "6e4bc71daa93a94d5ed161a35bcaf9077a68b6f1491359fd183731e6f62b3b39",
+    "lastmod": "2026-11-13"
   },
   "https://6ixo.com/listing/2-bedroom-house-f1944673e5/": {
     "hash": "7ca79062834cebc60204b68671aaf85d719b90a7f166b2e18b57e2aa348de2ef",
@@ -11763,6 +11787,30 @@
     "hash": "282b27fc8689ca2a4801630ea3b57a63da961c67c24d879285b2220588e68b58",
     "lastmod": "2026-11-07"
   },
+  "https://6ixo.com/listing/3-bedroom-apartment-for-sale-in-kololo-with-golf-course-vi-364afe0ef6/": {
+    "hash": "bd0733ffde73b22f59f066f2e38e0daa0be44f96eb48d595b2dada5f7ab848bf",
+    "lastmod": "2026-11-13"
+  },
+  "https://6ixo.com/listing/3-bedroom-apartment-for-sale-in-naguru-280-000-bc37e7586a/": {
+    "hash": "2f8dfaeeaf69196a64b844e77f8019caa188f307d2bda1cd0b325db0bf7381f0",
+    "lastmod": "2026-11-13"
+  },
+  "https://6ixo.com/listing/3-bedroom-furnished-apartment-for-rent-in-bugolobi-2-500-m-8c33a1f7df/": {
+    "hash": "30d36414117f059b24dc4018c5fa505130ab2c56fa42faaf1f71df63de01ff19",
+    "lastmod": "2026-11-13"
+  },
+  "https://6ixo.com/listing/3-bedroom-furnished-apartment-for-rent-in-naguru-2-000-11086691af/": {
+    "hash": "da90fded8e361ea25332a36ba44862f8b1730ac61d3e8b4d1606098c68b43a55",
+    "lastmod": "2026-11-13"
+  },
+  "https://6ixo.com/listing/3-bedroom-furnished-apartment-for-rent-in-nakasero-2-500-fc3ad99cc9/": {
+    "hash": "ca328aef470720082aaec802a2b386be24f0ebdf9d44359e9a0092af35ceab9d",
+    "lastmod": "2026-11-13"
+  },
+  "https://6ixo.com/listing/3-bedroom-furnished-apartment-for-rent-in-nakasero-3-800-5a2590ea83/": {
+    "hash": "f7b3e909ec66fb15847c1cc4e42d653572fc0f4b65bc434ec7d3fa4b1f2bb392",
+    "lastmod": "2026-11-13"
+  },
   "https://6ixo.com/listing/3-bedroom-house-ars2523128/": {
     "hash": "c3f56ef3f110d7cf9ab9a66b731321304cfd41bb8d08ddded9347fcaadb0f254",
     "lastmod": "2026-11-07"
@@ -11774,6 +11822,10 @@
   "https://6ixo.com/listing/3-bedroom-luxury-apartment-for-sale-in-ayat-beshale-addis--d6b2a9a3bd/": {
     "hash": "f48bac5bc645591ac1f2397430f666cd14e050b8cbf36e827bc16d07b0cd8eb0",
     "lastmod": "2026-11-07"
+  },
+  "https://6ixo.com/listing/3-bedroom-luxury-apartment-for-sale-in-kololo-kampala-ad4ed7d685/": {
+    "hash": "ae3703f2964a2ee3d48a4d7a0782c4b99db29f81359b9828313e0082c615ee44",
+    "lastmod": "2026-11-13"
   },
   "https://6ixo.com/listing/3-bedroom-modern-house-3caea2439d/": {
     "hash": "0d86adae68821506feca225bc9601cf1de1aa8bd8a461febe357f791ecb0a001",
@@ -11790,6 +11842,10 @@
   "https://6ixo.com/listing/3-bedroom-shared-unit-1745613258/": {
     "hash": "72b2904e7797e545a44562d276412d75e18af8b98dd24b83c4006b91c3398406",
     "lastmod": "2026-11-11"
+  },
+  "https://6ixo.com/listing/3-bedroom-townhouse-for-rent-in-kololo-kampala-2-500-07290c6527/": {
+    "hash": "6e4bca8c3ad0c3856069daf01a8915845b3ad310097b620b3960a3e49e651c85",
+    "lastmod": "2026-11-13"
   },
   "https://6ixo.com/listing/3-bedroom-unit-for-rent-eiwo-canadian-management-1743465210/": {
     "hash": "1bae62f289dadeb0b65fbc5a387e6be4f557c7b2fe172e9fb0cf19521f54d4e9",
@@ -11962,6 +12018,18 @@
   "https://6ixo.com/listing/4-bedroom-house-c820ab0eac/": {
     "hash": "6ebafff353d3e8ebdf50add6cbd892e97d48af2bb7e4a53731585e3e483d8e97",
     "lastmod": "2026-11-09"
+  },
+  "https://6ixo.com/listing/4-bedroom-house-for-sale-in-naguru-kampala-2-lounges-garde-f15551b415/": {
+    "hash": "dbd2405e388aa32ea0b037d323d590ab8204772a8cb766440ffd9988d729d021",
+    "lastmod": "2026-11-13"
+  },
+  "https://6ixo.com/listing/4-bedroom-house-for-sale-in-najjera-kampala-17-decimals-re-58e6ccb4f6/": {
+    "hash": "cbef6baa6f55660d9d6b54975e6fa37a1cf98624ecbdae38e6ca6b390c954fe7",
+    "lastmod": "2026-11-13"
+  },
+  "https://6ixo.com/listing/4-bedroom-luxury-house-for-sale-in-muyenga-kampala-650-000-2fd7a06a02/": {
+    "hash": "8ecaf4b533d70c50903c088bcfd01bfded8a8fafcf22a86314aed4ba441fde2c",
+    "lastmod": "2026-11-13"
   },
   "https://6ixo.com/listing/4-br-2-ba-2-car-garage-coppell-home-huge-yard-no-carpet-xrjjntruzc/": {
     "hash": "d73fc7b1089efac234de65b5a9364caaf4fd31b9f9101f754d0eb1e1ad789635",
@@ -13667,6 +13735,10 @@
     "hash": "cdea9f92148039396118f226182042d1c7eda3b3861699e3b75c1af2ad7a3f10",
     "lastmod": "2026-11-12"
   },
+  "https://6ixo.com/listing/brand-new-3-bedroom-apartments-for-rent-in-bugolobi-1-600-2d94a696e9/": {
+    "hash": "fa877362c8b22cf5e194a157de1093c969b7b90d6d85be8e8e0d5731dc016d05",
+    "lastmod": "2026-11-13"
+  },
   "https://6ixo.com/listing/brand-new-4k-formuler-z10se-or-zmini-or-mag555-9059713335-1745958537/": {
     "hash": "ab4f31929dc7ad53b1a6c48ea77fa25819e98699ac104c5d372b4465b84045f1",
     "lastmod": "2026-11-11"
@@ -14827,6 +14899,10 @@
     "hash": "9c96ac6f44ea90dbb52cf0ee55e552a370f4b3a75081493cfd5a1ae1555e3a34",
     "lastmod": "2026-11-06"
   },
+  "https://6ixo.com/listing/dell-latitude-3310-2-in-1-refurbished-laptop-3d5cd025cb/": {
+    "hash": "523a9c8e3c84af8f49202029d199c8970817d9d4c7f83962f42260cef1c3017d",
+    "lastmod": "2026-11-13"
+  },
   "https://6ixo.com/listing/dell-latitude-3500-laptop-used-bc6c720e8c/": {
     "hash": "7eaa1b5803e3bf1f2a6f257013b1a1c09364571e92afee1bce1f1af684241d80",
     "lastmod": "2026-11-12"
@@ -15983,9 +16059,17 @@
     "hash": "db29a0e77f6ba41bea0e0afbacb12c0f7d0ec4150d801c48266f91e3e0a947e9",
     "lastmod": "2026-11-11"
   },
+  "https://6ixo.com/listing/furnished-4-bedroom-penthouse-for-rent-in-kololo-4-500-d6ea209c3f/": {
+    "hash": "154a9b3e92da7ae5e9ac6400cfc36ca26827e6d1c3dc1f4cd6362e421caf565a",
+    "lastmod": "2026-11-13"
+  },
   "https://6ixo.com/listing/furnished-4-bedroom-retreat-with-parking-in-east-coast-dem-6120d52f8e/": {
     "hash": "608c1bc1ad06be5778930245897b83a9c1658219d1c852cd7521a8160ebdfad0",
     "lastmod": "2026-11-11"
+  },
+  "https://6ixo.com/listing/furnished-5-bedroom-penthouse-for-rent-in-nakasero-5-000-c5ba253c8b/": {
+    "hash": "a86fb8092625cef55a65929ef4f892c5493c232056b03901b5625e35083e8ebc",
+    "lastmod": "2026-11-13"
   },
   "https://6ixo.com/listing/furnished-country-suite-etwajgvzsn/": {
     "hash": "e6d308a39a36ede8432d5dd61a518a8c3595029ce5060e18ec74cb78ffaee606",
@@ -16521,6 +16605,14 @@
   },
   "https://6ixo.com/listing/google-fitbit-air-1777039520/": {
     "hash": "9d9b4e4cc5767f1aa93d30f9d8fa9220e2d956a00d75bf0fbd2cd6211c785502",
+    "lastmod": "2026-11-13"
+  },
+  "https://6ixo.com/listing/google-pixel-10-pro-256gb-9a07da1beb/": {
+    "hash": "c7bdc86f8e7cb567dc598aedd1aa9a6612b6a0f1a1a7f8d94ac9213f1ce9bb69",
+    "lastmod": "2026-11-13"
+  },
+  "https://6ixo.com/listing/google-pixel-10-pro-fold-256gb-aec24c1c39/": {
+    "hash": "d943851577166628f90d99950f111a6647f79aaa65efbc3074f4c54cfdace429",
     "lastmod": "2026-11-13"
   },
   "https://6ixo.com/listing/gorgeous-1-bed-1-bath-w-d-in-unit-gym-roof-deck-ogzjtkghsu/": {
@@ -17947,6 +18039,10 @@
     "hash": "295bc0dc95de5ff4da77d23171b672fc119097b87cbbd6bde546d177e819774b",
     "lastmod": "2026-11-12"
   },
+  "https://6ixo.com/listing/iphone-17-air-256gb-bafc3b30a8/": {
+    "hash": "9e89a7c50eaea2bd35277acf4074e37986f8114667299c71764b5e1930225e73",
+    "lastmod": "2026-11-13"
+  },
   "https://6ixo.com/listing/iphone-17-ars2531667/": {
     "hash": "07828369868100821aa9541b10cc2e6a749d5173a8fbd7bc03b8db78dec39c02",
     "lastmod": "2026-11-12"
@@ -17958,6 +18054,10 @@
   "https://6ixo.com/listing/iphone-17-pro-max-100-battery-health-only-100-cycle-count--bc3ca63121/": {
     "hash": "04d8d815e60da6931bbf8ae56a5f5504a94fbb941c205ebcc46e82f08cd20480",
     "lastmod": "2026-11-12"
+  },
+  "https://6ixo.com/listing/iphone-duo-256gb-de6c168832/": {
+    "hash": "6785ebebc9904de628e8b64eb04b3866c0cb2eb0ef99940d8bf17afa279116c9",
+    "lastmod": "2026-11-13"
   },
   "https://6ixo.com/listing/iphone-samsung-pixel-ipad-screen-replace-on-the-spot-1745786620/": {
     "hash": "e1c7ee6e84bdd6834fb31172a6a769f969cabf976c636fd6b02febe67c12ff1e",
@@ -18867,6 +18967,10 @@
     "hash": "fe44badcc8be78586f7410d63602a9c21507671c774267930c7031db512ef8b7",
     "lastmod": "2026-11-13"
   },
+  "https://6ixo.com/listing/luxury-apartments-for-sale-in-kololo-kampala-embassy-distr-4bf86900d6/": {
+    "hash": "bf77819c1f0c07c505c9a5e546f5c9158d9f095e890402e32da101a552f7113c",
+    "lastmod": "2026-11-13"
+  },
   "https://6ixo.com/listing/luxury-black-2013-toyota-sequoia-limited-15950-vpbvvadqwk/": {
     "hash": "b6bb1364c757aef1616407c1e9a62142d33c8da152c6e06bf95f3c494ae175b0",
     "lastmod": "2026-11-13"
@@ -18897,6 +19001,10 @@
   },
   "https://6ixo.com/listing/maasai-beaded-size-47-steering-wheel-cover-f2c1c65a3d/": {
     "hash": "407eeb77fffee6c31b676fd5b5bb3bfe481f3400cafb52676c0eaaed64b2e66c",
+    "lastmod": "2026-11-13"
+  },
+  "https://6ixo.com/listing/macbook-air-13inch-m5-chip-512gb-0fa96621de/": {
+    "hash": "457a153157703746cd151359ff4c535a8d1b182b989a2bc51b8c177f9caa9425",
     "lastmod": "2026-11-13"
   },
   "https://6ixo.com/listing/maclaren-junk-removal-we-show-up-on-time-or-it-s-free-1743269438/": {
@@ -19787,6 +19895,10 @@
     "hash": "ce7b036db2b165f8cc3857896d193b455d42a8f8689dd65531df57a5d0d2060b",
     "lastmod": "2026-11-13"
   },
+  "https://6ixo.com/listing/new-condominium-apartments-for-sale-in-naguru-hill-with-la-70f2d72618/": {
+    "hash": "d755242ad602bd0153e44febca3b53be5693f9155e149bf849f0508715f8c7a9",
+    "lastmod": "2026-11-13"
+  },
   "https://6ixo.com/listing/new-construction-3br-apartment-apt-4c-available-now-vepj3exmf9/": {
     "hash": "c57b5f8b806555e6259cbb74d74c26059ac431c83ef9393bbc6a204101bceb8a",
     "lastmod": "2026-11-13"
@@ -20495,6 +20607,10 @@
     "hash": "61769b9d15f28ada577bf9de80f26c87fde54f2d7530990b1599ab60381e9622",
     "lastmod": "2026-11-11"
   },
+  "https://6ixo.com/listing/off-plan-apartments-for-sale-in-bugolobi-from-124-000-169ea013a3/": {
+    "hash": "3a962e54a3db431f5ca9374bb563d71986a41a4b46535e7aca90cfbb2c080166",
+    "lastmod": "2026-11-13"
+  },
   "https://6ixo.com/listing/offce-room-for-rent-1744437651/": {
     "hash": "0f268e41a067e245ad3b1d7aefddc8cfe825558e7cabc72962c6cc46343c6d4b",
     "lastmod": "2026-11-11"
@@ -20589,6 +20705,10 @@
   },
   "https://6ixo.com/listing/oneday-or03-48w-usb-and-usb-c-car-charger-wholesale-b77e921871/": {
     "hash": "535a6e2c19377ccd255377c172f942932534bfa07759fbab8aa7699ddd1e9f37",
+    "lastmod": "2026-11-13"
+  },
+  "https://6ixo.com/listing/oneplus-15-512gb-07e234a0c4/": {
+    "hash": "6a898126c194ea2e1481c0adf83c8fd9c56c54504113b859ca9a6dbeb0e5f289",
     "lastmod": "2026-11-13"
   },
   "https://6ixo.com/listing/onkyo-5-1-surround-sound-system-cldz14bafb/": {
@@ -21403,6 +21523,10 @@
     "hash": "9480eb38180c2c848b8b53eab18cd52c2fb0450148e9ebd2430d03220426fe40",
     "lastmod": "2026-11-11"
   },
+  "https://6ixo.com/listing/refined-3-bedroom-all-ensuite-apartment-for-sale-in-kololo-00b2667a0c/": {
+    "hash": "88c252417d45a4863588ce14714f807e45e9f303b44ec8ffcb3785f779cf3597",
+    "lastmod": "2026-11-13"
+  },
   "https://6ixo.com/listing/refrigerator-more-top-freezer-side-by-side-f7djp8eorh/": {
     "hash": "1caad05237d01468a6a1b59182ea0bd479f173271812c33ca8ca80bb1c2c9391",
     "lastmod": "2026-11-13"
@@ -21955,6 +22079,10 @@
     "hash": "5c9333d5bb392783f2d42d0af76b37da54e50576f142ce37caeea8ff946e1fa9",
     "lastmod": "2026-11-13"
   },
+  "https://6ixo.com/listing/samsung-galaxy-s26-ultra-256gb-6e2984236a/": {
+    "hash": "a57c60939f9a752babc9f44781f36127beed18aa82beeed1a7e293845a3d58aa",
+    "lastmod": "2026-11-13"
+  },
   "https://6ixo.com/listing/samsung-galaxy-tab-a8-wi-fi-4gb-ram-64gb-storage-0424424608/": {
     "hash": "11398f67c59fa61f0e9bb81ee3afa41583739251b54d6d587f9f17675861792d",
     "lastmod": "2026-11-13"
@@ -22098,6 +22226,10 @@
   "https://6ixo.com/listing/serene-2-bedroom-apartment-for-rent-better-hope-east-coast-aa2c8ec817/": {
     "hash": "90739438a186b7f632a5a3f9e2c9456c702cc572322f09e4785ff5a6386e30ad",
     "lastmod": "2026-11-11"
+  },
+  "https://6ixo.com/listing/serviced-apartments-for-rent-in-nakasero-kampala-3-000-0af51654d3/": {
+    "hash": "22750350462bd61d8866aa1b8529adc5f141e238d314a5217b3594369b846931",
+    "lastmod": "2026-11-13"
   },
   "https://6ixo.com/listing/set-of-3-vintage-brass-blowtorches-1745876317/": {
     "hash": "1f142140bcc1a0ac5d34bca1321fbc07f3838fa2e5a492560df0f05bb4d46b0b",
@@ -24852,23 +24984,23 @@
     "lastmod": "2026-11-13"
   },
   "https://6ixo.com/listings/": {
-    "hash": "44ab62389773e5da117b90a556e5efd6f9b56d2b4d987dc66d23d6171e325858",
+    "hash": "28f7e7d5641985d59430428ededc1aace52f7ef25a22604939b4342bbb85e008",
     "lastmod": "2026-11-13"
   },
   "https://6ixo.com/listings/auto-parts/": {
-    "hash": "369fd1de7febfa9a4f51c173f2febf18f7ea1bdb53484ceb5fa67ccea1136033",
+    "hash": "e75c49fd972b3b5a032d399b1b56343f4f9a4f8ce1f929b554663ba84b23af72",
     "lastmod": "2026-11-13"
   },
   "https://6ixo.com/listings/buy-and-sell/": {
-    "hash": "7245631a7ee93cb59ffc4a0194181744f4587d063763df2ef41281c5ebdc4f9b",
+    "hash": "b811017f854217aee1091e794c575546b726b571e7f600e47f8acfc9e4a1b402",
     "lastmod": "2026-11-13"
   },
   "https://6ixo.com/listings/car-rentals/": {
-    "hash": "20f0e9c3716605ec54a621bec03ec129d63258de6e19a1c9c63eefeafd52d1d0",
+    "hash": "11b353c816b850cd2fdb1615f3fa065583b8e30c94edceb8cc5a7b056b94775f",
     "lastmod": "2026-11-13"
   },
   "https://6ixo.com/listings/community/": {
-    "hash": "9559a6255cc745f9b6abf03cc85e36581459274ea4d64292c1c5a8ce3c126f46",
+    "hash": "3c10bdc276038715b72bbb0a5305b5a59af610613a5a320a316a4ee3ade397ad",
     "lastmod": "2026-11-13"
   },
   "https://6ixo.com/listings/country/canada/": {
@@ -25040,7 +25172,15 @@
     "lastmod": "2026-11-11"
   },
   "https://6ixo.com/listings/country/uganda/": {
-    "hash": "3781e404e61afff1a2aa0e07bfdae582cc5fa581d138fef04ac62751d764210c",
+    "hash": "683c4ad40198b994be219d05bf71f0e02b37c2aa7fe296b1ebe37d74335aee15",
+    "lastmod": "2026-11-13"
+  },
+  "https://6ixo.com/listings/country/uganda/electronics/": {
+    "hash": "440f83677b9bd40491d5a886d029e1ade83aee81309420328c1425ad8e01ca4b",
+    "lastmod": "2026-11-13"
+  },
+  "https://6ixo.com/listings/country/uganda/real-estate/": {
+    "hash": "60e21e575205393eb8c345f40f2925a253a4cf95f300ced06480f307c39a5a75",
     "lastmod": "2026-11-13"
   },
   "https://6ixo.com/listings/country/united-arab-emirates/": {
@@ -25100,36 +25240,36 @@
     "lastmod": "2026-11-13"
   },
   "https://6ixo.com/listings/electronics/": {
-    "hash": "67a58451747d944cb5c4e91a86b6dbb8b1e67380ac72048d0a5e06703a87f46f",
+    "hash": "0e6cd9ed45b61476f8b1a392474a0fe9bb6b6465ac256723f65535d95f05b3f3",
     "lastmod": "2026-11-13"
   },
   "https://6ixo.com/listings/fashion/": {
-    "hash": "cf82ee745b6bc261e0d96922d1f2592ef6bb22d564557b3d531e4a8f86e2b9d4",
+    "hash": "c5eab8c22a3429ca99f88a498d9a542bd9133bdfba0d01f2b1ed6d542b4a997d",
     "lastmod": "2026-11-13"
   },
   "https://6ixo.com/listings/jobs/": {
-    "hash": "85b389c24d0b9cdd709f068f58d8e26a2d2653a111c5289814ea19efd4ddae12",
+    "hash": "d0b57009956c0373a221eef57da47a0afff5912af99be25d9e97fd9757838f1e",
     "lastmod": "2026-11-13"
   },
   "https://6ixo.com/listings/real-estate/": {
-    "hash": "f8112c07427dea93914ada755536f6180e0ed8cbbe5d1a958f2f022527120fd6",
+    "hash": "702af5e1e3cb758c57f62ac91288c11ed2cb3cfb774169c2fe35c9ce54b85de1",
     "lastmod": "2026-11-13"
   },
   "https://6ixo.com/listings/services/": {
-    "hash": "a7b82a17d94a36e1b48f11af7567297c30621d832e083068f78a75c6af471475",
+    "hash": "ec8faf176fb02dba0d8a401bae35bb111266bd00ab86ca22dd11885df36586f3",
     "lastmod": "2026-11-13"
   },
   "https://6ixo.com/listings/short-term-rentals/": {
-    "hash": "31ff1cd605dcd2530741008363f7392386204fea16aaf45364b6e6efdd2c6f6f",
+    "hash": "e2fd99fb4f001f6d6c432dd456d5a9e6071407cff31585bed3ac12bfaa0097fe",
     "lastmod": "2026-11-13"
   },
   "https://6ixo.com/listings/vehicles/": {
-    "hash": "0a4ef98bf7e387ac5bfb9d2fca89ada72dbc4da613bd5a90d2f903dc15fc94d0",
+    "hash": "f193a633ece4d79e2ea47c28dbef13e85695c0fefbf14ddc7aeed09c2155d99f",
     "lastmod": "2026-11-13"
   },
   "https://6ixo.com/phones-for-sale/": {
-    "hash": "09a62ebb344712093d9a4a99e2278aeab378e80cb1afcbc04df0fa6157b4a087",
-    "lastmod": "2026-11-11"
+    "hash": "81f49068a9a164b070c3c7656785c6720ea0ce84c111733d44a72c1c03d9571a",
+    "lastmod": "2026-11-13"
   },
   "https://6ixo.com/phones-for-sale/canada/": {
     "hash": "3d6e7a859162c7141f646dc0a04a3d21c9c10f1a71f8e53339aa253e89b45baa",
@@ -25163,6 +25303,14 @@
     "hash": "73192fe04b3be15910efacd8dd02bf1837bc540db278a3cdd52398838618b947",
     "lastmod": "2026-11-06"
   },
+  "https://6ixo.com/phones-for-sale/uganda/": {
+    "hash": "457ece543095ea88f5264dc36842c31fe08d47cca209ebad927b899fb70fd2af",
+    "lastmod": "2026-11-13"
+  },
+  "https://6ixo.com/phones-for-sale/uganda/kampala/": {
+    "hash": "e1e58605fa899fc47806b9ac1924680c2a06daa221a24730e3c735b1d98aac26",
+    "lastmod": "2026-11-13"
+  },
   "https://6ixo.com/phones-for-sale/united-states/": {
     "hash": "1c451671737b762b564111724904341ffb06116db83cfe01c42038591baf3e3d",
     "lastmod": "2026-11-09"
@@ -25172,7 +25320,7 @@
     "lastmod": "2026-10-08"
   },
   "https://6ixo.com/real-estate/": {
-    "hash": "20582946552a0e2ba92b52d7a50052790b33fe06dae59335aa49753f447f6df5",
+    "hash": "e9916bf7fb3bcb9b6946b3298a0fd5444e6ea86d9ecdc1a4c124e3601c6f6040",
     "lastmod": "2026-11-13"
   },
   "https://6ixo.com/rewards/": {

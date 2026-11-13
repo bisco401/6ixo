@@ -335,7 +335,7 @@ test('ad artwork is uploaded before checkout and reused on retry', async () => {
 
 test('seller profile cards resolve string listing IDs into real conversations', () => {
   const f = fixture();
-  const listing = { id:'ml_uuid123', serverBacked:true, sourceTable:'marketplace_listings' };
+  const listing = { id:'ml_uuid123', serverBacked:true, sourceTable:'marketplace_listings', sellerUserId: 'seller-account' };
   f.app.marketplaceItems = [listing];
   f.app.discoveryPosts = [{ id:'post123', marketplaceItemId:listing.id }];
   assert.equal(f.app.resolveSellerChatListing({type:'marketplace',id:listing.id}),listing);

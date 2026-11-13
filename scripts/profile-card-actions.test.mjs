@@ -8,7 +8,7 @@ function fixture() {
     const elements = new Map();
     const context = {
         console, URL, URLSearchParams, navigator: {},
-        document: { getElementById: id => elements.get(id), querySelectorAll: () => [], addEventListener() {} },
+        document: { getElementById: id => elements.get(id), querySelector: () => null, querySelectorAll: () => [], addEventListener() {} },
         window: { location: { href: 'https://6ixo.com/?code=private-auth-code#vehicles', search: '' }, prompt() {} }
     };
     vm.runInNewContext(`${source.slice(0, source.indexOf('// Initialize the app when the page loads'))}\nglobalThis.App = DatingApp;`, context);
@@ -108,7 +108,7 @@ test('unpublished contacts and unsafe links never open a simulated chat or exter
 
 test('connected seller messaging preserves the server recipient after the modal closes', () => {
     const { app } = fixture();
-    const listing = { id: 'uuid', serverBacked: true, sourceTable: 'marketplace_listings' };
+    const listing = { id: 'uuid', serverBacked: true, sourceTable: 'marketplace_listings', sellerUserId: 'seller-account' };
     app.marketplaceItems = [listing];
     app.activeSellerProfile = { name: 'Seller', source: { type: 'marketplace', id: 'uuid' } };
     app.openSafetyModal = ({ onContinue }) => onContinue();
@@ -238,4 +238,42 @@ test('Call visibility resets when switching to a listing without a published num
     assert.equal(button.disabled, true);
     assert.equal(classes.has('hidden'), true);
     assert.equal(attributes['aria-label'], 'Call');
+});
+
+test('seller profile switches Message visibility with the listing account and keeps Call available', () => {
+    const { app, elements } = fixture();
+    const element = () => {
+        const classes = new Set(['hidden']);
+        return {
+            classList: {
+                toggle(name, enabled) { enabled ? classes.add(name) : classes.delete(name); },
+                remove(name) { classes.delete(name); },
+                contains(name) { return classes.has(name); }
+            },
+            setAttribute() {}
+        };
+    };
+    elements.set('seller-profile-modal', element());
+    const message = element();
+    const call = element();
+    elements.set('seller-profile-message', message);
+    elements.set('seller-profile-call', call);
+    app.enforceMobileFullscreenModal = () => {};
+    app.setViewerCardPreview = () => {};
+    app.syncOverlayViewportMeta = () => {};
+    app.pushModalHistoryState = () => {};
+    app.renderSellerProfileRentalPanel = () => {};
+
+    const seller = { id: 'seller-listing', serverBacked: true, sourceTable: 'marketplace_listings', sellerUserId: 'seller-account' };
+    const imported = { id: 'scraped-listing', sourceTable: 'csv_scraped_listings', source: { type: 'scraped_csv' }, phone: '416-555-0123' };
+    const unconnected = { id: 'unconnected-listing', serverBacked: true, sourceTable: 'marketplace_listings' };
+    app.marketplaceItems = [seller, imported, unconnected];
+
+    for (const [listing, canMessage, canCall] of [[seller, true, false], [imported, false, true], [unconnected, false, false], [seller, true, false]]) {
+        app.renderSellerProfileModal({ source: { type: 'marketplace', id: listing.id } });
+        assert.equal(message.classList.contains('hidden'), !canMessage);
+        assert.equal(message.hidden, !canMessage);
+        assert.equal(message.disabled, !canMessage);
+        assert.equal(call.hidden, !canCall);
+    }
 });

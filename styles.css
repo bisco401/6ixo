@@ -42681,3 +42681,21 @@ body:has(.modal[data-viewer-preview]:not(.hidden)) :is(#media-lightbox, #vehicle
 #seller-profile-modal #seller-profile-interests {
     color: #334155;
 }
+
+:is(#vehicle-modal, #realestate-modal, #service-modal, #seller-profile-modal).cb-shared-profile .cb-profile-contact-bar:not(:has(> button:not(.hidden))) {
+    display: none !important;
+}
+
+.cb-shared-profile .cb-profile-contact-bar:not(:has(> .cb-profile-message:not(.hidden))) > .cb-profile-call {
+    grid-column: 1 / -1;
+}
+
+:is(#luxury-ad-modal, #marketplace-item-modal).gallery-tabs-profile.clean-blue-profile :is(.luxury-ad-actions, .marketplace-item-actions) > button.hidden {
+    display: none !important;
+}
+
+:is(#luxury-ad-modal, #marketplace-item-modal).gallery-tabs-profile.clean-blue-profile :is(.luxury-ad-actions, .marketplace-item-actions):has(> :is(#luxury-ad-message, #marketplace-item-offer).hidden) > :is(#luxury-ad-call, #marketplace-item-call) {
+    grid-column: 1 / -1 !important;
+}
+
+.vehicle-featured-actions > button:only-child { grid-column: 1 / -1; }

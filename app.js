@@ -27709,6 +27709,7 @@ class DatingApp {
         }
         if (messageBtn) {
             messageBtn.textContent = isRental ? 'Message host' : 'Message seller';
+            this.syncListingActionVisibility(messageBtn, this.canMessageListing(item));
         }
         if (actionsEl) {
             actionsEl.classList.remove('is-single-action');
@@ -29354,7 +29355,7 @@ class DatingApp {
         const dots = document.getElementById('luxury-ad-dots');
         dots.innerHTML = this.luxuryAdPhotos.map((_, index) => `<button type="button" class="native-photo-dot" data-photo-index="${index}" aria-label="Show photo ${index + 1}" aria-pressed="${index === this.luxuryAdIndex}"></button>`).join('');
         const canMessage = Boolean(this.resolveSellerChatListing(data.source));
-        document.getElementById('luxury-ad-message').disabled = !canMessage;
+        this.syncListingActionVisibility(document.getElementById('luxury-ad-message'), canMessage);
         const seller = document.getElementById('luxury-ad-seller');
         if (!data.sourceRecordUrl && data.sourceType !== 'external') {
             const name = String(data.sellerName || 'Seller');
@@ -29376,7 +29377,7 @@ class DatingApp {
         if (!data) return;
         const item = data.resourceId ? this.getMarketplaceItemById(data.resourceId) : null;
         const listing = this.resolveSellerChatListing(data.source);
-        if (item?.serverBacked) {
+        if (listing && item === listing) {
             this.closeLuxuryAdModal({ useHistory: false });
             this.openMarketplaceChat(item);
         } else if (listing) {
@@ -29651,6 +29652,8 @@ class DatingApp {
 	        this.activeServiceId = data.id || null;
 	        this.activeServiceProfile = data;
         this.syncCardCallButton('service-modal', data);
+        this.syncListingActionVisibility(document.getElementById('service-modal-message'),
+            Boolean(this.resolveSellerChatListing({ type: 'service', id: data.id })));
         this.lastServiceModalPayload = data;
 
         if (imageEl) this.applyContainedModalImage(imageEl, this.serviceModalPhotos[0] || '', {
@@ -29823,8 +29826,8 @@ class DatingApp {
             viewBtn.setAttribute('aria-label', `View photos of ${data.title || 'this listing'}`);
         }
         if (offerBtn) {
-            offerBtn.classList.toggle('hidden', data.canOffer !== true);
-            offerBtn.disabled = data.canOffer !== true;
+            this.syncListingActionVisibility(offerBtn, data.canOffer === true
+                && Boolean(this.resolveSellerChatListing(data.source)));
             offerBtn.setAttribute('aria-label', `Make an offer on ${data.title || 'this item'}`);
         }
 
@@ -32072,7 +32075,7 @@ class DatingApp {
 
     openMarketplaceChat(item, { intent = 'message', suggestedBid = null } = {}) {
         if (!item) return;
-        if (!item.serverBacked && !this.authBypassEnabled) return this.openPublishedContact(item);
+        if (!this.canMessageListing(item) && !this.authBypassEnabled) return this.openPublishedContact(item);
         const sellerName = String(item.seller || 'Seller').trim() || 'Seller';
         const title = String(item.title || 'Listing').trim() || 'Listing';
         const isBidIntent = intent === 'bid' && item.category === 'clothing';
@@ -32080,8 +32083,7 @@ class DatingApp {
         const bidValueRaw = Number(suggestedBid);
         const resolvedBid = Number.isFinite(bidValueRaw) && bidValueRaw > 0 ? bidValueRaw : fallbackBid;
         const bidLabel = isBidIntent ? this.formatMarketplaceMoney(resolvedBid, { ...item, fallback: '' }) : '';
-        const isServerBacked = item?.serverBacked === true
-            && ['marketplace_listings', 'short_term_listings'].includes(String(item?.sourceTable || '').trim());
+        const isServerBacked = this.canMessageListing(item);
         const prefillText = isBidIntent
             ? (bidLabel
                 ? `Hi ${sellerName}, I want to place a bid of ${bidLabel} on ${title}.`
@@ -32167,7 +32169,7 @@ class DatingApp {
         if (!this.activeSellerProfile) return;
         const sellerName = String(this.activeSellerProfile.name || 'Seller').trim() || 'Seller';
         const status = this.activeSellerProfile.responseLabel || 'Seller';
-        const listing = this.resolveSellerChatListing(this.activeSellerProfile.source || this.activeSellerProfileSource || {});
+        const listing = this.resolveSellerChatListing(this.activeSellerProfile.shareRecord?.source || this.activeSellerProfile.source || this.activeSellerProfileSource);
         if (!listing && !this.authBypassEnabled) return this.openPublishedContact(this.activeSellerProfile);
         this.openSafetyModal({
             title: 'Safety tips before messaging',
@@ -40656,6 +40658,7 @@ class DatingApp {
         if (messageBtn) {
             const shortTerm = this.isRealestateShortTermListing(listing);
             messageBtn.textContent = shortTerm ? 'Message host' : 'Request a viewing';
+            this.syncListingActionVisibility(messageBtn, this.canMessageListing(listing));
         }
         if (sellerBtn) {
             const shortTerm = this.isRealestateShortTermListing(listing);
@@ -42918,9 +42921,9 @@ class DatingApp {
                         <button class="post-action-btn like-btn" type="button" title="Save listing">
                             <i class="fas fa-bookmark"></i><span>${likes}</span>
                         </button>
-                        <button class="post-action-btn comment-btn" type="button" title="Send inquiry">
+                        ${this.resolveSellerChatListing({ type: 'discovery', id: post.id }) ? `<button class="post-action-btn comment-btn" type="button" title="Send inquiry">
                             <i class="fas fa-paper-plane"></i><span>Inquire</span>
-                        </button>
+                        </button>` : ''}
                         <button class="post-action-btn seller-profile-btn" type="button" title="View seller profile" aria-label="View ${this.escapeHtml(name)} profile">
                             <i class="fas fa-user"></i><span>Seller</span>
                         </button>
@@ -44764,10 +44767,10 @@ class DatingApp {
                     <div class="dating-feed-status ${verified ? 'online' : 'offline'}">By <button class="seller-name-link" type="button" data-seller-source="discovery" data-seller-id="${sellerIdAttr}" aria-label="View ${this.escapeHtml(sellerName)} profile">${this.escapeHtml(sellerName)}</button> · <i class="fas fa-star" aria-hidden="true" style="color:#facc15;margin:0 0.25rem 0 0.35rem;"></i>${ratingText} · ${reviewCount} · ${this.escapeHtml(String(dateLabel))}</div>
                 </div>
                 <div class="marketplace-feed-actions">
-                    <button class="post-action-btn comment-btn marketplace-offer-btn" type="button" title="Send inquiry" aria-label="Send inquiry about ${title}">
+                    ${this.resolveSellerChatListing({ type: 'discovery', id: post.id }) ? `<button class="post-action-btn comment-btn marketplace-offer-btn" type="button" title="Send inquiry" aria-label="Send inquiry about ${title}">
                         <i class="fas fa-paper-plane" aria-hidden="true"></i>
                         Inquire
-                    </button>
+                    </button>` : ''}
                     <button class="post-action-btn seller-profile-btn seller-profile-link" type="button" title="View seller profile" aria-label="View ${this.escapeHtml(sellerName)} profile">
                         <i class="fas fa-user" aria-hidden="true"></i>
                         Seller
@@ -47739,6 +47742,8 @@ class DatingApp {
         this.activeSellerProfile = data;
         this.syncCardCallButton('seller-profile', data);
         this.activeSellerProfileSource = data.source || null;
+        this.syncListingActionVisibility(document.getElementById('seller-profile-message'),
+            !data.preview && Boolean(this.resolveSellerChatListing(data.shareRecord?.source || data.source)));
         const sourceType = String(data?.source?.type || '').trim();
         const isLuxury = sourceType === 'home_featured';
         const profileGalleryImages = Array.from(new Set([
@@ -58188,6 +58193,7 @@ class DatingApp {
         auctionHtml = '',
         trustLabel = 'Secure checkout',
         trustIcon = 'fa-shield-halved',
+        canMessage = false,
         secondaryAction = 'Message',
         primaryAction = '',
         externalProvider = false
@@ -58247,7 +58253,7 @@ class DatingApp {
                 </span>
             </div>
             <div class="vehicle-featured-actions">
-                <button type="button"><i class="${externalProvider ? 'fas fa-circle-info' : 'far fa-message'}" aria-hidden="true"></i>${safeSecondaryAction}</button>
+                ${externalProvider || canMessage ? `<button type="button"><i class="${externalProvider ? 'fas fa-circle-info' : 'far fa-message'}" aria-hidden="true"></i>${safeSecondaryAction}</button>` : ''}
                 <button class="primary" type="button">${this.escapeHtml(resolvedPrimaryAction)}</button>
             </div>
         `;
@@ -58486,6 +58492,8 @@ class DatingApp {
                 auctionHtml,
                 trustLabel: presentation.trustLabel,
                 trustIcon: presentation.trustIcon,
+                canMessage: Boolean(this.resolveSellerChatListing({ type: 'marketplace', id: dataset.adResourceId || dataset.postItemId })
+                    || this.resolveSellerChatListing({ type: 'vehicle', id: dataset.vehicleId || dataset.adResourceId })),
                 secondaryAction: externalProvider ? 'Provider info' : 'Message',
                 primaryAction: presentation.primaryAction,
                 externalProvider
@@ -59173,10 +59181,10 @@ class DatingApp {
                     ${formMetaHtml}
                     ${trustBadgesHtml}
                     <div class="marketplace-card-actions">
-                        <button class="marketplace-offer-btn${isBidListing ? ' bid-action' : ''}${isSold ? ' sold' : ''}" type="button" data-market-action="${actionType}" aria-label="${actionAria}" ${shouldDisableBidAction ? 'disabled' : ''}>
+                        ${isSold || isBidListing || this.canMessageListing(item) ? `<button class="marketplace-offer-btn${isBidListing ? ' bid-action' : ''}${isSold ? ' sold' : ''}" type="button" data-market-action="${actionType}" aria-label="${actionAria}" ${shouldDisableBidAction ? 'disabled' : ''}>
                             <i class="fas ${actionIcon}" aria-hidden="true"></i>
                             ${bidButtonLabel}
-                        </button>
+                        </button>` : ''}
                         </div>
 	                    ${specsHtml}
                     <button class="marketplace-seller-row seller-profile-link" type="button" data-seller-id="${this.escapeHtml(String(item.id))}" aria-label="View seller profile for ${seller}">
@@ -59325,10 +59333,10 @@ class DatingApp {
                     <div class="dating-feed-status ${verified ? 'online' : 'offline'}">By <button class="seller-name-link" type="button" data-seller-source="marketplace" data-seller-id="${sellerIdAttr}" aria-label="View seller profile for ${seller}">${seller}</button> · <i class="fas fa-star" aria-hidden="true" style="color:#facc15;margin:0 0.25rem 0 0.35rem;"></i>${this.escapeHtml(sellerReviewMeta.ratingText)} · ${this.escapeHtml(this.formatReviewCountLabel(sellerReviewMeta.reviewCount))} · ${this.escapeHtml(String(dateLabel))}</div>
                 </div>
                 <div class="marketplace-feed-actions">
-                    <button class="marketplace-offer-btn${isBidListing ? ' bid-action' : ''}${isSold ? ' sold' : ''}" type="button" data-market-action="${actionType}" aria-label="${actionAria}" ${shouldDisableBidAction ? 'disabled' : ''}>
+                    ${isSold || isBidListing || this.canMessageListing(item) ? `<button class="marketplace-offer-btn${isBidListing ? ' bid-action' : ''}${isSold ? ' sold' : ''}" type="button" data-market-action="${actionType}" aria-label="${actionAria}" ${shouldDisableBidAction ? 'disabled' : ''}>
                         <i class="fas ${actionIcon}" aria-hidden="true"></i>
                         ${bidButtonLabel}
-                    </button>
+                    </button>` : ''}
                     <button class="marketplace-save-btn ${saved ? 'saved' : ''}" type="button" aria-pressed="${saved ? 'true' : 'false'}" aria-label="${saved ? 'Unsave listing' : 'Save listing'}">
                         <i class="fas fa-bookmark" aria-hidden="true"></i>
                         ${marketList ? `<span class="marketplace-save-label">${saved ? 'Saved' : 'Save'}</span>` : ''}
@@ -65297,7 +65305,9 @@ class DatingApp {
             offerBtn.classList.toggle('bid-action', isBidListing);
             offerBtn.classList.toggle('sold', isSold);
             offerBtn.dataset.marketAction = isSold ? 'sold' : (isBidListing ? 'bid' : (isCrossBorderListing ? 'offer' : 'message'));
-            offerBtn.disabled = isSold || (isBidListing && market?.isLive ? !canBidLiveAuction : false);
+            const showAction = isSold || isBidListing || this.canMessageListing(item);
+            this.syncListingActionVisibility(offerBtn, showAction);
+            offerBtn.disabled = !showAction || isSold || (isBidListing && market?.isLive ? !canBidLiveAuction : false);
             offerBtn.setAttribute('aria-label', isSold
                 ? `${item.title || 'listing'} is sold`
                 : (isBidListing
@@ -66016,7 +66026,8 @@ class DatingApp {
 	    openVehicleSellerChat() {
 	        const listing = this.activeVehicleListing;
 	        if (!listing) return;
-        if (!listing.serverBacked && !this.authBypassEnabled) return this.openPublishedContact(listing);
+        const canMessage = this.canMessageListing(listing);
+        if (!canMessage && !this.authBypassEnabled) return this.openPublishedContact(listing);
 	        const sellerName = String(listing.seller || 'Seller').trim() || 'Seller';
 	        const title = String(listing.title || 'Vehicle listing').trim() || 'Vehicle listing';
 	        const photos = Array.isArray(listing.images) ? listing.images : [listing.image];
@@ -66028,7 +66039,7 @@ class DatingApp {
 	            onContinue: () => {
 	                this.closeVehicleModal({ useHistory: false });
 	                const prefill = `Hi ${sellerName}, is "${title}" still available?`;
-	                if (listing?.serverBacked === true && String(listing?.sourceTable || '').trim() === 'marketplace_listings') {
+	                if (canMessage) {
 	                    void this.openServerBackedListingConversation(listing, {
 	                        name: sellerName,
 	                        photo,
@@ -66063,7 +66074,8 @@ class DatingApp {
 	    openRealestateSellerChat() {
 	        const listing = this.activeRealestateListing;
 	        if (!listing) return;
-        if (!listing.serverBacked && !this.authBypassEnabled) return this.openPublishedContact(listing);
+        const canMessage = this.canMessageListing(listing);
+        if (!canMessage && !this.authBypassEnabled) return this.openPublishedContact(listing);
 	        const sellerName = String(listing.seller || 'Host').trim() || 'Host';
 	        const title = String(listing.title || 'Property').trim() || 'Property';
         const isShortTerm = this.isRealestateShortTermListing(listing);
@@ -66080,7 +66092,7 @@ class DatingApp {
 	                const prefill = isShortTerm
 	                    ? this.buildShortTermBookingRequestMessage(listing, sellerName, title)
 	                    : `Hi ${sellerName}, I’m interested in "${title}". Could we arrange a viewing? Please let me know your available times.`;
-	                if (listing?.serverBacked === true && ['marketplace_listings', 'short_term_listings'].includes(String(listing?.sourceTable || '').trim())) {
+	                if (canMessage) {
 	                    void this.openServerBackedListingConversation(listing, {
 	                        name: sellerName,
 	                        photo,
@@ -69551,14 +69563,34 @@ class DatingApp {
         }
 	    }
 
+    canMessageListing(listing) {
+        return listing?.serverBacked === true
+            && ['marketplace_listings', 'short_term_listings'].includes(listing.sourceTable)
+            && Boolean(listing.sellerUserId || listing.hostUserId || listing.userId)
+            && Boolean(listing.serverListingPublicId || listing.public_id || listing.id)
+            && !this.isScrapedMarketplaceItem(listing);
+    }
+
+    syncListingActionVisibility(button, visible) {
+        if (!button) return;
+        button.classList.toggle('hidden', !visible);
+        button.hidden = !visible;
+        button.disabled = !visible;
+    }
+
     resolveSellerChatListing(source = {}) {
-        const id = String(source.id || source.marketplaceItemId || '').trim();
-        const lists = { marketplace: this.marketplaceItems, vehicle: this.vehicleListings, realestate: this.realestateListings, service: this.serviceProfiles, discovery: this.discoveryPosts };
-        let listing = (lists[source.type] || []).find((entry) => String(entry.id) === id);
-        if (source.type === 'discovery' && listing?.marketplaceItemId) {
-            listing = (this.marketplaceItems || []).find((entry) => String(entry.id) === String(listing.marketplaceItemId));
+        const id = String(source?.id || source?.marketplaceItemId || '').trim();
+        if (!id) return null;
+        const { type } = source;
+        if (!['marketplace', 'vehicle', 'realestate', 'service', 'discovery'].includes(type)) return null;
+        let listing = this.getCardRecord(type, id);
+        if (type === 'discovery') {
+            listing = this.getMarketplaceItemById(listing?.marketplaceItemId || listing?.refs?.marketplaceItemId || listing?.listing?.marketplaceItemId);
+        } else if (type === 'service') {
+            const item = this.getMarketplaceItemById(id);
+            if (item?.category === 'services' && this.canMessageListing(item)) return item;
         }
-        return listing?.serverBacked && ['marketplace_listings', 'short_term_listings'].includes(listing.sourceTable) ? listing : null;
+        return this.canMessageListing(listing) ? listing : null;
     }
 
     async uploadMarketplaceListingImages(files = []) {

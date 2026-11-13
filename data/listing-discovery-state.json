@@ -1,53 +1,52 @@
 {
-  "intervalHours": 48,
   "sources": {
     "regional": {
-      "lastAttemptAt": "2026-11-12T06:44:05.619192+00:00",
+      "lastAttemptAt": "2026-11-13T06:44:22.798843+00:00",
       "outcome": "failure"
     },
     "general": {
-      "lastAttemptAt": "2026-11-12T06:44:05.619192+00:00",
+      "lastAttemptAt": "2026-11-13T06:44:22.798843+00:00",
       "outcome": "success",
-      "lastSuccessfulSlot": "2026-11-12T00:00:00+00:00"
+      "lastSuccessfulSlot": "2026-11-13T06:33:10Z"
     },
     "ghana": {
-      "lastAttemptAt": "2026-11-12T06:44:05.619192+00:00",
+      "lastAttemptAt": "2026-11-13T06:44:22.798843+00:00",
       "outcome": "success",
-      "lastSuccessfulSlot": "2026-11-12T00:00:00+00:00"
+      "lastSuccessfulSlot": "2026-11-13T06:33:10Z"
     },
     "kenya": {
-      "lastAttemptAt": "2026-11-12T06:44:05.619192+00:00",
+      "lastAttemptAt": "2026-11-13T06:44:22.798843+00:00",
       "outcome": "failure"
     },
     "china": {
-      "lastAttemptAt": "2026-11-12T06:44:05.619192+00:00",
+      "lastAttemptAt": "2026-11-13T06:44:22.798843+00:00",
       "outcome": "failure"
     },
     "expansion": {
-      "lastAttemptAt": "2026-11-12T06:44:05.619192+00:00",
+      "lastAttemptAt": "2026-11-13T06:44:22.798843+00:00",
       "outcome": "failure",
       "lastSuccessfulSlot": "2026-11-06T00:00:00+00:00"
     },
     "guyana": {
-      "lastAttemptAt": "2026-11-12T06:44:05.619192+00:00",
+      "lastAttemptAt": "2026-11-13T06:44:22.798843+00:00",
       "outcome": "failure"
     },
     "dubai_vehicles": {
-      "lastAttemptAt": "2026-11-12T06:44:05.619192+00:00",
+      "lastAttemptAt": "2026-11-13T06:44:22.798843+00:00",
       "outcome": "success",
-      "lastSuccessfulSlot": "2026-11-12T00:00:00+00:00"
+      "lastSuccessfulSlot": "2026-11-13T06:33:10Z"
     },
     "dubai_marketplace": {
-      "lastAttemptAt": "2026-11-12T06:44:05.619192+00:00",
+      "lastAttemptAt": "2026-11-13T06:44:22.798843+00:00",
       "outcome": "success",
-      "lastSuccessfulSlot": "2026-11-12T00:00:00+00:00"
+      "lastSuccessfulSlot": "2026-11-13T06:33:10Z"
     },
     "products": {
-      "lastAttemptAt": "2026-11-12T06:44:05.619192+00:00",
+      "lastAttemptAt": "2026-11-13T06:44:22.798843+00:00",
       "outcome": "failure"
     },
     "jobs": {
-      "lastAttemptAt": "2026-11-12T06:44:05.619192+00:00",
+      "lastAttemptAt": "2026-11-13T06:44:22.798843+00:00",
       "outcome": "failure",
       "lastSuccessfulSlot": "2026-11-06T00:00:00+00:00"
     }

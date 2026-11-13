@@ -14,7 +14,7 @@ The 6ixo website reads that CSV file on load and merges `published` rows into th
 
 GitHub Actions owns the automatic schedule. **Deactivate the older 6ixo listing workflows in the n8n server**, including Hamilton, US Craigslist, Guyana, generic CSV scrapers, image upgrades, availability and policy enforcement. They can overwrite existing records or reintroduce removed listings. Updating exports in this repository does not update an already imported server workflow. These exports now have disabled schedule triggers and remain available for deliberate manual maintenance.
 
-`.github/workflows/refresh-marketplace-listings.yml` searches for new ads every 48 hours and checks availability every 24 hours across all five normalized feeds, the Kijiji backup feed, and the three legacy Oxglow feeds. Discovery adds only new source URLs. Existing content, images, prices and posting dates are preserved; the separate availability check updates its check metadata and removes confirmed unavailable ads. Source regions come from the existing site inventory. New imports focus on vehicles, parts, property and electronics and require a complete public contact number plus a responding source gallery image. Kenyan retail products use the store's public contact number and exact in-stock product offer.
+`.github/workflows/refresh-marketplace-listings.yml` searches for new ads five times a day and checks availability every 24 hours across all five normalized feeds, the Kijiji backup feed, and the three legacy Oxglow feeds. Discovery adds only new source URLs. Existing content, images, prices and posting dates are preserved; the separate availability check updates its check metadata and removes confirmed unavailable ads. Source regions come from the existing site inventory. New imports focus on vehicles, parts, property and electronics and require a complete public contact number plus a responding source gallery image. Kenyan retail products use the store's public contact number and exact in-stock product offer.
 
 `scripts/refresh-category-listings.py` adds electronics and appliances from primary retailers in Lagos, Johannesburg and London, and vacancies from Tradewind's London office and Taylored Appointments in Johannesburg. Product offers, currency, photos and public business contacts must match the source. Jobs require their own vacancy page, recruiter identity/logo, work location and a future closing date; missing salaries stay unspecified. Their application action opens the source vacancy. Daily checks also remove expired or explicitly closed vacancies. Source rate limits defer further requests and never remove existing inventory. US Craigslist discovery also includes appliances in its configured regions, including Atlanta and Houston.
 
@@ -38,7 +38,7 @@ python scripts/check-listing-availability.py --prune-confirmed
 - `automations/n8n/6ixo-upgrade-listing-images.json`: re-open Kijiji and Pigiame detail pages, replace low-resolution CSV images with verified full-size source images, and retry failed pages later.
 - `automations/n8n/6ixo-crawl4ai-guyana-listings.json`: dedicated six-hour Guyana vehicle sync using public `carsforsale.gy` listing pages and seller-enabled contacts.
 - `automations/n8n/6ixo-enforce-listing-policy.json`: run after the source workflows to enforce four images per ad, all eligible listings per country, and confirmed-unavailable deletion safeguards.
-- `.github/workflows/ghana-marketplace-sync.yml`: manually refresh verified Ghana vehicle, electronics, property, and auto-parts listings; the shared workflow owns the automatic 48-hour schedule.
+- `.github/workflows/ghana-marketplace-sync.yml`: manually refresh verified Ghana vehicle, electronics, property, and auto-parts listings; the shared workflow owns the automatic discovery schedule.
 - `automations/n8n/docker-compose.crawl4ai.yml`: standalone Crawl4AI service for a server.
 - `automations/n8n/test-crawl4ai.sh`: quick health check for the Crawl4AI service.
 - `apify_import.py`: import an Apify dataset or export file into the same website CSV.
@@ -67,10 +67,10 @@ n8n schedule/manual trigger
 Canada, the United States (including Atlanta and Houston), Jamaica, Guyana, Ghana,
 Kenya, Ethiopia, China, the United Arab Emirates, Nigeria, South Africa and the
 United Kingdom. New country sources start in Lagos, Johannesburg and London. Each source
-group is searched every 48 hours, tracked in `data/listing-discovery-state.json`.
-The workflow wakes every 24 hours to check all imported source URLs for removals;
-failed discovery groups retry then, without advancing their successful checkpoint.
-A manual workflow dispatch forces all source searches. The Ghana, Kenya, Guyana and
+group is searched at 01:17, 06:17, 11:17, 16:17 and 21:17 UTC. The 06:17 run
+also checks imported source URLs for removals. Source outcomes are tracked in
+`data/listing-discovery-state.json`. Failed groups retry on the next run.
+A manual workflow dispatch runs all source searches and the availability check. The Ghana, Kenya, Guyana and
 Kijiji standalone workflows remain available for manual repair and have no competing schedule.
 The listing-integrity repair workflow is also manual: the shared discovery job
 validates new ads without allowing a separate audit to rewrite existing content.
@@ -83,7 +83,7 @@ gallery and seller together before adding new listings. Existing listings retain
 
 China discovery searches the existing supplier websites for new products, requiring
 exact product identity, current public business contacts and working primary product photos. Blocked or
-unverifiable suppliers retain their existing records and retry the next day.
+unverifiable suppliers retain their existing records and retry on the next scheduled run.
 
 Exact source 404/410 responses and confirmed sold/removed states remove the listing
 from matching feeds and exclude it through the shared availability ledger. Timeouts, challenges,
@@ -93,7 +93,7 @@ Run summaries expose each source outcome; JSON source reports are retained as
 workflow artifacts for 14 days. This covers configured sources, not every country
 bordering Ghana or Kenya.
 
-The shared GitHub Actions workflow owns the 48-hour discovery schedule for all twelve configured countries. Keep the legacy n8n writers deactivated; their previous schedules conflict with this policy. All CSV-writing workflows fall back to GitHub's blob API when the listing file is too large for inline Contents API data, and refuse to write if the existing CSV cannot be decoded. This prevents a single-country sync from erasing Ghana or any other country.
+The shared GitHub Actions workflow owns the five-times-daily discovery schedule for all twelve configured countries. Keep the legacy n8n writers deactivated; their previous schedules conflict with this policy. All CSV-writing workflows fall back to GitHub's blob API when the listing file is too large for inline Contents API data, and refuse to write if the existing CSV cannot be decoded. This prevents a single-country sync from erasing Ghana or any other country.
 
 Ghana's `scraped_at` is the website's posting/sort date: use the source posting date when available, otherwise retain the existing first-import date. Rechecks update `source_last_seen_at` and `source_availability_checked_at` separately, so an undated older ad does not jump ahead of new inventory. The November 1, 2026 repair recovered first-seen dates for legacy auto-parts ads from their original import commit `9233d834553de57bffda94716c991cf1d72b4245`.
 

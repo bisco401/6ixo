@@ -7,7 +7,7 @@ import os
 from datetime import datetime, timezone
 from pathlib import Path
 
-SOURCES = ("regional", "general", "ghana", "kenya", "china", "expansion", "products", "jobs", "guyana", "dubai_vehicles", "dubai_marketplace")
+SOURCES = ("regional", "general", "ghana", "kenya", "china", "expansion", "products", "uganda_property", "jobs", "guyana", "dubai_vehicles", "dubai_marketplace")
 
 
 def record(state, outcomes, started_at, completed_at):

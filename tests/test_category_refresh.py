@@ -79,6 +79,43 @@ class CategorySourceTests(unittest.TestCase):
         state, _ = module.availability.classify(row, 200, body.replace('instock', 'outofstock'), url)
         self.assertEqual(state, 'unavailable')
 
+    def test_kampala_property_requires_exact_available_monthly_offer(self):
+        url = 'https://www.juhaproperties.com/property/own/'
+        image = 'https://www.juhaproperties.com/uploads/properties/own.webp'
+        title = 'Apartment for Rent in Kampala'
+        data = [{'@type': 'Product', 'category': 'Real Estate', 'name': title, 'image': image,
+                 'offers': {'url': url, 'price': 1200, 'priceCurrency': 'USD',
+                            'availability': 'https://schema.org/InStock', 'seller': {'name': 'Juha Properties'}}},
+                {'@type': 'BreadcrumbList', 'itemListElement': [{'item': 'https://www.juhaproperties.com/rentals/'}]}]
+        body = f'''<link rel="canonical" href="{url}"><h1>{title}</h1>
+            <div id="mainPriceDisplay">$1,200</div><p class="semantic-description">Asking $1,200 per month.</p>
+            <div class="gallery-container"><div class="swiper-main">
+            <a data-fancybox="property-gallery" href="{image}"></a></div></div>
+            <script type="application/ld+json">{json.dumps(data)}</script>'''
+        row = module.parse_property('juha_rentals', body, url, self.checked)
+        self.assertEqual((row['country'], row['city'], row['price_text']), ('Uganda', 'Kampala', 'USD 1,200 / month'))
+        self.assertEqual(json.loads(row['attributes'])['priceTerm'], 'per_month')
+        for invalid in (body.replace('per month', 'per night'), body.replace('InStock', 'OutOfStock'),
+                        body.replace('$1,200</div>', 'UGX 1,200</div>'), body.replace('own.webp"></a>', 'other.webp"></a>')):
+            with self.assertRaises(ValueError):
+                module.parse_property('juha_rentals', invalid, url, self.checked)
+
+    def test_kampala_retailer_distinguishes_local_stock_and_special_orders(self):
+        url = 'https://net-cart.com/product/own/'
+        product = {'@type': 'Product', '@id': url + '#product', 'name': 'Example Smartphone',
+                   'category': 'Electronics &gt; Phones', 'image': 'https://net-cart.com/own.jpg',
+                   'offers': {'url': url, 'price': 250000, 'priceCurrency': 'UGX',
+                              'availability': 'https://schema.org/InStock'}}
+        body = f'''<link rel="canonical" href="{url}"><h1>Example Smartphone</h1>
+            <span class="nc-pdp__stock nc-pdp__stock--ok">In stock · ready to ship</span>
+            <script type="application/ld+json">{json.dumps(product)}</script>'''
+        row = module.parse_product('netcart_kampala', body, url, self.checked)
+        self.assertEqual((row['app_subcategory'], row['currency']), ('phones_accessories', 'UGX'))
+        special_order = body.replace('In stock · ready to ship', 'Available to order')
+        with self.assertRaises(module.SkipListing):
+            module.parse_product('netcart_kampala', special_order, url, self.checked)
+        self.assertEqual(module.availability.classify(row, 200, special_order, url)[0], 'unavailable')
+
     def test_job_keeps_real_pay_unit_dates_and_recruiter(self):
         url, body = self.job()
         row = module.parse_job('tradewind', body, url, self.checked)

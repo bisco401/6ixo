@@ -84,10 +84,14 @@ jobs:
         id: expansion
         continue-on-error: true
         run: python scripts/refresh-expansion-listings.py
-      - name: Add new electronics and appliances in Lagos, Johannesburg and London
+      - name: Add new electronics and appliances, including Kampala
         id: products
         continue-on-error: true
         run: python scripts/refresh-category-listings.py --kind product --report output/product-listing-refresh-report.json
+      - name: Add available homes and apartments in Kampala
+        id: uganda_property
+        continue-on-error: true
+        run: python scripts/refresh-category-listings.py --kind property --report output/uganda-property-refresh-report.json
       - name: Add current vacancies with verified recruiter contacts and closing dates
         id: jobs
         continue-on-error: true

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Discover new electronics, appliances and vacancies from public primary sources."""
+"""Discover new electronics, appliances, property and vacancies from public primary sources."""
 import argparse
 import csv
 import hashlib
@@ -44,6 +44,24 @@ SOURCES = {
     'fonavia': dict(name='Fonavia', country='United Kingdom', city='London', currency='GBP', code='44', digits=10,
                    catalogs=['https://fonavia.co.uk/collections/all'], contact='https://fonavia.co.uk/pages/contact',
                    location='London W12 8AA', phone='+447951807037', kind='product'),
+    'gadgetcraze_kampala': dict(name='Gadget Craze', country='Uganda', city='Kampala', currency='UGX', code='256', digits=9,
+                               catalogs=['https://gadgetcraze.ug/shop'],
+                               contact='https://gadgetcraze.ug/contact', location='Mabirizi Complex',
+                               phone='+256758005360', kind='product', candidates=20,
+                               pattern=r'^/shop/[^/]+-\d+/?$'),
+    'netcart_kampala': dict(name='netCart', country='Uganda', city='Kampala', currency='UGX', code='256', digits=9,
+                            catalogs=['https://net-cart.com/product-category/electronics/phones/smartphones/',
+                                      'https://net-cart.com/product-category/electronics/computing/laptops-desktops/business-laptops/'],
+                            contact='https://net-cart.com/contact-us/', location='Bunga, Ggaba Road, Kampala',
+                            phone='+256752734748', kind='product', candidates=20),
+    'juha_rentals': dict(name='Juha Properties', country='Uganda', city='Kampala', code='256', digits=9,
+                         catalogs=['https://www.juhaproperties.com/rentals/'],
+                         contact='https://www.juhaproperties.com/contact/', location='Kampala',
+                         phone='+256772596660', kind='property', transaction='rent', candidates=16),
+    'juha_sales': dict(name='Juha Properties', country='Uganda', city='Kampala', code='256', digits=9,
+                       catalogs=['https://www.juhaproperties.com/sales/'],
+                       contact='https://www.juhaproperties.com/contact/', location='Kampala',
+                       phone='+256772596660', kind='property', transaction='sale', candidates=16),
     'tradewind': dict(name='Tradewind Recruitment', country='United Kingdom', city='London', currency='GBP', code='44', digits=10,
                      catalogs=['https://www.twrecruitment.com/contact-us/london'], contact='https://www.twrecruitment.com/contact-us/london',
                      location='High Holborn', phone='+442078455450', kind='job', country_code='GB'),
@@ -150,7 +168,10 @@ def parse_product(source_id, body, url, checked):
             offer_list = variant.get('offers') or []
             for offer in offer_list if isinstance(offer_list, list) else [offer_list]:
                 offer = resolve(offer)
-                if key(urljoin(url, offer.get('url', ''))) != key(url):
+                offer_url = offer.get('url')
+                if source_id == 'gadgetcraze_kampala':
+                    offer_url = offer_url or variant.get('url')
+                if (source_id == 'gadgetcraze_kampala' and not offer_url) or key(urljoin(url, offer_url or '')) != key(url):
                     raise ValueError('Offer belongs to a different item')
                 if offer.get('priceCurrency') != source['currency']:
                     raise ValueError('Unexpected currency')
@@ -162,6 +183,8 @@ def parse_product(source_id, body, url, checked):
             raise SkipListing('No available product offers')
         amounts = {str(o.get('price', '')) for o in offers}
         if len(amounts) != 1:
+            if source_id == 'gadgetcraze_kampala':
+                raise SkipListing('Variants have different advertised prices')
             raise ValueError('Variants have different prices; no exact single price')
         amount = amounts.pop()
         condition = str(offers[0].get('itemCondition', '')).rsplit('/', 1)[-1]
@@ -172,10 +195,87 @@ def parse_product(source_id, body, url, checked):
     posted = next((e.get('datePublished', '') for e in entities if types(e) & {'WebPage', 'ItemPage'}
                    and key(urljoin(url, e.get('url') or e.get('@id') or '')) == key(url)), '')
     category, subcategory = product_category(title)
+    if source_id == 'netcart_kampala':
+        stock = soup.select_one('.nc-pdp__stock--ok')
+        if not stock or not clean(stock.get_text(' ', strip=True)).casefold().startswith('in stock'):
+            raise SkipListing('Exact product is not stocked locally')
+    if source_id == 'gadgetcraze_kampala':
+        breadcrumb_urls = [item.get('item', '') for e in entities if 'BreadcrumbList' in types(e)
+                           for item in e.get('itemListElement', []) if isinstance(item.get('item'), str)]
+        if any('/shop/category/phones-' in link for link in breadcrumb_urls):
+            category, subcategory = 'electronics', 'phones_accessories'
+        elif re.search(r'\b(?:macbook|laptop|ideapad|thinkpad|vivobook|elitebook|probook)\b', title, re.I):
+            category, subcategory = 'electronics', 'computers_tablets'
+        else:
+            raise SkipListing('Product is outside the Kampala phone and laptop categories')
+    if source_id == 'netcart_kampala':
+        product_type = ' '.join(name_tokens(product.get('category')))
+        if re.search(r'\b(?:phone|phones|smartphone|smartphones)\b', product_type):
+            category, subcategory = 'electronics', 'phones_accessories'
+        elif re.search(r'\b(?:laptop|laptops)\b', product_type):
+            category, subcategory = 'electronics', 'computers_tablets'
+        else:
+            raise SkipListing('Product is outside the Kampala phone and laptop categories')
     attrs = {'condition': condition} if condition else {}
     return make_row(source, url, title, images, checked, posted, category, subcategory, amount,
                     f"{source['currency']} {float(amount):,.2f}", attrs)
 
+
+
+def parse_property(source_id, body, url, checked):
+    source = SOURCES[source_id]
+    soup, entities, resolve = page(body, url)
+    heading = soup.select_one('h1')
+    title = clean(heading.get_text(' ', strip=True)) if heading else ''
+    products = [e for e in entities if 'Product' in types(e) and e.get('category') == 'Real Estate'
+                and title and name_tokens(e.get('name')) == name_tokens(title)]
+    if not products:
+        raise SkipListing('No exact property schema')
+    if len(products) != 1:
+        raise ValueError('Ambiguous property schema')
+    product = products[0]
+    offer = resolve(product.get('offers'))
+    if key(offer.get('url', '')) != key(url) or (offer.get('seller') or {}).get('name') != source['name']:
+        raise ValueError('Offer does not match the property and agency')
+    if str(offer.get('availability', '')).rsplit('/', 1)[-1] != 'InStock':
+        raise SkipListing('Property is not marked available')
+    rent = source['transaction'] == 'rent'
+    breadcrumb_urls = {key(item.get('item', '')) for e in entities if 'BreadcrumbList' in types(e)
+                       for item in e.get('itemListElement', []) if isinstance(item.get('item'), str)}
+    if key(source['catalogs'][0]) not in breadcrumb_urls or not re.search(r'\bfor ' + source['transaction'] + r'\b', title, re.I):
+        raise SkipListing('Property transaction could not be confirmed')
+    property_type = ('apartment' if re.search(r'\b(?:apartments?|penthouse|condo)\b', title, re.I)
+                     else 'house' if re.search(r'\b(?:house|townhouse|villa|bungalow|mansion)\b', title, re.I) else '')
+    if not property_type:
+        raise SkipListing('Only residential apartments and houses are included')
+    overview = soup.select_one('.semantic-description')
+    details = clean(overview.get_text(' ', strip=True)) if overview else ''
+    if not re.search(r'\bKampala\b', f'{title} {details}', re.I):
+        raise SkipListing('Property location does not explicitly identify Kampala')
+    price = soup.select_one('#mainPriceDisplay')
+    shown = re.fullmatch(r'(\$|UGX\s*)([\d,]+(?:\.\d+)?)', clean(price.get_text(' ', strip=True))) if price else None
+    amount = shown[2].replace(',', '') if shown else ''
+    currency = 'USD' if shown and shown[1] == '$' else 'UGX'
+    if not amount or offer.get('priceCurrency') != currency or float(amount) <= 0 or float(amount) != float(offer.get('price') or 0):
+        raise ValueError('Property does not have a matching advertised price')
+    if rent and not re.search(r'(?:/\s*(?:mo(?:nth)?|pcm)\b|\bper month\b|\bmonthly\b)', f"{title} {product.get('description', '')} {details}", re.I):
+        raise SkipListing('Rental period is unconfirmed')
+    images = [urljoin(url, a['href']) for a in soup.select('.gallery-container .swiper-main a[data-fancybox="property-gallery"][href]')
+              if urlsplit(urljoin(url, a['href'])).netloc == urlsplit(url).netloc
+              and urlsplit(urljoin(url, a['href'])).path.startswith('/uploads/properties/')]
+    if product.get('image') not in images:
+        raise SkipListing('Property cover does not match the source gallery')
+    attrs = {'propertyType': property_type, 'priceTerm': 'per_month' if rent else 'total'}
+    for icon, field in (('fa-bed', 'bedrooms'), ('fa-bath', 'bathrooms'), ('fa-vector-square', 'area')):
+        node = soup.select_one(f'li .{icon}')
+        value = re.match(r'^([1-9]\d*)\b', node.parent.get_text(' ', strip=True)) if node else None
+        if value:
+            attrs[field] = int(value[1])
+    price_text = f'{currency} {float(amount):,.0f}' + (' / month' if rent else '')
+    row = make_row({**source, 'currency': currency}, url, title, images, checked, '', 'real_estate',
+                   'for_rent_long' if rent else 'for_sale', amount, price_text, attrs)
+    row['description'] = f"{title}. Listed by {source['name']} in Kampala. Advertised price: {price_text}. See the source for property details and viewings."
+    return row
 
 def parse_job(source_id, body, url, checked):
     source = SOURCES[source_id]
@@ -250,7 +350,7 @@ def make_row(source, url, title, images, checked, posted, category, subcategory,
                                and not re.search(r'placeholder|no.image|unsplash', i, re.I)))[:4]
     if not images:
         raise SkipListing('Source-owned product photos or recruiter logo missing')
-    attrs.update(parser='category_sources_v1', sourceKind='recruiter' if category == 'jobs' else 'retailer',
+    attrs.update(parser='category_sources_v1', sourceKind={'jobs': 'recruiter', 'real_estate': 'agency'}.get(category, 'retailer'),
                  contactSourceUrl=source['contact'], sourcePostedAt=posted, imageSourceUrl=url, imageVerifiedAt=checked,
                  detailsSourceUrl=url, detailsVerifiedAt=checked,
                  listingIdentity=dict(sourceUrl=url, title=title, images=images, phones=[source['phone']], city=source['city'], checkedAt=checked))
@@ -267,7 +367,7 @@ def make_row(source, url, title, images, checked, posted, category, subcategory,
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--sources', default=','.join(SOURCES))
-    parser.add_argument('--kind', choices=['product', 'job'])
+    parser.add_argument('--kind', choices=['product', 'job', 'property'])
     parser.add_argument('--limit-per-source', type=int, default=40)
     parser.add_argument('--candidate-limit', type=int, default=100)
     parser.add_argument('--cache-dir', type=Path)
@@ -307,23 +407,29 @@ def main():
             contact_body = fetch(source['contact'])
             contact(source, contact_body)
             links = []
-            pattern = r'^/jobs?/[^/]+/?$' if source['kind'] == 'job' else r'^/products?/[^/]+/?$'
+            pattern = {'job': r'^/jobs?/[^/]+/?$', 'product': r'^/products?/[^/]+/?$',
+                       'property': r'^/property/[^/]+/?$'}[source['kind']]
             for catalog in source['catalogs']:
                 body = contact_body if catalog == source['contact'] else fetch(catalog)
                 soup = BeautifulSoup(body, 'html.parser')
-                links.extend(urljoin(catalog, a['href']).split('?')[0].split('#')[0] for a in soup.select('a[href]')
+                anchors = soup.select('a[href]')
+                if name == 'netcart_kampala':
+                    anchors = [a for card in soup.select('.nc-card:has(.nc-card__stock--ok)')
+                               for a in card.select('a.nc-card__name[href]')]
+                links.extend(urljoin(catalog, a['href']).split('?')[0].split('#')[0] for a in anchors
                              if urlsplit(urljoin(catalog, a['href'])).netloc == urlsplit(catalog).netloc
-                             and re.fullmatch(pattern, urlsplit(a['href']).path))
+                             and re.fullmatch(source.get('pattern', pattern), urlsplit(a['href']).path))
             links = list(dict.fromkeys(links))
             report['discovered'] = len(links)
             if not links:
                 raise ValueError('No source listing links found')
-            candidates = [u for u in links if key(u) not in existing][:args.candidate_limit]
+            candidates = [u for u in links if key(u) not in existing][:min(args.candidate_limit, source.get('candidates', args.candidate_limit))]
             report['candidates'] = len(candidates)
+            parse = {'job': parse_job, 'product': parse_product, 'property': parse_property}[source['kind']]
             def load(url):
                 try:
                     body = fetch(url)
-                    row = (parse_job if source['kind'] == 'job' else parse_product)(name, body, url, checked)
+                    row = parse(name, body, url, checked)
                     state, reason = availability.classify(row, 200, body, url)
                     if state in availability.UNAVAILABLE:
                         raise SkipListing(reason)

@@ -92,6 +92,12 @@ def classify(row, status, body, resolved_url=""):
         return "gone", f"Exact source URL returned HTTP {status}"
     if not 200 <= status < 400:
         return "unknown", f"Unexpected HTTP {status}"
+    if host(original_parts) == "net-cart.com" and original_parts.path.startswith("/product/"):
+        canonical = soup.select_one('link[rel="canonical"]')
+        stock = soup.select_one('.nc-pdp__stock')
+        if canonical and stock and source_key(urljoin(original, canonical.get('href', ''))) == source_key(original):
+            if stock.get_text(' ', strip=True).casefold() == 'available to order':
+                return "unavailable", "Exact product now requires a special order"
     if host(original_parts) == "sublimemotorcars.com" and original_parts.path.startswith("/vehicle/"):
         # The dealer's visible primary badge can mark a car sold while its schema says InStock.
         canonical = soup.select_one('link[rel="canonical"]')

@@ -67,7 +67,9 @@ n8n schedule/manual trigger
 Canada, the United States (including Atlanta and Houston), Jamaica, Guyana, Ghana,
 Kenya, Ethiopia, China, the United Arab Emirates, Nigeria, South Africa, the
 United Kingdom and Uganda. Kampala discovery covers used dealer vehicles from ML Motors
-and Sublime Motors, with public dealer phones, matching photos and UGX prices. Each source
+and Sublime Motors, phones and laptops from Gadget Craze and netCart, and available residential
+sales and monthly rentals from Juha Properties. Property prices use the currency
+advertised on the exact listing. Each source
 group is searched at 01:17, 06:17, 11:17, 16:17 and 21:17 UTC. The 06:17 run
 also checks imported source URLs for removals. Source outcomes are tracked in
 `data/listing-discovery-state.json`. Failed groups retry on the next run.

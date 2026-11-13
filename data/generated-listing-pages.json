@@ -1,6 +1,321 @@
 {
-  "count": 6135,
+  "count": 6162,
   "listings": [
+    {
+      "id": "dealer-646b4a03c92e284ea3",
+      "slug": "2016-forester-subaru-c92e284ea3",
+      "url": "https://6ixo.com/listing/2016-forester-subaru-c92e284ea3/",
+      "images": [
+        "https://mandelmotors.com/storage/88/conversions/01M00HMAHNWVAAVGQK16V66DGP-large.jpg",
+        "https://mandelmotors.com/storage/89/conversions/01M00HMC5X69HKX9MA1P4C0KG7-large.jpg",
+        "https://mandelmotors.com/storage/90/conversions/01M00HMDMZHA93WHD9J5EVTM0K-large.jpg",
+        "https://mandelmotors.com/storage/91/conversions/01M00HMFMCPJ4KWZNACAY0XHQ0-large.jpg"
+      ],
+      "categoryKey": "vehicles"
+    },
+    {
+      "id": "dealer-853673c9fdc6c4f33c",
+      "slug": "2010-toyota-noah-fdc6c4f33c",
+      "url": "https://6ixo.com/listing/2010-toyota-noah-fdc6c4f33c/",
+      "images": [
+        "https://mandelmotors.com/storage/80/conversions/01M00HDQZ61BJT9ZNWMHEQ5NGF-large.jpg",
+        "https://mandelmotors.com/storage/81/conversions/01M00HDTB7A47YVXTWW2N6NFSZ-large.jpg",
+        "https://mandelmotors.com/storage/82/conversions/01M00HDWFNSC9G7DX77YQRYVJ0-large.jpg",
+        "https://mandelmotors.com/storage/83/conversions/01M00HDY40KQBBGR4FDH2DR2VP-large.jpg"
+      ],
+      "categoryKey": "vehicles"
+    },
+    {
+      "id": "dealer-9f1c687ea71562f359",
+      "slug": "2015-toy-harrier-a71562f359",
+      "url": "https://6ixo.com/listing/2015-toy-harrier-a71562f359/",
+      "images": [
+        "https://mandelmotors.com/storage/61/conversions/01KYWEK30BNSR1Y3NXGSA2SC0B-large.jpg",
+        "https://mandelmotors.com/storage/62/conversions/01KYWEK3W1KPZ8W94YPPBCBYRP-large.jpg",
+        "https://mandelmotors.com/storage/63/conversions/01KYWEK50AGX3RQ4W7EDRK5E9M-large.jpg",
+        "https://mandelmotors.com/storage/64/conversions/01KYWEK5ZNYH6ZRBS90DDHFV4H-large.jpg"
+      ],
+      "categoryKey": "vehicles"
+    },
+    {
+      "id": "dealer-eb57706b108b73b692",
+      "slug": "2015-toyota-harrier-108b73b692",
+      "url": "https://6ixo.com/listing/2015-toyota-harrier-108b73b692/",
+      "images": [
+        "https://mandelmotors.com/storage/51/conversions/01KYWE10MN5F1T1D5B6SNZFGAT-large.jpg",
+        "https://mandelmotors.com/storage/52/conversions/01KYWE116JXGW4KNYXD9313BCC-large.jpg",
+        "https://mandelmotors.com/storage/53/conversions/01KYWE11PSKTHT757K3TQQGFJ8-large.jpg",
+        "https://mandelmotors.com/storage/54/conversions/01KYWE128APFGB155CNTFX2WKZ-large.jpg"
+      ],
+      "categoryKey": "vehicles"
+    },
+    {
+      "id": "dealer-8610b8f4b5ec83acbe",
+      "slug": "2014-subaru-forester-xt-b5ec83acbe",
+      "url": "https://6ixo.com/listing/2014-subaru-forester-xt-b5ec83acbe/",
+      "images": [
+        "https://mandelmotors.com/storage/39/conversions/01KYWDD8R0W3TM8RGXQM1NVA1K-large.jpg",
+        "https://mandelmotors.com/storage/40/conversions/01KYWDD9MYSB1AHGV6HH8G10AX-large.jpg",
+        "https://mandelmotors.com/storage/41/conversions/01KYWDDAFP9K5M15AXFA89GPQZ-large.jpg",
+        "https://mandelmotors.com/storage/42/conversions/01KYWDDBBK0267QXA5S20VR2RH-large.jpg"
+      ],
+      "categoryKey": "vehicles"
+    },
+    {
+      "id": "dealer-24da57bd73ec325f60",
+      "slug": "2009-toyota-fielder-73ec325f60",
+      "url": "https://6ixo.com/listing/2009-toyota-fielder-73ec325f60/",
+      "images": [
+        "https://mandelmotors.com/storage/28/conversions/01KYWCXNSX90GP7GCFKC1CPRRC-large.jpg",
+        "https://mandelmotors.com/storage/29/conversions/01KYWCXPN73DHSVJXVCVWKKE3P-large.jpg",
+        "https://mandelmotors.com/storage/30/conversions/01KYWCXQ5WYCR9TVNSXQ0H9ZJP-large.jpg",
+        "https://mandelmotors.com/storage/31/conversions/01KYWCXQSKHBFS89YKCQCS2JDZ-large.jpg"
+      ],
+      "categoryKey": "vehicles"
+    },
+    {
+      "id": "dealer-16cee2df2531e08f24",
+      "slug": "2008-toyota-vitz-2531e08f24",
+      "url": "https://6ixo.com/listing/2008-toyota-vitz-2531e08f24/",
+      "images": [
+        "https://mandelmotors.com/storage/23/conversions/01KYWCGV4JZJKVA2KR6PG4YZAE-large.jpg",
+        "https://mandelmotors.com/storage/24/conversions/01KYWCGVQF76CWNC2CY9HG3PTS-large.jpg",
+        "https://mandelmotors.com/storage/25/conversions/01KYWCGW7DP41X29STBAGBDPGB-large.jpg",
+        "https://mandelmotors.com/storage/26/conversions/01KYWCGWQVWNY125YCEDRB8RQC-large.jpg"
+      ],
+      "categoryKey": "vehicles"
+    },
+    {
+      "id": "dealer-18f115e889c044a7dc",
+      "slug": "2008-toyota-harrier-89c044a7dc",
+      "url": "https://6ixo.com/listing/2008-toyota-harrier-89c044a7dc/",
+      "images": [
+        "https://mandelmotors.com/storage/14/conversions/01KYWCEP0QRCC6VZ5MJYCWEZC7-large.jpg",
+        "https://mandelmotors.com/storage/15/conversions/01KYWCEQ1XZW1BQ4ACJ43J1CDM-large.jpg",
+        "https://mandelmotors.com/storage/16/conversions/01KYWCERV8Q3X2N9X50986EX6G-large.jpg",
+        "https://mandelmotors.com/storage/17/conversions/01KYWCETN8FG9SF00S2VVNXD6T-large.jpg"
+      ],
+      "categoryKey": "vehicles"
+    },
+    {
+      "id": "dealer-8cbdf3f9a806575870",
+      "slug": "2015-subaru-impreza-a806575870",
+      "url": "https://6ixo.com/listing/2015-subaru-impreza-a806575870/",
+      "images": [
+        "https://mandelmotors.com/storage/10/conversions/01KYWBD07MEJ9ZZMB7WCJG95EE-large.jpg",
+        "https://mandelmotors.com/storage/11/conversions/01KYWBD16JGX85CAE5FA3Z7H5P-large.jpg",
+        "https://mandelmotors.com/storage/12/conversions/01KYWBD22D7S5C4CC7KC3BRDQA-large.jpg",
+        "https://mandelmotors.com/storage/13/conversions/01KYWBD2RJ21WZHDMBP8VV5RAV-large.jpg"
+      ],
+      "categoryKey": "vehicles"
+    },
+    {
+      "id": "dealer-b2163a4019d21d2139",
+      "slug": "2023-toyota-hilux-revo-rocco-19d21d2139",
+      "url": "https://6ixo.com/listing/2023-toyota-hilux-revo-rocco-19d21d2139/",
+      "images": [
+        "https://sublimemotorcars.com/wp-content/uploads/2026/07/2023-toyota-hilux-revo-rocco.jpg",
+        "https://sublimemotorcars.com/wp-content/uploads/2026/07/2023-toyota-hilux-revo-rocco-2.jpg",
+        "https://sublimemotorcars.com/wp-content/uploads/2026/07/2023-toyota-hilux-revo-rocco-3.jpg",
+        "https://sublimemotorcars.com/wp-content/uploads/2026/07/2023-toyota-hilux-revo-rocco-4.jpg"
+      ],
+      "categoryKey": "vehicles"
+    },
+    {
+      "id": "dealer-a60e1356837a841360",
+      "slug": "2022-toyota-2gd-837a841360",
+      "url": "https://6ixo.com/listing/2022-toyota-2gd-837a841360/",
+      "images": [
+        "https://sublimemotorcars.com/wp-content/uploads/2026/07/WhatsApp-Image-2026-07-24-at-15.03.36-1.jpeg",
+        "https://sublimemotorcars.com/wp-content/uploads/2026/07/WhatsApp-Image-2026-07-24-at-15.03.38-2.jpeg",
+        "https://sublimemotorcars.com/wp-content/uploads/2026/07/WhatsApp-Image-2026-07-24-at-15.03.39.jpeg",
+        "https://sublimemotorcars.com/wp-content/uploads/2026/07/WhatsApp-Image-2026-07-24-at-15.03.39-1.jpeg"
+      ],
+      "categoryKey": "vehicles"
+    },
+    {
+      "id": "dealer-83847f8396d8b93b78",
+      "slug": "2021-toyota-hilux-revo-96d8b93b78",
+      "url": "https://6ixo.com/listing/2021-toyota-hilux-revo-96d8b93b78/",
+      "images": [
+        "https://sublimemotorcars.com/wp-content/uploads/2026/07/WhatsApp-Image-2026-07-29-at-14.35.00-1.jpeg",
+        "https://sublimemotorcars.com/wp-content/uploads/2026/07/WhatsApp-Image-2026-07-29-at-14.35.04.jpeg",
+        "https://sublimemotorcars.com/wp-content/uploads/2026/07/WhatsApp-Image-2026-07-29-at-14.35.04-1.jpeg",
+        "https://sublimemotorcars.com/wp-content/uploads/2026/07/WhatsApp-Image-2026-07-29-at-14.35.04-2.jpeg"
+      ],
+      "categoryKey": "vehicles"
+    },
+    {
+      "id": "dealer-62d922c68d53e4346a",
+      "slug": "2021-toyota-hilux-revo-4-4-8d53e4346a",
+      "url": "https://6ixo.com/listing/2021-toyota-hilux-revo-4-4-8d53e4346a/",
+      "images": [
+        "https://sublimemotorcars.com/wp-content/uploads/2026/07/2021-toyota-hilux-revo-manual.jpg",
+        "https://sublimemotorcars.com/wp-content/uploads/2026/07/2021-toyota-hilux-revo-manual-2.jpg",
+        "https://sublimemotorcars.com/wp-content/uploads/2026/07/2021-toyota-hilux-revo-manual-3.jpg",
+        "https://sublimemotorcars.com/wp-content/uploads/2026/07/2021-toyota-hilux-revo-manual-4.jpg"
+      ],
+      "categoryKey": "vehicles"
+    },
+    {
+      "id": "dealer-926618bc46c9952f84",
+      "slug": "2021-toyota-hilux-revo-rocco-grs-46c9952f84",
+      "url": "https://6ixo.com/listing/2021-toyota-hilux-revo-rocco-grs-46c9952f84/",
+      "images": [
+        "https://sublimemotorcars.com/wp-content/uploads/2026/07/2021-toyota-hilux-revo-rocco-grs.jpg",
+        "https://sublimemotorcars.com/wp-content/uploads/2026/07/2021-toyota-hilux-revo-rocco-grs-2.jpg",
+        "https://sublimemotorcars.com/wp-content/uploads/2026/07/2021-toyota-hilux-revo-rocco-grs-3.jpg",
+        "https://sublimemotorcars.com/wp-content/uploads/2026/07/2021-toyota-hilux-revo-rocco-grs-4.jpg"
+      ],
+      "categoryKey": "vehicles"
+    },
+    {
+      "id": "dealer-d98c6ff49d36afdc3a",
+      "slug": "2020-toyota-2gd-9d36afdc3a",
+      "url": "https://6ixo.com/listing/2020-toyota-2gd-9d36afdc3a/",
+      "images": [
+        "https://sublimemotorcars.com/wp-content/uploads/2026/07/WhatsApp-Image-2026-07-24-at-15.02.54-2.jpeg",
+        "https://sublimemotorcars.com/wp-content/uploads/2026/07/WhatsApp-Image-2026-07-24-at-15.02.53.jpeg",
+        "https://sublimemotorcars.com/wp-content/uploads/2026/07/WhatsApp-Image-2026-07-24-at-15.02.53-1.jpeg",
+        "https://sublimemotorcars.com/wp-content/uploads/2026/07/WhatsApp-Image-2026-07-24-at-15.02.54.jpeg"
+      ],
+      "categoryKey": "vehicles"
+    },
+    {
+      "id": "dealer-e5b80e625bbcf2f845",
+      "slug": "2020-toyota-hilux-revo-4-4-5bbcf2f845",
+      "url": "https://6ixo.com/listing/2020-toyota-hilux-revo-4-4-5bbcf2f845/",
+      "images": [
+        "https://sublimemotorcars.com/wp-content/uploads/2026/07/2020-toyota-hilux-revo-2400.jpg",
+        "https://sublimemotorcars.com/wp-content/uploads/2026/07/2020-toyota-hilux-revo-2400-2.jpg",
+        "https://sublimemotorcars.com/wp-content/uploads/2026/07/2020-toyota-hilux-revo-2400-3.jpg",
+        "https://sublimemotorcars.com/wp-content/uploads/2026/07/2020-toyota-hilux-revo-2400-4.jpg"
+      ],
+      "categoryKey": "vehicles"
+    },
+    {
+      "id": "dealer-c99a1541f8e7e26945",
+      "slug": "2020-toyota-hilux-revo-rocco-f8e7e26945",
+      "url": "https://6ixo.com/listing/2020-toyota-hilux-revo-rocco-f8e7e26945/",
+      "images": [
+        "https://sublimemotorcars.com/wp-content/uploads/2026/07/2020-toyota-hilux-revo.jpg",
+        "https://sublimemotorcars.com/wp-content/uploads/2026/07/2020-toyota-hilux-revo-2.jpg",
+        "https://sublimemotorcars.com/wp-content/uploads/2026/07/2020-toyota-hilux-revo-3.jpg",
+        "https://sublimemotorcars.com/wp-content/uploads/2026/07/2020-toyota-hilux-revo-4.jpg"
+      ],
+      "categoryKey": "vehicles"
+    },
+    {
+      "id": "dealer-5104a466b3773503b0",
+      "slug": "2019-toyota-toyota-hilux-revo-b3773503b0",
+      "url": "https://6ixo.com/listing/2019-toyota-toyota-hilux-revo-b3773503b0/",
+      "images": [
+        "https://sublimemotorcars.com/wp-content/uploads/2026/07/WhatsApp-Image-2026-07-24-at-15.01.31-1.jpeg",
+        "https://sublimemotorcars.com/wp-content/uploads/2026/07/WhatsApp-Image-2026-07-24-at-15.01.33-1.jpeg",
+        "https://sublimemotorcars.com/wp-content/uploads/2026/07/WhatsApp-Image-2026-07-24-at-15.01.33-2.jpeg",
+        "https://sublimemotorcars.com/wp-content/uploads/2026/07/WhatsApp-Image-2026-07-24-at-15.01.34.jpeg"
+      ],
+      "categoryKey": "vehicles"
+    },
+    {
+      "id": "dealer-cd20da6b9ba207eece",
+      "slug": "2018-toyota-harrier-premium-9ba207eece",
+      "url": "https://6ixo.com/listing/2018-toyota-harrier-premium-9ba207eece/",
+      "images": [
+        "https://sublimemotorcars.com/wp-content/uploads/2026/07/2018-toyota-harrier-premium.jpg"
+      ],
+      "categoryKey": "vehicles"
+    },
+    {
+      "id": "dealer-5147897b206a964543",
+      "slug": "2018-toyota-hiace-super-gl-206a964543",
+      "url": "https://6ixo.com/listing/2018-toyota-hiace-super-gl-206a964543/",
+      "images": [
+        "https://sublimemotorcars.com/wp-content/uploads/2026/07/2018-toyota-hiace-super-gl.jpg"
+      ],
+      "categoryKey": "vehicles"
+    },
+    {
+      "id": "dealer-2516bcb02e994bfce4",
+      "slug": "2017-mitsubishi-mitsubishi-rosa-2e994bfce4",
+      "url": "https://6ixo.com/listing/2017-mitsubishi-mitsubishi-rosa-2e994bfce4/",
+      "images": [
+        "https://sublimemotorcars.com/wp-content/uploads/2026/07/WhatsApp-Image-2026-07-22-at-12.58.28.jpeg",
+        "https://sublimemotorcars.com/wp-content/uploads/2026/07/WhatsApp-Image-2026-07-22-at-12.58.32.jpeg",
+        "https://sublimemotorcars.com/wp-content/uploads/2026/07/WhatsApp-Image-2026-07-22-at-12.58.31-2.jpeg",
+        "https://sublimemotorcars.com/wp-content/uploads/2026/07/WhatsApp-Image-2026-07-22-at-12.58.31-1.jpeg"
+      ],
+      "categoryKey": "vehicles"
+    },
+    {
+      "id": "dealer-ff1f4e13fc0d13a7fd",
+      "slug": "2017-toyota-hilux-revo-4-4-fc0d13a7fd",
+      "url": "https://6ixo.com/listing/2017-toyota-hilux-revo-4-4-fc0d13a7fd/",
+      "images": [
+        "https://sublimemotorcars.com/wp-content/uploads/2026/07/2017-toyota-hilux-revo.jpg",
+        "https://sublimemotorcars.com/wp-content/uploads/2026/07/2017-toyota-hilux-revo-2.jpg",
+        "https://sublimemotorcars.com/wp-content/uploads/2026/07/2017-toyota-hilux-revo-3.jpg",
+        "https://sublimemotorcars.com/wp-content/uploads/2026/07/2017-toyota-hilux-revo-4.jpg"
+      ],
+      "categoryKey": "vehicles"
+    },
+    {
+      "id": "dealer-87766d2c681e0e29d6",
+      "slug": "2016-mitsubishi-rosa-bus-681e0e29d6",
+      "url": "https://6ixo.com/listing/2016-mitsubishi-rosa-bus-681e0e29d6/",
+      "images": [
+        "https://sublimemotorcars.com/wp-content/uploads/2026/07/2016-mitsubishi-rosa.jpg",
+        "https://sublimemotorcars.com/wp-content/uploads/2026/07/WhatsApp-Image-2026-07-16-at-12.59.24-1.jpeg",
+        "https://sublimemotorcars.com/wp-content/uploads/2026/07/WhatsApp-Image-2026-07-16-at-12.59.24.jpeg",
+        "https://sublimemotorcars.com/wp-content/uploads/2026/07/WhatsApp-Image-2026-07-16-at-12.59.25-1.jpeg"
+      ],
+      "categoryKey": "vehicles"
+    },
+    {
+      "id": "dealer-4c2780f9dc883edcb9",
+      "slug": "2016-toyota-hilux-revo-4-4-dc883edcb9",
+      "url": "https://6ixo.com/listing/2016-toyota-hilux-revo-4-4-dc883edcb9/",
+      "images": [
+        "https://sublimemotorcars.com/wp-content/uploads/2026/07/2016-toyota-hilux-revo.jpg",
+        "https://sublimemotorcars.com/wp-content/uploads/2026/07/2016-toyota-hilux-revo-2.jpg",
+        "https://sublimemotorcars.com/wp-content/uploads/2026/07/2016-toyota-hilux-revo-3.jpg",
+        "https://sublimemotorcars.com/wp-content/uploads/2026/07/2016-toyota-hilux-revo-4.jpg"
+      ],
+      "categoryKey": "vehicles"
+    },
+    {
+      "id": "dealer-9feddfb72ebb70e37d",
+      "slug": "2015-toyota-hilux-revo-4-4-2ebb70e37d",
+      "url": "https://6ixo.com/listing/2015-toyota-hilux-revo-4-4-2ebb70e37d/",
+      "images": [
+        "https://sublimemotorcars.com/wp-content/uploads/2026/07/2015-toyota-hilux-revo.jpg",
+        "https://sublimemotorcars.com/wp-content/uploads/2026/07/2015-toyota-hilux-revo-2.jpg",
+        "https://sublimemotorcars.com/wp-content/uploads/2026/07/2015-toyota-hilux-revo-3.jpg",
+        "https://sublimemotorcars.com/wp-content/uploads/2026/07/2015-toyota-hilux-revo-4.jpg"
+      ],
+      "categoryKey": "vehicles"
+    },
+    {
+      "id": "dealer-697049014b1a0f203d",
+      "slug": "2014-toyota-hiace-dx-4b1a0f203d",
+      "url": "https://6ixo.com/listing/2014-toyota-hiace-dx-4b1a0f203d/",
+      "images": [
+        "https://sublimemotorcars.com/wp-content/uploads/2026/07/2014-toyota-hiace-dx-4wd.jpg"
+      ],
+      "categoryKey": "vehicles"
+    },
+    {
+      "id": "dealer-d0ca3a27bb962488c3",
+      "slug": "2013-toyota-land-cruiser-prado-bb962488c3",
+      "url": "https://6ixo.com/listing/2013-toyota-land-cruiser-prado-bb962488c3/",
+      "images": [
+        "https://sublimemotorcars.com/wp-content/uploads/2026/07/WhatsApp-Image-2026-07-29-at-14.37.36-1.jpeg",
+        "https://sublimemotorcars.com/wp-content/uploads/2026/07/WhatsApp-Image-2026-07-29-at-14.37.38-1.jpeg",
+        "https://sublimemotorcars.com/wp-content/uploads/2026/07/WhatsApp-Image-2026-07-29-at-14.37.38.jpeg",
+        "https://sublimemotorcars.com/wp-content/uploads/2026/07/WhatsApp-Image-2026-07-29-at-14.37.37-1.jpeg"
+      ],
+      "categoryKey": "vehicles"
+    },
     {
       "id": "allsopp-dubai-l-313678",
       "slug": "1-bedroom-apartment-for-rent-belgravia-square-jumeirah-vil-bail313678",
@@ -73881,6 +74196,9 @@
       "url": "https://6ixo.com/listings/page/171/"
     },
     {
+      "url": "https://6ixo.com/listings/page/172/"
+    },
+    {
       "url": "https://6ixo.com/listings/electronics/"
     },
     {
@@ -74140,6 +74458,9 @@
     },
     {
       "url": "https://6ixo.com/listings/vehicles/page/74/"
+    },
+    {
+      "url": "https://6ixo.com/listings/vehicles/page/75/"
     },
     {
       "url": "https://6ixo.com/listings/auto-parts/"
@@ -74973,6 +75294,9 @@
       "url": "https://6ixo.com/listings/country/south-africa/"
     },
     {
+      "url": "https://6ixo.com/listings/country/uganda/"
+    },
+    {
       "url": "https://6ixo.com/listings/country/united-arab-emirates/real-estate/"
     },
     {
@@ -75502,6 +75826,9 @@
     },
     {
       "url": "https://6ixo.com/cars-for-sale/south-africa/"
+    },
+    {
+      "url": "https://6ixo.com/cars-for-sale/uganda/"
     },
     {
       "url": "https://6ixo.com/cars-for-sale/united-arab-emirates/"

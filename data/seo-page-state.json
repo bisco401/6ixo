@@ -1,6 +1,6 @@
 {
   "https://6ixo.com/": {
-    "hash": "075e23f9444dd21eee378dd495df5e1a9bb6c11f8d8a1c7e38f5b8290f4947b5",
+    "hash": "c38c19740e3834be3a2de8f7024be0cb86dd6cd24f01065e54105a9da5d2bee6",
     "lastmod": "2026-11-13"
   },
   "https://6ixo.com/about/": {
@@ -124,7 +124,7 @@
     "lastmod": "2026-08-04"
   },
   "https://6ixo.com/cars-for-sale/": {
-    "hash": "7e0faa78cce576d38245c1a7502e6a4db80c65e66aa16d77c2240a0625484672",
+    "hash": "3d12de1aa685b8bba1a4cc7dfbc9da42834e6269800a0b91a05d8055f434965d",
     "lastmod": "2026-11-13"
   },
   "https://6ixo.com/cars-for-sale/accra/": {
@@ -162,6 +162,10 @@
   "https://6ixo.com/cars-for-sale/south-africa/": {
     "hash": "ccb72ea6fe0b90ec6147ebac73a42e53d72217888a3a9426ace26e3cbde32937",
     "lastmod": "2026-11-08"
+  },
+  "https://6ixo.com/cars-for-sale/uganda/": {
+    "hash": "000b8c273ac5dfb1952d97d89cb52d5d2349b685605515dacbe7ec8334a785a4",
+    "lastmod": "2026-11-13"
   },
   "https://6ixo.com/cars-for-sale/united-arab-emirates/": {
     "hash": "78fd9031aeff3b19f3d2b55ab671a744be68306d6defebf9f35b3ad3c23df337",
@@ -2991,12 +2995,20 @@
     "hash": "58b09560ebe663783a85acafe4bb7e5607a1216b65bc05bbf081ac5c55e42c59",
     "lastmod": "2026-11-13"
   },
+  "https://6ixo.com/listing/2008-toyota-harrier-89c044a7dc/": {
+    "hash": "adbb56f8286e9f93919057774b0de48b10bbd1548ee9484533e09658112dec27",
+    "lastmod": "2026-11-13"
+  },
   "https://6ixo.com/listing/2008-toyota-sienna-xle-limited-mobility-handicap-wheelchai-lsqk2phhoq/": {
     "hash": "bf0ece6d057bba4adc7f23554130b491606b991b669cffc6c73f1a9121bddf38",
     "lastmod": "2026-11-13"
   },
   "https://6ixo.com/listing/2008-toyota-tacoma-prerunner-access-cab-2dr-truck-club-cab-mj2tkhkkgg/": {
     "hash": "1d9ef52e42e4003ceb3a7032a23ef4bb6fbccff5c10092d6e87ac42148ffce09",
+    "lastmod": "2026-11-13"
+  },
+  "https://6ixo.com/listing/2008-toyota-vitz-2531e08f24/": {
+    "hash": "085d7aa1b38931ca057599986999468398b1737bc78d9f151a80576587265a29",
     "lastmod": "2026-11-13"
   },
   "https://6ixo.com/listing/2009-2009-ford-f-150-automatic-transmission-f36562-5fauj4cdju/": {
@@ -3161,6 +3173,10 @@
   },
   "https://6ixo.com/listing/2009-toyota-corolla-xle-low-miles-amcnrdqvar/": {
     "hash": "19bd79b90493068ad96903ee77919a147518128c754f1e25d9f5c939d943cfe8",
+    "lastmod": "2026-11-13"
+  },
+  "https://6ixo.com/listing/2009-toyota-fielder-73ec325f60/": {
+    "hash": "05caac17f31292902c1cb2070ae155a3860cd425a06487f54699dff91742e79a",
     "lastmod": "2026-11-13"
   },
   "https://6ixo.com/listing/2009-toyota-tundra-double-cab-2wd-cvezzppgc4/": {
@@ -3417,6 +3433,10 @@
   },
   "https://6ixo.com/listing/2010-toyota-corolla-6a4142396f/": {
     "hash": "0d292a5da7b859d2884497d594ddfc8df2c70ac0788ebd1551cb5dc7207f7e08",
+    "lastmod": "2026-11-13"
+  },
+  "https://6ixo.com/listing/2010-toyota-noah-fdc6c4f33c/": {
+    "hash": "f37e4b3846f211eaba8aa31e3c9fcc14c119ac598c8fff2d418aaab51bad80d2",
     "lastmod": "2026-11-13"
   },
   "https://6ixo.com/listing/2010-toyota-vitz-08666c4f31/": {
@@ -4467,6 +4487,10 @@
     "hash": "445dde5814b0681dd2fba1689e7c0bf9dae43ae2338228b3483e9f10ec363085",
     "lastmod": "2026-11-13"
   },
+  "https://6ixo.com/listing/2013-toyota-land-cruiser-prado-bb962488c3/": {
+    "hash": "3bf319f4032d3dff2c94280acb844bb48c5689bdd029e3aa2338b36913475159",
+    "lastmod": "2026-11-13"
+  },
   "https://6ixo.com/listing/2013-toyota-prius-iii-guaranteed-financing-vxbnc9gw2g/": {
     "hash": "84afc7dbe4c5b4aaa5c129d3bad3be7cef813e2fd5ee9fbd886cad063d5acba9",
     "lastmod": "2026-11-13"
@@ -4879,6 +4903,10 @@
     "hash": "095261d88792deb30818d6d26bf75917aed0f5bfac3a0292c7793d05def176ca",
     "lastmod": "2026-11-13"
   },
+  "https://6ixo.com/listing/2014-subaru-forester-xt-b5ec83acbe/": {
+    "hash": "45a2f962219fbb219920e46e33261561ffecdd34c721d1de75f39a1fb7b5e0a5",
+    "lastmod": "2026-11-13"
+  },
   "https://6ixo.com/listing/2014-subaru-impreza-2-0-sport-premium-wagon-5-speed-manual-cqwscyxern/": {
     "hash": "ab7d4c9b7617a1ff511cd4f0aa87282edac77c4bb0a55ae18162d08c85f8c599",
     "lastmod": "2026-11-13"
@@ -4913,6 +4941,10 @@
   },
   "https://6ixo.com/listing/2014-toyota-corolla-yretydgl4q/": {
     "hash": "cf03d5608413364c690b4cf4c6455737667b08b22d92cafb68d27233b7872bf5",
+    "lastmod": "2026-11-13"
+  },
+  "https://6ixo.com/listing/2014-toyota-hiace-dx-4b1a0f203d/": {
+    "hash": "ca9eff05969b57adee1cfca8b29793f4cc5d97d88c231b1c139a430271ef3789",
     "lastmod": "2026-11-13"
   },
   "https://6ixo.com/listing/2014-toyota-highlander-xle-awd-loaded-rvqcpcxpxr/": {
@@ -5427,6 +5459,10 @@
     "hash": "6529610e1d7d3c688620e5aeb450d016a7515c559e432d7e4ee2f66f0a2de09e",
     "lastmod": "2026-11-13"
   },
+  "https://6ixo.com/listing/2015-subaru-impreza-a806575870/": {
+    "hash": "d5d4a2878c09f81d332db52b779b8d48972400a038df90b75641ce67f6157b01",
+    "lastmod": "2026-11-13"
+  },
   "https://6ixo.com/listing/2015-subaru-outback-limited-202k-hywy-miles-v6-awd-excelle-7f2ij5eha6/": {
     "hash": "12bcbf14b07018ea5727903cc72773f4381fe34cf1f40cf62bc65b7062ac4cca",
     "lastmod": "2026-11-13"
@@ -5439,8 +5475,16 @@
     "hash": "26c2b81338afe032ca2f3dfb4e7b6d016bedb106d1d21a5c6c8aba506de89c59",
     "lastmod": "2026-11-13"
   },
+  "https://6ixo.com/listing/2015-toy-harrier-a71562f359/": {
+    "hash": "ce31247a82457e8691efbef63ae8b74917f7c39bd3137dca46d37dac371dff5e",
+    "lastmod": "2026-11-13"
+  },
   "https://6ixo.com/listing/2015-toyota-camry-se-xftf2zkjxt/": {
     "hash": "e5b21bcf54430e3a599a3bbb213560963518154df784fc0b3f0dd04cc062d8a7",
+    "lastmod": "2026-11-13"
+  },
+  "https://6ixo.com/listing/2015-toyota-harrier-108b73b692/": {
+    "hash": "bd01b4a92183627603ebc6123f7124097984ebe46ee2c39da4c0cb899d59800d",
     "lastmod": "2026-11-13"
   },
   "https://6ixo.com/listing/2015-toyota-highlander-4d-suv-fwd-limited-platinum-aexyjrjg9g/": {
@@ -5453,6 +5497,10 @@
   },
   "https://6ixo.com/listing/2015-toyota-highlander-xle-awd-loaded-pa3j2yhype/": {
     "hash": "3b1ae3702383358c94f72f6a86f528e1663bc9b06b737ef91b3efbec0b527698",
+    "lastmod": "2026-11-13"
+  },
+  "https://6ixo.com/listing/2015-toyota-hilux-revo-4-4-2ebb70e37d/": {
+    "hash": "e67768b04c37b6403a55c861e13f09859115a9c43994efc0c43057544845e9ea",
     "lastmod": "2026-11-13"
   },
   "https://6ixo.com/listing/2015-toyota-rav4-xle-6e978358c3/": {
@@ -5723,6 +5771,10 @@
     "hash": "c593df015007c9b311eba90ee76975ee99270bc6da095af041567551fcf7f175",
     "lastmod": "2026-11-13"
   },
+  "https://6ixo.com/listing/2016-forester-subaru-c92e284ea3/": {
+    "hash": "d148636e8ab27275bb4ce9a08f765a785b55913399bcf2e5d04a836138e9f53c",
+    "lastmod": "2026-11-13"
+  },
   "https://6ixo.com/listing/2016-gmc-acadia-great-deal-queens-n409omvtca/": {
     "hash": "819a51d1835c4d596f9aae853aecfd5aaa422aec18e5e28019e11b23732ce950",
     "lastmod": "2026-11-13"
@@ -5931,6 +5983,10 @@
     "hash": "d9c9d999bddb3499ba5e173a74a6a1c8a69367d67479ae685e3ec8be7c933c35",
     "lastmod": "2026-11-07"
   },
+  "https://6ixo.com/listing/2016-mitsubishi-rosa-bus-681e0e29d6/": {
+    "hash": "c5dc7b9e0ad11b7761114b5ee6e0906ed758f0c7b65114835ad682cdeb0076a5",
+    "lastmod": "2026-11-13"
+  },
   "https://6ixo.com/listing/2016-nissan-altima-2-5-4dr-sedan-iyzj5mhkkw/": {
     "hash": "9c4897f45aa1c311add57df838789161cb52fd89ec95888685dd46456196e2ed",
     "lastmod": "2026-11-13"
@@ -6017,6 +6073,10 @@
   },
   "https://6ixo.com/listing/2016-toyota-highlander-financing-available-xpcpsnm1gw/": {
     "hash": "74f77ca3cb1611bb42bb15ab5387d7ad5dcccc92a6b92c1b0b5f3c67eae4ef57",
+    "lastmod": "2026-11-13"
+  },
+  "https://6ixo.com/listing/2016-toyota-hilux-revo-4-4-dc883edcb9/": {
+    "hash": "c377f1453253aed76a152fe2cbc4da67929200ec9b109bab806370d306ab939d",
     "lastmod": "2026-11-13"
   },
   "https://6ixo.com/listing/2016-toyota-rav4-le-173-402-km-heated-seats-toronto-gta-1745367011/": {
@@ -6615,6 +6675,10 @@
     "hash": "9d107a944c6ab627409432e23c8ba5f46e2794b1f4353263fc3c2730776bba89",
     "lastmod": "2026-11-13"
   },
+  "https://6ixo.com/listing/2017-mitsubishi-mitsubishi-rosa-2e994bfce4/": {
+    "hash": "dcf4c035af474fa75c7e99b7c9c70445be5130711a46355a63dc7ca4589c9e32",
+    "lastmod": "2026-11-13"
+  },
   "https://6ixo.com/listing/2017-mustang-18-x-8-black-wheels-1745964598/": {
     "hash": "cc8645759f94cc545ccab1daf15a959396c9767c438683d222bf60725eba8b4a",
     "lastmod": "2026-11-11"
@@ -6773,6 +6837,10 @@
   },
   "https://6ixo.com/listing/2017-toyota-highlander-limited-qczetikxyk/": {
     "hash": "2db7762b6ecac8accda3bf10437d0854fa6bfd0e026c608ac558e23bb7724c97",
+    "lastmod": "2026-11-13"
+  },
+  "https://6ixo.com/listing/2017-toyota-hilux-revo-4-4-fc0d13a7fd/": {
+    "hash": "8d35ae54267a43ae5c4857b6e3e923f68e5411877e35a5b69af9789ee6b08fbe",
     "lastmod": "2026-11-13"
   },
   "https://6ixo.com/listing/2017-toyota-rav4-awd-certified-1744248214/": {
@@ -7446,6 +7514,14 @@
   "https://6ixo.com/listing/2018-toyota-etios-1-5-29a1564204/": {
     "hash": "577563e06d1c52ea0265abab64bbd4f8a8040677e5277e9523f75291eb857cc4",
     "lastmod": "2026-11-08"
+  },
+  "https://6ixo.com/listing/2018-toyota-harrier-premium-9ba207eece/": {
+    "hash": "6afe28de5b3e73d30c9590866ee486e5757d2a67ec7c055b249a379058f3a91e",
+    "lastmod": "2026-11-13"
+  },
+  "https://6ixo.com/listing/2018-toyota-hiace-super-gl-206a964543/": {
+    "hash": "3b588c7f6d1840717acd6c8546a7497fafd4f143b42039d56c60543bf40d496c",
+    "lastmod": "2026-11-13"
   },
   "https://6ixo.com/listing/2018-toyota-highlander-3500-down-bad-credit-we-do-ddzmqmk8me/": {
     "hash": "89580d5d1e7d701a331f4d9497af9d30effb87a81d9652950e45c0cffa854f03",
@@ -8151,6 +8227,10 @@
     "hash": "634fbfd8e6dab2f8810cf4896cb4b6d59e0eebe9350f59abf24b93318b136854",
     "lastmod": "2026-11-13"
   },
+  "https://6ixo.com/listing/2019-toyota-toyota-hilux-revo-b3773503b0/": {
+    "hash": "ff496822d846510ff0c632ffbb07ad523d0fbaaab1c4c3cac9645e4b1375295a",
+    "lastmod": "2026-11-13"
+  },
   "https://6ixo.com/listing/2019-toyota-yaris-from-1700-down-manual-6-speed-get-it-tod-0oownlgcaq/": {
     "hash": "30393712c17efbd720977719a3d35dc92b612d38622893672128721df33eda24",
     "lastmod": "2026-11-13"
@@ -8779,6 +8859,10 @@
     "hash": "bd8c6e4152ae4a1ce3810ac1b020a83e121e143ad77daddbd5a8c7fa522c27c3",
     "lastmod": "2026-11-13"
   },
+  "https://6ixo.com/listing/2020-toyota-2gd-9d36afdc3a/": {
+    "hash": "32ef36f7abf66b7db3c45c37510fd245cdc23ee6f1e2ef0dbec9f9be28ff871d",
+    "lastmod": "2026-11-13"
+  },
   "https://6ixo.com/listing/2020-toyota-corolla-le-sedan-great-deal-gc1gzhqamn/": {
     "hash": "e6dcd88e8c81a5d7a575a23e475378bfd0ed39f40585cd40b89c4a0ef7c0686c",
     "lastmod": "2026-11-13"
@@ -8786,6 +8870,14 @@
   "https://6ixo.com/listing/2020-toyota-corolla-xse-20th-anniversary-sale-1743570660/": {
     "hash": "7bb9d94caf9d7181a6f679611ee1cb33b1bbb6e0f96dbdb5e10a5eca90c6b1ee",
     "lastmod": "2026-11-11"
+  },
+  "https://6ixo.com/listing/2020-toyota-hilux-revo-4-4-5bbcf2f845/": {
+    "hash": "7aad70921ea49388b954d14186d8feb4bfb7f404fcd88f5901790eb0bcc4d847",
+    "lastmod": "2026-11-13"
+  },
+  "https://6ixo.com/listing/2020-toyota-hilux-revo-rocco-f8e7e26945/": {
+    "hash": "905b0aab5d687525d2610f48bf2fadc1756ce8fc64dac35b90dc83c00ed6c19d",
+    "lastmod": "2026-11-13"
   },
   "https://6ixo.com/listing/2020-toyota-noah-voxy-esquire-80-series-right-door-mirror-ars2430470/": {
     "hash": "ca9a23c7baa96c81f12e2565993668d53aa0c00dfa6433aa9f6d0e1bb1c94e1b",
@@ -9247,6 +9339,18 @@
     "hash": "7c8a49c0343d9967147d8fc5743d1b4d2be29dc33c59039f5c7b70e6bf17fa9e",
     "lastmod": "2026-11-13"
   },
+  "https://6ixo.com/listing/2021-toyota-hilux-revo-4-4-8d53e4346a/": {
+    "hash": "536d958c525c76468fb7d4cbc99afd4adaf72fb3b94598263790ccb2b9da3de1",
+    "lastmod": "2026-11-13"
+  },
+  "https://6ixo.com/listing/2021-toyota-hilux-revo-96d8b93b78/": {
+    "hash": "b92b78d099dadaeeb2c3b8ec69df35f204aa397518365033dec7d7d63b6612d2",
+    "lastmod": "2026-11-13"
+  },
+  "https://6ixo.com/listing/2021-toyota-hilux-revo-rocco-grs-46c9952f84/": {
+    "hash": "dbc314f7f4057b42b0acfcad5edb37919bce954c95e4d939f6f5ccffcc3af20f",
+    "lastmod": "2026-11-13"
+  },
   "https://6ixo.com/listing/2021-toyota-prius-prime-le-4dr-hatchback-6vxb8ypcv9/": {
     "hash": "40649e590df8d945baca32994dcc2bb9cbbc5cb194da029291bccc219ea9ad49",
     "lastmod": "2026-11-13"
@@ -9617,6 +9721,10 @@
   },
   "https://6ixo.com/listing/2022-tesla-model-3-standard-range-rgomoklx3a/": {
     "hash": "d9bbf03bad01453b09b2e9f6afb8b26d6f5eadbb88b144cd0c86e84a04415825",
+    "lastmod": "2026-11-13"
+  },
+  "https://6ixo.com/listing/2022-toyota-2gd-837a841360/": {
+    "hash": "742fab2212ad975bb7c07662ef103c48f2bcefeb879efc808f0f4f0e64e7b891",
     "lastmod": "2026-11-13"
   },
   "https://6ixo.com/listing/2022-toyota-camry-se-awd-sed-1-owner-loaded-warranty-mint-dgrutxc3ym/": {
@@ -10050,6 +10158,10 @@
   "https://6ixo.com/listing/2023-toyota-highlander-xle-8-passenger-1-owner-no-1743896825/": {
     "hash": "bd70680b16ebaca37edcd51bf89e071b645acac18944e92b393ea5dac9723278",
     "lastmod": "2026-11-11"
+  },
+  "https://6ixo.com/listing/2023-toyota-hilux-revo-rocco-19d21d2139/": {
+    "hash": "cecd9c91bee99c1315f62f4465901daf96671e2bba38b29ef2b11d9ffeb0d376",
+    "lastmod": "2026-11-13"
   },
   "https://6ixo.com/listing/2023-toyota-prius-le-u6nmygeipa/": {
     "hash": "d40795e0378416fde54d2f9ca243feb8914363503a4011c18a90d82cc8fe1d67",
@@ -24740,23 +24852,23 @@
     "lastmod": "2026-11-13"
   },
   "https://6ixo.com/listings/": {
-    "hash": "1df11fb0a16356c26475689b9c12f4559cfec3d613fe773af3ebc94bd4e08eda",
+    "hash": "44ab62389773e5da117b90a556e5efd6f9b56d2b4d987dc66d23d6171e325858",
     "lastmod": "2026-11-13"
   },
   "https://6ixo.com/listings/auto-parts/": {
-    "hash": "e16ef3b9343b75c8b421c08d9d6102607cc9acbab815e9642d81ed0f8f85fc7d",
+    "hash": "369fd1de7febfa9a4f51c173f2febf18f7ea1bdb53484ceb5fa67ccea1136033",
     "lastmod": "2026-11-13"
   },
   "https://6ixo.com/listings/buy-and-sell/": {
-    "hash": "860d98a7abaa0cd9eb75d5a4ba7ecf4c3bbf1880fa457a7424851079c94abb78",
+    "hash": "7245631a7ee93cb59ffc4a0194181744f4587d063763df2ef41281c5ebdc4f9b",
     "lastmod": "2026-11-13"
   },
   "https://6ixo.com/listings/car-rentals/": {
-    "hash": "452df8b9eedaf49157f3ae5c0dcb32ea6dc40258c79103971579fbbf1bd79b8b",
+    "hash": "20f0e9c3716605ec54a621bec03ec129d63258de6e19a1c9c63eefeafd52d1d0",
     "lastmod": "2026-11-13"
   },
   "https://6ixo.com/listings/community/": {
-    "hash": "a1735b4f04def030cb9a142e7c916b98f553e3c780a41f14b33798d0a899c552",
+    "hash": "9559a6255cc745f9b6abf03cc85e36581459274ea4d64292c1c5a8ce3c126f46",
     "lastmod": "2026-11-13"
   },
   "https://6ixo.com/listings/country/canada/": {
@@ -24927,6 +25039,10 @@
     "hash": "ddd388ba7a148f7887d466a4cbbcafa5afdd37a96272b334a3a12294cf41f839",
     "lastmod": "2026-11-11"
   },
+  "https://6ixo.com/listings/country/uganda/": {
+    "hash": "3781e404e61afff1a2aa0e07bfdae582cc5fa581d138fef04ac62751d764210c",
+    "lastmod": "2026-11-13"
+  },
   "https://6ixo.com/listings/country/united-arab-emirates/": {
     "hash": "5841c29c75b7cb36b5e6cb8330b411114c214dca65b2ff850478510df4a7e2b2",
     "lastmod": "2026-11-13"
@@ -24984,31 +25100,31 @@
     "lastmod": "2026-11-13"
   },
   "https://6ixo.com/listings/electronics/": {
-    "hash": "f3ea0aa0b1f0aa52f245c31be947fe1c87739d751d0fd5b40d9715e431e6ae80",
+    "hash": "67a58451747d944cb5c4e91a86b6dbb8b1e67380ac72048d0a5e06703a87f46f",
     "lastmod": "2026-11-13"
   },
   "https://6ixo.com/listings/fashion/": {
-    "hash": "acb9e36b3fefb1fbe47cef24e425b89b8a0f56994777f641c9e62cf47d0c4e12",
+    "hash": "cf82ee745b6bc261e0d96922d1f2592ef6bb22d564557b3d531e4a8f86e2b9d4",
     "lastmod": "2026-11-13"
   },
   "https://6ixo.com/listings/jobs/": {
-    "hash": "ec70fb94814d6d1c95f7a7d729f12575ab20951f08ea22d0df68df80a6044633",
+    "hash": "85b389c24d0b9cdd709f068f58d8e26a2d2653a111c5289814ea19efd4ddae12",
     "lastmod": "2026-11-13"
   },
   "https://6ixo.com/listings/real-estate/": {
-    "hash": "1d3384df8d4d60dad6ca181a681929060f3edebe875a8c5e97c42538a5150dda",
+    "hash": "f8112c07427dea93914ada755536f6180e0ed8cbbe5d1a958f2f022527120fd6",
     "lastmod": "2026-11-13"
   },
   "https://6ixo.com/listings/services/": {
-    "hash": "a586966402318ae44299b38d6b0bda41d287914ae75216322a93fa53eb67f1f4",
+    "hash": "a7b82a17d94a36e1b48f11af7567297c30621d832e083068f78a75c6af471475",
     "lastmod": "2026-11-13"
   },
   "https://6ixo.com/listings/short-term-rentals/": {
-    "hash": "980e9a1415a3e59ef7485dc65b6fa9cd3ecf6beee27e0fb3c191e9f0de2b9c13",
+    "hash": "31ff1cd605dcd2530741008363f7392386204fea16aaf45364b6e6efdd2c6f6f",
     "lastmod": "2026-11-13"
   },
   "https://6ixo.com/listings/vehicles/": {
-    "hash": "278513b87e2ad5821e52521a7900f34ac57aca246a8d0412201ea984686c3ef6",
+    "hash": "0a4ef98bf7e387ac5bfb9d2fca89ada72dbc4da613bd5a90d2f903dc15fc94d0",
     "lastmod": "2026-11-13"
   },
   "https://6ixo.com/phones-for-sale/": {

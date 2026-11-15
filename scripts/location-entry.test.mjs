@@ -6,7 +6,7 @@ const entrySource = readFileSync(new URL('../location-entry.js', import.meta.url
 const appSource = readFileSync(new URL('../app.js', import.meta.url), 'utf8');
 const indexSource = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
 
-function createHarness({ startRequest = true, native = false, supported = true, secure = true, desktop = false, hash = '', storage = new Map(), cookies = { value: '' }, storageUnavailable = false } = {}) {
+function createHarness({ showPrompt = true, startRequest = true, native = false, supported = true, secure = true, desktop = false, hash = '', storage = new Map(), cookies = { value: '' }, storageUnavailable = false } = {}) {
   const requests = [];
   const watches = [];
   const clearedWatches = [];
@@ -58,10 +58,26 @@ function createHarness({ startRequest = true, native = false, supported = true, 
   } : {};
   const context = vm.createContext({ window, document, navigator, console, Date, Map, Set, URL, URLSearchParams });
   vm.runInContext(entrySource, context);
+  // Legacy dialog interaction cases explicitly open it; startup itself is silent.
+  if (showPrompt && !/^#(?:realestate|shortstays)/.test(hash)) window.SIXO_LOCATION_ENTRY?.showPrompt(null, { force: true });
   // Existing acquisition/recovery cases begin after the visitor chooses Allow.
   if (startRequest && supported && secure) window.SIXO_LOCATION_ENTRY?.request({ userInitiated: true });
   return { window, document, navigator, context, requests, watches, clearedWatches, timers, panels, storage, cookies };
 }
+
+for (const savedChoice of ['', 'seen', 'allowed', 'denied', 'dismissed']) {
+  const visit = createHarness({ showPrompt: false, startRequest: false, storage: new Map([['sixo_location_onboarding_v1', savedChoice]]) });
+  assert.equal(visit.panels.length, 0, 'Browsing starts without an automatic overlay');
+  assert.equal(visit.requests.length, 0, 'Startup never asks for device permission');
+  if (savedChoice !== 'allowed') assert.equal(visit.window.SIXO_LOCATION_ENTRY.canRequestAutomatically('granted'), false, 'A browser grant alone is not a browsing opt-in');
+}
+
+const inlineVisit = createHarness({ showPrompt: false, startRequest: false, storage: new Map([['sixo_location_onboarding_v1', 'dismissed']]) });
+inlineVisit.window.SIXO_LOCATION_ENTRY.beginUserRequest();
+inlineVisit.window.SIXO_LOCATION_ENTRY.recordPermission('granted');
+assert.equal(inlineVisit.storage.get('sixo_location_onboarding_v1'), 'allowed');
+assert.equal(inlineVisit.window.SIXO_LOCATION_ENTRY.canRequestAutomatically('granted'), true);
+assert.equal(inlineVisit.panels.length, 0, 'Inline location opt-in needs no application dialog');
 
 const position = { coords: { latitude: 43.65, longitude: -79.38, accuracy: 15 }, timestamp: Date.now() };
 
@@ -356,7 +372,7 @@ assert.equal(closed.requests.length, 1, 'Dismissing recovery must not trigger fu
 assert.equal(closed.window.SIXO_LOCATION_ENTRY.showPrompt({ code: 1 }, { force: true }), false, 'Pin failures remain nonblocking');
 console.log('Suppressed prompt recovery passed: nonblocking failure, synchronous tap, stale callback isolation, success closure and dismissal.');
 
-// Real page-entry behavior: no request or disappearance until the visitor acts.
+// An explicitly opened permission dialog waits for the visitor, even after a prior grant.
 for (const savedChoice of ['', 'seen', 'allowed', 'denied', 'dismissed']) {
   for (const permissionState of ['unknown', 'prompt', 'granted', 'denied']) {
     const visit = createHarness({ startRequest: false, storage: new Map([[preferenceKey, savedChoice]]) });
@@ -385,7 +401,7 @@ const earlyApp = connectApp(earlyAllow);
 await earlyApp.requestLocationPermissionOnLoad();
 assert.equal(earlyApp.appliedSamples, 1);
 assert.equal(earlyAllow.requests.length, 1);
-console.log('QR entry popup passed: immediate choice, all saved/browser permission combinations, dismissal, synchronous Allow and early app handoff.');
+console.log('Explicit location dialog passed: saved/browser permissions, dismissal, synchronous Allow and early app handoff.');
 
 // Keep the permission choices alongside the new manual browsing path.
 assert.match(entrySource, /“6ixo.com” Would Like to Use Your Location/);

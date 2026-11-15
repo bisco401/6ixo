@@ -2243,8 +2243,8 @@ class DatingApp {
 	        this.setupBrowserNavigation();
 	        this.hideLoadingScreen();
 	        this.showMainApp();
-	        // Restore screen-specific filters first, then let browser location win
-	        // for every new page load.
+	        // Restore deliberate browsing choices before optional device location.
+	        void Promise.resolve(this.restoreBrowsingLocation()).catch(error => console.warn('Browsing area could not be restored:', error));
 	        this.setupLiveLocationLifecycle();
 	        this.requestLocationPermissionOnLoad();
         try {
@@ -4801,6 +4801,25 @@ class DatingApp {
         return this.normalizeImportedSellerName(value, fallback);
     }
 
+    getListingSellerDisplayName(item = {}) {
+        const name = this.getImportedListingSellerName(item, 'Seller');
+        if (!/^(?:unknown|seller|company|vehicle seller)$/i.test(name)) return name;
+        if (!this.isScrapedMarketplaceItem(item)) return name;
+        // Kijiji seller names remain private. Other imports may explicitly name
+        // an advertiser, which is attribution, never a verified 6ixo identity.
+        if (!this.isKijijiImportedListing(item)) {
+            const attribution = String(item.fullDescription || item.description || '').match(/\bListed by ([^\n.]{2,100}?) in [^\n.]+[.\n]/i)?.[1]?.trim();
+            if (attribution && !/^(?:kijiji|craigslist|jiji|pigiame|facebook|gumtree|ebay|unknown)(?: seller)?$/i.test(attribution)) return attribution;
+        }
+        return 'External advertiser';
+    }
+
+    getListingReviewSummary(item = {}) {
+        if (this.isScrapedMarketplaceItem(item)) return 'Imported listing · confirm availability';
+        const meta = this.getMarketplaceSellerReviewMeta(item);
+        return meta.reviewCount > 0 ? `${meta.ratingText} · ${this.formatReviewCountLabel(meta.reviewCount)}` : 'No reviews yet';
+    }
+
     getListingContactPhone(item = {}) {
         return ListingIntegrity.phone(item.phone, item.contactPhone, item.contact?.phone,
             item.realestate?.contactPhone, item.vehicle?.contactPhone, item.service?.phone);
@@ -4854,6 +4873,8 @@ class DatingApp {
                 .replace(/&gt;/gi, '>');
         }
         return decoded
+            .replace(/\bQR Code Link to This Post\b\s*/gi, '')
+            .replace(/\b(?:post id|posted id)\s*:\s*\d+\b/gi, '')
             .replace(/\r/g, '')
             .replace(/[\u00a0\u200b]/g, ' ')
             .replace(/[ \t]+/g, ' ')
@@ -4863,7 +4884,9 @@ class DatingApp {
     }
 
     cleanScrapedListingDescription(value = '', item = {}) {
-        const decoded = this.decodeScrapedDescription(value);
+        const decoded = this.decodeScrapedDescription(value)
+            .replace(/\bQR Code Link to This Post\b\s*/gi, '')
+            .replace(/\b(?:post id|posted id)\s*:\s*\d+\b/gi, '').trim();
         if (!decoded) return '';
 
         const clipAtWord = (text, max) => {
@@ -5531,11 +5554,12 @@ class DatingApp {
                 url: sourceUrl
             }
         }, normalizedSeller);
-        const priceValue = Number(row.price_value);
+        const priceValue = String(row.price_value ?? '').trim() ? Number(row.price_value) : NaN;
         const suppliedPrice = String(row.price_text || '').trim();
         const rawPriceText = /^contact(?: the)? seller(?: for price)?$/i.test(suppliedPrice)
-            ? 'Price not provided'
-            : this.formatListingPriceText(suppliedPrice, { currency: row.currency, country: row.country });
+            ? 'Contact for price'
+            : (this.formatListingPriceText(suppliedPrice, { currency: row.currency, country: row.country })
+                || (priceValue > 0 ? this.formatListingPriceText(String(priceValue), row) : 'Contact for price'));
         const priceTextValue = Number(rawPriceText.replace(/[^0-9.]/g, ''));
         let normalizedPriceValue = Number.isFinite(priceValue) ? priceValue : null;
         if (Number.isFinite(priceValue) && Number.isFinite(priceTextValue) && priceTextValue > 0) {
@@ -5610,7 +5634,7 @@ class DatingApp {
         const item = {
             ...common,
             category: appCategory,
-            price: Number.isFinite(normalizedPriceValue) ? normalizedPriceValue : 0,
+            price: Number.isFinite(normalizedPriceValue) ? normalizedPriceValue : null,
             priceText: rawPriceText,
             priceLabel: rawPriceText,
             currency: common.currency,
@@ -15929,6 +15953,7 @@ class DatingApp {
     }
 
     getDiscoveryLocationLabelParts() {
+        if (this.browseWorldwideSelected) return {};
         return this.manualDiscoveryLocation || this.getAccuracySupportedDeviceLocation(this.resolvedDeviceLocation) || {};
     }
 
@@ -15938,6 +15963,7 @@ class DatingApp {
     }
 
     getCurrentLocationDisplayText() {
+        if (this.browseWorldwideSelected) return '';
         if (this.manualDiscoveryLocation?.country) {
             return [this.manualDiscoveryLocation.city || this.manualDiscoveryLocation.region, this.manualDiscoveryLocation.country].filter(Boolean).join(', ');
         }
@@ -16386,6 +16412,36 @@ class DatingApp {
             : (label ? `${label}${this.manualDiscoveryLocation ? ' — selected browsing area.' : ' — live device location.'}` : fallback);
     }
 
+    rememberBrowsingLocation(location) {
+        try { window.localStorage?.setItem('sixo_browsing_area_v1', JSON.stringify(location)); } catch {}
+    }
+
+    restoreBrowsingLocation() {
+        try {
+            const saved = JSON.parse(window.localStorage?.getItem('sixo_browsing_area_v1') || 'null');
+            if (saved?.mode === 'worldwide') return this.browseWorldwide();
+            if (saved?.mode === 'manual' && typeof saved.country === 'string' && saved.country.trim()) {
+                return this.applyManualDiscoveryLocation(saved);
+            }
+        } catch {}
+    }
+
+    async browseWorldwide() {
+        window.SIXO_LOCATION_ENTRY?.dismiss?.();
+        this.stopLocationTracking();
+        this.browseWorldwideSelected = true;
+        this.manualDiscoveryLocation = null;
+        this.homeLocationDraft = null;
+        this.rememberBrowsingLocation({ mode: 'worldwide' });
+        this.homeQuickFilters = { ...(this.homeQuickFilters || {}), nearMe: false };
+        this.googleListingLocationScope = {};
+        this.resetScreenLocationsForBrowserRefresh({ worldwide: true });
+        this.setHomeLocationControls({});
+        this.didApplyEntryLocationDefaults = true;
+        await this.refreshDeviceLocationFeeds();
+        this.updateHomeCurrentLocationDisplay();
+    }
+
     async applyManualDiscoveryLocation(location) {
         const country = String(location?.country || '').trim().slice(0, 100);
         if (!country) throw new Error('Choose a country.');
@@ -16394,7 +16450,9 @@ class DatingApp {
             city: String(location.city || '').trim().slice(0, 100),
             region: String(location.region || '').trim().slice(0, 100), country, source: 'manual', approximate: false
         };
+        this.browseWorldwideSelected = false;
         this.manualDiscoveryLocation = selected;
+        this.rememberBrowsingLocation({ mode: 'manual', city: selected.city, region: selected.region, country: selected.country });
         this.locationLifecycleGeneration = Number(this.locationLifecycleGeneration || 0) + 1;
         if (this.locationLabelRetryTimer != null) window.clearTimeout(this.locationLabelRetryTimer);
         this.locationLabelRetryTimer = null;
@@ -16429,17 +16487,24 @@ class DatingApp {
             field?.focus();
             field?.scrollIntoView?.({ block: 'center' });
         };
-        ['browsing-location-choose', 'home-location-choose'].forEach(id => {
+        ['browsing-location-choose', 'home-location-choose', 'home-browse-city'].forEach(id => {
             const chooseArea = document.getElementById(id);
             if (!chooseArea || chooseArea.dataset.bound) return;
             chooseArea.addEventListener('click', chooseLocation);
             chooseArea.dataset.bound = '1';
         });
         window.SIXO_LOCATION_ENTRY?.setManualLocationHandler?.(chooseLocation);
+        const worldwide = document.getElementById('home-browse-worldwide');
+        if (worldwide && !worldwide.dataset.bound) {
+            worldwide.addEventListener('click', () => { void this.browseWorldwide(); });
+            worldwide.dataset.bound = '1';
+        }
         ['home-use-location', 'site-use-location', 'home-device-location-retry'].forEach((id) => {
             const button = document.getElementById(id);
             if (!button || button.dataset.boundLocationRetry) return;
             button.addEventListener('click', () => {
+                this.browseWorldwideSelected = false;
+                this.rememberBrowsingLocation({ mode: 'device' });
                 this.manualDiscoveryLocation = null;
                 this.deviceLocationFeedsReady = false;
                 this.didApplyEntryLocationDefaults = false;
@@ -18011,6 +18076,8 @@ class DatingApp {
                 // A visible Allow tap starts a fresh platform request, even if
                 // a previous user request was suppressed and is still pending.
                 this.stopLocationTracking();
+                this.browseWorldwideSelected = false;
+                this.rememberBrowsingLocation({ mode: 'device' });
                 this.manualDiscoveryLocation = null;
                 this.homeLocationDraft = null;
                 this.didApplyEntryLocationDefaults = false;
@@ -18094,6 +18161,7 @@ class DatingApp {
         // Retire an unanswered automatic request before a deliberate button retry.
         entry?.cancel();
         if (announce) {
+            entry?.beginUserRequest?.();
             // An earlier asynchronous permission query cannot overwrite the
             // result of this newer user-initiated platform check.
             this.locationPermissionRefreshGeneration = Number(this.locationPermissionRefreshGeneration || 0) + 1;
@@ -18872,12 +18940,12 @@ class DatingApp {
         this.didApplyEntryLocationDefaults = true;
     }
 
-    resetScreenLocationsForBrowserRefresh({ city = '', region = '', country = '', label = '' } = {}) {
+    resetScreenLocationsForBrowserRefresh({ city = '', region = '', country = '', label = '', worldwide = false } = {}) {
         const targetCity = String(city || '').trim();
         const targetRegion = String(region || '').trim();
         const targetCountry = String(country || '').trim();
         const targetLabel = String(label || [targetCity, targetRegion, targetCountry].filter(Boolean).join(', ')).trim();
-        if (!targetCity && !targetRegion && !targetCountry) return;
+        if (!targetCity && !targetRegion && !targetCountry && !worldwide) return;
 
         const setValue = (id, value = '') => {
             const control = document.getElementById(id);
@@ -28501,10 +28569,12 @@ class DatingApp {
         const sellerReviewMeta = this.getMarketplaceSellerReviewMeta(item);
         if (!this.authBypassEnabled) {
             return {
-                sellerName, verified: false, hasPhone, protectionLevel: 'Review the listing and contact the seller',
+                sellerName, importedListing, verified: false, hasPhone, protectionLevel: importedListing
+                    ? 'Imported advert. Confirm price and availability with the advertiser. This is not seller verification or payment protection.'
+                    : 'Review the listing and contact the seller',
                 completedDeals: null, secureDealCount: null, responseHours: null,
                 ratingText: sellerReviewMeta.ratingText, reviewCount: sellerReviewMeta.reviewCount,
-                badges: hasPhone ? [{ key: 'phone', label: 'Phone available', icon: 'fa-phone', tone: '' }] : []
+                badges: [importedListing ? { key: 'imported', label: 'Imported listing', icon: 'fa-arrow-up-right-from-square', tone: '' } : null, hasPhone ? { key: 'phone', label: 'Phone available', icon: 'fa-phone', tone: '' } : null].filter(Boolean)
             };
         }
         const explicitResponse = String(item?.service?.responseTime || item?.responseTime || '').trim();
@@ -28565,7 +28635,7 @@ class DatingApp {
             <div class="marketplace-trust-panel-head">
                 <i class="fas fa-shield-halved" aria-hidden="true"></i>
                 <div>
-                    <strong>6ixo Shield</strong>
+                    <strong>${profile.importedListing ? 'About this listing' : '6ixo Shield'}</strong>
                     <span>${this.escapeHtml(profile.protectionLevel || 'Trust checks available')}</span>
                 </div>
             </div>
@@ -41986,6 +42056,27 @@ class DatingApp {
         return [];
     }
 
+    scoreHomeSearchMatch(entry, tokens, expandToken = token => [token], details = []) {
+        const normalize = value => this.normalizeSearchText(String(value || ''));
+        const title = normalize(entry.title);
+        const identity = normalize([entry.title, entry.raw?.brand, entry.raw?.make, entry.raw?.model].filter(Boolean).join(' '));
+        const text = normalize([identity, ...details].filter(value => typeof value === 'string').join(' '));
+        const contains = (haystack, word) => (` ${haystack} `).includes(` ${normalize(word)} `);
+        const matches = (haystack, token) => expandToken(token).some(word => contains(haystack, word)
+            || (word.length > 3 && !word.endsWith('s') && contains(haystack, `${word}s`))
+            || (word.length > 3 && word.endsWith('s') && !word.endsWith('ss') && contains(haystack, word.slice(0, -1))));
+        if (!tokens.length) return { matched: true, score: 0, related: false };
+        if (!tokens.every(token => matches(text, token))) return { matched: false, score: 0, related: false };
+        const titleMatches = tokens.filter(token => matches(title, token)).length;
+        const categoryText = normalize([...(entry.searchHints || []), entry.raw?.category, entry.raw?.electronicsCategory, entry.raw?.subcategory].filter(Boolean).join(' '));
+        const identityMatch = tokens.every(token => matches(identity, token) || matches(categoryText, token));
+        const accessory = /\b(case|cover|protector|charger|cable|adapter|strap|holder)\b/.test(title)
+            && !tokens.some(token => /^(?:cases?|covers?|protectors?|chargers?|cables?|adapters?|straps?|holders?)$/.test(token));
+        const related = !identityMatch || accessory;
+        const phrase = contains(title, tokens.join(' '));
+        return { matched: true, related, score: (related ? 0 : 100) + (phrase ? 30 : 0) + titleMatches * 10 };
+    }
+
     async applyHomeFilters({ scrollToResults = false } = {}) {
             const requestId = (this.homeSearchRequestId || 0) + 1;
             this.homeSearchRequestId = requestId;
@@ -42077,21 +42168,6 @@ class DatingApp {
             const buildHomeLocationLabel = (entry = {}) => {
                 const region = entry.region || entry.state || entry.province || entry.locationRegion || '';
                 return [entry.city, region, entry.country].filter(Boolean).join(', ') || entry.city || entry.country || '';
-            };
-            const scoreQueryMatch = (haystackParts) => {
-                if (!tokens.length) return { matched: true, score: 0 };
-                const text = normalizeText(
-                    (Array.isArray(haystackParts) ? haystackParts : [haystackParts])
-                        .filter(Boolean)
-                        .join(' ')
-                );
-                if (!text) return { matched: false, score: 0 };
-                let matchedCount = 0;
-                tokens.forEach((token) => {
-                    const found = this.tokenMatchesWithFuzzy(token, text, expandToken(token));
-                    if (found) matchedCount += 1;
-                });
-                return { matched: matchedCount > 0, score: matchedCount };
             };
 
 	        const results = [];
@@ -42349,7 +42425,8 @@ class DatingApp {
 	            ];
 	            if (Array.isArray(entry.raw?.listing?.tags)) haystackParts.push(...entry.raw.listing.tags);
                 if (query) {
-                    const { matched, score } = scoreQueryMatch(haystackParts);
+                    const { matched, score, related } = this.scoreHomeSearchMatch(entry, tokens, expandToken, haystackParts);
+                    entry.searchRelated = related;
                     if (!matched) return false;
                     queryScore = score;
                     if (restaurantIntent && entry.type === 'service' && String(entry.raw?.category || '').trim().toLowerCase() === 'food') {
@@ -42360,6 +42437,8 @@ class DatingApp {
                 entry._queryScore = queryScore;
                 return true;
             }).sort((a, b) => {
+                if (query && a.searchRelated !== b.searchRelated) return a.searchRelated ? 1 : -1;
+                if (query && a._queryScore !== b._queryScore) return b._queryScore - a._queryScore;
                 if (intent.topRated) {
                     const ratingDiff = this.getHomeEntryRating(b) - this.getHomeEntryRating(a);
                     if (ratingDiff !== 0) return ratingDiff;
@@ -42554,19 +42633,20 @@ class DatingApp {
                 ];
                 const grouped = new Map();
                 displayItems.forEach((item) => {
-                    const key = this.getHomeResultGroupKey(item);
+                    const key = item.searchRelated ? 'related' : this.getHomeResultGroupKey(item);
                     if (!grouped.has(key)) grouped.set(key, []);
                     grouped.get(key).push(item);
                 });
                 const orderedKeys = order.filter((key) => grouped.has(key)).concat(
-                    Array.from(grouped.keys()).filter((key) => !order.includes(key))
+                    Array.from(grouped.keys()).filter((key) => !order.includes(key) && key !== 'related')
+                ).concat(grouped.has('related') ? ['related'] : []
                 );
                 grid.innerHTML = orderedKeys.map((key) => {
                     const groupItems = grouped.get(key) || [];
                     return `
                         <section class="home-results-section" data-home-results-group="${this.escapeHtml(key)}">
                             <header class="home-results-section-header">
-                                <h4>${this.escapeHtml(this.getHomeResultSectionLabel(key))}</h4>
+                                <h4>${this.escapeHtml((key === 'related' ? 'Related mentions & accessories' : this.getHomeResultSectionLabel(key)))}</h4>
                                 <span>${groupItems.length}</span>
                             </header>
                             <div class="home-results-section-grid">
@@ -59077,7 +59157,7 @@ class DatingApp {
         const hasThumbMedia = images.some((src) => this.isLowResolutionListingImage(src));
         const title = this.escapeHtml(String(item.title || 'Listing'));
         const locationLabel = this.escapeHtml(this.getFeedLocationLabel(item));
-        const sellerName = this.getImportedListingSellerName(item, 'Seller');
+        const sellerName = this.getListingSellerDisplayName(item, 'Seller');
         const seller = this.escapeHtml(sellerName);
         const initials = this.getInitials(sellerName) || '•';
         const saved = this.isMarketplaceSaved(item.id);
@@ -59193,8 +59273,7 @@ class DatingApp {
                             <div class="seller-name"><span class="seller-name-text">${seller}</span></div>
                             <div class="seller-sub">
                                 <span class="item-location">${locationLabel}</span>
-                                <span class="seller-rating"><i class="fas fa-star" aria-hidden="true"></i> ${this.escapeHtml(sellerReviewMeta.ratingText)}</span>
-                                <span class="seller-review-count">${this.escapeHtml(this.formatReviewCountLabel(sellerReviewMeta.reviewCount))}</span>
+                                <span class="seller-review-count">${this.escapeHtml(this.getListingReviewSummary(item))}</span>
                             </div>
                         </div>
                     </button>
@@ -59216,7 +59295,7 @@ class DatingApp {
         const hasThumbMedia = images.some((src) => this.isLowResolutionListingImage(src));
         const title = this.escapeHtml(String(item.title || 'Listing'));
         const locationLabel = this.getFeedLocationLabel(item);
-        const seller = this.escapeHtml(this.getImportedListingSellerName(item, 'Seller'));
+        const seller = this.escapeHtml(this.getListingSellerDisplayName(item, 'Seller'));
         const sellerIdAttr = this.escapeHtml(String(item.id));
         const saved = this.isMarketplaceSaved(item.id);
         const verified = this.isMarketplaceSellerVerified(item);
@@ -61083,8 +61162,9 @@ class DatingApp {
         const regionAlias = this.getRegionAlias(region);
         removeWholeWord(regionAlias?.abbr);
         removeWholeWord(country);
+        for (const match of raw.matchAll(/\b(?:(?:between|from)\s*\$?\d[\d,]*\s*(?:and|to|-)\s*\$?\d[\d,]*|(?:under|below|less than|up to|max|over|above|more than|at least|min)\s*\$?\d[\d,]*)\b/gi)) removeWholeWord(match[0]);
         cleaned = cleaned
-            .replace(/\b\d+\b/g, ' ')
+            .replace(/\b(?:last|past)?\s*(?:7|30) days\b/g, ' ')
             .replace(/\b(today|tonight|week|month|all|anytime|time|open|now|rated|best|cheap|budget|affordable|luxury|premium)\b/g, ' ')
             .replace(/\b(listing|listings|posted|post|posts|app|country|countries|show|find|search)\b/g, ' ')
             .replace(/\b(under|below|less|than|up|to|max|over|above|more|at|least|min|between|from|and|in|near|around|with|for|within|close|by)\b/g, ' ')
@@ -61092,7 +61172,7 @@ class DatingApp {
             .trim();
 
         const cleanedTokens = cleaned
-            ? cleaned.split(' ').filter(Boolean).filter((t) => t.length > 1).slice(0, 6)
+            ? cleaned.split(' ').filter(Boolean).filter((t) => t.length > 1 || /^\d$/.test(t)).slice(0, 6)
             : [];
 
         return {
@@ -64859,7 +64939,7 @@ class DatingApp {
         const isCrossBorderListing = this.isCrossBorderSponsoredListing(item);
         const isSold = this.isMarketplaceItemSold(item);
         const isMobileModalLayout = this.isMarketplaceModalMobileLayout();
-        const seller = this.getImportedListingSellerName(item);
+        const seller = this.getListingSellerDisplayName(item);
         const trustProfile = this.getMarketplaceTrustProfile(item);
         const secureDealEligible = this.isSecureDealEligible(item) && !isSold && !sourceType;
 
@@ -65290,7 +65370,7 @@ class DatingApp {
         }
         if (sellerName) sellerName.innerHTML = `<span class="seller-name-text">${this.escapeHtml(seller)}</span>`;
         if (sellerLocation) sellerLocation.textContent = [item.city, item.country].filter(Boolean).join(', ') || 'Location not listed';
-        if (sellerRating) sellerRating.innerHTML = `<i class="fas fa-star" aria-hidden="true"></i> ${this.escapeHtml(sellerReviewMeta.ratingText)} · ${this.escapeHtml(this.formatReviewCountLabel(sellerReviewMeta.reviewCount))}`;
+        if (sellerRating) sellerRating.textContent = this.getListingReviewSummary(item);
         if (sellerBtn) sellerBtn.setAttribute('aria-label', `View seller profile for ${seller}`);
         if (offerBtn) {
             const isClosedLiveAuction = Boolean(market?.isLive && market?.isClosed);
@@ -65472,6 +65552,13 @@ class DatingApp {
         if (modalCard) modalCard.scrollTop = 0;
         if (modalBody) modalBody.scrollTop = 0;
         window.configureListingGalleryTabs?.(this, modal, { enabled:!['companionship','community'].includes(sourceType) });
+        const sellerNote = modal.querySelector('.gt-seller-empty');
+        if (sellerNote && this.isScrapedMarketplaceItem(item)) {
+            sellerNote.textContent = seller === 'External advertiser'
+                ? 'Imported advert. No linked 6ixo seller account; confirm details with the advertiser.'
+                : `Advertiser: ${seller}. No linked 6ixo seller account; confirm details with the advertiser.`;
+        }
+
 	        modal.classList.remove('hidden');
         this.syncOverlayViewportMeta();
         window.requestAnimationFrame(() => {

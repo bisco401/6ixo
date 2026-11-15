@@ -38,8 +38,8 @@
     let requestTimer = null;
     let cancelDesktopWatch = null;
     let observedPermission = 'unknown';
-    // Each new page entry asks visibly, including a returning QR visitor.
-    let pauseAutomaticRequests = true;
+    // Only visitors who explicitly opted into device location resume it.
+    let pauseAutomaticRequests = choice !== 'allowed';
 
     let requestHandler = null;
     let dismissHandler = null;
@@ -47,7 +47,7 @@
     let manualLocationRequested = false;
     let fallbackTimer = null;
     let panel = null;
-    let dismissed = false;
+    let dismissed = choice === 'dismissed';
     let entryPromptAnswered = false;
     let confirmed = false;
     // Direct property links must be usable before the main app has loaded.
@@ -112,7 +112,7 @@
     };
     const showPrompt = (error = null, { force = false } = {}) => {
         if (promptSuppressed && !force) return false;
-        if (force) dismissed = false;
+        if (force) { dismissed = false; pauseAutomaticRequests = true; }
         if (dismissed || (!error && confirmed) || document.visibilityState === 'hidden') return false;
         if (!panel) {
             panel = document.createElement('section');
@@ -190,13 +190,15 @@
         if (state === 'granted') {
             observedPermission = 'granted';
             confirmed = true;
-            pauseAutomaticRequests = false;
-            remember('allowed');
+            if (!dismissed && (!pauseAutomaticRequests || (entryPromptAnswered && choice === 'denied'))) {
+                pauseAutomaticRequests = false;
+                remember('allowed');
+            }
             hidePrompt();
         } else if (state === 'denied') {
             observedPermission = 'denied';
             confirmed = false;
-            remember('denied');
+            if (!dismissed) remember('denied');
             pauseAutomaticRequests = true;
             hidePrompt();
         }
@@ -320,6 +322,12 @@
         },
         watchForDesktopPosition,
         recordPermission,
+        beginUserRequest() {
+            entryPromptAnswered = true;
+            dismissed = false;
+            pauseAutomaticRequests = false;
+            remember('requested');
+        },
         canRequestAutomatically,
         cancel() {
             if (!pending) return;
@@ -341,13 +349,6 @@
         }
     };
 
-    // This runs on the QR landing page, including the coming-soon screen,
-    // before the marketplace bundle or its remote dependencies finish loading.
-    const showEntryPrompt = () => {
-        if (!dismissed && !entryPromptAnswered && pauseAutomaticRequests) showPrompt();
-    };
-    if (document.body) showEntryPrompt();
-    else document.addEventListener('DOMContentLoaded', showEntryPrompt, { once: true });
-    // A QR tab opened in the background must show the choice when it becomes visible.
-    document.addEventListener('visibilitychange', showEntryPrompt);
+    // Location is an optional action in the search area. The browser prompt is
+    // reached only by a tap, or by a returning visitor who already opted in.
 })();

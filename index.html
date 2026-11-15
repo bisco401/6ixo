@@ -11,7 +11,7 @@
     <meta http-equiv="Expires" content="0">
     <script>
         (function forceFreshMobileBuild() {
-                var BUILD = '20261107221608';
+                var BUILD = '20261115150000';
             var KEY = 'sixo_head_build_version';
             var CHECK_KEY = 'sixo_head_build_last_check';
             var RELOAD_KEY = 'sixo_head_build_reload_target';
@@ -154,7 +154,7 @@
     </style>
     <link rel="stylesheet" href="vehicle-layout-modes.css?v=20260813190000">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" media="print" onload="this.media='all'">
-    <link rel="stylesheet" href="assets/location-entry.css?v=20261110-location-popup-5">
+    <link rel="stylesheet" href="assets/location-entry.css?v=20261115-usability-1">
     <link rel="stylesheet" href="assets/local-location.css?v=20261102-location-typing-1">
     <script type="application/ld+json">
 {
@@ -708,6 +708,12 @@
                     <h1>6ixo worldwide marketplace</h1>
                     <p><span class="home-search-mobile-copy">Find cars for sale, apartments for rent, phones, local events and services on 6ixo.com. Browse worldwide or post an ad for free.</span><span class="home-search-desktop-copy">Buy and sell locally. Discover more worldwide.</span></p>
                 </div>
+                <div class="home-browse-choices" aria-label="Choose where to browse">
+                    <button type="button" id="home-browse-city">Choose city</button>
+                    <button type="button" id="site-use-location">Use my location</button>
+                    <button type="button" id="home-browse-worldwide" aria-label="Browse worldwide">Worldwide</button>
+                </div>
+                <p class="home-location-privacy">Device location uses BigDataCloud to find your city. <a href="/privacy/#sharing" target="_blank" rel="noopener">Privacy details</a></p>
                 <div id="home-location-recovery" class="home-location-recovery" hidden>
                     <p id="home-location-recovery-message" role="status" aria-live="polite">Allow your phone to share its location to load nearby listings.</p>
                     <button id="home-device-location-retry" type="button">Use my device location</button>
@@ -7310,14 +7316,14 @@
             </div>
         </div>
 
-            <script src="location-entry.js?v=20261110-location-popup-5"></script>
+            <script src="location-entry.js?v=20261115-usability-1"></script>
 		    <script src="assets/vendor/supabase-2.117.2.js"></script>
 		    <script src="supabase-config.js?v=20260220"></script>
             <script src="stripe-config.js?v=20260804033500"></script>
             <script src="coming-soon-config.js?v=20260911-public-launch-1"></script>
 	    <script src="local-geography.js?v=20260929-stable-location-refresh-1"></script>
         <script src="location-autocomplete.js?v=20261107-all-location-searches-1"></script>
-        <script src="home-location-search.js?v=20261110-device-permission-4"></script>
+        <script src="home-location-search.js?v=20261115-usability-1"></script>
         <script src="area-picker.js?v=20261107-home-country-city-1"></script>
         <script src="screen-location-search.js?v=20261107-all-location-searches-1"></script>
         <script src="device-geocoder.js?v=20260929-worldwide-location-1"></script>
@@ -7332,7 +7338,7 @@
     <link rel="stylesheet" href="assets/auth-captcha.css?v=20261109-turnstile-1">
     <script src="turnstile-config.js?v=20261109-turnstile-1"></script>
     <script src="assets/auth-captcha.js?v=20261109-turnstile-1"></script>
-    <script src="app.js?v=20261113-listing-message-1"></script>
+    <script src="app.js?v=20261115-usability-1"></script>
         <script src="rental-finance-ui.js?v=20260930-stay-booking-ready-1"></script>
         <script src="vehicle-rental-flow.js?v=20260914-host-insurance-1"></script>
 			</body>

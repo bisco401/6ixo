@@ -126,3 +126,15 @@ test('posted ads persist their displayed currency and retain it after a server r
         assert.equal(postedApp.formatMarketplaceMoney(restored.price,restored),`${expected} ${row.price.toFixed(2)}`);
     }
 });
+
+test('Missing imported prices are never presented as free', () => {
+    const base={id:'missing-price',title:'Used phone',app_category:'electronics',target_surface:'marketplace',source_url:'https://example.com/phone',phone:'4165550123',country:'Canada',image_urls:'https://example.com/phone.jpg'};
+    const missing=app.normalizeCsvScrapedListingRow({...base,price_value:'',price_text:''}).item;
+    assert.equal(missing.priceText,'Contact for price');
+    assert.equal(missing.price,null);
+    const amount=app.normalizeCsvScrapedListingRow({...base,price_value:'125',price_text:''}).item;
+    assert.equal(amount.priceText,'CAD 125.00');
+    const free=app.normalizeCsvScrapedListingRow({...base,price_value:'0',price_text:'Free'}).item;
+    assert.equal(free.priceText,'Free');
+    assert.equal(free.price,0);
+});

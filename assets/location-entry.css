@@ -120,3 +120,18 @@
 .browsing-location-recovery h2 { margin: 0 0 12px; }
 .browsing-location-recovery p { margin: 0 0 20px; color: #475569; line-height: 1.5; }
 .browsing-location-recovery button { min-height: 44px; }
+
+/* Optional location controls remain in the page flow on every screen size. */
+.home-browse-choices { display: flex; flex-wrap: wrap; gap: 6px 12px; margin: 12px 0; }
+.home-browse-choices button { min-height: 44px; padding: 8px 10px; border: 1px solid #d6e3f3; border-radius: 10px; background: #f2f6fc; color: #174b88; font: inherit; font-size: 13px; font-weight: 600; cursor: pointer; }
+.home-browse-choices button:first-child { background: #2b5f98; color: white; border-color: #2b5f98; }
+.home-browse-choices button:focus-visible { outline: 3px solid #1d4ed8; outline-offset: 2px; }
+[data-home-results-group="related"] { border-top: 1px solid #d6e3f3; margin-top: 16px; padding-top: 16px; }
+
+@media (max-width: 480px) {
+    .home-browse-choices { flex-wrap: nowrap; gap: 6px; }
+    .home-browse-choices button { flex: 1; min-width: 0; padding: 8px 5px; font-size: 12px; }
+}
+
+.home-location-privacy { margin: -4px 0 12px; color: #52647b; font-size: 11px; line-height: 1.4; }
+.home-location-privacy a { color: #174b88; text-decoration: underline; }

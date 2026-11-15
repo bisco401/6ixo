@@ -3060,7 +3060,7 @@ class DatingApp {
             await this.loadSupabaseProfile(userId);
             if (this.currentUser?.id !== userId || !this.isSignedIn) return;
             this.applyPendingSignupProfileForEmail(this.currentUser?.email || '');
-            const marketplaceProfile = await this.loadSupabaseMarketplaceProfile(userId);
+            const marketplaceProfile = await this.loadSupabaseMarketplaceProfile(userId, { throwOnError: true });
             if (this.currentUser?.id !== userId || !this.isSignedIn) return;
             if (!marketplaceProfile || this.isGeneratedMarketplaceUsername(marketplaceProfile.display_name)) {
                 await this.upsertSupabaseMarketplaceProfile();
@@ -3135,7 +3135,7 @@ class DatingApp {
         if (!user) return;
         if (!this.currentUser) this.currentUser = {};
         const userId = String(user.id || '').trim();
-        this.prepareCurrentUserIdentityForAuthUser(userId);
+        const newIdentity = this.prepareCurrentUserIdentityForAuthUser(userId);
         this.currentUser.id = userId || this.currentUser.id;
         const meta = user.user_metadata || {};
         const metadataFullName = String(meta.full_name || meta.name || '').trim();
@@ -3149,6 +3149,11 @@ class DatingApp {
         if (fullName) {
             this.currentUser.accountName = fullName;
             this.currentUser.name = fullName;
+        }
+        const signupPublicName = this.normalizeMarketplaceHandle(meta.signup_public_name, '');
+        if (newIdentity && signupPublicName) {
+            this.currentUser.marketplaceUsername = signupPublicName;
+            this.currentUser.marketplaceName = signupPublicName;
         }
         if (user.email) this.currentUser.email = String(user.email).trim();
         this.currentUser.emailVerified = Boolean(user.email_confirmed_at);
@@ -3456,7 +3461,7 @@ class DatingApp {
         }
     }
 
-    async loadSupabaseMarketplaceProfile(userId) {
+    async loadSupabaseMarketplaceProfile(userId, { throwOnError = false } = {}) {
         if (!this.supabase || !userId) return null;
         try {
             const { data, error } = await this.supabase
@@ -3464,7 +3469,8 @@ class DatingApp {
                 .select('*')
                 .eq('user_id', userId)
                 .maybeSingle();
-            if (error || !data || this.currentUser?.id !== userId) return null;
+            if (error) throw error;
+            if (!data || this.currentUser?.id !== userId) return null;
             if (!this.currentUser) this.currentUser = {};
             this.currentUser.marketplaceProfileId = String(data.id || '').trim() || this.currentUser.marketplaceProfileId;
             this.currentUser.marketplacePublicId = String(data.public_id || '').trim() || this.currentUser.marketplacePublicId;
@@ -3498,6 +3504,7 @@ class DatingApp {
             this.ensureProfileUsernames();
             return data;
         } catch (err) {
+            if (throwOnError) throw err;
             console.warn('Marketplace profile load failed:', err);
             return null;
         }
@@ -14624,7 +14631,10 @@ class DatingApp {
         const loginForm = document.getElementById('login-form');
         if (loginForm) loginForm.addEventListener('submit', (e) => this.handleLogin(e));
         const signupForm = document.getElementById('signup-form');
-        if (signupForm) signupForm.addEventListener('submit', (e) => this.handleSignup(e));
+        if (signupForm) {
+            signupForm.addEventListener('submit', (e) => this.handleSignup(e));
+            this.setupSignupPublicName(signupForm);
+        }
         const showSignupLink = document.getElementById('show-signup');
         if (showSignupLink) showSignupLink.addEventListener('click', () => this.showSignupScreen());
         const showLoginLink = document.getElementById('show-login');
@@ -19620,6 +19630,33 @@ class DatingApp {
             } finally { this.resetPasswordBusy = false; }
     }
 
+    getSignupPublicName(fullName = '') {
+        const useRealName = document.getElementById('signup-name-real')?.checked;
+        const nickname = document.getElementById('signup-nickname')?.value;
+        return this.normalizeMarketplaceHandle(useRealName ? fullName : nickname, '');
+    }
+
+    setupSignupPublicName(form) {
+        const nickname = document.getElementById('signup-nickname');
+        const field = document.getElementById('signup-nickname-field');
+        const preview = document.getElementById('signup-name-preview');
+        if (!nickname || !field || !preview) return;
+        const update = () => {
+            const realName = document.getElementById('signup-name-real').checked;
+            nickname.required = !realName;
+            nickname.disabled = realName;
+            nickname.setCustomValidity('');
+            field.hidden = realName;
+            const fullName = ['signup-first-name', 'signup-last-name']
+                .map(id => document.getElementById(id).value).join(' ');
+            const publicName = this.getSignupPublicName(fullName);
+            preview.textContent = publicName ? `Viewers will see: ${publicName}` : '';
+        };
+        form.addEventListener('input', update);
+        form.addEventListener('reset', () => queueMicrotask(update));
+        update();
+    }
+
     async handleSignup(e) {
         e.preventDefault();
         if (this.signupBusy) return;
@@ -19655,6 +19692,13 @@ class DatingApp {
         if (validationMessage) {
             this.showNotification(validationMessage, { type: 'warn', force: true });
             document.getElementById('signup-email')?.focus();
+            return;
+        }
+        const publicName = this.getSignupPublicName(fullName);
+        const nicknameField = document.getElementById('signup-nickname');
+        if (nicknameField && !nicknameField.disabled && (!publicName || /^(you|6ixo member)$/i.test(publicName))) {
+            nicknameField.setCustomValidity('Enter a nickname viewers can recognize.');
+            nicknameField.reportValidity();
             return;
         }
         const termsAcceptance = document.getElementById('signup-terms-accepted');
@@ -19693,6 +19737,7 @@ class DatingApp {
                             first_name: trimmedFirst,
                             last_name: trimmedLast,
                             full_name: fullName,
+                            ...(publicName ? { signup_public_name: publicName } : {}),
                             age: Number.isFinite(parsedAge) ? parsedAge : null,
                             legal_acceptance: legalAcceptance
                         }

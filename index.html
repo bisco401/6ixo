@@ -11,7 +11,7 @@
     <meta http-equiv="Expires" content="0">
     <script>
         (function forceFreshMobileBuild() {
-                var BUILD = '20261115170000';
+                var BUILD = '20261115180000';
             var KEY = 'sixo_head_build_version';
             var CHECK_KEY = 'sixo_head_build_last_check';
             var RELOAD_KEY = 'sixo_head_build_reload_target';
@@ -155,7 +155,7 @@
     <link rel="stylesheet" href="vehicle-layout-modes.css?v=20260813190000">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" media="print" onload="this.media='all'">
     <link rel="stylesheet" href="assets/location-entry.css?v=20261115-usability-1">
-    <link rel="stylesheet" href="assets/saved-hub.css?v=20261115">
+    <link rel="stylesheet" href="assets/saved-hub.css?v=20261115-public-name">
     <link rel="stylesheet" href="assets/local-location.css?v=20261102-location-typing-1">
     <script type="application/ld+json">
 {
@@ -411,7 +411,19 @@
                         <input type="text" id="signup-last-name" name="last-name" placeholder="Parker" autocomplete="family-name" required>
                     </div>
                 </div>
-                <p class="auth-name-privacy-note"><i class="fas fa-lock" aria-hidden="true"></i> Your first and last name make up your private Profile name. Viewers only see the Public name you choose.</p>
+                <fieldset id="signup-public-name-choice" aria-describedby="signup-name-note">
+                    <legend>What name should people see?</legend>
+                    <div class="signup-name-options">
+                        <label><input type="radio" name="signup-name-mode" id="signup-name-nickname" value="nickname" checked> Use a nickname</label>
+                        <label><input type="radio" name="signup-name-mode" id="signup-name-real" value="real"> Use my real name</label>
+                    </div>
+                    <div class="auth-field" id="signup-nickname-field">
+                        <label for="signup-nickname">Nickname</label>
+                        <input type="text" id="signup-nickname" name="nickname" maxlength="40" autocomplete="nickname" required>
+                    </div>
+                    <p id="signup-name-note">Your signup name stays private unless you choose to show it. You can change your public name in Profile.</p>
+                    <p id="signup-name-preview" role="status"></p>
+                </fieldset>
                 <div class="auth-field">
                     <label for="signup-email">Email</label>
                     <input type="email" id="signup-email" name="email" aria-describedby="signup-email-status" placeholder="you@example.com" autocomplete="email" inputmode="email" autocapitalize="none" spellcheck="false" required>
@@ -7344,7 +7356,7 @@
     <script src="turnstile-config.js?v=20261109-turnstile-1"></script>
     <script src="assets/auth-captcha.js?v=20261109-turnstile-1"></script>
     <script src="assets/saved-hub.js?v=20261115"></script>
-    <script src="app.js?v=20261115-saved"></script>
+    <script src="app.js?v=20261115-public-name"></script>
         <script src="rental-finance-ui.js?v=20260930-stay-booking-ready-1"></script>
         <script src="vehicle-rental-flow.js?v=20260914-host-insurance-1"></script>
 			</body>

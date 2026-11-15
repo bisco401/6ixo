@@ -11,7 +11,7 @@
     <meta http-equiv="Expires" content="0">
     <script>
         (function forceFreshMobileBuild() {
-                var BUILD = '20261115150000';
+                var BUILD = '20261115160000';
             var KEY = 'sixo_head_build_version';
             var CHECK_KEY = 'sixo_head_build_last_check';
             var RELOAD_KEY = 'sixo_head_build_reload_target';
@@ -642,6 +642,87 @@
 	                </div>
 	            </div>
 
+	            <!-- Main Search Section -->
+	            <section class="home-search" aria-label="Search listings">
+                <div class="home-hero-copy">
+                    <h1>6ixo worldwide marketplace</h1>
+                    <p><span class="home-search-mobile-copy">Find cars for sale, apartments for rent, phones, local events and services on 6ixo.com. Browse worldwide or post an ad for free.</span><span class="home-search-desktop-copy">Buy and sell locally. Discover more worldwide.</span></p>
+                </div>
+                <div id="home-location-recovery" class="home-location-recovery" hidden>
+                    <p id="home-location-recovery-message" role="status" aria-live="polite">Allow your phone to share its location to load nearby listings.</p>
+                    <button id="home-device-location-retry" type="button">Use my device location</button>
+                    <details id="home-location-permission-help" hidden>
+                        <summary>How to allow device location</summary>
+                        <p>On iPhone: open Settings → Privacy &amp; Security → Location Services. Turn it on and allow location for the browser or app you are using. Also allow 6ixo.com in the browser’s website settings.</p>
+                        <p>On Android: turn on Location in Settings, allow location for your browser or app, and allow 6ixo.com in the browser’s site permissions.</p>
+                        <p>Inside WhatsApp, TikTok, Instagram or Snapchat? If no phone permission request appears, use the app’s menu to open this link in Safari or Chrome. Then tap Use my device location and allow the browser’s request.</p>
+                        <p>6ixo cannot change your phone’s permissions. After enabling them, return here and try device location again.</p>
+                    </details>
+                    <button id="home-location-choose" type="button">Choose city instead</button>
+                </div>
+	                <div class="home-search-row">
+	                    <div class="home-search-field home-search-query-field">
+	                        <label for="home-search-what">What are you looking for?</label>
+	                        <i class="fas fa-search home-search-field-icon" aria-hidden="true"></i>
+	                        <input type="text" id="home-search-what" placeholder="e.g., iPhone 13, bicycle, couch" autocomplete="off">
+	                        <div id="home-smart-suggestions" class="home-smart-suggestions hidden" role="listbox" aria-label="Search suggestions"></div>
+	                    </div>
+                        <div class="home-location-pair">
+                            <button id="home-location-toggle" type="button" aria-expanded="false" aria-controls="home-location-panel" aria-label="Location: All locations">
+                                <i class="fas fa-location-dot" aria-hidden="true"></i>
+                                <span id="home-location-summary">All locations</span>
+                                <i class="fas fa-chevron-down" aria-hidden="true"></i>
+                            </button>
+                            <div id="home-location-panel" role="region" aria-labelledby="home-location-heading" hidden>
+                            <div class="home-location-toolbar">
+                                <span id="home-location-heading">Choose location</span>
+                                <button type="button" id="home-use-location" aria-label="Use my location"><i class="fas fa-location-arrow" aria-hidden="true"></i><span>Use my location</span></button>
+                            </div>
+                            <p class="home-location-privacy">Device location uses BigDataCloud to find your city. <a href="/privacy/#sharing" target="_blank" rel="noopener">Privacy details</a></p>
+                            <div id="home-location-fields" class="home-location-fields">
+                                <label class="home-location-field" for="home-location-country"><span>Country</span>
+                                    <input id="home-location-country" type="text" placeholder="Choose country" autocomplete="off" spellcheck="false" role="combobox" aria-autocomplete="list" aria-haspopup="listbox" aria-controls="area-picker-countries" aria-expanded="false" aria-describedby="area-picker-status home-device-location-status">
+                                </label>
+                                <label class="home-location-field" for="home-location-city"><span class="home-location-label"><span>City</span><small>Optional</small></span>
+                                    <input id="home-location-city" type="text" placeholder="All cities" autocomplete="off" spellcheck="false" role="combobox" aria-autocomplete="list" aria-haspopup="listbox" aria-controls="area-picker-countries" aria-expanded="false" aria-describedby="area-picker-status home-device-location-status">
+                                </label>
+                            </div>
+                            <input type="hidden" id="home-search-location">
+                            <div id="area-picker" hidden>
+                                <p id="area-picker-status" role="status"></p>
+                                <div id="area-picker-countries" role="listbox" aria-label="Cities and countries"></div>
+                                <button type="button" id="area-picker-retry" hidden>Try again</button>
+                            </div>
+                            <div class="home-location-actions">
+                                <button type="button" id="home-location-cancel">Cancel</button>
+                                <button type="button" id="home-location-apply">Apply location</button>
+                            </div>
+                            </div>
+	                    </div>
+                    <div class="home-search-field home-search-category-field">
+                        <label for="home-search-category">Category</label>
+                            <i class="fas fa-th-large home-search-field-icon" aria-hidden="true"></i>
+                            <select id="home-search-category" class="home-select">
+                                <option value="">All Categories</option>
+                                <option value="electronics">Electronics</option>
+                                <option value="clothing">Fashion & Accessories</option>
+                                <option value="real_estate">Real Estate</option>
+                                <option value="jobs">Jobs</option>
+                                <option value="services">Services</option>
+                                <option value="buy_sell">Buy n Sell</option>
+                                <option value="vehicles">Vehicles</option>
+                                <option value="arrive_plus">Arrive+</option>
+                                <option value="community">Community</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+	                <div class="home-search-actions">
+	                    <button id="home-search-btn" class="btn-primary" type="button"><i class="fas fa-search home-search-desktop-copy" aria-hidden="true"></i><span>Search</span><i class="fas fa-arrow-right home-search-mobile-copy" aria-hidden="true"></i></button>
+	                </div>
+                </div>
+                <small id="home-device-location-status" role="status" aria-live="polite">Finding your device location…</small>
+	            </section>
+
                 <!-- Category Navigation -->
                 <nav id="home-category-nav" class="home-category-nav" aria-label="Browse categories">
                     <button class="home-category-chip active" type="button" data-home-category="" aria-pressed="true" aria-label="For you">
@@ -701,92 +782,6 @@
                 </nav>
 
 
-
-	            <!-- Main Search Section -->
-	            <section class="home-search" aria-label="Search listings">
-                <div class="home-hero-copy">
-                    <h1>6ixo worldwide marketplace</h1>
-                    <p><span class="home-search-mobile-copy">Find cars for sale, apartments for rent, phones, local events and services on 6ixo.com. Browse worldwide or post an ad for free.</span><span class="home-search-desktop-copy">Buy and sell locally. Discover more worldwide.</span></p>
-                </div>
-                <div class="home-browse-choices" aria-label="Choose where to browse">
-                    <button type="button" id="home-browse-city">Choose city</button>
-                    <button type="button" id="site-use-location">Use my location</button>
-                    <button type="button" id="home-browse-worldwide" aria-label="Browse worldwide">Worldwide</button>
-                </div>
-                <p class="home-location-privacy">Device location uses BigDataCloud to find your city. <a href="/privacy/#sharing" target="_blank" rel="noopener">Privacy details</a></p>
-                <div id="home-location-recovery" class="home-location-recovery" hidden>
-                    <p id="home-location-recovery-message" role="status" aria-live="polite">Allow your phone to share its location to load nearby listings.</p>
-                    <button id="home-device-location-retry" type="button">Use my device location</button>
-                    <details id="home-location-permission-help" hidden>
-                        <summary>How to allow device location</summary>
-                        <p>On iPhone: open Settings → Privacy &amp; Security → Location Services. Turn it on and allow location for the browser or app you are using. Also allow 6ixo.com in the browser’s website settings.</p>
-                        <p>On Android: turn on Location in Settings, allow location for your browser or app, and allow 6ixo.com in the browser’s site permissions.</p>
-                        <p>Inside WhatsApp, TikTok, Instagram or Snapchat? If no phone permission request appears, use the app’s menu to open this link in Safari or Chrome. Then tap Use my device location and allow the browser’s request.</p>
-                        <p>6ixo cannot change your phone’s permissions. After enabling them, return here and try device location again.</p>
-                    </details>
-                    <button id="home-location-choose" type="button">Choose city instead</button>
-                </div>
-	                <div class="home-search-row">
-	                    <div class="home-search-field home-search-query-field">
-	                        <label for="home-search-what">What are you looking for?</label>
-	                        <i class="fas fa-search home-search-field-icon" aria-hidden="true"></i>
-	                        <input type="text" id="home-search-what" placeholder="e.g., iPhone 13, bicycle, couch" autocomplete="off">
-	                        <div id="home-smart-suggestions" class="home-smart-suggestions hidden" role="listbox" aria-label="Search suggestions"></div>
-	                    </div>
-                        <div class="home-location-pair">
-                            <button id="home-location-toggle" type="button" aria-expanded="false" aria-controls="home-location-panel" aria-label="Location: All locations">
-                                <i class="fas fa-location-dot" aria-hidden="true"></i>
-                                <span id="home-location-summary">All locations</span>
-                                <i class="fas fa-chevron-down" aria-hidden="true"></i>
-                            </button>
-                            <div id="home-location-panel" role="region" aria-labelledby="home-location-heading" hidden>
-                            <div class="home-location-toolbar">
-                                <span id="home-location-heading">Choose location</span>
-                                <button type="button" id="home-use-location" aria-label="Use my location"><i class="fas fa-location-arrow" aria-hidden="true"></i><span>Use my location</span></button>
-                            </div>
-                            <div id="home-location-fields" class="home-location-fields">
-                                <label class="home-location-field" for="home-location-country"><span>Country</span>
-                                    <input id="home-location-country" type="text" placeholder="Choose country" autocomplete="off" spellcheck="false" role="combobox" aria-autocomplete="list" aria-haspopup="listbox" aria-controls="area-picker-countries" aria-expanded="false" aria-describedby="area-picker-status home-device-location-status">
-                                </label>
-                                <label class="home-location-field" for="home-location-city"><span class="home-location-label"><span>City</span><small>Optional</small></span>
-                                    <input id="home-location-city" type="text" placeholder="All cities" autocomplete="off" spellcheck="false" role="combobox" aria-autocomplete="list" aria-haspopup="listbox" aria-controls="area-picker-countries" aria-expanded="false" aria-describedby="area-picker-status home-device-location-status">
-                                </label>
-                            </div>
-                            <input type="hidden" id="home-search-location">
-                            <div id="area-picker" hidden>
-                                <p id="area-picker-status" role="status"></p>
-                                <div id="area-picker-countries" role="listbox" aria-label="Cities and countries"></div>
-                                <button type="button" id="area-picker-retry" hidden>Try again</button>
-                            </div>
-                            <div class="home-location-actions">
-                                <button type="button" id="home-location-cancel">Cancel</button>
-                                <button type="button" id="home-location-apply">Apply location</button>
-                            </div>
-                            </div>
-	                    </div>
-                    <div class="home-search-field home-search-category-field">
-                        <label for="home-search-category">Category</label>
-                            <i class="fas fa-th-large home-search-field-icon" aria-hidden="true"></i>
-                            <select id="home-search-category" class="home-select">
-                                <option value="">All Categories</option>
-                                <option value="electronics">Electronics</option>
-                                <option value="clothing">Fashion & Accessories</option>
-                                <option value="real_estate">Real Estate</option>
-                                <option value="jobs">Jobs</option>
-                                <option value="services">Services</option>
-                                <option value="buy_sell">Buy n Sell</option>
-                                <option value="vehicles">Vehicles</option>
-                                <option value="arrive_plus">Arrive+</option>
-                                <option value="community">Community</option>
-                                <option value="other">Other</option>
-                            </select>
-                        </div>
-	                <div class="home-search-actions">
-	                    <button id="home-search-btn" class="btn-primary" type="button"><i class="fas fa-search home-search-desktop-copy" aria-hidden="true"></i><span>Search</span><i class="fas fa-arrow-right home-search-mobile-copy" aria-hidden="true"></i></button>
-	                </div>
-                </div>
-                <small id="home-device-location-status" role="status" aria-live="polite">Finding your device location…</small>
-	            </section>
 
 	            <!-- Featured Ads Strip -->
 	            <section id="home-featured-ads-strip" class="home-featured-ads" aria-label="Featured ads">

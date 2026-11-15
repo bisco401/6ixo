@@ -1,0 +1,46 @@
+.signup-names {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+}
+.signup-names input { min-width: 0; width: 100%; }
+#home-save-search { min-height: 44px; white-space: nowrap; }
+#home-save-search[hidden] { display: none !important; }
+#nav-saved { min-width: 44px; min-height: 44px; }
+#saved-hub {
+    width: min(560px, calc(100% - 24px));
+    max-height: min(740px, calc(100dvh - 32px));
+    box-sizing: border-box;
+    overflow: auto;
+    padding: 20px;
+    border: 1px solid #c7d7eb;
+    border-radius: 18px;
+    background: #fff;
+    color: #142e4e;
+    box-shadow: 0 14px 50px #172b4c38;
+}
+#saved-hub::backdrop { background: #172b4c80; }
+#saved-hub button {
+    min-height: 44px;
+    border: 1px solid #d4e0ef;
+    border-radius: 9px;
+    padding: 6px 12px;
+    background: #fff;
+    color: #244e80;
+    font: inherit;
+    cursor: pointer;
+}
+#saved-hub button:focus-visible { outline: 2px solid #285e99; outline-offset: 2px; }
+#saved-hub .saved-hub-header { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+#saved-hub .saved-hub-header h2 { margin: 0; font-size: 24px; }
+#saved-hub .saved-hub-tabs { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+#saved-hub [aria-pressed="true"] { background: #285e99; border-color: #285e99; color: #fff; }
+#saved-hub-status { margin: 14px 0 0; color: #4d6480; }
+#saved-hub-status:empty { display: none; }
+#saved-hub-list { padding: 0; margin: 12px 0 0; list-style: none; }
+#saved-hub-list > li { display: grid; gap: 6px; padding: 12px 0; border-top: 1px solid #d4e0ef; overflow-wrap: anywhere; }
+#saved-hub-list > li > span { color: #4d6480; }
+#saved-hub .saved-hub-listing { width: 100%; text-align: left; font-weight: 650; }
+.saved-hub-actions { display: flex; flex-wrap: wrap; gap: 6px; }
+
+#home-content .home-listings-header { flex-wrap: wrap; gap: 8px; }

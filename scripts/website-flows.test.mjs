@@ -97,7 +97,7 @@ test('signup rejects underage, fractional ages, and short passwords before conta
 });
 
 test('signup records policy acceptance and asks for email confirmation without marking it signed in', async () => {
-  const f = fixture({ 'signup-first-name':'Test','signup-last-name':'Member','signup-email':'TEST@example.test','signup-email-confirm':'test@example.test','signup-age':'25','signup-password':'TestPassword1!', 'signup-terms-accepted':true });
+  const f = fixture({ 'signup-first-name':'Test','signup-last-name':'Member','signup-email':'TEST@example.test','signup-password':'TestPassword1!', 'signup-terms-accepted':true });
   f.app.isSignedIn = false;
   f.app.getAuthRedirectTo = () => 'https://6ixo.com/';
   f.app.markAuthEmailSent = () => {};
@@ -503,9 +503,9 @@ test('missing auth client cannot fake login, signup, or onboarding success', asy
   }
 });
 
-test('signup rejects mismatched and malformed email before contacting auth', async () => {
- for (const [email,confirmation] of [['member@example.test','other@example.test'],['not-an-email','not-an-email'],['member@example.test','']]) {
-  const f=fixture({'signup-first-name':'Audit','signup-last-name':'Test','signup-email':email,'signup-email-confirm':confirmation,'signup-age':'25','signup-password':'Password1!'});
+test('signup rejects malformed email before contacting auth', async () => {
+ for (const email of ['not-an-email', 'invalid@', 'member@domain']) {
+  const f=fixture({'signup-first-name':'Audit','signup-last-name':'Test','signup-email':email,'signup-password':'Password1!','signup-terms-accepted':true});
   let calls=0; f.app.supabase={auth:{signUp:async()=>{calls++;return {};}}};
   await f.app.handleSignup(f.event); assert.equal(calls,0);assert.ok(f.notices.length);assert.equal(f.app.signupBusy,false);
  }

@@ -2225,15 +2225,10 @@ class DatingApp {
 	        this.loadSampleData();
         this.restoreDatingProfileSession();
         this.initializeSupabaseClient();
-        this.loadSupabaseMarketplaceListings();
-        this.loadSupabaseShortTermListings();
-        this.loadSupabaseVehicleRentalListings();
-        this.loadCsvScrapedListings();
-        this.loadKijijiGtaListings();
+        this.savedHub = window.SixoSavedHub?.attach(this);
+        this.savedHub?.updateCount();
+        void this.refreshListingInventory();
         this.startCsvScrapedListingsRefresh();
-        this.loadOxglowRealestateListings();
-        this.loadOxglowElectronicsListings();
-        this.loadOxglowAutoPartsListings();
 	        this.setupEventListeners();
 	        this.setupPromotionAnalytics();
         this.applyTouchDeviceClass();
@@ -2504,7 +2499,7 @@ class DatingApp {
             const lastNameLabel = signupScreen.querySelector('label[for="signup-last-name"]');
             const lastNameField = lastNameInput?.closest('.auth-field');
             if (title) title.textContent = 'Join 6ixo';
-            if (subtitle) subtitle.textContent = 'Create a profile to share listings, services, and discover people worldwide.';
+            if (subtitle) subtitle.textContent = 'Create an account to post and manage your listings.';
             if (submit) submit.textContent = 'Create account';
             if (firstNameLabel) firstNameLabel.textContent = 'First name';
             if (firstNameInput) {
@@ -3206,7 +3201,7 @@ class DatingApp {
             firstName: String(firstName || '').trim(),
             lastName: String(lastName || '').trim(),
             fullName: String(fullName || '').trim(),
-            age: Number.isFinite(Number(age)) ? Number(age) : null,
+            age: age != null && Number.isFinite(Number(age)) ? Number(age) : null,
             createdAt: new Date().toISOString()
         };
         try {
@@ -3290,7 +3285,7 @@ class DatingApp {
             changed = true;
         }
         const age = Number(cached.age);
-        if (Number.isFinite(age) && this.currentUser.age !== age) {
+        if (age >= 18 && age <= 120 && this.currentUser.age !== age) {
             this.currentUser.age = age;
             changed = true;
         }
@@ -5175,7 +5170,7 @@ class DatingApp {
                 ['listing-availability.json', 'scrapedListingAvailability']
             ].map(async ([file, field]) => {
                 try {
-                    const response = await fetch(`data/${file}?fresh=${Date.now()}`, { cache: 'no-store' });
+                    const response = await fetch(`data/${file}`, { cache: 'no-cache' });
                     if (response.ok) {
                         const data = await response.json();
                         if (data?.listings) this[field] = data.listings;
@@ -5185,6 +5180,35 @@ class DatingApp {
         })();
         try { return await this.scrapedListingIntegrityRequest; }
         finally { this.scrapedListingIntegrityRequest = null; }
+    }
+
+    async refreshListingInventory() {
+        if (this.listingInventoryRequest) return this.listingInventoryRequest;
+        this.listingInventoryRequest = Promise.allSettled([
+            this.loadSupabaseMarketplaceListings(),
+            this.loadSupabaseShortTermListings(),
+            this.loadSupabaseVehicleRentalListings(),
+            this.loadCsvScrapedListings(),
+            this.loadKijijiGtaListings(),
+            this.loadOxglowRealestateListings(),
+            this.loadOxglowElectronicsListings(),
+            this.loadOxglowAutoPartsListings()
+        ]);
+        try {
+            await this.listingInventoryRequest;
+            await this.savedHub?.checkAlerts();
+        } finally {
+            this.listingInventoryRequest = null;
+        }
+    }
+
+    async fetchImportedListingRows(filename) {
+        const [response] = await Promise.all([
+            fetch(`data/${filename}`, { cache: 'no-cache' }),
+            this.loadScrapedListingIntegrityRepairs()
+        ]);
+        if (!response.ok) throw new Error(`Listing feed unavailable: ${filename} (${response.status})`);
+        return this.parseCsvRows(await response.text());
     }
 
     applyScrapedListingIntegrity(row = {}) {
@@ -5712,8 +5736,7 @@ class DatingApp {
             window.clearInterval(this.csvScrapedListingsRefreshTimer);
         }
         this.csvScrapedListingsRefreshTimer = window.setInterval(() => {
-            this.loadCsvScrapedListings();
-            this.loadKijijiGtaListings();
+            if (!document.hidden) void this.refreshListingInventory();
         }, 5 * 60 * 1000);
     }
 
@@ -6171,23 +6194,8 @@ class DatingApp {
 
     async loadCsvScrapedListings() {
         try {
-            await this.loadScrapedListingIntegrityRepairs();
-            const fresh = Date.now();
-            const csvUrls = [
-                `data/scraped-listings.csv?fresh=${fresh}`,
-                `data/jamaica-listings.csv?fresh=${fresh}`,
-                `data/dubai-listings.csv?fresh=${fresh}`,
-                `data/guyana-listings.csv?fresh=${fresh}`,
-                `data/kenya-listings.csv?fresh=${fresh}`
-            ];
-            const rowSets = await Promise.all(csvUrls.map(async (csvUrl) => {
-                try {
-                    const response = await fetch(csvUrl, { cache: 'no-store' });
-                    return response.ok ? this.parseCsvRows(await response.text()) : [];
-                } catch {
-                    return [];
-                }
-            }));
+            const files = ['scraped-listings.csv', 'jamaica-listings.csv', 'dubai-listings.csv', 'guyana-listings.csv', 'kenya-listings.csv'];
+            const rowSets = await Promise.all(files.map(file => this.fetchImportedListingRows(file)));
             const rowBySource = new Map();
             rowSets.flat().forEach((row, index) => {
                 const key = String(row.id || row.source_url || `csv-row-${index}`).trim();
@@ -6262,10 +6270,7 @@ class DatingApp {
 
     async loadOxglowRealestateListings() {
         try {
-            await this.loadScrapedListingIntegrityRepairs();
-            const response = await fetch('data/oxglow-real-estate-recent.csv', { cache: 'no-store' });
-            if (!response.ok) return [];
-            const rows = this.parseCsvRows(await response.text());
+            const rows = await this.fetchImportedListingRows('oxglow-real-estate-recent.csv');
             const listings = rows
                 .map((row) => this.normalizeOxglowRealestateRow(row))
                 .filter(Boolean);
@@ -6296,10 +6301,7 @@ class DatingApp {
 
     async loadOxglowElectronicsListings() {
         try {
-            await this.loadScrapedListingIntegrityRepairs();
-            const response = await fetch('data/oxglow-electronics-recent.csv', { cache: 'no-store' });
-            if (!response.ok) return [];
-            const rows = this.parseCsvRows(await response.text());
+            const rows = await this.fetchImportedListingRows('oxglow-electronics-recent.csv');
             const items = rows
                 .map((row) => this.normalizeOxglowElectronicsRow(row))
                 .filter(Boolean);
@@ -6331,10 +6333,7 @@ class DatingApp {
 
     async loadOxglowAutoPartsListings() {
         try {
-            await this.loadScrapedListingIntegrityRepairs();
-            const response = await fetch('data/oxglow-auto-parts-accessories-recent.csv', { cache: 'no-store' });
-            if (!response.ok) return [];
-            const rows = this.parseCsvRows(await response.text());
+            const rows = await this.fetchImportedListingRows('oxglow-auto-parts-accessories-recent.csv');
             const listings = rows
                 .map((row) => this.normalizeOxglowAutoPartsRow(row))
                 .filter(Boolean);
@@ -6379,10 +6378,7 @@ class DatingApp {
 
     async loadKijijiGtaListings() {
         try {
-            await this.loadScrapedListingIntegrityRepairs();
-            const response = await fetch('data/kijiji-gta-recent-with-phones.csv', { cache: 'no-store' });
-            if (!response.ok) return [];
-            const rows = this.parseCsvRows(await response.text());
+            const rows = await this.fetchImportedListingRows('kijiji-gta-recent-with-phones.csv');
             const normalizedRows = rows
                 .map((row) => this.normalizeKijijiGtaRow(row))
                 .filter((entry) => entry && entry.item);
@@ -19635,7 +19631,6 @@ class DatingApp {
         const firstName = String(document.getElementById('signup-first-name')?.value || '');
         const lastName = String(document.getElementById('signup-last-name')?.value || '');
         const email = String(document.getElementById('signup-email')?.value || '');
-        const emailConfirmation = this.normalizeAuthEmail(document.getElementById('signup-email-confirm')?.value || '');
         const age = String(document.getElementById('signup-age')?.value || '');
         const password = String(document.getElementById('signup-password')?.value || '');
 
@@ -19643,10 +19638,10 @@ class DatingApp {
         const trimmedLast = lastName.trim();
         const trimmedEmail = email.trim().toLowerCase();
         const fullName = [trimmedFirst, trimmedLast].filter(Boolean).join(' ').trim();
-        const parsedAge = Number(age);
+        const parsedAge = age === '' ? null : Number(age);
 
-        if (!(trimmedFirst && trimmedLast && trimmedEmail && age && password)) return;
-        if (!Number.isInteger(parsedAge) || parsedAge < 18 || parsedAge > 120) {
+        if (!(trimmedFirst && trimmedLast && trimmedEmail && password)) return;
+        if (age && (!Number.isInteger(parsedAge) || parsedAge < 18 || parsedAge > 120)) {
             this.showNotification('You must be between 18 and 120 to create an account.', { type: 'warn', force: true });
             return;
         }
@@ -19654,14 +19649,12 @@ class DatingApp {
             this.showNotification('Password must be at least 8 characters.', { type: 'warn', force: true });
             return;
         }
-        const validationMessage = !emailConfirmation
-            ? 'Confirm your email address before creating the account.'
-            : this.getAuthEmailValidationMessage(trimmedEmail, { confirmation: emailConfirmation });
+        const validationMessage = this.getAuthEmailValidationMessage(trimmedEmail);
         const emailStatus = document.getElementById('signup-email-status');
         if (emailStatus) emailStatus.textContent = validationMessage;
         if (validationMessage) {
             this.showNotification(validationMessage, { type: 'warn', force: true });
-            document.getElementById('signup-email-confirm')?.focus();
+            document.getElementById('signup-email')?.focus();
             return;
         }
         const termsAcceptance = document.getElementById('signup-terms-accepted');
@@ -19731,7 +19724,12 @@ class DatingApp {
                     if (this.supabaseProfileHydrationPromise) {
                         await this.supabaseProfileHydrationPromise;
                     }
-                    this.showOnboardingScreen();
+                    if (this.pendingAuthAction) {
+                        this.showMainApp();
+                        this.runPendingAuthAction();
+                    } else {
+                        this.showOnboardingScreen();
+                    }
                     this.showNotification(`Welcome, ${this.getSignedInFirstName()}.`, { type: 'success', force: true });
                     return;
                 }
@@ -19969,7 +19967,7 @@ class DatingApp {
     }
 
     initializeNavOrder() {
-        const buttons = Array.from(document.querySelectorAll('.nav-btn'))
+        const buttons = Array.from(document.querySelectorAll('.nav-btn[data-screen]'))
             .map(btn => btn.dataset.screen)
             .filter(Boolean);
         if (buttons.length) {
@@ -20069,7 +20067,7 @@ class DatingApp {
             screen.classList.remove('active');
         });
 
-        document.querySelectorAll('.nav-btn').forEach((btn) => {
+        document.querySelectorAll('.nav-btn[data-screen]').forEach((btn) => {
             btn.classList.remove('active');
         });
 
@@ -20266,7 +20264,7 @@ class DatingApp {
 	    }
 
     bindPrimaryNavigation() {
-        document.querySelectorAll('.nav-btn, [data-return-home], .home-home-link').forEach((button) => {
+        document.querySelectorAll('.nav-btn[data-screen], [data-return-home], .home-home-link').forEach((button) => {
             if (button.dataset.boundPrimaryNavigation) return;
             const navigate = () => {
                 const screen = button.dataset.screen || 'home';
@@ -31077,6 +31075,7 @@ class DatingApp {
         if (this.vehicleFavorites.has(id)) this.vehicleFavorites.delete(id);
         else this.vehicleFavorites.add(id);
         this.persistVehicleState();
+        this.savedHub?.updateCount();
     }
 
     syncVehicleFavoritesButton(btn) {
@@ -38918,6 +38917,7 @@ class DatingApp {
                     <div class="notification-item-title">${this.escapeHtml(item.title || 'Notification')}</div>
                     ${item.message ? `<p class="notification-item-message">${this.escapeHtml(item.message)}</p>` : ''}
                     ${timeLabel ? `<span class="notification-item-time">${this.escapeHtml(timeLabel)}</span>` : ''}
+                    ${item.type === 'saved_search' ? '<button type="button" class="btn-link" data-open-saved-searches>Open saved searches</button>' : ''}
                 </div>
             `;
         }).join('');
@@ -42143,343 +42143,23 @@ class DatingApp {
                 explicitSearchLocation: Boolean(interpreted.city || interpreted.region || interpreted.country)
             });
             const openNowActive = Boolean(quickFilters.openNow || interpreted.intentFlags?.openNow);
-            const localPriorityScope = this.getCurrentListingLocationPriorityScope();
             if (Array.isArray(this.scrapedHomeFeaturedRows)) {
                 this.syncScrapedHomeFeaturedAds(this.scrapedHomeFeaturedRows);
             }
 
-	        const synonymMap = {
-	            shoes: ['shoes', 'shoe', 'sneakers', 'sneaker', 'footwear', 'kicks', 'slides', 'boots'],
-	            shoe: ['shoes', 'shoe', 'sneakers', 'sneaker', 'footwear', 'kicks', 'slides', 'boots'],
-	            sneakers: ['sneakers', 'sneaker', 'shoes', 'shoe', 'footwear', 'kicks'],
-	            sneaker: ['sneakers', 'sneaker', 'shoes', 'shoe', 'footwear', 'kicks'],
-	            cars: ['cars', 'car', 'vehicle', 'vehicles', 'auto', 'automobile'],
-	            car: ['cars', 'car', 'vehicle', 'vehicles', 'auto', 'automobile'],
-	            vehicles: ['vehicles', 'vehicle', 'cars', 'car', 'auto', 'automobile'],
-	            vehicle: ['vehicles', 'vehicle', 'cars', 'car', 'auto', 'automobile']
-	        };
-	        const expandToken = (token) => {
-	            const t = String(token || '').trim().toLowerCase();
-	            if (!t) return [];
-	            if (synonymMap[t]) return synonymMap[t];
-	            if (t.endsWith('s') && synonymMap[t.slice(0, -1)]) return synonymMap[t.slice(0, -1)];
-	            return [t];
-	        };
-            const buildHomeLocationLabel = (entry = {}) => {
-                const region = entry.region || entry.state || entry.province || entry.locationRegion || '';
-                return [entry.city, region, entry.country].filter(Boolean).join(', ') || entry.city || entry.country || '';
+            const criteria = {
+                rawQuery: String(rawQuery), interpreted, query, tokens, queryNearMe, restaurantIntent,
+                category, rawCategory, otherSubcategory, minPrice, maxPrice, quickFilters: { ...quickFilters },
+                dateFilter, nearMeActive, nearMeTarget, hasNearMeTarget, effectiveLocationScope, openNowActive,
+                categoryLocalFocus: Boolean(this.homeCategoryLocalFocus),
+                categoryFilters: { ...this.homeCategoryFilters }
             };
-
-	        const results = [];
-            const specializedSourceRowIds = new Set([
-                ...(this.vehicleListings || []),
-                ...(this.realestateListings || []),
-                ...(this.serviceProfiles || [])
-            ]
-                .map((entry) => String(entry?.sourceRowId || '').trim())
-                .filter(Boolean));
-	        (this.marketplaceItems || []).forEach((item) => {
-                const sourceRowId = String(item?.sourceRowId || '').trim();
-                if (sourceRowId && specializedSourceRowIds.has(sourceRowId)) return;
-	            results.push({
-	                type: 'marketplace',
-	                id: String(item.id),
-	                title: item.title || '',
-	                priceText: String(item.priceText || item.priceLabel || '').trim()
-                        || (Number.isFinite(item.price) ? `${item.price}` : String(item.price || '')),
-	                priceValue: Number.isFinite(item.price) ? item.price : null,
-	                city: item.city || '',
-                    region: item.region || item.state || item.province || '',
-	                country: item.country || '',
-	                locationLabel: buildHomeLocationLabel(item),
-	                searchHints: [],
-	                imageUrl: item.images?.[0] || '',
-	                postedAt: item.postedDate,
-	                raw: item
-	            });
-	        });
-	        (this.vehicleListings || []).forEach((vehicle) => {
-	            results.push({
-	                type: 'vehicle',
-	                id: String(vehicle.id),
-	                title: vehicle.title || '',
-	                priceText: vehicle.price || '',
-	                priceValue: Number.isFinite(vehicle.priceValue) ? vehicle.priceValue : null,
-	                city: vehicle.city || '',
-                    region: vehicle.region || vehicle.state || vehicle.province || '',
-	                country: vehicle.country || '',
-	                locationLabel: buildHomeLocationLabel(vehicle),
-	                searchHints: ['car', 'cars', 'vehicle', 'vehicles', 'auto', 'automobile'],
-	                imageUrl: vehicle.images?.[0] || vehicle.image || '',
-	                postedAt: vehicle.date,
-	                raw: vehicle
-	            });
-	        });
-	        (this.realestateListings || []).forEach((listing) => {
-	            results.push({
-	                type: 'realestate',
-	                id: String(listing.id),
-	                title: listing.title || '',
-	                priceText: listing.price || '',
-	                priceValue: null,
-	                city: listing.city || '',
-                    region: listing.region || listing.state || listing.province || '',
-	                country: listing.country || '',
-	                locationLabel: buildHomeLocationLabel(listing),
-	                searchHints: ['home', 'homes', 'house', 'houses', 'apartment', 'apartments', 'condo', 'condos', 'property', 'properties', 'real estate', 'realestate'],
-	                imageUrl: listing.images?.[0] || '',
-	                postedAt: listing.date,
-	                raw: listing
-	            });
-	        });
-	        (this.serviceProfiles || []).forEach((service) => {
-                const serviceCategoryKey = String(service?.category || '').trim().toLowerCase();
-                const serviceSearchHints = ['service', 'services'];
-                const serviceCategoryLabelWords = this.normalizeSearchText(this.getServiceCategoryLabel(serviceCategoryKey)).split(' ').filter(Boolean);
-                const serviceCategoryHints = {
-                    food: ['food', 'restaurant', 'restaurants', 'dining', 'dinner', 'lunch', 'brunch', 'cafe', 'coffee', 'pizza', 'burger', 'sushi', 'bakery'],
-                    health_beauty: ['beauty', 'barber', 'barbers', 'barbering', 'salon', 'spa', 'hairstylist', 'hair', 'makeup', 'massage', 'facial', 'nails', 'wellness'],
-                    home_services: ['cleaning', 'home service', 'home services', 'maid', 'housekeeping', 'organizing'],
-                    skilled_trades: ['mechanic', 'repair', 'repairs', 'plumber', 'electrician', 'hvac', 'contractor', 'installation'],
-                    fitness: ['fitness', 'trainer', 'training', 'gym', 'workout', 'coaching'],
-                    pet_services: ['pet', 'pets', 'dog', 'cat', 'grooming', 'walking', 'sitting', 'vet'],
-                    classes_lessons: ['tutor', 'tutoring', 'lesson', 'lessons', 'coach', 'coaching', 'class', 'classes']
-                };
-                if (serviceCategoryKey === 'food') {
-                    serviceSearchHints.push('food', 'restaurant', 'restaurants', 'dining', 'dinner', 'lunch', 'brunch', 'cafe', 'coffee');
-                }
-                if (serviceCategoryLabelWords.length) {
-                    serviceSearchHints.push(...serviceCategoryLabelWords);
-                }
-                if (Array.isArray(serviceCategoryHints[serviceCategoryKey])) {
-                    serviceSearchHints.push(...serviceCategoryHints[serviceCategoryKey]);
-                }
-	            results.push({
-	                type: 'service',
-	                id: String(service.id),
-	                title: service.title || '',
-	                priceText: service.price || '',
-	                priceValue: null,
-	                city: service.city || '',
-                    region: service.region || service.state || service.province || '',
-	                country: service.country || '',
-	                locationLabel: buildHomeLocationLabel(service),
-	                searchHints: serviceSearchHints,
-	                imageUrl: service.photos?.[0] || '',
-	                postedAt: service.postedAt,
-	                raw: service
-	            });
-	        });
-	        (this.discoveryPosts || []).forEach((post) => {
-	            const listing = post.listing || {};
-	            const listingType = String(post.listingType || listing.type || '').toLowerCase();
-	            const seller = post.seller || post.user || {};
-	            const sellerLoc = seller.location || {};
-	            const locationLabel = this.buildListingLocationLabel(sellerLoc, post.location);
-	            const media = listing.mediaUrl || listing.image || post.mediaUrl || '';
-	            results.push({
-	                type: 'discovery',
-	                id: String(post.id),
-	                title: listing.title || '',
-	                priceText: this.formatListingPrice(listing, listingType),
-	                priceValue: null,
-	                city: sellerLoc.city || '',
-	                country: sellerLoc.country || '',
-	                locationLabel: locationLabel || '',
-	                searchHints: ['listing', 'listings', 'marketplace'],
-	                imageUrl: media,
-	                postedAt: post.timestamp,
-	                raw: post
-	            });
-	        });
-	        (this.communityPosts || []).forEach((post) => {
-	            const loc = post.location || {};
-	            const locationLabel = [loc.city, loc.country].filter(Boolean).join(', ');
-	            results.push({
-	                type: 'community',
-	                id: String(post.id),
-	                title: post.title || '',
-	                priceText: post.priceText || '',
-	                priceValue: null,
-	                city: loc.city || '',
-	                country: loc.country || '',
-	                locationLabel: locationLabel || '',
-	                searchHints: ['community', 'event', 'events', 'group', 'groups', 'classes', 'rideshare'],
-	                imageUrl: post.image || '',
-	                postedAt: post.postedAt,
-	                raw: post
-	            });
-	        });
-            // The lower-cost Places field set does not include rating or opening hours.
-            // Skip the paid provider call when those filters are required instead of
-            // paying for results that the UI would have to discard.
-            const canUseLivePlaces = !openNowActive && !Boolean(interpreted.intentFlags?.topRated);
-            const livePlaces = canUseLivePlaces
-                ? await this.fetchHomeLivePlaceResults({
-                    rawQuery,
-                    interpreted,
-                    nearMeActive,
-                    explicitSearch: scrollToResults
-                })
-                : [];
+            const { filtered, candidates, shouldBalanceCategories, intent } =
+                await this.getHomeMatchingListings(criteria, { explicitSearch: scrollToResults });
             if (requestId !== this.homeSearchRequestId) return;
-            livePlaces.forEach((entry) => results.push(entry));
-
-	        const intent = {
-	            vehicle: tokens.some((t) => expandToken(t).some((alt) => ['car', 'cars', 'vehicle', 'vehicles', 'auto', 'automobile'].includes(alt))),
-	            realestate: tokens.some((t) => expandToken(t).some((alt) => ['home', 'homes', 'house', 'houses', 'apartment', 'apartments', 'condo', 'condos', 'property', 'properties', 'real', 'estate', 'realestate'].includes(alt))),
-	            service: tokens.some((t) => expandToken(t).some((alt) => ['service', 'services'].includes(alt))),
-	            community: tokens.some((t) => expandToken(t).some((alt) => ['community', 'event', 'events', 'group', 'groups', 'classes', 'rideshare'].includes(alt))),
-                restaurant: restaurantIntent,
-                cheap: Boolean(interpreted.intentFlags?.cheap),
-                topRated: Boolean(interpreted.intentFlags?.topRated),
-                luxury: Boolean(interpreted.intentFlags?.luxury)
-	        };
-	        const intentBoost = (entry) => {
-                if (entry.type === 'live_place' && intent.restaurant) return 10;
-                if (entry.type === 'live_place' && intent.service) return 8;
-                if (intent.restaurant && entry.type === 'service' && String(entry.raw?.category || '').trim().toLowerCase() === 'food') return 9;
-                if (intent.restaurant && entry.type === 'service') return 6;
-	            if (intent.vehicle && entry.type === 'vehicle') return 5;
-	            if (intent.realestate && entry.type === 'realestate') return 5;
-	            if (intent.service && entry.type === 'service') return 4;
-	            if (intent.community && entry.type === 'community') return 3;
-	            if (entry.type === 'marketplace') return 2;
-	            if (entry.type === 'discovery') return 1;
-	            return 0;
-	        };
-
-            // Country/city browsing shows each featured ad once. Targeted searches
-            // still include every matching listing, including featured ones.
-            const excludeFeatured = !query && !rawCategory && !nearMeActive
-                && !Number.isFinite(minPrice) && !Number.isFinite(maxPrice)
-                && !quickFilters.verifiedSeller && !openNowActive && dateFilter === 'all'
-                && !intent.cheap && !intent.luxury && !intent.topRated;
-            let filtered = this.dedupeHomeSearchResults(results, { excludeFeatured: false }).filter((entry) => {
-                let queryScore = 0;
-
-	            const locationText = entry.locationLabel || [entry.city, entry.country].filter(Boolean).join(', ');
-                if (!this.matchesListingLocationScope({
-                    metro: entry.metro || entry.raw?.metro || '',
-                    city: entry.city,
-                    region: entry.region,
-                    country: entry.country,
-                    label: locationText
-                }, effectiveLocationScope)) return false;
-                if (nearMeActive && entry.type !== 'live_place') {
-                    if (!hasNearMeTarget) return false;
-                    const targetLat = Number(nearMeTarget.lat);
-                    const targetLng = Number(nearMeTarget.lng);
-                    const entryCoords = this.getMarketplaceItemCoords(entry.raw || entry);
-                    if (
-                        Number.isFinite(targetLat)
-                        && Number.isFinite(targetLng)
-                        && entryCoords
-                        && Number.isFinite(Number(entryCoords.lat))
-                        && Number.isFinite(Number(entryCoords.lng))
-                    ) {
-                        const distance = this.calculateDistance(
-                            targetLat,
-                            targetLng,
-                            Number(entryCoords.lat),
-                            Number(entryCoords.lng)
-                        );
-                        if (!Number.isFinite(distance) || distance > Number(nearMeTarget.radiusKm || 90)) return false;
-                    } else {
-                        const entryCity = normalizeText(entry.city || '');
-                        const entryCountry = normalizeText(entry.country || '');
-                        if (nearMeTarget.city) {
-                            if (!entryCity.includes(nearMeTarget.city)) return false;
-                        } else if (nearMeTarget.country && !entryCountry.includes(nearMeTarget.country)) {
-                            return false;
-                        }
-                    }
-                }
-
-	            const haystackParts = [
-	                entry.title,
-                    entry.locationLabel,
-                    entry.city,
-                    entry.region,
-                    entry.country,
-	                entry.raw?.description,
-	                entry.raw?.meta,
-	                entry.raw?.summary,
-	                entry.raw?.listing?.summary,
-	                entry.raw?.content,
-	                entry.raw?.seller,
-	                entry.raw?.host,
-	                entry.raw?.provider,
-	                entry.raw?.brand,
-	                entry.raw?.model,
-	                entry.raw?.make,
-	                entry.raw?.electronicsCategory,
-	                entry.raw?.subcategory,
-	                entry.raw?.category,
-	                entry.raw?.condition,
-	                entry.raw?.listing?.condition,
-	                entry.raw?.listingType,
-	                entry.raw?.when,
-	                ...(Array.isArray(entry.searchHints) ? entry.searchHints : []),
-	                ...(Array.isArray(entry.raw?.tags) ? entry.raw.tags : [])
-	            ];
-	            if (Array.isArray(entry.raw?.listing?.tags)) haystackParts.push(...entry.raw.listing.tags);
-                if (query) {
-                    const { matched, score, related } = this.scoreHomeSearchMatch(entry, tokens, expandToken, haystackParts);
-                    entry.searchRelated = related;
-                    if (!matched) return false;
-                    queryScore = score;
-                    if (restaurantIntent && entry.type === 'service' && String(entry.raw?.category || '').trim().toLowerCase() === 'food') {
-                        queryScore += 3;
-                    }
-                }
-
-                entry._queryScore = queryScore;
-                return true;
-            }).sort((a, b) => {
-                if (query && a.searchRelated !== b.searchRelated) return a.searchRelated ? 1 : -1;
-                if (query && a._queryScore !== b._queryScore) return b._queryScore - a._queryScore;
-                if (intent.topRated) {
-                    const ratingDiff = this.getHomeEntryRating(b) - this.getHomeEntryRating(a);
-                    if (ratingDiff !== 0) return ratingDiff;
-                }
-                if (intent.cheap || intent.luxury) {
-                    const aPrice = this.getHomeEntryPriceValue(a);
-                    const bPrice = this.getHomeEntryPriceValue(b);
-                    const aHasPrice = Number.isFinite(aPrice);
-                    const bHasPrice = Number.isFinite(bPrice);
-                    if (aHasPrice && bHasPrice && aPrice !== bPrice) {
-                        return intent.cheap ? aPrice - bPrice : bPrice - aPrice;
-                    }
-                    if (aHasPrice !== bHasPrice) return aHasPrice ? -1 : 1;
-                }
-	            const boost = intentBoost(b) - intentBoost(a);
-	            if (boost !== 0) return boost;
-                const queryScoreDiff = (b._queryScore || 0) - (a._queryScore || 0);
-                if (queryScoreDiff !== 0) return queryScoreDiff;
-                if (category || this.homeCategoryLocalFocus || nearMeActive || effectiveLocationScope?.active) {
-                    const localPriorityDiff = this.compareListingLocalPriority(a, b, localPriorityScope);
-                    if (localPriorityDiff !== 0) return localPriorityDiff;
-                }
-	            const ad = a.postedAt instanceof Date ? a.postedAt : new Date(a.postedAt);
-	            const bd = b.postedAt instanceof Date ? b.postedAt : new Date(b.postedAt);
-	            const at = Number.isFinite(ad.getTime()) ? ad.getTime() : 0;
-                const bt = Number.isFinite(bd.getTime()) ? bd.getTime() : 0;
-                return bt - at;
-            });
-            filtered.forEach((entry) => delete entry._queryScore);
-            const shouldBalanceCategories = Boolean(
-                effectiveLocationScope?.active
-                && !query
-                && !rawCategory
-                && !nearMeActive
-                && !intent.cheap
-                && !intent.luxury
-                && !intent.topRated
-            );
-            if (shouldBalanceCategories) filtered = this.balanceHomeSearchResults(filtered);
-
-            this.homeFilterCandidates = filtered.slice();
+            this.homeSearchCriteria = criteria;
+            this.savedHub?.updateSearchAction(criteria);
+            this.homeFilterCandidates = candidates.slice();
             this.homeFilterPreviewContext = {
                 rawQuery: String(rawQuery), category: interpreted.category || '',
                 minPrice: interpreted.priceMin, maxPrice: interpreted.priceMax,
@@ -42487,13 +42167,6 @@ class DatingApp {
                 nearMe: nearMeActive, queryNearMe,
                 canExcludeFeatured: !query && !intent.cheap && !intent.luxury && !intent.topRated
             };
-            filtered = this.filterHomeUiEntries(filtered, {
-                category: rawCategory, minPrice, maxPrice, dateFilter,
-                quickFilters: { ...quickFilters, openNow: openNowActive },
-                advanced: this.homeCategoryFilters || {}
-            });
-            if (excludeFeatured) filtered = this.dedupeHomeSearchResults(filtered, { excludeFeatured: true });
-            if (nearMeActive && !hasNearMeTarget) filtered = [];
 
 	        const hasFilters = Boolean(
 	            query ||
@@ -42541,6 +42214,357 @@ class DatingApp {
 	            document.querySelector('#home-content .home-listings')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
 	        }
 	    }
+
+    async getHomeMatchingListings(criteria, { explicitSearch = false } = {}) {
+        const {
+            rawQuery, interpreted, query, tokens, restaurantIntent, category, rawCategory,
+            otherSubcategory, minPrice, maxPrice, quickFilters, dateFilter, nearMeActive,
+            nearMeTarget, hasNearMeTarget, effectiveLocationScope, openNowActive,
+            categoryLocalFocus, categoryFilters
+        } = criteria;
+        const normalizeText = value => String(value || '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+        const localPriorityScope = this.getCurrentListingLocationPriorityScope();
+        const synonymMap = {
+            shoes: ['shoes', 'shoe', 'sneakers', 'sneaker', 'footwear', 'kicks', 'slides', 'boots'],
+            shoe: ['shoes', 'shoe', 'sneakers', 'sneaker', 'footwear', 'kicks', 'slides', 'boots'],
+            sneakers: ['sneakers', 'sneaker', 'shoes', 'shoe', 'footwear', 'kicks'],
+            sneaker: ['sneakers', 'sneaker', 'shoes', 'shoe', 'footwear', 'kicks'],
+            cars: ['cars', 'car', 'vehicle', 'vehicles', 'auto', 'automobile'],
+            car: ['cars', 'car', 'vehicle', 'vehicles', 'auto', 'automobile'],
+            vehicles: ['vehicles', 'vehicle', 'cars', 'car', 'auto', 'automobile'],
+            vehicle: ['vehicles', 'vehicle', 'cars', 'car', 'auto', 'automobile']
+        };
+        const expandToken = (token) => {
+            const t = String(token || '').trim().toLowerCase();
+            if (!t) return [];
+            if (synonymMap[t]) return synonymMap[t];
+            if (t.endsWith('s') && synonymMap[t.slice(0, -1)]) return synonymMap[t.slice(0, -1)];
+            return [t];
+        };
+        const buildHomeLocationLabel = (entry = {}) => {
+            const region = entry.region || entry.state || entry.province || entry.locationRegion || '';
+            return [entry.city, region, entry.country].filter(Boolean).join(', ') || entry.city || entry.country || '';
+        };
+
+        const results = [];
+        const specializedSourceRowIds = new Set([
+            ...(this.vehicleListings || []),
+            ...(this.realestateListings || []),
+            ...(this.serviceProfiles || [])
+        ]
+            .map((entry) => String(entry?.sourceRowId || '').trim())
+            .filter(Boolean));
+        (this.marketplaceItems || []).forEach((item) => {
+            const sourceRowId = String(item?.sourceRowId || '').trim();
+            if (sourceRowId && specializedSourceRowIds.has(sourceRowId)) return;
+            results.push({
+                type: 'marketplace',
+                id: String(item.id),
+                title: item.title || '',
+                priceText: String(item.priceText || item.priceLabel || '').trim()
+                    || (Number.isFinite(item.price) ? `${item.price}` : String(item.price || '')),
+                priceValue: Number.isFinite(item.price) ? item.price : null,
+                city: item.city || '',
+                region: item.region || item.state || item.province || '',
+                country: item.country || '',
+                locationLabel: buildHomeLocationLabel(item),
+                searchHints: [],
+                imageUrl: item.images?.[0] || '',
+                postedAt: item.postedDate,
+                raw: item
+            });
+        });
+        (this.vehicleListings || []).forEach((vehicle) => {
+            results.push({
+                type: 'vehicle',
+                id: String(vehicle.id),
+                title: vehicle.title || '',
+                priceText: vehicle.price || '',
+                priceValue: Number.isFinite(vehicle.priceValue) ? vehicle.priceValue : null,
+                city: vehicle.city || '',
+                region: vehicle.region || vehicle.state || vehicle.province || '',
+                country: vehicle.country || '',
+                locationLabel: buildHomeLocationLabel(vehicle),
+                searchHints: ['car', 'cars', 'vehicle', 'vehicles', 'auto', 'automobile'],
+                imageUrl: vehicle.images?.[0] || vehicle.image || '',
+                postedAt: vehicle.date,
+                raw: vehicle
+            });
+        });
+        (this.realestateListings || []).forEach((listing) => {
+            results.push({
+                type: 'realestate',
+                id: String(listing.id),
+                title: listing.title || '',
+                priceText: listing.price || '',
+                priceValue: null,
+                city: listing.city || '',
+                region: listing.region || listing.state || listing.province || '',
+                country: listing.country || '',
+                locationLabel: buildHomeLocationLabel(listing),
+                searchHints: ['home', 'homes', 'house', 'houses', 'apartment', 'apartments', 'condo', 'condos', 'property', 'properties', 'real estate', 'realestate'],
+                imageUrl: listing.images?.[0] || '',
+                postedAt: listing.date,
+                raw: listing
+            });
+        });
+        (this.serviceProfiles || []).forEach((service) => {
+            const serviceCategoryKey = String(service?.category || '').trim().toLowerCase();
+            const serviceSearchHints = ['service', 'services'];
+            const serviceCategoryLabelWords = this.normalizeSearchText(this.getServiceCategoryLabel(serviceCategoryKey)).split(' ').filter(Boolean);
+            const serviceCategoryHints = {
+                food: ['food', 'restaurant', 'restaurants', 'dining', 'dinner', 'lunch', 'brunch', 'cafe', 'coffee', 'pizza', 'burger', 'sushi', 'bakery'],
+                health_beauty: ['beauty', 'barber', 'barbers', 'barbering', 'salon', 'spa', 'hairstylist', 'hair', 'makeup', 'massage', 'facial', 'nails', 'wellness'],
+                home_services: ['cleaning', 'home service', 'home services', 'maid', 'housekeeping', 'organizing'],
+                skilled_trades: ['mechanic', 'repair', 'repairs', 'plumber', 'electrician', 'hvac', 'contractor', 'installation'],
+                fitness: ['fitness', 'trainer', 'training', 'gym', 'workout', 'coaching'],
+                pet_services: ['pet', 'pets', 'dog', 'cat', 'grooming', 'walking', 'sitting', 'vet'],
+                classes_lessons: ['tutor', 'tutoring', 'lesson', 'lessons', 'coach', 'coaching', 'class', 'classes']
+            };
+            if (serviceCategoryKey === 'food') {
+                serviceSearchHints.push('food', 'restaurant', 'restaurants', 'dining', 'dinner', 'lunch', 'brunch', 'cafe', 'coffee');
+            }
+            if (serviceCategoryLabelWords.length) {
+                serviceSearchHints.push(...serviceCategoryLabelWords);
+            }
+            if (Array.isArray(serviceCategoryHints[serviceCategoryKey])) {
+                serviceSearchHints.push(...serviceCategoryHints[serviceCategoryKey]);
+            }
+            results.push({
+                type: 'service',
+                id: String(service.id),
+                title: service.title || '',
+                priceText: service.price || '',
+                priceValue: null,
+                city: service.city || '',
+                region: service.region || service.state || service.province || '',
+                country: service.country || '',
+                locationLabel: buildHomeLocationLabel(service),
+                searchHints: serviceSearchHints,
+                imageUrl: service.photos?.[0] || '',
+                postedAt: service.postedAt,
+                raw: service
+            });
+        });
+        (this.discoveryPosts || []).forEach((post) => {
+            const listing = post.listing || {};
+            const listingType = String(post.listingType || listing.type || '').toLowerCase();
+            const seller = post.seller || post.user || {};
+            const sellerLoc = seller.location || {};
+            const locationLabel = this.buildListingLocationLabel(sellerLoc, post.location);
+            const media = listing.mediaUrl || listing.image || post.mediaUrl || '';
+            results.push({
+                type: 'discovery',
+                id: String(post.id),
+                title: listing.title || '',
+                priceText: this.formatListingPrice(listing, listingType),
+                priceValue: null,
+                city: sellerLoc.city || '',
+                country: sellerLoc.country || '',
+                locationLabel: locationLabel || '',
+                searchHints: ['listing', 'listings', 'marketplace'],
+                imageUrl: media,
+                postedAt: post.timestamp,
+                raw: post
+            });
+        });
+        (this.communityPosts || []).forEach((post) => {
+            const loc = post.location || {};
+            const locationLabel = [loc.city, loc.country].filter(Boolean).join(', ');
+            results.push({
+                type: 'community',
+                id: String(post.id),
+                title: post.title || '',
+                priceText: post.priceText || '',
+                priceValue: null,
+                city: loc.city || '',
+                country: loc.country || '',
+                locationLabel: locationLabel || '',
+                searchHints: ['community', 'event', 'events', 'group', 'groups', 'classes', 'rideshare'],
+                imageUrl: post.image || '',
+                postedAt: post.postedAt,
+                raw: post
+            });
+        });
+        // The lower-cost Places field set does not include rating or opening hours.
+        // Skip the paid provider call when those filters are required instead of
+        // paying for results that the UI would have to discard.
+        const canUseLivePlaces = !openNowActive && !Boolean(interpreted.intentFlags?.topRated);
+        const livePlaces = canUseLivePlaces
+            ? await this.fetchHomeLivePlaceResults({
+                rawQuery,
+                interpreted,
+                nearMeActive,
+                explicitSearch
+            })
+            : [];
+        livePlaces.forEach((entry) => results.push(entry));
+
+        const intent = {
+            vehicle: tokens.some((t) => expandToken(t).some((alt) => ['car', 'cars', 'vehicle', 'vehicles', 'auto', 'automobile'].includes(alt))),
+            realestate: tokens.some((t) => expandToken(t).some((alt) => ['home', 'homes', 'house', 'houses', 'apartment', 'apartments', 'condo', 'condos', 'property', 'properties', 'real', 'estate', 'realestate'].includes(alt))),
+            service: tokens.some((t) => expandToken(t).some((alt) => ['service', 'services'].includes(alt))),
+            community: tokens.some((t) => expandToken(t).some((alt) => ['community', 'event', 'events', 'group', 'groups', 'classes', 'rideshare'].includes(alt))),
+            restaurant: restaurantIntent,
+            cheap: Boolean(interpreted.intentFlags?.cheap),
+            topRated: Boolean(interpreted.intentFlags?.topRated),
+            luxury: Boolean(interpreted.intentFlags?.luxury)
+        };
+        const intentBoost = (entry) => {
+            if (entry.type === 'live_place' && intent.restaurant) return 10;
+            if (entry.type === 'live_place' && intent.service) return 8;
+            if (intent.restaurant && entry.type === 'service' && String(entry.raw?.category || '').trim().toLowerCase() === 'food') return 9;
+            if (intent.restaurant && entry.type === 'service') return 6;
+            if (intent.vehicle && entry.type === 'vehicle') return 5;
+            if (intent.realestate && entry.type === 'realestate') return 5;
+            if (intent.service && entry.type === 'service') return 4;
+            if (intent.community && entry.type === 'community') return 3;
+            if (entry.type === 'marketplace') return 2;
+            if (entry.type === 'discovery') return 1;
+            return 0;
+        };
+
+        // Country/city browsing shows each featured ad once. Targeted searches
+        // still include every matching listing, including featured ones.
+        const excludeFeatured = !query && !rawCategory && !nearMeActive
+            && !Number.isFinite(minPrice) && !Number.isFinite(maxPrice)
+            && !quickFilters.verifiedSeller && !openNowActive && dateFilter === 'all'
+            && !intent.cheap && !intent.luxury && !intent.topRated;
+        let filtered = this.dedupeHomeSearchResults(results, { excludeFeatured: false }).filter((entry) => {
+            let queryScore = 0;
+
+            const locationText = entry.locationLabel || [entry.city, entry.country].filter(Boolean).join(', ');
+            if (!this.matchesListingLocationScope({
+                metro: entry.metro || entry.raw?.metro || '',
+                city: entry.city,
+                region: entry.region,
+                country: entry.country,
+                label: locationText
+            }, effectiveLocationScope)) return false;
+            if (nearMeActive && entry.type !== 'live_place') {
+                if (!hasNearMeTarget) return false;
+                const targetLat = Number(nearMeTarget.lat);
+                const targetLng = Number(nearMeTarget.lng);
+                const entryCoords = this.getMarketplaceItemCoords(entry.raw || entry);
+                if (
+                    Number.isFinite(targetLat)
+                    && Number.isFinite(targetLng)
+                    && entryCoords
+                    && Number.isFinite(Number(entryCoords.lat))
+                    && Number.isFinite(Number(entryCoords.lng))
+                ) {
+                    const distance = this.calculateDistance(
+                        targetLat,
+                        targetLng,
+                        Number(entryCoords.lat),
+                        Number(entryCoords.lng)
+                    );
+                    if (!Number.isFinite(distance) || distance > Number(nearMeTarget.radiusKm || 90)) return false;
+                } else {
+                    const entryCity = normalizeText(entry.city || '');
+                    const entryCountry = normalizeText(entry.country || '');
+                    if (nearMeTarget.city) {
+                        if (!entryCity.includes(nearMeTarget.city)) return false;
+                    } else if (nearMeTarget.country && !entryCountry.includes(nearMeTarget.country)) {
+                        return false;
+                    }
+                }
+            }
+
+            const haystackParts = [
+                entry.title,
+                entry.locationLabel,
+                entry.city,
+                entry.region,
+                entry.country,
+                entry.raw?.description,
+                entry.raw?.meta,
+                entry.raw?.summary,
+                entry.raw?.listing?.summary,
+                entry.raw?.content,
+                entry.raw?.seller,
+                entry.raw?.host,
+                entry.raw?.provider,
+                entry.raw?.brand,
+                entry.raw?.model,
+                entry.raw?.make,
+                entry.raw?.electronicsCategory,
+                entry.raw?.subcategory,
+                entry.raw?.category,
+                entry.raw?.condition,
+                entry.raw?.listing?.condition,
+                entry.raw?.listingType,
+                entry.raw?.when,
+                ...(Array.isArray(entry.searchHints) ? entry.searchHints : []),
+                ...(Array.isArray(entry.raw?.tags) ? entry.raw.tags : [])
+            ];
+            if (Array.isArray(entry.raw?.listing?.tags)) haystackParts.push(...entry.raw.listing.tags);
+            if (query) {
+                const { matched, score, related } = this.scoreHomeSearchMatch(entry, tokens, expandToken, haystackParts);
+                entry.searchRelated = related;
+                if (!matched) return false;
+                queryScore = score;
+                if (restaurantIntent && entry.type === 'service' && String(entry.raw?.category || '').trim().toLowerCase() === 'food') {
+                    queryScore += 3;
+                }
+            }
+
+            entry._queryScore = queryScore;
+            return true;
+        }).sort((a, b) => {
+            if (query && a.searchRelated !== b.searchRelated) return a.searchRelated ? 1 : -1;
+            if (query && a._queryScore !== b._queryScore) return b._queryScore - a._queryScore;
+            if (intent.topRated) {
+                const ratingDiff = this.getHomeEntryRating(b) - this.getHomeEntryRating(a);
+                if (ratingDiff !== 0) return ratingDiff;
+            }
+            if (intent.cheap || intent.luxury) {
+                const aPrice = this.getHomeEntryPriceValue(a);
+                const bPrice = this.getHomeEntryPriceValue(b);
+                const aHasPrice = Number.isFinite(aPrice);
+                const bHasPrice = Number.isFinite(bPrice);
+                if (aHasPrice && bHasPrice && aPrice !== bPrice) {
+                    return intent.cheap ? aPrice - bPrice : bPrice - aPrice;
+                }
+                if (aHasPrice !== bHasPrice) return aHasPrice ? -1 : 1;
+            }
+            const boost = intentBoost(b) - intentBoost(a);
+            if (boost !== 0) return boost;
+            const queryScoreDiff = (b._queryScore || 0) - (a._queryScore || 0);
+            if (queryScoreDiff !== 0) return queryScoreDiff;
+            if (category || categoryLocalFocus || nearMeActive || effectiveLocationScope?.active) {
+                const localPriorityDiff = this.compareListingLocalPriority(a, b, localPriorityScope);
+                if (localPriorityDiff !== 0) return localPriorityDiff;
+            }
+            const ad = a.postedAt instanceof Date ? a.postedAt : new Date(a.postedAt);
+            const bd = b.postedAt instanceof Date ? b.postedAt : new Date(b.postedAt);
+            const at = Number.isFinite(ad.getTime()) ? ad.getTime() : 0;
+            const bt = Number.isFinite(bd.getTime()) ? bd.getTime() : 0;
+            return bt - at;
+        });
+        filtered.forEach((entry) => delete entry._queryScore);
+        const shouldBalanceCategories = Boolean(
+            effectiveLocationScope?.active
+            && !query
+            && !rawCategory
+            && !nearMeActive
+            && !intent.cheap
+            && !intent.luxury
+            && !intent.topRated
+        );
+        if (shouldBalanceCategories) filtered = this.balanceHomeSearchResults(filtered);
+
+        const candidates = filtered;
+        filtered = this.filterHomeUiEntries(filtered, {
+            category: rawCategory, minPrice, maxPrice, dateFilter,
+            quickFilters: { ...quickFilters, openNow: openNowActive },
+            advanced: categoryFilters
+        });
+        if (excludeFeatured) filtered = this.dedupeHomeSearchResults(filtered, { excludeFeatured: true });
+        if (nearMeActive && !hasNearMeTarget) filtered = [];
+
+        return { filtered, candidates, shouldBalanceCategories, intent };
+    }
 
     renderHomeListings(items, { hasFilters = false } = {}) {
 	        const grid = document.getElementById('home-listings-grid');
@@ -42614,7 +42638,7 @@ class DatingApp {
 	            return `
 	                <div class="home-card-item" data-type="${this.escapeHtml(String(it.type || 'marketplace'))}" data-id="${this.escapeHtml(String(it.id || ''))}"${swipeAttrs}>
 	                    <div class="home-card-media listing-category-media">
-                            <img class="home-card-img" src="${img}" alt="${cardTitle}" data-photo-index="0">
+                            <img class="home-card-img" src="${img}" alt="${cardTitle}" loading="lazy" decoding="async" data-photo-index="0">
                             ${this.renderListingCategoryBadge(typeLabel)}
                         </div>
 	                    <div class="home-card-body">
@@ -42666,56 +42690,60 @@ class DatingApp {
 	            card.addEventListener('click', () => {
 	                const type = card.dataset.type || 'marketplace';
 	                const id = card.dataset.id || '';
-                    if (type === 'live_place') {
-                        const livePlace = (this.homeFilteredItems || []).find((entry) => String(entry?.type || '') === 'live_place' && String(entry?.id || '') === String(id));
-                        if (livePlace?.raw?.mapQuery) this.openMapPreview(String(livePlace.raw.mapQuery || '').trim());
-                        return;
-                    }
-	                if (type === 'vehicle') {
-	                    this.openVehicleListingModal(id);
-	                    return;
-	                }
-	                if (type === 'realestate') {
-	                    this.openRealestateModalById(id);
-	                    return;
-	                }
-	                if (type === 'service') {
-	                    const service = (this.serviceProfiles || []).find(entry => String(entry.id) === String(id));
-	                    if (service) this.openServiceModal(service);
-	                    return;
-	                }
-	                if (type === 'discovery') {
-	                    const post = (this.discoveryPosts || []).find(entry => String(entry.id) === String(id));
-	                    if (post) this.openDiscoveryListing(post);
-	                    return;
-	                }
-	                if (type === 'community') {
-	                    const post = (this.communityPosts || []).find(entry => String(entry.id) === String(id));
-	                    if (!post) return;
-	                    const loc = post.location || {};
-	                    const locationLabel = [loc.city, loc.country].filter(Boolean).join(', ');
-	                    const meta = {
-	                        bio: post.summary || '',
-	                        location: locationLabel,
-	                        date: post.when || '',
-	                        specs: post.priceText || '',
-	                        tags: Array.isArray(post.tags) ? post.tags : []
-	                    };
-	                    const title = post.title || 'Community';
-	                    const image = post.image || '';
-	                    if (image) {
-	                        this.openMediaLightbox([{ src: image, label: title, type: 'image', meta }], title, 0);
-	                    } else {
-	                        this.showNotification(title);
-	                    }
-	                    return;
-	                }
-	                const numericId = Number(id);
-	                if (Number.isFinite(numericId)) this.showItemDetails(numericId);
-	            });
+                    this.openHomeListing(type, id);
+            });
 	        });
         this.renderHomePagination(totalPages, totalCount, displayItems.length);
 	    }
+
+    openHomeListing(type, id) {
+        if (type === 'live_place') {
+            const livePlace = (this.homeFilteredItems || []).find(entry => entry.type === type && String(entry.id) === String(id));
+            if (livePlace?.raw?.mapQuery) this.openMapPreview(String(livePlace.raw.mapQuery).trim());
+            return;
+        }
+        if (type === 'vehicle') {
+            this.openVehicleListingModal(id);
+            return;
+        }
+        if (type === 'realestate') {
+            this.openRealestateModalById(id);
+            return;
+        }
+        if (type === 'service') {
+            const service = (this.serviceProfiles || []).find(entry => String(entry.id) === String(id));
+            if (service) this.openServiceModal(service);
+            return;
+        }
+        if (type === 'discovery') {
+            const post = (this.discoveryPosts || []).find(entry => String(entry.id) === String(id));
+            if (post) this.openDiscoveryListing(post);
+            return;
+        }
+        if (type === 'community') {
+            const post = (this.communityPosts || []).find(entry => String(entry.id) === String(id));
+            if (!post) return;
+            const loc = post.location || {};
+            const locationLabel = [loc.city, loc.country].filter(Boolean).join(', ');
+            const meta = {
+                bio: post.summary || '',
+                location: locationLabel,
+                date: post.when || '',
+                specs: post.priceText || '',
+                tags: Array.isArray(post.tags) ? post.tags : []
+            };
+            const title = post.title || 'Community';
+            const image = post.image || '';
+            if (image) {
+                this.openMediaLightbox([{ src: image, label: title, type: 'image', meta }], title, 0);
+            } else {
+                this.showNotification(title);
+            }
+            return;
+        }
+        this.showItemDetails(id);
+
+    }
 
     renderHomePagination(totalPages, totalCount = 0, visibleCount = 0) {
         const bar = document.getElementById('home-pagination');
@@ -56883,10 +56911,12 @@ class DatingApp {
         if (this.marketplaceSaved.has(id)) {
             this.marketplaceSaved.delete(id);
             this.persistMarketplaceSaved();
+            this.savedHub?.updateCount();
             return false;
         }
         this.marketplaceSaved.add(id);
         this.persistMarketplaceSaved();
+        this.savedHub?.updateCount();
         return true;
     }
 

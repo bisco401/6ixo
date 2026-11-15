@@ -11,7 +11,7 @@
     <meta http-equiv="Expires" content="0">
     <script>
         (function forceFreshMobileBuild() {
-                var BUILD = '20261115160000';
+                var BUILD = '20261115170000';
             var KEY = 'sixo_head_build_version';
             var CHECK_KEY = 'sixo_head_build_last_check';
             var RELOAD_KEY = 'sixo_head_build_reload_target';
@@ -155,6 +155,7 @@
     <link rel="stylesheet" href="vehicle-layout-modes.css?v=20260813190000">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" media="print" onload="this.media='all'">
     <link rel="stylesheet" href="assets/location-entry.css?v=20261115-usability-1">
+    <link rel="stylesheet" href="assets/saved-hub.css?v=20261115">
     <link rel="stylesheet" href="assets/local-location.css?v=20261102-location-typing-1">
     <script type="application/ld+json">
 {
@@ -397,31 +398,25 @@
             </button>
             <div class="auth-headline">
                 <h2>Join 6ixo</h2>
-                <p>Create a profile to share listings, services, and discover people worldwide.</p>
+                <p>Create an account to post and manage your listings.</p>
             </div>
             <form id="signup-form" class="auth-form">
-                <div class="auth-field">
-                    <label for="signup-first-name">First name</label>
-                    <input type="text" id="signup-first-name" name="first-name" placeholder="Alex" autocomplete="given-name" required>
-                </div>
-                <div class="auth-field">
-                    <label for="signup-last-name">Last name</label>
-                    <input type="text" id="signup-last-name" name="last-name" placeholder="Parker" autocomplete="family-name" required>
+                <div class="signup-names">
+                    <div class="auth-field">
+                        <label for="signup-first-name">First name</label>
+                        <input type="text" id="signup-first-name" name="first-name" placeholder="Alex" autocomplete="given-name" required>
+                    </div>
+                    <div class="auth-field">
+                        <label for="signup-last-name">Last name</label>
+                        <input type="text" id="signup-last-name" name="last-name" placeholder="Parker" autocomplete="family-name" required>
+                    </div>
                 </div>
                 <p class="auth-name-privacy-note"><i class="fas fa-lock" aria-hidden="true"></i> Your first and last name make up your private Profile name. Viewers only see the Public name you choose.</p>
                 <div class="auth-field">
                     <label for="signup-email">Email</label>
-                    <input type="email" id="signup-email" name="email" placeholder="you@example.com" autocomplete="email" inputmode="email" autocapitalize="none" spellcheck="false" required>
-                </div>
-                <div class="auth-field">
-                    <label for="signup-email-confirm">Confirm email</label>
-                    <input type="email" id="signup-email-confirm" name="email-confirm" placeholder="Type your email again" autocomplete="email" inputmode="email" autocapitalize="none" spellcheck="false" aria-describedby="signup-email-status" required>
+                    <input type="email" id="signup-email" name="email" aria-describedby="signup-email-status" placeholder="you@example.com" autocomplete="email" inputmode="email" autocapitalize="none" spellcheck="false" required>
                 </div>
                 <p id="signup-email-status" class="verify-email-status error" role="status" aria-live="polite"></p>
-                <div class="auth-field">
-                    <label for="signup-age">Age</label>
-                    <input type="number" id="signup-age" name="age" min="18" max="120" placeholder="25" required>
-                </div>
                 <div class="auth-field">
                     <label for="signup-password">Password</label>
                     <div class="password-field">
@@ -431,14 +426,11 @@
                         </button>
                     </div>
                 </div>
-                <p class="auth-form-help">
-                    <button id="signup-forgot-password" type="button" class="btn-link" data-forgot-password data-forgot-password-email="signup-email">Forgot password?</button>
-                </p>
                 <label class="auth-policy-acceptance" for="signup-terms-accepted">
                     <input type="checkbox" id="signup-terms-accepted" name="terms-accepted" required aria-describedby="signup-policy-note">
                     <span>I am at least 18 and agree to the <a href="/terms/" target="_blank" rel="noopener">Terms of Use</a> and <a href="/guidelines/" target="_blank" rel="noopener">Community Guidelines</a>.</span>
                 </label>
-                <p class="auth-policy-note" id="signup-policy-note">Read the <a href="/privacy/" target="_blank" rel="noopener">Privacy Policy</a> to understand how we use your information. Optional permissions and analytics have separate choices.</p>
+                <p class="auth-policy-note" id="signup-policy-note"><a href="/privacy/" target="_blank" rel="noopener">Privacy Policy</a></p>
                 <button type="submit" class="btn-primary full-width">Create account</button>
             </form>
             <p class="auth-switch">Already have an account?
@@ -595,6 +587,10 @@
                     <i class="fas fa-plane-arrival" aria-hidden="true"></i>
                     <span>Arrive+</span>
                 </button>
+                <button id="nav-saved" class="nav-btn" type="button" aria-haspopup="dialog" aria-controls="saved-hub">
+                    <i class="far fa-heart" aria-hidden="true"></i>
+                    <span>Saved</span>
+                </button>
                 <button class="nav-btn" data-screen="profile" type="button">
                     <i class="fas fa-user"></i>
                     <span>Profile</span>
@@ -602,6 +598,19 @@
 	                </button>
 	            </div>
 	        </nav>
+
+        <dialog id="saved-hub" aria-labelledby="saved-hub-title">
+            <header class="saved-hub-header">
+                <h2 id="saved-hub-title">Saved</h2>
+                <form method="dialog"><button type="submit" autofocus aria-label="Close saved items">Close</button></form>
+            </header>
+            <div class="saved-hub-tabs" role="group" aria-label="Saved items">
+                <button type="button" data-saved-view="listings" aria-pressed="true">Listings</button>
+                <button type="button" data-saved-view="searches" aria-pressed="false">Searches &amp; alerts</button>
+            </div>
+            <p id="saved-hub-status" role="status"></p>
+            <ul id="saved-hub-list"></ul>
+        </dialog>
 
         <section id="browsing-location-recovery" class="browsing-location-recovery" hidden aria-labelledby="browsing-location-title">
             <h2 id="browsing-location-title">Choose where to browse</h2>
@@ -798,7 +807,7 @@
                         <strong>One Marketplace.</strong>
                         <span>Connecting the World.</span>
                     </div>
-	                <img loading="eager" src="assets/home/6ixo-marketplace-hero-concept.png?v=20260831" alt="6ixo — One Marketplace. Connecting the World." decoding="async" fetchpriority="high">
+	                <img loading="lazy" src="assets/home/6ixo-marketplace-hero-concept.png?v=20260831" alt="6ixo — One Marketplace. Connecting the World." decoding="async">
 	            </section>
 
                 <!-- Personalized Picks -->
@@ -868,6 +877,7 @@
 	                    <div class="home-listings-header">
 	                        <h3 id="home-results-title">Recent Listings</h3>
 	                        <span id="home-listing-count">0 items</span>
+                            <button id="home-save-search" class="btn-secondary small" type="button" hidden>Save search</button>
 	                    </div>
 	                    <div id="home-listings-grid" class="home-listings-grid">
 	                        <!-- Cards injected by JS -->
@@ -7325,15 +7335,16 @@
     <script src="assets/clean-blue-profile.a5977c70749b.js"></script>
     <script src="assets/profile-card-ui.a1b9f67f476b.js"></script>
     <script defer src="assets/profile-source-brand-blur.js?v=20261106-1"></script>
-        <link rel="stylesheet" href="assets/posting-accordion.css?v=20261012-property-categories-1">
-    <script src="assets/posting-accordion.js?v=20261104-category-badges-1"></script>
+        <link rel="stylesheet" href="assets/posting-accordion.css?v=20261115">
+    <script src="assets/posting-accordion.js?v=20261115"></script>
     <script src="assets/arrive-trip-planner.js?v=20261111-complete-trip-screen-1"></script>
     <script src="assets/arrive-discovery.js?v=20261111-complete-trip-screen-1"></script>
     <script src="assets/listing-image-recovery.js?v=20261109-quality-1"></script>
     <link rel="stylesheet" href="assets/auth-captcha.css?v=20261109-turnstile-1">
     <script src="turnstile-config.js?v=20261109-turnstile-1"></script>
     <script src="assets/auth-captcha.js?v=20261109-turnstile-1"></script>
-    <script src="app.js?v=20261115-usability-1"></script>
+    <script src="assets/saved-hub.js?v=20261115"></script>
+    <script src="app.js?v=20261115-saved"></script>
         <script src="rental-finance-ui.js?v=20260930-stay-booking-ready-1"></script>
         <script src="vehicle-rental-flow.js?v=20260914-host-insurance-1"></script>
 			</body>

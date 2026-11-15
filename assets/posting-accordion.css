@@ -224,3 +224,17 @@
 #community-post-modal.smart-posting .posting-community-heading { display: flex; align-items: center; gap: 8px; color: #fff; }
 #community-post-modal.smart-posting .community-composer-preview-section { position: static; grid-column: auto; grid-row: auto; border: 0; padding: 20px 0 0; background: transparent; }
 #community-post-modal.smart-posting .posting-section-body input, #community-post-modal.smart-posting .posting-section-body select, #community-post-modal.smart-posting .posting-section-body textarea { width: 100%; box-sizing: border-box; }
+
+#post-item-modal .posting-three-steps #posting-chapter-3 {
+    margin-top: 14px;
+}
+
+#post-item-modal .posting-three-steps #posting-chapter-3 .posting-eyebrow {
+    display: none;
+}
+
+@media (max-width: 900px) {
+    #post-item-modal .posting-three-steps .posting-chapter-list {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+}

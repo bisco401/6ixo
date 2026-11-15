@@ -182,9 +182,9 @@
         }
 
         buildChapterShell(titles, subtitles, railSubtitles) {
-            titles ??= ['Ad details', 'Photos & video', 'Price & location', 'Review & promote'];
+            titles ??= ['Ad details', 'Photos & video', 'Price & location', 'Review & publish'];
             subtitles ??= ['The essentials and your category-specific details', 'Photos, camera uploads, and an optional story', 'Pricing, delivery, and how buyers reach you', 'Check your ad and choose whether to feature it'];
-            railSubtitles ??= ['Category, copy & badges', 'Show what makes it special', 'Price, area & contact', 'Final check & visibility'];
+            railSubtitles ??= ['Category & description', 'Add your listing photos', 'Price, area & contact', 'Final check & visibility'];
             this.shell = document.createElement('div');
             this.shell.className = 'posting-shell';
             this.shell.innerHTML = `<aside class="posting-chapter-rail"><div class="posting-rail-intro"><p class="posting-eyebrow">PLACE YOUR AD</p><h2>Make it<br>stand out.</h2><p>Your listing, in four chapters.</p></div><nav aria-label="Ad chapters"><ol class="posting-chapter-list"></ol></nav><div class="posting-rail-note"><span class="posting-draft-state"><i class="fas fa-cloud" aria-hidden="true"></i> Draft on this device</span><p>You can return to any chapter before publishing.</p></div></aside><div class="posting-workspace"><div class="posting-main"><div class="posting-intro"><div><p class="posting-eyebrow">NEW LISTING</p><h2>Create your listing.</h2><p>The right details help the right people find you.</p></div><span class="posting-chapter-counter">Chapter 1 of 4</span></div><div class="posting-progress" role="progressbar" aria-label="Posting progress" aria-valuemin="0" aria-valuemax="4" aria-valuenow="0"><span></span></div><div class="posting-sections"></div></div></div>`;
@@ -210,6 +210,10 @@
             });
         }
 
+        get lastStep() {
+            return this.community || this.isShortTermStay() ? 3 : 2;
+        }
+
         setupFooter(submit) {
             this.footer = document.createElement('div');
             this.footer.className = 'posting-footer';
@@ -226,7 +230,7 @@
             this.footer.querySelector('.posting-save').addEventListener('click', () => this.saveDraft());
             this.footer.querySelector('.posting-back').addEventListener('click', () => this.openStep(Math.max(0, this.active - 1)));
             this.next.addEventListener('click', event => {
-                if (this.active === 3) return;
+                if (this.active === this.lastStep) return;
                 // Changing this button to submit must not submit the same click.
                 event.preventDefault();
                 if (this.validateStep(this.active)) {
@@ -235,7 +239,7 @@
                 }
             });
             this.form.addEventListener('submit', event => {
-                if (this.active === 3) return;
+                if (this.active === this.lastStep) return;
                 event.preventDefault();
                 event.stopImmediatePropagation();
                 this.next.click();
@@ -337,17 +341,17 @@
 
         openStep(index, scroll = true) {
             this.setCategoryPickerOpen(false);
-            this.active = Math.max(0, Math.min(3, index));
+            this.active = Math.max(0, Math.min(this.lastStep, index));
             this.sections.forEach((section, i) => {
-                const active = i === this.active;
+                const active = i === this.active || (i === 3 && this.lastStep === 2 && this.active === 2);
                 section.classList.toggle('is-open', active);
                 section.classList.toggle('is-complete', this.completed.has(i));
                 section.hidden = !active;
             });
             this.updateChapterNavigation();
             this.footer.querySelector('.posting-back').hidden = this.active === 0;
-            this.next.type = this.active === 3 ? 'submit' : 'button';
-            this.next.innerHTML = this.active === 3 ? `${this.isShortTermStay() ? 'Publish stay' : 'Publish ad'} <i class="fas fa-check" aria-hidden="true"></i>` : 'Continue <i class="fas fa-arrow-right" aria-hidden="true"></i>';
+            this.next.type = this.active === this.lastStep ? 'submit' : 'button';
+            this.next.innerHTML = this.active === this.lastStep ? `${this.isShortTermStay() ? 'Publish stay' : 'Publish ad'} <i class="fas fa-check" aria-hidden="true"></i>` : 'Continue <i class="fas fa-arrow-right" aria-hidden="true"></i>';
             this.renderReview();
             if (this.isShortTermStay()) requestAnimationFrame(() => { this.app.shortstayPreviewMap?.invalidateSize(); this.app.shortstayReviewPreviewMap?.invalidateSize(); this.app.shortstayLocationPickerMap?.invalidateSize(); });
             if (scroll) {
@@ -359,6 +363,7 @@
         updateChapterNavigation() {
             this.chapterButtons.forEach((button, i) => {
                 const active = i === this.active;
+                button.closest('li').hidden = i > this.lastStep;
                 const complete = this.completed.has(i);
                 button.classList.toggle('is-active', active);
                 button.classList.toggle('is-complete', complete);
@@ -367,10 +372,13 @@
                 button.querySelector('.posting-chapter-state').textContent = active ? 'Current chapter' : complete ? 'Complete' : '';
                 button.querySelector('.posting-chapter-number').innerHTML = complete && !active ? '<i class="fas fa-check" aria-hidden="true"></i>' : String(i + 1).padStart(2, '0');
             });
-            this.shell.querySelector('.posting-chapter-counter').textContent = `Chapter ${this.active + 1} of 4`;
+            const total = this.lastStep + 1;
+            const completed = [...this.completed].filter(step => step < total).length;
+            this.shell.querySelector('.posting-chapter-counter').textContent = `Step ${this.active + 1} of ${total}`;
             const progress = this.shell.querySelector('.posting-progress');
-            progress.setAttribute('aria-valuenow', String(this.completed.size));
-            progress.querySelector('span').style.width = `${this.completed.size * 25}%`;
+            progress.setAttribute('aria-valuemax', String(total));
+            progress.setAttribute('aria-valuenow', String(completed));
+            progress.querySelector('span').style.width = `${completed / total * 100}%`;
         }
 
         fieldsForValidation(container) {
@@ -430,17 +438,20 @@
             this.sections[0].querySelector('.posting-step-title').textContent = categoryNames[category] || 'Ad details';
             this.chapterButtons[0].querySelector('.posting-chapter-title').textContent = categoryNames[category] || 'Ad details';
             const shortStay = this.isShortTermStay();
-            const chapterTitles = shortStay ? ['Stay details', 'Property photos', 'Nightly price & area', 'Review & publish'] : [categoryNames[category] || 'Ad details', 'Photos & video', 'Price & location', 'Review & promote'];
+            const chapterTitles = shortStay ? ['Stay details', 'Property photos', 'Nightly price & area', 'Review & publish'] : [categoryNames[category] || 'Ad details', 'Photos & video', 'Price & review', 'Review your ad'];
             chapterTitles.forEach((title, index) => {
                 this.sections[index].querySelector('.posting-step-title').textContent = title;
                 this.chapterButtons[index].querySelector('.posting-chapter-title').textContent = title;
             });
-            this.shell.querySelector('.posting-intro h2').textContent = shortStay ? 'Create your short stay.' : 'Create your listing.';
-            this.shell.querySelector('.posting-intro > div > p:last-child').textContent = shortStay ? 'Build the Signature profile your guests will see.' : 'The right details help the right people find you.';
+            this.form.classList.toggle('posting-three-steps', !shortStay);
+            this.shell.querySelector('.posting-intro h2').textContent = shortStay ? 'Create your short stay' : 'Post an ad';
+            this.shell.querySelector('.posting-rail-intro h2').textContent = shortStay ? 'List your stay' : 'Post an ad';
+            this.shell.querySelector('.posting-rail-intro > p:last-child').textContent = shortStay ? 'Four steps to publish' : 'Three steps to publish';
+            this.shell.querySelector('.posting-intro > div > p:last-child').textContent = shortStay ? 'Add the details guests need to book.' : 'Standard listings are free.';
             this.shell.querySelector('.posting-chapter-rail nav').setAttribute('aria-label', shortStay ? 'Stay chapters' : 'Ad chapters');
             this.shell.querySelector('.posting-rail-intro > p').textContent = shortStay ? 'HOST YOUR STAY' : 'PLACE YOUR AD';
             this.sections[1].querySelector('.posting-chapter-header > p:last-child').textContent = shortStay ? 'Add 5–30 property photos. The first photo is your cover.' : 'Photos, camera uploads, and an optional story';
-            this.sections[3].querySelector('.posting-chapter-header > p:last-child').textContent = shortStay ? 'Check the nightly price, fees, guest details and public vicinity before publishing.' : 'Check your ad and choose whether to feature it';
+            this.sections[3].querySelector('.posting-chapter-header > p:last-child').textContent = shortStay ? 'Check the nightly price, fees, guest details and public vicinity before publishing.' : 'Check the details before publishing.';
             const buyerPayment = get('item-payment')?.closest('.input-group');
             const buyerPaymentAllowed = this.app.getCurrentPostItemCommerceUiState?.()?.buyerPayment ?? !['real_estate', 'jobs', 'dating', 'community'].includes(category);
             if (buyerPayment) buyerPayment.hidden = !buyerPaymentAllowed;
@@ -465,7 +476,8 @@
                 const node = get(id);
                 return node && !node.classList.contains('hidden');
             });
-            this.updateChapterNavigation();
+            if (this.active > this.lastStep) this.openStep(this.lastStep, false);
+            else this.updateChapterNavigation();
             this.renderReview();
         }
 

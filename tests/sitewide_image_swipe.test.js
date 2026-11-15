@@ -3,6 +3,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const test = require('node:test');
 const vm = require('node:vm');
+const ListingImageQuality = require('../assets/listing-image-recovery.js');
 
 const root = path.resolve(__dirname, '..');
 const source = fs.readFileSync(path.join(root, 'app.js'), 'utf8');
@@ -20,6 +21,8 @@ const context = {
         getElementById() { return null; }
     },
     window: {
+        location: { href: 'https://6ixo.com/' },
+        ListingImageQuality,
         setTimeout(callback) { callback(); }
     }
 };
@@ -101,7 +104,7 @@ test('upgrades small Kijiji thumbnails for the full-screen viewer', () => {
 
     assert.equal(
         item.src,
-        'https://media.kijiji.ca/api/v1/images/example?rule=kijijica-640-webp'
+        'https://media.kijiji.ca/api/v1/images/example?rule=kijijica-1600-webp'
     );
 });
 

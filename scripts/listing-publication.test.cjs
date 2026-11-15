@@ -68,7 +68,11 @@ const modal=app.getLuxuryAdDataFromCard(card);
 assert.ok(modal.details.some(d=>d.label==='Phone'&&d.value===row.phone));
 assert.ok(modal.details.some(d=>d.label==='Category'&&d.value===attrs.adCategory));
 assert.equal(modal.photos[0],rental.images[0]);
-assert.equal(app.getLuxuryAdDataFromCard({...card,querySelector:()=>({textContent:'Toronto, Canada'})}).price,'','Missing price must not borrow location text');
+const cardWithLocationText = {...card,querySelector:()=>({textContent:'Toronto, Canada'})};
+assert.equal(app.getLuxuryAdDataFromCard(cardWithLocationText).price,'Contact for price',
+  'An unpriced imported listing displays the explicit contact-price label');
+assert.equal(app.getLuxuryAdDataFromCard({...cardWithLocationText,dataset:{...attrs,adPrice:''}}).price,'',
+  'An unlabeled listing without price metadata must not borrow location text');
 assert.match(app.renderPhoneLinkHtml(row.phone),/647/);
 assert.match(app.renderPhoneLinkHtml(row.phone),/href="tel:/);
 assert.equal(app.buildScrapedHomeFeaturedListing({item:{...rental,phone:'',contact:{},realestate:{}}}),null);

@@ -11,7 +11,7 @@
     <meta http-equiv="Expires" content="0">
     <script>
         (function forceFreshMobileBuild() {
-                var BUILD = '20261115180000';
+                var BUILD = '20261115190000';
             var KEY = 'sixo_head_build_version';
             var CHECK_KEY = 'sixo_head_build_last_check';
             var RELOAD_KEY = 'sixo_head_build_reload_target';
@@ -156,6 +156,7 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" media="print" onload="this.media='all'">
     <link rel="stylesheet" href="assets/location-entry.css?v=20261115-usability-1">
     <link rel="stylesheet" href="assets/saved-hub.css?v=20261115-public-name">
+    <link rel="stylesheet" href="assets/profile-overview.css?v=20261115">
     <link rel="stylesheet" href="assets/local-location.css?v=20261102-location-typing-1">
     <script type="application/ld+json">
 {
@@ -4793,251 +4794,344 @@
 
         <!-- Profile Screen -->
         <div id="profile-content" class="content-screen">
-            <header class="app-header">
-                <h2>Profile</h2>
-                <button class="settings-btn">
-                    <i class="fas fa-cog"></i>
-                </button>
-            </header>
-            <div class="home-auth profile-auth" role="group" aria-label="Account access">
-                <button id="home-login" class="btn-primary small" type="button" onclick="window.app?.handleTopbarAuthAction ? window.app.handleTopbarAuthAction('global') : window.app?.showLoginScreen('global')">Log in</button>
-                <button id="home-signup-btn" class="btn-primary small" type="button" onclick="window.app?.showSignupScreen()">Sign up</button>
-            </div>
-            <div class="profile-container">
-                <div class="profile-photo" id="profile-photo-wrap">
-                    <img decoding="async" loading="lazy" src="" alt="Your photo" id="profile-photo">
-                    <button id="profile-video-trigger" class="profile-video-trigger hidden" type="button" aria-label="Play your 10 second profile video">
-                        <span class="profile-video-dot"></span>
-                        <span>10s video</span>
-                    </button>
-                    <button class="edit-photo-btn">
-                        <i class="fas fa-camera"></i>
-                    </button>
+            <header class="app-header"><h2>Profile</h2></header>
+            <section id="profile-guest" class="profile-container" aria-labelledby="profile-guest-title">
+                <h3 id="profile-guest-title">Welcome to 6ixo</h3>
+                <p>Log in or create an account to manage your profile, listings, and messages.</p>
+                <div class="home-auth profile-auth" role="group" aria-label="Account access">
+                    <button id="home-login" class="btn-primary small" type="button" onclick="window.app?.handleTopbarAuthAction ? window.app.handleTopbarAuthAction('global') : window.app?.showLoginScreen('global')">Log in</button>
+                    <button id="home-signup-btn" class="btn-primary small" type="button" onclick="window.app?.showSignupScreen()">Sign up</button>
                 </div>
-                <div id="profile-video-player-wrap" class="profile-video-player hidden" role="dialog" aria-label="Profile video">
-                    <div class="profile-video-player-head">
-                        <div class="profile-video-live">
-                            <span class="profile-video-dot"></span>
-                            <span>Profile video • 0–10s</span>
+            </section>
+            <div id="profile-member" class="profile-container" hidden>
+                <section class="profile-info" data-profile-panel="overview" aria-labelledby="profile-name">
+                    <div class="profile-overview-identity">
+                        <div class="profile-photo" id="profile-photo-wrap">
+                            <img decoding="async" loading="lazy" src="" alt="Your photo" id="profile-photo">
+                            <button id="profile-video-trigger" class="profile-video-trigger hidden" type="button" aria-label="Play your 10 second profile video">
+                                <span class="profile-video-dot"></span>
+                                <span>10s video</span>
+                            </button>
                         </div>
-                        <button id="profile-video-close" class="profile-video-close" type="button" aria-label="Close profile video">&times;</button>
+                        <div>
+                            <h3 id="profile-name" tabindex="-1" data-profile-focus>Your public name</h3>
+                            <p id="profile-overview-location" hidden></p>
+                        </div>
                     </div>
-                    <video id="profile-video-player" playsinline controls preload="metadata"></video>
-                </div>
-                <div class="profile-info">
-                    <h3 id="profile-name">Your Name</h3>
-                    <p id="profile-age">Age</p>
-                    <div class="profile-privacy">
-                        <i class="fas fa-lock" aria-hidden="true"></i>
-                        <span>Your private edit space</span>
+                    <div id="profile-video-player-wrap" class="profile-video-player hidden" role="dialog" aria-label="Profile video">
+                        <div class="profile-video-player-head">
+                            <div class="profile-video-live">
+                                <span class="profile-video-dot"></span>
+                                <span>Profile video • 0–10s</span>
+                            </div>
+                            <button id="profile-video-close" class="profile-video-close" type="button" aria-label="Close profile video">&times;</button>
+                        </div>
+                        <video id="profile-video-player" playsinline controls preload="metadata"></video>
                     </div>
-                    <p class="profile-privacy-note">Others can see your profile where it appears in the app. This screen is only for you to edit it.</p>
-                    <nav class="profile-policy-links" aria-label="Account policies"><a href="/terms/" target="_blank" rel="noopener">Terms</a><a href="/guidelines/" target="_blank" rel="noopener">Guidelines</a><a href="/privacy/" target="_blank" rel="noopener">Privacy Policy</a><a href="/account-deletion/" target="_blank" rel="noopener">Account deletion</a><button type="button" data-open-privacy-choices>Analytics choices</button></nav>
-	                    <div class="profile-form-grid">
-	                        <div class="profile-input-group">
-	                            <label for="profile-account-name">Profile name <span class="profile-name-status is-private"><i class="fas fa-lock" aria-hidden="true"></i> Private</span></label>
-	                            <input type="text" id="profile-account-name" maxlength="80" autocomplete="name" placeholder="Your registration name">
-	                            <p class="profile-field-note">This is the name you registered with. Only you can see it.</p>
-	                        </div>
-	                        <div class="profile-input-group">
-	                            <label for="profile-public-name">Public name <span class="profile-name-status is-public"><i class="fas fa-eye" aria-hidden="true"></i> Visible</span></label>
-	                            <input type="text" id="profile-public-name" maxlength="40" autocomplete="nickname" placeholder="The name viewers will see">
-	                            <p class="profile-field-note">Shown to viewers on your profile, listings, reviews, and messages.</p>
-	                        </div>
-	                        <div class="profile-input-group">
-	                            <label for="profile-email">Sign-in email <span class="profile-name-status is-private">Private</span></label>
-	                            <input type="email" id="profile-email" readonly aria-describedby="profile-email-note">
-                            <p id="profile-email-note" class="profile-field-note">This is your sign-in email.</p>
-	                        </div>
-	                        <div class="profile-input-group">
-	                            <label for="profile-phone">Account phone <span class="profile-name-status is-private">Private</span></label>
-	                            <input type="tel" id="profile-phone" placeholder="+1 (555) 123-4567">
-	                        </div>
-	                        <div class="profile-input-group">
-	                            <label for="profile-public-phone">Public seller phone (optional)</label>
-                            <input type="tel" id="profile-public-phone" maxlength="60" aria-describedby="profile-public-phone-note">
-                            <p id="profile-public-phone-note" class="profile-field-note">Viewers can use this number to reach you from your seller profile.</p>
+                    <div class="profile-overview-actions">
+                        <button class="btn-primary" type="button" data-profile-view="edit"><i class="fas fa-pen" aria-hidden="true"></i> Edit profile</button>
+                        <button class="btn-secondary" id="profile-viewer-preview" type="button"><i class="fas fa-eye" aria-hidden="true"></i> Preview public profile</button>
+                        <button class="btn-secondary" type="button" data-profile-view="posts"><i class="fas fa-list" aria-hidden="true"></i> My Posts</button>
+                        <button class="btn-secondary" type="button" data-profile-view="messages"><i class="fas fa-comments" aria-hidden="true"></i> Messages <span id="profile-overview-unread" hidden></span></button>
+                    </div>
+                    <details class="profile-disclosure">
+                        <summary>Seller and account tools</summary>
+                        <div class="profile-info profile-disclosure-content">
+                            <div class="wallet-card" aria-label="Stripe host payouts">
+                                <div class="wallet-row">
+                                    <div>
+                                        <p class="wallet-label">Host payouts</p>
+                                        <p id="host-payout-summary" class="wallet-value" style="font-size:1.05rem;">Stripe setup required</p>
+                                    </div>
+                                    <button id="host-payout-action" class="btn-primary small" type="button">Set up payouts</button>
+                                </div>
+                                <p id="host-payout-status" class="wallet-status" aria-live="polite">Approved hosts receive rental earnings through Stripe Connect.</p>
+                            </div>
+                            <section class="seller-pro-card" aria-labelledby="seller-pro-title">
+                                <div class="seller-pro-head">
+                                    <div>
+                                        <p class="seller-pro-eyebrow"><i class="fas fa-chart-line" aria-hidden="true"></i> Seller growth</p>
+                                        <h3 id="seller-pro-title">Seller Pro</h3>
+                                        <p>Measure paid promotions, compare campaign performance, and turn more listing views into leads.</p>
+                                    </div>
+                                    <span id="seller-pro-status-pill" class="seller-pro-status-pill">Free seller</span>
+                                </div>
+                                <div class="seller-pro-features" aria-label="Seller Pro features">
+                                    <span><i class="fas fa-eye" aria-hidden="true"></i> Real impressions</span>
+                                    <span><i class="fas fa-arrow-pointer" aria-hidden="true"></i> Click-through rate</span>
+                                    <span><i class="fas fa-bullseye" aria-hidden="true"></i> Location targeting</span>
+                                    <span><i class="fas fa-file-export" aria-hidden="true"></i> Campaign reporting</span>
+                                </div>
+                                <div class="seller-pro-checkout" id="seller-pro-checkout">
+                                    <label for="seller-pro-plan-select">Billing plan</label>
+                                    <select id="seller-pro-plan-select">
+                                        <option value="seller_pro_monthly">Monthly · $19.99 USD</option>
+                                        <option value="seller_pro_annual">Annual · $199 USD (save $40.88)</option>
+                                    </select>
+                                    <button id="start-seller-pro-btn" class="btn-primary" type="button">Start Seller Pro</button>
+                                    <button id="manage-seller-pro-billing-btn" class="btn-secondary hidden" type="button">Manage billing</button>
+                                </div>
+                                <p id="seller-pro-billing-status" class="seller-pro-billing-status" aria-live="polite">Promoted listings and targeted banners are available without a subscription. Seller Pro adds analytics and reporting.</p>
+                                <div class="advertiser-dashboard" aria-labelledby="advertiser-dashboard-title">
+                                    <div class="advertiser-dashboard-head">
+                                        <div>
+                                            <h4 id="advertiser-dashboard-title">Promotion performance</h4>
+                                            <p>Paid campaigns and targeted banners update here.</p>
+                                        </div>
+                                        <button id="refresh-advertiser-dashboard" class="btn-secondary small" type="button"><i class="fas fa-rotate" aria-hidden="true"></i> Refresh</button>
+                                    </div>
+                                    <div class="advertiser-metrics" aria-label="Campaign totals">
+                                        <div><span>Impressions</span><strong id="advertiser-impressions">0</strong></div>
+                                        <div><span>Clicks</span><strong id="advertiser-clicks">0</strong></div>
+                                        <div><span>Leads</span><strong id="advertiser-leads">0</strong></div>
+                                        <div><span>CTR</span><strong id="advertiser-ctr">0%</strong></div>
+                                    </div>
+                                    <div id="advertiser-campaign-list" class="advertiser-campaign-list" aria-live="polite">
+                                        <p class="advertiser-empty">Your paid campaign results will appear here.</p>
+                                    </div>
+                                </div>
+                            </section>
+                            <section class="profile-ad-section home-featured-ads" aria-label="Post and promote">
+                                <div class="featured-ads-header">
+                                    <div>
+                                        <p class="featured-label">Sponsored</p>
+                                        <h3>Post / Promote</h3>
+                                        <p class="featured-fee-note">One shared form for all categories and featured placements.</p>
+                                    </div>
+                                    <button id="profile-promote-ad" type="button" class="btn-luxe small profile-post-promote-btn" aria-label="Open shared post and promote form">
+                                        <i class="fas fa-gem" aria-hidden="true"></i>
+                                        Post / Promote
+                                    </button>
+                                </div>
+                            </section>
+                            <section id="guest-bookings-section" class="host-bookings-section hidden" aria-label="Guest booking history" aria-hidden="true">
+                                <div class="host-bookings-head">
+                                    <div>
+                                        <h4>My Stays</h4>
+                                        <p class="host-bookings-subtitle">Track your short-term rental requests, approved stays, and past trips.</p>
+                                    </div>
+                                    <button id="guest-bookings-refresh" class="btn-secondary small" type="button">
+                                        <i class="fas fa-rotate-right" aria-hidden="true"></i>
+                                        Refresh
+                                    </button>
+                                </div>
+                                <div class="host-bookings-filters" role="tablist" aria-label="Guest booking filters">
+                                    <button type="button" class="host-bookings-filter-btn active" data-guest-booking-filter="upcoming" aria-selected="true">Upcoming <span class="host-booking-filter-count">0</span></button>
+                                    <button type="button" class="host-bookings-filter-btn" data-guest-booking-filter="requested" aria-selected="false">Requests <span class="host-booking-filter-count">0</span></button>
+                                    <button type="button" class="host-bookings-filter-btn" data-guest-booking-filter="confirmed" aria-selected="false">Confirmed <span class="host-booking-filter-count">0</span></button>
+                                    <button type="button" class="host-bookings-filter-btn" data-guest-booking-filter="past" aria-selected="false">Past <span class="host-booking-filter-count">0</span></button>
+                                    <button type="button" class="host-bookings-filter-btn" data-guest-booking-filter="all" aria-selected="false">All <span class="host-booking-filter-count">0</span></button>
+                                </div>
+                                <div id="guest-bookings-list" class="host-bookings-list" aria-live="polite"></div>
+                            </section>
+                            <section id="host-bookings-section" class="host-bookings-section hidden" aria-label="Host booking dashboard" aria-hidden="true">
+                                <div class="host-bookings-head">
+                                    <div>
+                                        <h4>Host Bookings</h4>
+                                        <p class="host-bookings-subtitle">Review short-term rental requests and manage confirmed stays.</p>
+                                    </div>
+                                    <button id="host-bookings-refresh" class="btn-secondary small" type="button">
+                                        <i class="fas fa-rotate-right" aria-hidden="true"></i>
+                                        Refresh
+                                    </button>
+                                </div>
+                                <div class="host-bookings-filters" role="tablist" aria-label="Booking status filters">
+                                    <button type="button" class="host-bookings-filter-btn active" data-host-booking-filter="requested" aria-selected="true">Requests <span class="host-booking-filter-count">0</span></button>
+                                    <button type="button" class="host-bookings-filter-btn" data-host-booking-filter="confirmed" aria-selected="false">Confirmed <span class="host-booking-filter-count">0</span></button>
+                                    <button type="button" class="host-bookings-filter-btn" data-host-booking-filter="declined" aria-selected="false">Declined <span class="host-booking-filter-count">0</span></button>
+                                    <button type="button" class="host-bookings-filter-btn" data-host-booking-filter="cancelled" aria-selected="false">Cancelled <span class="host-booking-filter-count">0</span></button>
+                                    <button type="button" class="host-bookings-filter-btn" data-host-booking-filter="all" aria-selected="false">All <span class="host-booking-filter-count">0</span></button>
+                                </div>
+                                <div id="host-bookings-list" class="host-bookings-list" aria-live="polite"></div>
+                            </section>
+                            <section class="profile-arrive-section" aria-label="Dating trips">
+                                <div class="profile-arrive-head">
+                                    <div>
+                                        <h4>Dating Trips</h4>
+                                        <p class="profile-arrive-subtitle">Trips you submitted in Arrive+ are saved here.</p>
+                                    </div>
+                                </div>
+                                <div id="profile-arrive-trips-list" class="profile-arrive-trips-list" aria-live="polite"></div>
+                            </section>
+                            <div class="profile-tools-actions">
+                                <button id="open-dating-profile-editor" class="btn-secondary" type="button">Edit Dating profile</button>
+                                <button id="open-admin-dashboard" class="btn-secondary small" type="button">Admin dashboard</button>
+                            </div>
                         </div>
-                        <div class="profile-input-group">
-                            <label for="profile-country">Public country</label>
-	                            <input type="text" id="profile-country" placeholder="Country">
-	                        </div>
-                        <div class="profile-input-group">
-                            <label for="profile-region">Public state / province</label>
-                            <input type="text" id="profile-region" placeholder="State or province">
+                    </details>
+                    <button id="profile-log-out" class="btn-link" type="button">Log out</button>
+                </section>
+                <section id="profile-editor" class="profile-info" data-profile-panel="edit" aria-labelledby="profile-editor-title" hidden>
+                    <header class="profile-save-bar">
+                        <div>
+                            <button data-profile-view="overview" class="btn-link" type="button">Back to profile</button>
+                            <h3 id="profile-editor-title" tabindex="-1" data-profile-focus>Edit profile</h3>
                         </div>
-	                        <div class="profile-input-group">
-	                            <label for="profile-city">Public city</label>
-	                            <input type="text" id="profile-city" placeholder="City">
-	                        </div>
-	                        <div class="profile-input-group profile-map-toggle" style="grid-column: 1 / -1;">
-	                            <label class="map-toggle">
-	                                <input type="checkbox" id="profile-map-visible">
-	                                Show my public profile in map links (city only)
-	                            </label>
-	                        </div>
-	                    </div>
-                    <div class="photos-section">
-                        <label class="photos-label">Photos (up to 3)</label>
+                        <button class="btn-primary" id="save-profile" type="button" data-save-profile>Save Changes</button>
+                    </header>
+                    <div class="profile-input-group">
+                        <label for="profile-public-name">Public name <span class="profile-name-status is-public"><i class="fas fa-eye" aria-hidden="true"></i> Visible</span></label>
+                        <input type="text" id="profile-public-name" maxlength="40" autocomplete="nickname" placeholder="The name viewers will see">
+                        <p class="profile-field-note">Shown to viewers on your profile, listings, reviews, and messages.</p>
+                    </div>
+                    <div class="photos-section profile-primary-photo">
+                        <p class="photos-label">Profile photo</p>
                         <div class="photos-grid">
                             <div class="photo-slot" data-index="0">
                                 <img decoding="async" loading="lazy" id="profile-photo-0" class="photo-img" alt="Photo 1" hidden>
                                 <div id="photo-placeholder-0" class="photo-placeholder"><i class="fas fa-camera"></i></div>
                                 <input type="file" id="photo-input-0" accept="image/*" hidden>
                                 <div class="photo-actions">
-                                    <button id="photo-change-0" type="button" class="btn-secondary small">Add/Change</button>
+                                    <button id="photo-change-0" type="button" class="btn-secondary small">Add or change photo</button>
                                     <button id="photo-remove-0" type="button" class="btn-secondary small" disabled>Remove</button>
-                                </div>
-                            </div>
-                            <div class="photo-slot" data-index="1">
-                                <img decoding="async" loading="lazy" id="profile-photo-1" class="photo-img" alt="Photo 2" hidden>
-                                <div id="photo-placeholder-1" class="photo-placeholder"><i class="fas fa-camera"></i></div>
-                                <input type="file" id="photo-input-1" accept="image/*" hidden>
-                                <div class="photo-actions">
-                                    <button id="photo-change-1" type="button" class="btn-secondary small">Add/Change</button>
-                                    <button id="photo-remove-1" type="button" class="btn-secondary small" disabled>Remove</button>
-                                </div>
-                            </div>
-                            <div class="photo-slot" data-index="2">
-                                <img decoding="async" loading="lazy" id="profile-photo-2" class="photo-img" alt="Photo 3" hidden>
-                                <div id="photo-placeholder-2" class="photo-placeholder"><i class="fas fa-camera"></i></div>
-                                <input type="file" id="photo-input-2" accept="image/*" hidden>
-                                <div class="photo-actions">
-                                    <button id="photo-change-2" type="button" class="btn-secondary small">Add/Change</button>
-                                    <button id="photo-remove-2" type="button" class="btn-secondary small" disabled>Remove</button>
                                 </div>
                             </div>
                         </div>
                         <div id="photo-status" class="photo-status" role="status" aria-live="polite"></div>
                     </div>
-                    <div class="profile-video-section">
-                        <label class="video-label">Profile Video (10 seconds)</label>
-                        <div class="profile-media-options" role="group" aria-label="Profile media">
-                            <label><input type="radio" name="profile-media-choice" value="photo_video" checked> Photo + 10s video</label>
-                            <label><input type="radio" name="profile-media-choice" value="photo"> Photo only</label>
-                        </div>
-                        <p class="video-helper">Record a short clip right here. You can retake once before using it. Choose Photo only and save your profile to remove a saved video.</p>
-                        <div id="profile-video-tools">
-                            <div class="video-record-controls">
-                                <button id="record-video-btn" class="record-btn" type="button">
-                                    <span class="record-dot"></span>
-                                    Record 10s
-                                </button>
-                                <button id="retake-video-btn" class="btn-secondary small" type="button" disabled>Retake</button>
-                                <button id="use-video-btn" class="btn-primary small" type="button" disabled>Use Video</button>
-                            </div>
-                            <div class="video-preview-wrapper">
-                                <video id="profile-video-preview" class="video-preview" controls playsinline preload="metadata" hidden></video>
-                                <div id="profile-video-status" class="video-status" role="status" aria-live="polite"></div>
-                            </div>
-                        </div>
-                    </div>
                     <div class="bio-section">
-                        <label for="profile-bio">Marketplace bio:</label>
+                        <label for="profile-bio">Bio</label>
                         <textarea id="profile-bio" placeholder="Tell buyers and clients about you..."></textarea>
                     </div>
-                    <div class="interests-section">
-                        <label>Interests:</label>
-                        <div class="interests-tags" id="interests-tags">
-                            <!-- Interest tags will be added here -->
-                        </div>
-                        <input type="text" id="interest-input" placeholder="Add an interest...">
-                        <label><input type="checkbox" id="profile-public-interests"> Show my interests on my public profile</label>
+                    <div class="profile-input-group">
+                        <label for="profile-city">Public city</label>
+                        <input type="text" id="profile-city" placeholder="City">
                     </div>
-                    <div class="wallet-card" aria-label="Stripe host payouts">
-                        <div class="wallet-row">
-                            <div>
-                                <p class="wallet-label">Host payouts</p>
-                                <p id="host-payout-summary" class="wallet-value" style="font-size:1.05rem;">Stripe setup required</p>
+                    <details class="profile-disclosure" id="profile-optional-details">
+                        <summary>Optional details</summary>
+                        <div class="profile-info profile-disclosure-content">
+                            <div class="profile-form-grid">
+                                <div class="profile-input-group">
+                                    <label for="profile-country">Public country</label>
+                                    <input type="text" id="profile-country" placeholder="Country">
+                                </div>
+                                <div class="profile-input-group">
+                                    <label for="profile-region">Public state / province</label>
+                                    <input type="text" id="profile-region" placeholder="State or province">
+                                </div>
+                                <div class="profile-input-group">
+                                    <label for="profile-public-phone">Public seller phone (optional)</label>
+                                    <input type="tel" id="profile-public-phone" maxlength="60" aria-describedby="profile-public-phone-note">
+                                    <p id="profile-public-phone-note" class="profile-field-note">Viewers can use this number to reach you from your seller profile.</p>
+                                </div>
+                                <div class="profile-input-group profile-map-toggle" style="grid-column: 1 / -1;">
+                                    <label class="map-toggle">
+                                        <input type="checkbox" id="profile-map-visible">
+                                        Show my public profile in map links (city only)
+                                    </label>
+                                </div>
                             </div>
-                            <button id="host-payout-action" class="btn-primary small" type="button">Set up payouts</button>
+                            <div class="photos-section">
+                                <p class="photos-label">Additional photos</p>
+                                <div class="photos-grid">
+                                    <div class="photo-slot" data-index="1">
+                                        <img decoding="async" loading="lazy" id="profile-photo-1" class="photo-img" alt="Photo 2" hidden>
+                                        <div id="photo-placeholder-1" class="photo-placeholder"><i class="fas fa-camera"></i></div>
+                                        <input type="file" id="photo-input-1" accept="image/*" hidden>
+                                        <div class="photo-actions">
+                                            <button id="photo-change-1" type="button" class="btn-secondary small">Add/Change</button>
+                                            <button id="photo-remove-1" type="button" class="btn-secondary small" disabled>Remove</button>
+                                        </div>
+                                    </div>
+                                    <div class="photo-slot" data-index="2">
+                                        <img decoding="async" loading="lazy" id="profile-photo-2" class="photo-img" alt="Photo 3" hidden>
+                                        <div id="photo-placeholder-2" class="photo-placeholder"><i class="fas fa-camera"></i></div>
+                                        <input type="file" id="photo-input-2" accept="image/*" hidden>
+                                        <div class="photo-actions">
+                                            <button id="photo-change-2" type="button" class="btn-secondary small">Add/Change</button>
+                                            <button id="photo-remove-2" type="button" class="btn-secondary small" disabled>Remove</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="profile-video-section">
+                                <label class="video-label">Profile Video (10 seconds)</label>
+                                <div class="profile-media-options" role="group" aria-label="Profile media">
+                                    <label><input type="radio" name="profile-media-choice" value="photo_video" checked> Photo + 10s video</label>
+                                    <label><input type="radio" name="profile-media-choice" value="photo"> Photo only</label>
+                                </div>
+                                <p class="video-helper">Record a short clip right here. You can retake once before using it. Choose Photo only and save your profile to remove a saved video.</p>
+                                <div id="profile-video-tools">
+                                    <div class="video-record-controls">
+                                        <button id="record-video-btn" class="record-btn" type="button">
+                                            <span class="record-dot"></span>
+                                            Record 10s
+                                        </button>
+                                        <button id="retake-video-btn" class="btn-secondary small" type="button" disabled>Retake</button>
+                                        <button id="use-video-btn" class="btn-primary small" type="button" disabled>Use Video</button>
+                                    </div>
+                                    <div class="video-preview-wrapper">
+                                        <video id="profile-video-preview" class="video-preview" controls playsinline preload="metadata" hidden></video>
+                                        <div id="profile-video-status" class="video-status" role="status" aria-live="polite"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="interests-section">
+                                <label>Interests:</label>
+                                <div class="interests-tags" id="interests-tags">
+                                    <!-- Interest tags will be added here -->
+                                </div>
+                                <input type="text" id="interest-input" placeholder="Add an interest...">
+                                <label><input type="checkbox" id="profile-public-interests"> Show my interests on my public profile</label>
+                            </div>
                         </div>
-                        <p id="host-payout-status" class="wallet-status" aria-live="polite">Approved hosts receive rental earnings through Stripe Connect.</p>
+                    </details>
+                    <details class="profile-disclosure" id="profile-private-details">
+                        <summary>Private account details</summary>
+                        <div class="profile-info profile-disclosure-content">
+                            <div class="profile-form-grid">
+                                <div class="profile-input-group">
+                                    <label for="profile-account-name">Profile name <span class="profile-name-status is-private"><i class="fas fa-lock" aria-hidden="true"></i> Private</span></label>
+                                    <input type="text" id="profile-account-name" maxlength="80" autocomplete="name" placeholder="Your registration name">
+                                    <p class="profile-field-note">This is the name you registered with. Only you can see it.</p>
+                                </div>
+                                <div class="profile-input-group">
+                                    <label for="profile-email">Sign-in email <span class="profile-name-status is-private">Private</span></label>
+                                    <input type="email" id="profile-email" readonly aria-describedby="profile-email-note">
+                                    <p id="profile-email-note" class="profile-field-note">This is your sign-in email.</p>
+                                </div>
+                                <div class="profile-input-group">
+                                    <label for="profile-phone">Account phone <span class="profile-name-status is-private">Private</span></label>
+                                    <input type="tel" id="profile-phone" placeholder="+1 (555) 123-4567">
+                                </div>
+                            </div>
+                            <p id="profile-age" hidden></p>
+                            <nav class="profile-policy-links" aria-label="Account policies"><a href="/terms/" target="_blank" rel="noopener">Terms</a><a href="/guidelines/" target="_blank" rel="noopener">Guidelines</a><a href="/privacy/" target="_blank" rel="noopener">Privacy Policy</a><a href="/account-deletion/" target="_blank" rel="noopener">Account deletion</a><button type="button" data-open-privacy-choices>Analytics choices</button></nav>
+                        </div>
+                    </details>
+                </section>
+                <section class="profile-info" data-profile-panel="posts" aria-label="My Posts" hidden>
+                    <button class="btn-link profile-back" type="button" data-profile-view="overview">Back to profile</button>
+                    <div class="my-posts-section" aria-label="My posts">
+                        <div class="my-posts-head">
+                            <div>
+                                <h3 tabindex="-1" data-profile-focus>My Posts</h3>
+                                <p class="my-posts-subtitle">Your recent listings and ads.</p>
+                            </div>
+                        </div>
+                        <div id="my-posts-list" class="my-posts-list" aria-live="polite"></div>
                     </div>
-	                    <section class="seller-pro-card" aria-labelledby="seller-pro-title">
-	                        <div class="seller-pro-head">
-	                            <div>
-	                                <p class="seller-pro-eyebrow"><i class="fas fa-chart-line" aria-hidden="true"></i> Seller growth</p>
-	                                <h3 id="seller-pro-title">Seller Pro</h3>
-	                                <p>Measure paid promotions, compare campaign performance, and turn more listing views into leads.</p>
-	                            </div>
-	                            <span id="seller-pro-status-pill" class="seller-pro-status-pill">Free seller</span>
-	                        </div>
-	                        <div class="seller-pro-features" aria-label="Seller Pro features">
-	                            <span><i class="fas fa-eye" aria-hidden="true"></i> Real impressions</span>
-	                            <span><i class="fas fa-arrow-pointer" aria-hidden="true"></i> Click-through rate</span>
-	                            <span><i class="fas fa-bullseye" aria-hidden="true"></i> Location targeting</span>
-	                            <span><i class="fas fa-file-export" aria-hidden="true"></i> Campaign reporting</span>
-	                        </div>
-	                        <div class="seller-pro-checkout" id="seller-pro-checkout">
-	                            <label for="seller-pro-plan-select">Billing plan</label>
-	                            <select id="seller-pro-plan-select">
-	                                <option value="seller_pro_monthly">Monthly · $19.99 USD</option>
-	                                <option value="seller_pro_annual">Annual · $199 USD (save $40.88)</option>
-	                            </select>
-	                            <button id="start-seller-pro-btn" class="btn-primary" type="button">Start Seller Pro</button>
-	                            <button id="manage-seller-pro-billing-btn" class="btn-secondary hidden" type="button">Manage billing</button>
-	                        </div>
-	                        <p id="seller-pro-billing-status" class="seller-pro-billing-status" aria-live="polite">Promoted listings and targeted banners are available without a subscription. Seller Pro adds analytics and reporting.</p>
-	                        <div class="advertiser-dashboard" aria-labelledby="advertiser-dashboard-title">
-	                            <div class="advertiser-dashboard-head">
-	                                <div>
-	                                    <h4 id="advertiser-dashboard-title">Promotion performance</h4>
-	                                    <p>Paid campaigns and targeted banners update here.</p>
-	                                </div>
-	                                <button id="refresh-advertiser-dashboard" class="btn-secondary small" type="button"><i class="fas fa-rotate" aria-hidden="true"></i> Refresh</button>
-	                            </div>
-	                            <div class="advertiser-metrics" aria-label="Campaign totals">
-	                                <div><span>Impressions</span><strong id="advertiser-impressions">0</strong></div>
-	                                <div><span>Clicks</span><strong id="advertiser-clicks">0</strong></div>
-	                                <div><span>Leads</span><strong id="advertiser-leads">0</strong></div>
-	                                <div><span>CTR</span><strong id="advertiser-ctr">0%</strong></div>
-	                            </div>
-	                            <div id="advertiser-campaign-list" class="advertiser-campaign-list" aria-live="polite">
-	                                <p class="advertiser-empty">Your paid campaign results will appear here.</p>
-	                            </div>
-	                        </div>
-	                    </section>
-	                    <section class="profile-ad-section home-featured-ads" aria-label="Post and promote">
-	                        <div class="featured-ads-header">
-	                            <div>
-	                                <p class="featured-label">Sponsored</p>
-	                                <h3>Post / Promote</h3>
-	                                <p class="featured-fee-note">One shared form for all categories and featured placements.</p>
-	                            </div>
-	                            <button id="profile-promote-ad" type="button" class="btn-luxe small profile-post-promote-btn" aria-label="Open shared post and promote form">
-	                                <i class="fas fa-gem" aria-hidden="true"></i>
-	                                Post / Promote
-	                            </button>
-	                        </div>
-	                    </section>
-	                    <div class="my-posts-section" aria-label="My posts">
-	                        <div class="my-posts-head">
-	                            <div>
-	                                <h4>My Posts</h4>
-	                                <p class="my-posts-subtitle">Your recent listings and ads.</p>
-	                            </div>
-	                        </div>
-	                        <div id="my-posts-list" class="my-posts-list" aria-live="polite"></div>
-	                    </div>
-	                    <div id="my-auctions-section" class="my-auctions-section" aria-label="My auctions">
-	                        <div class="my-auctions-head">
-	                            <div>
-	                                <h4>My Auctions</h4>
-	                                <p class="my-auctions-subtitle">Track open, closed, and won live auctions.</p>
-	                            </div>
-	                            <div class="my-auctions-filters" role="tablist" aria-label="Auction status filters">
-	                                <button type="button" class="my-auctions-filter-btn active" data-auction-filter="open" aria-selected="true">Open</button>
-	                                <button type="button" class="my-auctions-filter-btn" data-auction-filter="closed" aria-selected="false">Closed</button>
-	                                <button type="button" class="my-auctions-filter-btn" data-auction-filter="won" aria-selected="false">Won</button>
-	                            </div>
-	                        </div>
-	                        <div id="my-auctions-list" class="my-auctions-list" aria-live="polite"></div>
-	                    </div>
+                    <div id="my-auctions-section" class="my-auctions-section" aria-label="My auctions">
+                        <div class="my-auctions-head">
+                            <div>
+                                <h4>My Auctions</h4>
+                                <p class="my-auctions-subtitle">Track open, closed, and won live auctions.</p>
+                            </div>
+                            <div class="my-auctions-filters" role="tablist" aria-label="Auction status filters">
+                                <button type="button" class="my-auctions-filter-btn active" data-auction-filter="open" aria-selected="true">Open</button>
+                                <button type="button" class="my-auctions-filter-btn" data-auction-filter="closed" aria-selected="false">Closed</button>
+                                <button type="button" class="my-auctions-filter-btn" data-auction-filter="won" aria-selected="false">Won</button>
+                            </div>
+                        </div>
+                        <div id="my-auctions-list" class="my-auctions-list" aria-live="polite"></div>
+                    </div>
+                </section>
+                <section class="profile-info" data-profile-panel="messages" aria-label="Messages" hidden>
+                    <button class="btn-link profile-back" type="button" data-profile-view="overview">Back to profile</button>
                     <section id="profile-messages-section" class="profile-messages-section hidden" aria-label="Messages" aria-hidden="true">
                         <div class="profile-messages-head">
                             <div>
-                                <h4>Messages <span id="profile-messages-unread" class="profile-messages-unread hidden" aria-label="Unread messages">0</span></h4>
+                                <h3 tabindex="-1" data-profile-focus>Messages <span id="profile-messages-unread" class="profile-messages-unread hidden" aria-label="Unread messages">0</span></h3>
                                 <p class="profile-messages-subtitle">Continue private conversations with buyers, sellers, guests, and hosts.</p>
                             </div>
                             <button id="profile-messages-refresh" class="btn-secondary small" type="button">
@@ -5047,62 +5141,10 @@
                         </div>
                         <div id="profile-messages-list" class="profile-messages-list" aria-live="polite"></div>
                     </section>
-                    <section id="guest-bookings-section" class="host-bookings-section hidden" aria-label="Guest booking history" aria-hidden="true">
-                        <div class="host-bookings-head">
-                            <div>
-                                <h4>My Stays</h4>
-                                <p class="host-bookings-subtitle">Track your short-term rental requests, approved stays, and past trips.</p>
-                            </div>
-                            <button id="guest-bookings-refresh" class="btn-secondary small" type="button">
-                                <i class="fas fa-rotate-right" aria-hidden="true"></i>
-                                Refresh
-                            </button>
-                        </div>
-                        <div class="host-bookings-filters" role="tablist" aria-label="Guest booking filters">
-                            <button type="button" class="host-bookings-filter-btn active" data-guest-booking-filter="upcoming" aria-selected="true">Upcoming <span class="host-booking-filter-count">0</span></button>
-                            <button type="button" class="host-bookings-filter-btn" data-guest-booking-filter="requested" aria-selected="false">Requests <span class="host-booking-filter-count">0</span></button>
-                            <button type="button" class="host-bookings-filter-btn" data-guest-booking-filter="confirmed" aria-selected="false">Confirmed <span class="host-booking-filter-count">0</span></button>
-                            <button type="button" class="host-bookings-filter-btn" data-guest-booking-filter="past" aria-selected="false">Past <span class="host-booking-filter-count">0</span></button>
-                            <button type="button" class="host-bookings-filter-btn" data-guest-booking-filter="all" aria-selected="false">All <span class="host-booking-filter-count">0</span></button>
-                        </div>
-                        <div id="guest-bookings-list" class="host-bookings-list" aria-live="polite"></div>
-                    </section>
-                    <section id="host-bookings-section" class="host-bookings-section hidden" aria-label="Host booking dashboard" aria-hidden="true">
-                        <div class="host-bookings-head">
-                            <div>
-                                <h4>Host Bookings</h4>
-                                <p class="host-bookings-subtitle">Review short-term rental requests and manage confirmed stays.</p>
-                            </div>
-                            <button id="host-bookings-refresh" class="btn-secondary small" type="button">
-                                <i class="fas fa-rotate-right" aria-hidden="true"></i>
-                                Refresh
-                            </button>
-                        </div>
-                        <div class="host-bookings-filters" role="tablist" aria-label="Booking status filters">
-                            <button type="button" class="host-bookings-filter-btn active" data-host-booking-filter="requested" aria-selected="true">Requests <span class="host-booking-filter-count">0</span></button>
-                            <button type="button" class="host-bookings-filter-btn" data-host-booking-filter="confirmed" aria-selected="false">Confirmed <span class="host-booking-filter-count">0</span></button>
-                            <button type="button" class="host-bookings-filter-btn" data-host-booking-filter="declined" aria-selected="false">Declined <span class="host-booking-filter-count">0</span></button>
-                            <button type="button" class="host-bookings-filter-btn" data-host-booking-filter="cancelled" aria-selected="false">Cancelled <span class="host-booking-filter-count">0</span></button>
-                            <button type="button" class="host-bookings-filter-btn" data-host-booking-filter="all" aria-selected="false">All <span class="host-booking-filter-count">0</span></button>
-                        </div>
-                        <div id="host-bookings-list" class="host-bookings-list" aria-live="polite"></div>
-                    </section>
-                    <section class="profile-arrive-section" aria-label="Dating trips">
-                        <div class="profile-arrive-head">
-                            <div>
-                                <h4>Dating Trips</h4>
-                                <p class="profile-arrive-subtitle">Trips you submitted in Arrive+ are saved here.</p>
-                            </div>
-                        </div>
-                        <div id="profile-arrive-trips-list" class="profile-arrive-trips-list" aria-live="polite"></div>
-                    </section>
-                    <button id="open-admin-dashboard" class="btn-secondary small" type="button">Admin dashboard</button>
-                    <button class="btn-secondary" id="profile-viewer-preview" type="button">Preview public profile</button>
-                    <button class="btn-primary" id="save-profile" type="button" data-save-profile>Save Changes</button>
-			                    </div>
-			                </div>
-			            </div>
-	        </div>
+                    <p class="profile-messages-unavailable">Messages are temporarily unavailable.</p>
+                </section>
+            </div>
+        </div>
 	        <button id="quote-modal-restore" class="modal-restore hidden" type="button" aria-label="Restore quote request">
 	            <i class="fas fa-pen" aria-hidden="true"></i>
 	            Continue quote
@@ -7356,7 +7398,7 @@
     <script src="turnstile-config.js?v=20261109-turnstile-1"></script>
     <script src="assets/auth-captcha.js?v=20261109-turnstile-1"></script>
     <script src="assets/saved-hub.js?v=20261115"></script>
-    <script src="app.js?v=20261115-public-name"></script>
+    <script src="app.js?v=20261115-profile-overview"></script>
         <script src="rental-finance-ui.js?v=20260930-stay-booking-ready-1"></script>
         <script src="vehicle-rental-flow.js?v=20260914-host-insurance-1"></script>
 			</body>

@@ -2287,6 +2287,9 @@ class DatingApp {
 
         homeAuth?.classList.toggle('is-signed-in', signedIn);
         datingActions?.classList.toggle('is-signed-in', signedIn);
+        this.syncProfileAccess();
+        const profileLogout = document.getElementById('profile-log-out');
+        if (profileLogout) profileLogout.disabled = loggingOut;
 
         [homeSignup, datingSignup].forEach((button) => {
             if (!button) return;
@@ -7395,6 +7398,12 @@ class DatingApp {
         this.marketplaceUnreadTotal = total;
         const navBadge = document.getElementById('profile-message-count');
         const headingBadge = document.getElementById('profile-messages-unread');
+        const overviewBadge = document.getElementById('profile-overview-unread');
+        if (overviewBadge) {
+            overviewBadge.hidden = total === 0;
+            overviewBadge.textContent = total > 99 ? '99+' : String(total);
+            overviewBadge.setAttribute('aria-label', `${total} unread messages`);
+        }
         [navBadge, headingBadge].forEach((badge) => {
             if (!badge) return;
             badge.textContent = total > 99 ? '99+' : String(total);
@@ -14811,6 +14820,11 @@ class DatingApp {
 	        // Profile events
 	        document.getElementById('save-profile').addEventListener('click', () => this.saveProfile());
         document.getElementById('profile-viewer-preview')?.addEventListener('click', () => this.openPublicProfilePreview());
+        document.getElementById('profile-log-out')?.addEventListener('click', () => void this.handleLogout());
+        document.getElementById('profile-member')?.addEventListener('click', event => {
+            const button = event.target.closest('[data-profile-view]');
+            if (button) this.showProfilePanel(button.dataset.profileView, { focus: true });
+        });
         const datingProfileEditorBtn = document.getElementById('open-dating-profile-editor');
         if (datingProfileEditorBtn && !datingProfileEditorBtn.dataset.bound) {
             datingProfileEditorBtn.addEventListener('click', () => this.openDatingProfileEditor());
@@ -14872,19 +14886,6 @@ class DatingApp {
 	        if (profilePromote && !profilePromote.dataset.bound) {
 	            profilePromote.addEventListener('click', () => this.openSharedPostForm({ placement: 'home_featured', luxe: true, source: 'profile' }));
 	            profilePromote.dataset.bound = '1';
-        }
-        const updateMarketplaceIdentityPreview = () => {
-            const profilePublicNameInput = document.getElementById('profile-public-name');
-            const previewName = this.normalizeMarketplaceHandle(profilePublicNameInput?.value || '', '')
-                || this.getMarketplaceUsername()
-                || '6ixo member';
-            const profileName = document.getElementById('profile-name');
-            if (profileName) profileName.textContent = previewName;
-        };
-        const profilePublicName = document.getElementById('profile-public-name');
-        if (profilePublicName && !profilePublicName.dataset.bound) {
-            profilePublicName.addEventListener('input', updateMarketplaceIdentityPreview);
-            profilePublicName.dataset.bound = '1';
         }
 	        const profileMapVisible = document.getElementById('profile-map-visible');
 	        if (profileMapVisible && !profileMapVisible.dataset.bound) {
@@ -20416,6 +20417,7 @@ class DatingApp {
                 this.loadRewards();
                 break;
             case 'profile':
+                this.showProfilePanel('overview');
                 this.loadUserProfile();
                 break;
             case 'premium':
@@ -54120,10 +54122,51 @@ class DatingApp {
         return false;
     }
 
+    syncProfileAccess() {
+        const guest = document.getElementById('profile-guest');
+        const member = document.getElementById('profile-member');
+        if (!guest || !member) return;
+        guest.hidden = this.isSignedIn;
+        member.hidden = !this.isSignedIn;
+        if (!this.isSignedIn) this.showProfilePanel('overview');
+    }
+
+    showProfilePanel(view, { focus = false } = {}) {
+        const member = document.getElementById('profile-member');
+        if (!member || (view !== 'overview' && !this.isSignedIn)) return;
+        const target = member.querySelector(`[data-profile-panel="${view}"]`);
+        if (!target) return;
+        member.querySelectorAll('[data-profile-panel]').forEach(panel => {
+            panel.hidden = panel !== target;
+        });
+        if (view === 'messages' && focus) void this.loadMarketplaceConversations();
+        if (view === 'posts' && focus) {
+            this.renderMyPosts();
+            this.renderMyAuctions();
+        }
+        if (focus) {
+            const heading = target.querySelector('[data-profile-focus]');
+            const focusTarget = heading?.getClientRects().length ? heading : target.querySelector('.profile-back');
+            focusTarget?.focus({ preventScroll: true });
+            window.scrollTo({ top: 0, behavior: 'instant' });
+        }
+    }
+
+    updateProfileOverviewLocation(location = {}) {
+        const city = document.getElementById('profile-overview-location');
+        if (!city) return;
+        city.textContent = [location.city, location.country].filter(Boolean).join(', ');
+        city.hidden = !city.textContent;
+    }
+
 	    loadUserProfile() {
 	        this.ensureProfileUsernames();
 	        document.getElementById('profile-name').textContent = this.getMarketplaceUsername();
-	        document.getElementById('profile-age').textContent = Number.isInteger(this.currentUser.age) ? `${this.currentUser.age} years old` : 'Age not provided';
+        const age = document.getElementById('profile-age');
+        if (age) {
+            age.hidden = !Number.isInteger(this.currentUser.age);
+            age.textContent = age.hidden ? '' : `${this.currentUser.age} years old`;
+        }
 	        document.getElementById('profile-photo').src = this.getMarketplaceProfilePhoto();
 	        const accountName = document.getElementById('profile-account-name');
 	        if (accountName) accountName.value = this.getAccountSignupName() || this.currentUser.accountName || '';
@@ -54139,6 +54182,7 @@ class DatingApp {
         const publicInterests = document.getElementById('profile-public-interests');
         if (publicInterests) publicInterests.checked = this.currentUser.showProfileInterests === true;
         const profileLocation = this.currentUser.marketplaceProfileLocation || this.currentUser.location || {};
+        this.updateProfileOverviewLocation(this.currentUser.marketplaceProfileLocation);
         for (const field of ['country', 'region', 'city']) {
             const input = document.getElementById(`profile-${field}`);
             if (input) input.value = String(profileLocation[field] || '');
@@ -55934,7 +55978,9 @@ class DatingApp {
 	        const privateProfileName = this.normalizeOptionalPublicIdentity(accountNameInput?.value || '', 80);
 	        const publicIdentity = this.normalizeMarketplaceHandle(publicNameInput?.value || '', '');
 	        if (!privateProfileName) {
-	            accountNameInput?.focus();
+	            const details = accountNameInput?.closest?.('details');
+            if (details) details.open = true;
+            accountNameInput?.focus();
 	            this.showNotification('Enter your private Profile name.', { force: true, type: 'warn' });
 	            return;
 	        }
@@ -56016,6 +56062,7 @@ class DatingApp {
         await this.upsertSupabaseProfile({ throwOnError: true });
         this.saveUserPreferences();
         this.updateMapMarkers();
+        this.updateProfileOverviewLocation(profileLocation);
         this.showNotification('Profile saved successfully!', { force: true, type: 'success' });
         } catch (error) {
             console.warn('Profile save failed:', error);

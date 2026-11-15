@@ -2,7 +2,7 @@
 (() => {
     'use strict';
 
-    const rowIds = ['home-recommended-row', 'home-recent-row', 'marketplace-trending', 'marketplace-recommended', 'marketplace-recent'];
+    const rowIds = ['home-recommended-row', 'home-recent-row', 'marketplace-trending'];
 
     for (const id of rowIds) {
         const row = document.getElementById(id);

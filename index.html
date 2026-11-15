@@ -340,10 +340,10 @@
     <link rel="stylesheet" href="assets/mobile-marketplace-filters.css?v=20261106-compact-1">
     <script defer src="assets/mobile-marketplace-filters.js?v=20261106-compact-1"></script>
     <script defer src="assets/desktop-marketplace-filters.js?v=20261106-mobile-1"></script>
-    <link rel="stylesheet" href="assets/compact-marketplace-cards.css?v=20261103-slightly-smaller-1">
+    <link rel="stylesheet" href="assets/compact-marketplace-cards.css?v=20261115-market-trending-1">
     <link rel="stylesheet" href="assets/listing-category-badges.css?v=20261107-readable-badges-1">
     <link rel="stylesheet" href="assets/feed-browsing.css?v=20261104-desktop-feeds-3">
-    <script defer src="assets/feed-browsing.js?v=20261104-desktop-feeds-2"></script>
+    <script defer src="assets/feed-browsing.js?v=20261115-market-trending-1"></script>
     <script defer src="assets/home-featured-row.js?v=20261102-featured-details-1"></script>
 </head>
 <body>
@@ -2304,16 +2304,6 @@
                     </div>
             </section>
 
-	            <!-- Real paid sponsored listings; populated from live marketplace data. -->
-	            <section id="marketplace-sponsored-section" class="home-featured-ads vehicle-featured-top hidden" aria-label="Sponsored marketplace listings">
-	                <div class="featured-ads-header">
-	                    <div>
-	                        <p class="featured-label">Sponsored</p>
-	                    </div>
-                    </div>
-                    <div id="marketplace-sponsored-carousel" class="featured-ads-carousel" data-real-sponsored-only="1"></div>
-	            </section>
-
 	            <div id="marketplace-sections" class="marketplace-sections" aria-label="Marketplace sections">
 	                <section class="marketplace-section" aria-label="Trending listings">
 	                    <div class="marketplace-section-header">
@@ -2321,20 +2311,6 @@
 	                        <span class="marketplace-section-sub">Hot picks</span>
 	                    </div>
 	                    <div id="marketplace-trending" class="marketplace-row"></div>
-	                </section>
-	                <section id="marketplace-recommended-section" class="marketplace-section" aria-label="Recommended listings">
-	                    <div class="marketplace-section-header">
-	                        <h3>Recommended for you</h3>
-	                        <span class="marketplace-section-sub">Based on your browsing</span>
-	                    </div>
-	                    <div id="marketplace-recommended" class="marketplace-row"></div>
-	                </section>
-	                <section id="marketplace-recent-section" class="marketplace-section hidden" aria-label="Recently viewed listings">
-	                    <div class="marketplace-section-header">
-	                        <h3>Recently viewed</h3>
-	                        <span class="marketplace-section-sub">Quick return</span>
-	                    </div>
-	                    <div id="marketplace-recent" class="marketplace-row"></div>
 	                </section>
 	            </div>
 
@@ -2390,6 +2366,16 @@
                     <!-- Items will be populated here -->
                 </div>
                 <nav id="marketplace-pagination" class="pagination-bar" aria-label="Marketplace listing pages"></nav>
+            </section>
+
+            <!-- Real paid sponsored listings; populated from live marketplace data. -->
+            <section id="marketplace-sponsored-section" class="home-featured-ads vehicle-featured-top hidden" aria-label="Sponsored marketplace listings">
+                <div class="featured-ads-header">
+                    <div>
+                        <p class="featured-label">Sponsored</p>
+                    </div>
+                </div>
+                <div id="marketplace-sponsored-carousel" class="featured-ads-carousel" data-real-sponsored-only="1"></div>
             </section>
         </div>
 
@@ -7398,7 +7384,7 @@
     <script src="turnstile-config.js?v=20261109-turnstile-1"></script>
     <script src="assets/auth-captcha.js?v=20261109-turnstile-1"></script>
     <script src="assets/saved-hub.js?v=20261115"></script>
-    <script src="app.js?v=20261115-profile-overview"></script>
+    <script src="app.js?v=20261115-market-trending-1"></script>
         <script src="rental-finance-ui.js?v=20260930-stay-booking-ready-1"></script>
         <script src="vehicle-rental-flow.js?v=20260914-host-insurance-1"></script>
 			</body>

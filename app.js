@@ -59836,13 +59836,8 @@ class DatingApp {
     }
 
     renderMarketplaceSections(pool = null) {
-        const sections = document.getElementById('marketplace-sections');
-        if (!sections) return;
         const trendingEl = document.getElementById('marketplace-trending');
-        const recommendedEl = document.getElementById('marketplace-recommended');
-        const recentSection = document.getElementById('marketplace-recent-section');
-        const recentEl = document.getElementById('marketplace-recent');
-        if (!trendingEl || !recommendedEl || !recentSection || !recentEl) return;
+        if (!trendingEl) return;
 
         const countryFilter = document.getElementById('country-filter')?.value || '';
         const cityFilter = document.getElementById('city-filter')?.value || '';
@@ -59868,16 +59863,13 @@ class DatingApp {
             country: entry.country || '',
             label: [entry.city, entry.country].filter(Boolean).join(', ')
         }, effectiveLocationScope));
-        const byId = new Map(allItems.map((entry) => [Number(entry.id), entry]));
-        const poolIds = Array.isArray(pool) ? new Set(source.map((entry) => Number(entry.id))) : null;
-
         const sortByDateDesc = (arr) => arr.slice().sort((a, b) => this.getListingPostedTime(b) - this.getListingPostedTime(a));
         const sorted = sortByDateDesc(source);
         const sortedAll = sortByDateDesc(allItems);
 
-        const pickUnique = (primary, fallback, max, exclude = new Set()) => {
+        const pickUnique = (primary, fallback, max) => {
             const out = [];
-            const seen = new Set(exclude);
+            const seen = new Set();
             const addFrom = (list) => {
                 for (const entry of list) {
                     const id = Number(entry?.id);
@@ -59893,41 +59885,8 @@ class DatingApp {
         };
 
         const trending = pickUnique(sorted, sortedAll, 8);
-        const trendingIds = new Set(trending.map((entry) => Number(entry.id)));
-
-        const seedId = (Array.isArray(this.marketplaceRecent) && this.marketplaceRecent.length)
-            ? this.marketplaceRecent[0]
-            : null;
-        const seedItem = seedId ? byId.get(Number(seedId)) : null;
-        const seedCategory = seedItem?.category || null;
-        const recommendedPrimary = seedCategory
-            ? sortedAll.filter(entry => entry.category === seedCategory)
-            : sortedAll;
-        const recommended = pickUnique(
-            recommendedPrimary.filter(entry => !trendingIds.has(Number(entry.id))),
-            sortedAll,
-            8,
-            trendingIds
-        );
-        const resolvedRecommended = recommended.length ? recommended : trending.slice(0, 8);
-
-        const recent = (Array.isArray(this.marketplaceRecent) ? this.marketplaceRecent : [])
-            .map((id) => byId.get(Number(id)))
-            .filter(Boolean)
-            .filter((entry) => !poolIds || poolIds.has(Number(entry.id)))
-            .slice(0, 10);
-
         trendingEl.innerHTML = trending.map(entry => this.renderMarketplaceCard(entry, { compact: true })).join('');
-        recommendedEl.innerHTML = resolvedRecommended.map(entry => this.renderMarketplaceCard(entry, { compact: true })).join('');
-
-        if (recent.length) {
-            recentSection.classList.remove('hidden');
-            recentEl.innerHTML = recent.map(entry => this.renderMarketplaceCard(entry, { compact: true })).join('');
-        } else {
-            recentSection.classList.add('hidden');
-            recentEl.innerHTML = '';
-        }
-        [trendingEl, recommendedEl, recentEl].forEach((row) => this.bindMarketplaceItemCarousels(row));
+        this.bindMarketplaceItemCarousels(trendingEl);
     }
 
     bindMarketplaceVehicleFeaturedCarousels() {
@@ -64948,7 +64907,6 @@ class DatingApp {
 	        const item = this.getMarketplaceSearchItem(itemId);
 	        if (!item) return;
 	        this.recordMarketplaceRecent(itemId);
-	        this.renderMarketplaceSections(this.filteredItems);
 	        this.renderHomePersonalizedRows();
 	        this.openMarketplaceItemModal(item, openOptions);
 	    }

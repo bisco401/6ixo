@@ -34668,13 +34668,11 @@ class DatingApp {
     formatFeedHeaderDate(date) {
         if (!(date instanceof Date) || Number.isNaN(date.getTime())) return '';
         const today = new Date();
-        const todayKey = today.toISOString().slice(0, 10);
         const yesterday = new Date(today);
         yesterday.setDate(today.getDate() - 1);
-        const yesterdayKey = yesterday.toISOString().slice(0, 10);
-        const key = date.toISOString().slice(0, 10);
-        if (key === todayKey) return 'Today';
-        if (key === yesterdayKey) return 'Yesterday';
+        const localDay = date.toDateString();
+        if (localDay === today.toDateString()) return 'Today';
+        if (localDay === yesterday.toDateString()) return 'Yesterday';
         return date.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
     }
 

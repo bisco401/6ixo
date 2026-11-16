@@ -41339,6 +41339,9 @@ class DatingApp {
             && (values.quick.dateFilter || context.dateFilter || 'all') === 'all'
             && !Object.values(values.advanced || {}).some(Boolean);
         if (preview && previewExcludesFeatured) preview = this.dedupeHomeSearchResults(preview, { excludeFeatured: true });
+        if (preview && context.nearbySearch?.enabled) {
+            preview = this.selectHomeNearbyResults(preview, context.nearbySearch).items;
+        }
         const count = preview ? preview.length : null;
         const apply = document.getElementById('home-apply-filters');
         apply.disabled = Boolean(error);
@@ -42180,7 +42183,7 @@ class DatingApp {
                 nearMeTarget.city
                 || nearMeTarget.region
                 || nearMeTarget.country
-                || (Number.isFinite(Number(nearMeTarget.lat)) && Number.isFinite(Number(nearMeTarget.lng)))
+                || this.getValidListingCoords(nearMeTarget)
             );
             const effectiveLocationScope = this.getHomeListingLocationScope({
                 text: activeLocationText,
@@ -42190,6 +42193,21 @@ class DatingApp {
                 explicitSearchLocation: Boolean(interpreted.city || interpreted.region || interpreted.country)
             });
             const openNowActive = Boolean(quickFilters.openNow || interpreted.intentFlags?.openNow);
+            const controls = this.getHomeLocationControls();
+            const automaticLocation = !this.manualDiscoveryLocation && !parsedLocationText && (
+                [controls.country, controls.city, controls.hidden].some(control => control?.dataset?.autoLocationDefault === '1')
+                || (!activeLocationText && !this.browseWorldwideSelected)
+            );
+            const useDeviceTarget = !effectiveLocationScope.city && (automaticLocation || nearMeActive);
+            const nearbyTarget = useDeviceTarget ? this.getHomeNearMeTarget() : effectiveLocationScope;
+            const nearbySearch = {
+                enabled: Boolean(query && !restaurantIntent && !effectiveLocationScope.pending
+                    && !effectiveLocationScope.text && (automaticLocation || nearMeActive || effectiveLocationScope.city)),
+                scope: effectiveLocationScope,
+                target: nearbyTarget,
+                useDeviceTarget,
+                sortByDistance: !interpreted.intentFlags?.cheap && !interpreted.intentFlags?.luxury && !interpreted.intentFlags?.topRated
+            };
             if (Array.isArray(this.scrapedHomeFeaturedRows)) {
                 this.syncScrapedHomeFeaturedAds(this.scrapedHomeFeaturedRows);
             }
@@ -42199,9 +42217,10 @@ class DatingApp {
                 category, rawCategory, otherSubcategory, minPrice, maxPrice, quickFilters: { ...quickFilters },
                 dateFilter, nearMeActive, nearMeTarget, hasNearMeTarget, effectiveLocationScope, openNowActive,
                 categoryLocalFocus: Boolean(this.homeCategoryLocalFocus),
+                nearbySearch,
                 categoryFilters: { ...this.homeCategoryFilters }
             };
-            const { filtered, candidates, shouldBalanceCategories, intent } =
+            const { filtered, candidates, shouldBalanceCategories, intent, searchArea } =
                 await this.getHomeMatchingListings(criteria, { explicitSearch: scrollToResults });
             if (requestId !== this.homeSearchRequestId) return;
             this.homeSearchCriteria = criteria;
@@ -42211,7 +42230,7 @@ class DatingApp {
                 rawQuery: String(rawQuery), category: interpreted.category || '',
                 minPrice: interpreted.priceMin, maxPrice: interpreted.priceMax,
                 dateFilter: interpreted.dateFilter, openNow: Boolean(interpreted.intentFlags?.openNow),
-                nearMe: nearMeActive, queryNearMe,
+                nearMe: nearMeActive, queryNearMe, nearbySearch,
                 canExcludeFeatured: !query && !intent.cheap && !intent.luxury && !intent.topRated
             };
 
@@ -42251,6 +42270,8 @@ class DatingApp {
                 interpreted,
                 correctedQuery: interpreted.correctedQuery || '',
                 groupedResults: Boolean(hasFilters),
+                rawQuery: String(rawQuery).trim(),
+                searchArea,
                 balancedCategories: shouldBalanceCategories
             };
             this.homeFilteredItems = Array.isArray(filtered) ? filtered.slice() : [];
@@ -42267,7 +42288,7 @@ class DatingApp {
             rawQuery, interpreted, query, tokens, restaurantIntent, category, rawCategory,
             otherSubcategory, minPrice, maxPrice, quickFilters, dateFilter, nearMeActive,
             nearMeTarget, hasNearMeTarget, effectiveLocationScope, openNowActive,
-            categoryLocalFocus, categoryFilters
+            categoryLocalFocus, categoryFilters, nearbySearch
         } = criteria;
         const normalizeText = value => String(value || '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
         const localPriorityScope = this.getCurrentListingLocationPriorityScope();
@@ -42481,14 +42502,14 @@ class DatingApp {
             let queryScore = 0;
 
             const locationText = entry.locationLabel || [entry.city, entry.country].filter(Boolean).join(', ');
-            if (!this.matchesListingLocationScope({
+            if (!nearbySearch?.enabled && !this.matchesListingLocationScope({
                 metro: entry.metro || entry.raw?.metro || '',
                 city: entry.city,
                 region: entry.region,
                 country: entry.country,
                 label: locationText
             }, effectiveLocationScope)) return false;
-            if (nearMeActive && entry.type !== 'live_place') {
+            if (!nearbySearch?.enabled && nearMeActive && entry.type !== 'live_place') {
                 if (!hasNearMeTarget) return false;
                 const targetLat = Number(nearMeTarget.lat);
                 const targetLng = Number(nearMeTarget.lng);
@@ -42589,7 +42610,6 @@ class DatingApp {
             const bt = Number.isFinite(bd.getTime()) ? bd.getTime() : 0;
             return bt - at;
         });
-        filtered.forEach((entry) => delete entry._queryScore);
         const shouldBalanceCategories = Boolean(
             effectiveLocationScope?.active
             && !query
@@ -42610,7 +42630,73 @@ class DatingApp {
         if (excludeFeatured) filtered = this.dedupeHomeSearchResults(filtered, { excludeFeatured: true });
         if (nearMeActive && !hasNearMeTarget) filtered = [];
 
-        return { filtered, candidates, shouldBalanceCategories, intent };
+        const searchArea = this.selectHomeNearbyResults(filtered, nearbySearch);
+        filtered = searchArea.items;
+        return { filtered, candidates, shouldBalanceCategories, intent, searchArea };
+    }
+
+    selectHomeNearbyResults(items = [], { enabled = false, scope = {}, target = {}, useDeviceTarget = false, sortByDistance = true } = {}) {
+        const unchanged = { items, active: false, expanded: false, message: '' };
+        if (!enabled) return unchanged;
+        const countryKey = value => this.normalizeLocationText(this.getCountryAliasLabel(value) || value);
+        const country = scope.country || target.country || '';
+        const city = String(target.city || '').trim();
+        const coordinateCache = new Map();
+        const cityCoords = (name, nation) => {
+            const key = `${name}|${nation}`;
+            if (coordinateCache.has(key)) return coordinateCache.get(key);
+            for (const alias of this.getHomeSearchCityAliases(name)) {
+                const coords = this.getValidListingCoords(this.getMarketplaceCityCoords(alias, this.getCountryAliasLabel(nation) || nation) || {});
+                if (coords) { coordinateCache.set(key, coords); return coords; }
+            }
+            coordinateCache.set(key, null);
+            return null;
+        };
+        let origin = this.getValidListingCoords(target) || cityCoords(city, country);
+        if (useDeviceTarget && this.hasBrowserGeolocation && !city && !this.isDeviceLocationCityAccurate()) origin = null;
+        // Country-only or unresolved locations keep their existing scope; never
+        // fabricate distances or silently turn a pending location into worldwide.
+        if (!city && !origin) return { ...unchanged, items: items.filter(item => this.matchesListingLocationScope(item, scope)) };
+        const candidates = items.map(item => {
+            const raw = item.raw || item;
+            const location = raw.location && typeof raw.location === 'object' ? raw.location : {};
+            const itemCity = item.city || raw.city || location.city || '';
+            const itemCountry = item.country || raw.country || location.country || '';
+            const coords = this.getValidListingCoords(raw) || this.getValidListingCoords(location)
+                || cityCoords(itemCity, itemCountry);
+            const distance = origin && coords
+                ? this.calculateDistance(origin.lat, origin.lng, coords.lat, coords.lng, { precise: true }) : Infinity;
+            const sameCity = Boolean(city) && this.getHomeSearchCityAliases(itemCity).some(alias =>
+                this.getHomeSearchCityAliases(city).some(name => this.normalizeLocationText(alias) === this.normalizeLocationText(name)));
+            return { item, distance, sameCity, country: itemCountry };
+        }).filter(entry => !country || countryKey(entry.country) === countryKey(country));
+        const local = candidates.filter(entry => city ? entry.sameCity : entry.distance <= 25);
+        let selected = local;
+        let radiusKm = city ? null : 25;
+        let expanded = false;
+        // A local accessory must not suppress an actual item in a nearby city.
+        if (!local.some(entry => !entry.item.searchRelated) && origin) {
+            for (const radius of [25, 50, 100, 200]) {
+                radiusKm = radius;
+                expanded = true;
+                selected = candidates.filter(entry => entry.distance <= radius || entry.sameCity);
+                if (selected.some(entry => !entry.item.searchRelated)) break;
+            }
+        }
+        selected.sort((a, b) => {
+            const related = Number(Boolean(a.item.searchRelated)) - Number(Boolean(b.item.searchRelated));
+            const relevance = (b.item._queryScore || 0) - (a.item._queryScore || 0);
+            return related || relevance || (!sortByDistance || a.distance === b.distance ? 0 : a.distance - b.distance);
+        });
+        const locationLabel = city ? city.replace(/\b\p{L}/gu, letter => letter.toUpperCase()) : 'your location';
+        const localLabel = city ? `in ${locationLabel}` : 'within 25 km of your location';
+        const hasMatches = selected.some(entry => !entry.item.searchRelated);
+        const message = expanded
+            ? hasMatches ? `No matching listings ${localLabel}. Showing matches within ${radiusKm} km.`
+                : `No matching listings ${localLabel} or within ${radiusKm} km. Try different keywords or filters.${selected.length ? ' Related mentions and accessories are shown below.' : ''}`
+            : selected.length ? `Showing ${hasMatches ? 'matching listings' : 'related mentions and accessories'} ${localLabel}.`
+                : `No matching listings ${localLabel}. Try different keywords or filters.`;
+        return { items: selected.map(entry => entry.item), active: true, expanded, radiusKm, locationLabel, message };
     }
 
     renderHomeListings(items, { hasFilters = false } = {}) {
@@ -42619,7 +42705,20 @@ class DatingApp {
         const title = document.getElementById('home-results-title');
         const pagination = document.getElementById('home-pagination');
         if (!grid) return;
-        if (title) title.textContent = hasFilters ? 'Search Results' : 'Recent Listings';
+        const searchArea = this.homeSearchContext?.searchArea;
+        let notice = document.getElementById('home-search-area-notice');
+        if (searchArea?.message) {
+            if (!notice) {
+                notice = document.createElement('p');
+                notice.id = 'home-search-area-notice';
+                notice.setAttribute('role', 'status');
+                grid.parentNode.insertBefore(notice, grid);
+            }
+            notice.textContent = searchArea.message;
+        } else notice?.remove();
+        if (title) title.textContent = searchArea?.active
+            ? `Search Results near ${searchArea.locationLabel}`
+            : hasFilters ? 'Search Results' : 'Recent Listings';
 
         if (!this.homePagination) {
             this.homePagination = { page: 1, pageSize: 12, expanded: false };
@@ -42704,7 +42803,8 @@ class DatingApp {
                 ];
                 const grouped = new Map();
                 displayItems.forEach((item) => {
-                    const key = item.searchRelated ? 'related' : this.getHomeResultGroupKey(item);
+                    const key = item.searchRelated ? 'related'
+                        : this.homeSearchContext?.rawQuery ? 'matches' : this.getHomeResultGroupKey(item);
                     if (!grouped.has(key)) grouped.set(key, []);
                     grouped.get(key).push(item);
                 });
@@ -42717,7 +42817,7 @@ class DatingApp {
                     return `
                         <section class="home-results-section" data-home-results-group="${this.escapeHtml(key)}">
                             <header class="home-results-section-header">
-                                <h4>${this.escapeHtml((key === 'related' ? 'Related mentions & accessories' : this.getHomeResultSectionLabel(key)))}</h4>
+                                <h4>${this.escapeHtml((key === 'related' ? 'Related mentions & accessories' : key === 'matches' ? 'Matching listings' : this.getHomeResultSectionLabel(key)))}</h4>
                                 <span>${groupItems.length}</span>
                             </header>
                             <div class="home-results-section-grid">
@@ -64907,7 +65007,10 @@ class DatingApp {
 	        const item = this.getMarketplaceSearchItem(itemId);
 	        if (!item) return;
 	        this.recordMarketplaceRecent(itemId);
-	        this.renderHomePersonalizedRows();
+        // Updating the recently viewed row changes the height above Home search
+        // results just before modal history captures the return scroll position.
+        // Refresh that row when browsing resumes, keeping an active search stable.
+        if (this.activeScreen !== 'home' || !this.homeSearchContext?.rawQuery) this.renderHomePersonalizedRows();
 	        this.openMarketplaceItemModal(item, openOptions);
 	    }
 

@@ -58,7 +58,7 @@ function createHarness({ showPrompt = true, startRequest = true, native = false,
   } : {};
   const context = vm.createContext({ window, document, navigator, console, Date, Map, Set, URL, URLSearchParams });
   vm.runInContext(entrySource, context);
-  // Legacy dialog interaction cases explicitly open it; startup itself is silent.
+  // Recovery cases may explicitly reopen the arrival invitation.
   if (showPrompt && !/^#(?:realestate|shortstays)/.test(hash)) window.SIXO_LOCATION_ENTRY?.showPrompt(null, { force: true });
   // Existing acquisition/recovery cases begin after the visitor chooses Allow.
   if (startRequest && supported && secure) window.SIXO_LOCATION_ENTRY?.request({ userInitiated: true });
@@ -67,9 +67,9 @@ function createHarness({ showPrompt = true, startRequest = true, native = false,
 
 for (const savedChoice of ['', 'seen', 'allowed', 'denied', 'dismissed']) {
   const visit = createHarness({ showPrompt: false, startRequest: false, storage: new Map([['sixo_location_onboarding_v1', savedChoice]]) });
-  assert.equal(visit.panels.length, 0, 'Browsing starts without an automatic overlay');
+  assert.equal(visit.panels.filter(panel => !panel.hidden).length, ['allowed', 'dismissed'].includes(savedChoice) ? 0 : 1, 'New and unanswered visits show the arrival invitation; explicit dismissals and opt-ins are respected');
   assert.equal(visit.requests.length, 0, 'Startup never asks for device permission');
-  if (savedChoice !== 'allowed') assert.equal(visit.window.SIXO_LOCATION_ENTRY.canRequestAutomatically('granted'), false, 'A browser grant alone is not a browsing opt-in');
+  if (!['allowed', 'denied'].includes(savedChoice)) assert.equal(visit.window.SIXO_LOCATION_ENTRY.canRequestAutomatically('granted'), false, 'A browser grant alone is not a browsing opt-in');
 }
 
 const inlineVisit = createHarness({ showPrompt: false, startRequest: false, storage: new Map([['sixo_location_onboarding_v1', 'dismissed']]) });
@@ -174,7 +174,7 @@ firstVisit.requests[1].error({ code: 1, message: 'Permission revoked' });
 assert.equal(await refresh, false);
 assert.equal(app.locationPermissionState, 'denied');
 assert.equal(app.userLocation, null);
-assert.equal(firstVisit.panels.filter(panel => !panel.hidden).length, 0, 'A denied request must not reopen a blocking popup.');
+assert.equal(firstVisit.panels.filter(panel => !panel.hidden).length, 1, 'An explicit denied request shows actionable recovery.');
 const retry = app.requestLocationPermission({ announce: true });
 firstVisit.requests[2].success(position);
 assert.equal(await retry, true);
@@ -235,7 +235,7 @@ assert.equal(revokedApp.userLocation, null);
 const deniedVisit = createHarness();
 deniedVisit.requests[0].error({ code: 1, message: 'Browser permission denied' });
 assert.equal(deniedVisit.requests.length, 1, 'A denial must not trigger repeated automatic prompts.');
-assert.equal(deniedVisit.panels.filter(panel => !panel.hidden).length, 0);
+assert.equal(deniedVisit.panels.filter(panel => !panel.hidden).length, 1);
 assert.match(deniedVisit.panels[0].querySelector('[data-location-entry-message]').textContent, /browser.*blocking location/);
 assert.match(deniedVisit.panels[0].querySelector('[data-location-entry-message]').textContent, /Retrying cannot turn permission on/);
 assert.equal(deniedVisit.panels[0].querySelector('#location-entry-title').textContent, 'Location access is blocked');
@@ -262,10 +262,10 @@ const preferenceKey = 'sixo_location_onboarding_v1';
 const allowAgain = createHarness({ storage: firstVisit.storage });
 assert.equal(allowAgain.requests.length, 1, 'Allowed returning visitors must automatically obtain fresh device coordinates');
 for (const timer of allowAgain.timers.values()) timer.callback();
-assert.equal(allowAgain.panels.filter(panel => !panel.hidden).length, 0, 'GPS timeout must leave returning visitors free to browse');
+assert.equal(allowAgain.panels.filter(panel => !panel.hidden).length, 1, 'An explicit timed-out request offers dismissible recovery');
 allowAgain.requests[0].error({ code: 1 });
-assert.equal(allowAgain.panels.filter(panel => !panel.hidden).length, 0, 'A failed request does not reopen the dialog');
-assert.equal(allowAgain.window.SIXO_LOCATION_ENTRY.showPrompt({ code: 1 }, { force: true }), false);
+assert.equal(allowAgain.panels.filter(panel => !panel.hidden).length, 1, 'A failed explicit request stays actionable');
+assert.equal(allowAgain.window.SIXO_LOCATION_ENTRY.showPrompt({ code: 1 }, { force: true }), true);
 
 for (const savedChoice of ['denied', 'dismissed']) {
   const returning = createHarness({ storage: new Map([[preferenceKey, savedChoice]]) });
@@ -294,7 +294,7 @@ assert.equal(permissionChanged.panels.filter(panel => !panel.hidden).length, 0);
 
 const legacy = createHarness({ storage: new Map([['sixo_app_build_version', 'old-build']]) });
 for (const timer of legacy.timers.values()) timer.callback();
-assert.equal(legacy.panels.filter(panel => !panel.hidden).length, 0, 'Old visitors can browse after a failed location request');
+assert.equal(legacy.panels.filter(panel => !panel.hidden).length, 1, 'Old visitors receive visible recovery after an explicit failed request');
 
 const cookieVisit = createHarness({ storageUnavailable: true });
 cookieVisit.requests[0].error({ code: 1 });
@@ -307,7 +307,7 @@ assert.equal(unanswered.storage.get(preferenceKey), 'requested');
 const unansweredAgain = createHarness({ storage: unanswered.storage });
 assert.equal(unansweredAgain.requests.length, 1, 'An unanswered first visit must not disable device location on future visits');
 for (const timer of unansweredAgain.timers.values()) timer.callback();
-assert.equal(unansweredAgain.panels.filter(panel => !panel.hidden).length, 0, 'An unanswered browser prompt must not cover listings after Allow');
+assert.equal(unansweredAgain.panels.filter(panel => !panel.hidden).length, 1, 'An unanswered explicit request eventually shows recovery');
 
 for (const savedChoice of ['seen', 'allowed']) {
   const safariReturning = createHarness({ storage: new Map([[preferenceKey, savedChoice]]) });
@@ -369,7 +369,7 @@ closed.panels[0].querySelector('[data-location-entry-dismiss]').listeners.get('c
 closed.requests[0].error({ code: 1 });
 assert.equal(closed.panels[0].hidden, true, 'Not now stays dismissed after the pending request fails');
 assert.equal(closed.requests.length, 1, 'Dismissing recovery must not trigger further automatic requests');
-assert.equal(closed.window.SIXO_LOCATION_ENTRY.showPrompt({ code: 1 }, { force: true }), false, 'Pin failures remain nonblocking');
+assert.equal(closed.window.SIXO_LOCATION_ENTRY.showPrompt({ code: 1 }, { force: true }), true, 'A new explicit retry can reopen recovery after dismissal');
 console.log('Suppressed prompt recovery passed: nonblocking failure, synchronous tap, stale callback isolation, success closure and dismissal.');
 
 // An explicitly opened permission dialog waits for the visitor, even after a prior grant.
@@ -380,7 +380,7 @@ for (const savedChoice of ['', 'seen', 'allowed', 'denied', 'dismissed']) {
     const entryApp = connectApp(visit);
     await entryApp.requestLocationPermissionOnLoad();
     assert.equal(visit.requests.length, 0, 'Page entry must wait for Allow, regardless of a saved choice or browser permission');
-    assert.equal(visit.panels.filter(panel => !panel.hidden).length, permissionState === 'denied' ? 0 : 1, 'A known denial must not cover the public listings');
+    assert.equal(visit.panels.filter(panel => !panel.hidden).length, 1, 'A known denial updates the visible invitation with browser settings guidance');
     visit.panels[0].querySelector('[data-location-entry-dismiss]').listeners.get('click')();
     await entryApp.refreshLocationPermissionState({ requestIfAllowed: true });
     assert.equal(visit.requests.length, 0, 'Dismissal must stop background requests even for granted browser permission');
@@ -419,6 +419,7 @@ for (const connected of [false, true]) {
     await app.requestLocationPermissionOnLoad();
     app.manualDiscoveryLocation = { city: 'London', country: 'United Kingdom' };
     app.homeLocationDraft = { text: 'London' };
+    app.homeLocationClearedByUser = true;
     app.didApplyEntryLocationDefaults = true;
   }
   const allow = visit.panels[0].querySelector('[data-location-entry-allow]').listeners.get('click');
@@ -432,6 +433,7 @@ for (const connected of [false, true]) {
   if (app) {
     assert.equal(app.manualDiscoveryLocation, null, 'Allow must switch from a selected city to current device location');
     assert.equal(app.homeLocationDraft, null, 'An unfinished city draft must not hide the device label');
+    assert.equal(app.homeLocationClearedByUser, false, 'Allow restores the device label even after the search location was cleared');
     assert.equal(app.didApplyEntryLocationDefaults, false);
   }
   visit.requests[0].success(position);

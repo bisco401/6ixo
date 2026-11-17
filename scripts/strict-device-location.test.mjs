@@ -281,6 +281,7 @@ const entrySource = readFileSync(new URL('../location-entry.js', import.meta.url
 for (const savedChoice of ['', 'denied', 'dismissed', 'allowed']) {
  for (const permissionState of ['unknown', 'prompt', 'granted']) {
   delete window.SIXO_LOCATION_ENTRY;
+  entryPanel = null;
   document.cookie = "";
   timers.clear();
   const storage = new Map([['sixo_location_onboarding_v1', savedChoice]]);
@@ -295,9 +296,16 @@ for (const savedChoice of ['', 'denied', 'dismissed', 'allowed']) {
   entered.reverseGeocodeInFlight = new Map();
   entered.reverseGeocodeLatLng = App.prototype.reverseGeocodeLatLng;
   await entered.requestLocationPermissionOnLoad();
-  assert.equal(requests.length, 0, 'Wait for the visible entry choice');
-  assert.equal(entryPanel.hidden, false);
-  entryPanel.querySelector('[data-location-entry-allow]').events.click();
+  const resumes = savedChoice === 'allowed' || (savedChoice === 'denied' && permissionState === 'granted');
+  assert.equal(requests.length, resumes ? 1 : 0, 'Only returning opt-ins or a newly enabled permission resume automatically');
+  if (!resumes) {
+   if (savedChoice === 'dismissed') {
+    assert.equal(entryPanel, null, 'A remembered dismissal stays quiet until an explicit location action');
+    window.SIXO_LOCATION_ENTRY.showPrompt(null, { force: true });
+   }
+   assert.equal(entryPanel.hidden, false);
+   entryPanel.querySelector('[data-location-entry-allow]').events.click();
+  }
   assert.equal(requests.length, 1, `Saved ${savedChoice || 'empty'} / browser ${permissionState}: request device permission on entry`);
   requests[0].success(fix());
   await entered.locationDefaultsPromise;

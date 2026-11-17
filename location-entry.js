@@ -112,8 +112,13 @@
     };
     const showPrompt = (error = null, { force = false } = {}) => {
         if (promptSuppressed && !force) return false;
-        if (force) { dismissed = false; pauseAutomaticRequests = true; }
+        if (force) {
+            dismissed = false;
+            pauseAutomaticRequests = true;
+            if (!error) entryPromptAnswered = false;
+        }
         if (dismissed || (!error && confirmed) || document.visibilityState === 'hidden') return false;
+        const wasVisible = Boolean(panel && !panel.hidden);
         if (!panel) {
             panel = document.createElement('section');
             panel.className = 'location-entry-prompt';
@@ -179,9 +184,9 @@
         panel.querySelector('[data-location-entry-browser]').hidden = !error && !unsupported;
         button.disabled = unsupported;
         button.textContent = blocked ? 'Retry after enabling' : error ? 'Try again' : 'Allow';
-        // The visitor already chose Allow. A denied, timed-out or unanswered
-        // request must not put a blocking popup back over the marketplace.
-        panel.hidden = Boolean(error || pending);
+        // Explicit requests need visible recovery; background failures stay quiet.
+        // The panel is dismissible and never disables browsing underneath it.
+        panel.hidden = Boolean(pending || (error && !force && !wasVisible));
         if (error) entryPromptAnswered = true;
         return !panel.hidden;
     };
@@ -200,7 +205,8 @@
             confirmed = false;
             if (!dismissed) remember('denied');
             pauseAutomaticRequests = true;
-            hidePrompt();
+            if (panel && !panel.hidden) showPrompt({ code: 1 }, { force: true });
+            else hidePrompt();
         }
     }
 
@@ -349,6 +355,10 @@
         }
     };
 
-    // Location is an optional action in the search area. The browser prompt is
-    // reached only by a tap, or by a returning visitor who already opted in.
+    // Offer location before the main bundle loads, including visitors marked
+    // "seen" by the former silent startup. Only an actual dismissal suppresses
+    // the invitation; returning opted-in visitors resume through app startup.
+    if (choice !== 'allowed' && choice !== 'dismissed') {
+        if (!promptSuppressed) showPrompt(choice === 'denied' ? { code: 1 } : null, { force: true });
+    }
 })();

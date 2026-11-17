@@ -16513,6 +16513,7 @@ class DatingApp {
                 this.browseWorldwideSelected = false;
                 this.rememberBrowsingLocation({ mode: 'device' });
                 this.manualDiscoveryLocation = null;
+                this.setHomeLocationClearedByUser(false);
                 this.deviceLocationFeedsReady = false;
                 this.didApplyEntryLocationDefaults = false;
                 this.updateDeviceLocationUi();
@@ -18086,6 +18087,7 @@ class DatingApp {
                 this.browseWorldwideSelected = false;
                 this.rememberBrowsingLocation({ mode: 'device' });
                 this.manualDiscoveryLocation = null;
+                this.setHomeLocationClearedByUser(false);
                 this.homeLocationDraft = null;
                 this.didApplyEntryLocationDefaults = false;
                 return this.requestLocationPermission({ forceBrowserLocation: true, announce: true });
@@ -18643,7 +18645,8 @@ class DatingApp {
             || homeCity?.dataset.autoLocationDefault === '1';
         const homeClearedByUser = this.isHomeLocationClearedByUser();
         const canRefreshHomeLocation = !homeClearedByUser && Boolean(homeLocation || homeCountry || homeCity) && Boolean(displayLocation) && (
-            !currentHomeLocation
+            forceBrowserLocation
+            || !currentHomeLocation
             || homeAutoDefault
             || currentHomeLocation === country
             || currentHomeLocation === city

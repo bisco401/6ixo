@@ -296,8 +296,8 @@ for (const savedChoice of ['', 'denied', 'dismissed', 'allowed']) {
   entered.reverseGeocodeInFlight = new Map();
   entered.reverseGeocodeLatLng = App.prototype.reverseGeocodeLatLng;
   await entered.requestLocationPermissionOnLoad();
-  const resumes = savedChoice === 'allowed' || (savedChoice === 'denied' && permissionState === 'granted');
-  assert.equal(requests.length, resumes ? 1 : 0, 'Only returning opt-ins or a newly enabled permission resume automatically');
+  const resumes = savedChoice === '' || savedChoice === 'allowed' || (savedChoice === 'denied' && permissionState === 'granted');
+  assert.equal(requests.length, resumes ? 1 : 0, 'Fresh visits and returning opt-ins request location without a preliminary site dialog');
   if (!resumes) {
    if (savedChoice === 'dismissed') {
     assert.equal(entryPanel, null, 'A remembered dismissal stays quiet until an explicit location action');

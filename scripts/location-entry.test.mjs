@@ -58,8 +58,13 @@ function createHarness({ showPrompt = true, startRequest = true, native = false,
   } : {};
   const context = vm.createContext({ window, document, navigator, console, Date, Map, Set, URL, URLSearchParams });
   vm.runInContext(entrySource, context);
-  // Recovery cases may explicitly reopen the arrival invitation.
-  if (showPrompt && !/^#(?:realestate|shortstays)/.test(hash)) window.SIXO_LOCATION_ENTRY?.showPrompt(null, { force: true });
+  // Isolate deliberate dialog/recovery interactions from the direct startup
+  // request. The startup cases below retain the untouched page-load behavior.
+  if (showPrompt && !/^#(?:realestate|shortstays)/.test(hash)) {
+    window.SIXO_LOCATION_ENTRY?.cancel();
+    requests.length = 0; watches.length = 0; clearedWatches.length = 0; timers.clear();
+    window.SIXO_LOCATION_ENTRY?.showPrompt(null, { force: true });
+  }
   // Existing acquisition/recovery cases begin after the visitor chooses Allow.
   if (startRequest && supported && secure) window.SIXO_LOCATION_ENTRY?.request({ userInitiated: true });
   return { window, document, navigator, context, requests, watches, clearedWatches, timers, panels, storage, cookies };
@@ -67,9 +72,9 @@ function createHarness({ showPrompt = true, startRequest = true, native = false,
 
 for (const savedChoice of ['', 'seen', 'allowed', 'denied', 'dismissed']) {
   const visit = createHarness({ showPrompt: false, startRequest: false, storage: new Map([['sixo_location_onboarding_v1', savedChoice]]) });
-  assert.equal(visit.panels.filter(panel => !panel.hidden).length, ['allowed', 'dismissed'].includes(savedChoice) ? 0 : 1, 'New and unanswered visits show the arrival invitation; explicit dismissals and opt-ins are respected');
-  assert.equal(visit.requests.length, 0, 'Startup never asks for device permission');
-  if (!['allowed', 'denied'].includes(savedChoice)) assert.equal(visit.window.SIXO_LOCATION_ENTRY.canRequestAutomatically('granted'), false, 'A browser grant alone is not a browsing opt-in');
+  assert.equal(visit.panels.filter(panel => !panel.hidden).length, savedChoice === 'denied' ? 1 : 0, 'Only known denial needs site guidance; the native permission prompt comes first');
+  assert.equal(visit.requests.length, ['denied', 'dismissed'].includes(savedChoice) ? 0 : 1, 'New and returning opted-in visits request device location directly');
+  if (savedChoice === 'dismissed') assert.equal(visit.window.SIXO_LOCATION_ENTRY.canRequestAutomatically('granted'), false, 'A deliberate dismissal still stops background requests');
 }
 
 const inlineVisit = createHarness({ showPrompt: false, startRequest: false, storage: new Map([['sixo_location_onboarding_v1', 'dismissed']]) });
@@ -131,7 +136,7 @@ const initialRequest = firstVisit.window.SIXO_LOCATION_ENTRY.request();
 assert.equal(firstVisit.requests.length, 1, 'Background consumers must reuse the entry request.');
 assert.equal(firstVisit.window.SIXO_LOCATION_ENTRY.request(), initialRequest);
 assert.equal(firstVisit.panels.filter(panel => !panel.hidden).length, 0, 'The browser dialog must be the only location prompt.');
-assert.ok([...firstVisit.timers.values()].some(timer => timer.delay === 1500), 'A suppressed browser prompt must have a visible tap fallback.');
+assert.ok([...firstVisit.timers.values()].some(timer => timer.delay === 8000), 'A suppressed browser prompt must have a visible tap fallback.');
 firstVisit.requests[0].success(position);
 assert.equal((await initialRequest).position, position);
 assert.equal(firstVisit.timers.size, 0);
@@ -160,6 +165,30 @@ function connectApp(harness) {
     scheduleLocationTrackingRetry() { throw new Error('A denial must not start automatic retries.'); }
   });
 }
+
+// The browser's Allow response must finish the whole flow without a site click,
+// whether coordinates arrive before or after the main app connects.
+for (const connected of [false, true]) {
+  const direct = createHarness({ showPrompt: false, startRequest: false });
+  const directApp = connectApp(direct);
+  assert.equal(direct.requests.length, 1);
+  assert.equal(direct.panels.length, 0, 'No preliminary site Allow dialog');
+  if (connected) await directApp.requestLocationPermissionOnLoad();
+  direct.requests[0].success(position);
+  if (!connected) await directApp.requestLocationPermissionOnLoad();
+  assert.equal(directApp.appliedSamples, 1, 'The native Allow result applies immediately without a site action');
+  assert.equal(directApp.hasUsableCurrentLocation(), true);
+  assert.equal(direct.requests.length, 1, 'App startup must not request permission a second time');
+  assert.equal(direct.panels.length, 0);
+}
+const slowFix = createHarness({ showPrompt: false, startRequest: false });
+slowFix.navigator.permissions = { query: async () => ({ state: 'granted' }) };
+[...slowFix.timers.values()].find(timer => timer.delay === 8000).callback();
+await Promise.resolve();
+assert.equal(slowFix.panels.length, 0, 'A granted native prompt waiting for GPS must never ask for another Allow');
+slowFix.requests[0].success(position);
+assert.equal(slowFix.window.SIXO_LOCATION_ENTRY.pendingRequest, null);
+console.log('Direct native permission passed: no preliminary site dialog, no second tap, early app handoff and slow granted GPS.');
 
 const app = connectApp(firstVisit);
 await app.requestLocationPermissionOnLoad();
@@ -352,9 +381,9 @@ console.log('Silent entry recovery passed: bounded requests, retired callbacks a
 const suppressed = createHarness();
 const suppressedApp = connectApp(suppressed);
 await suppressedApp.requestLocationPermissionOnLoad();
-[...suppressed.timers.values()].find(timer => timer.delay === 1500).callback();
+[...suppressed.timers.values()].find(timer => timer.delay === 8000).callback();
 const recovery = suppressed.panels[0];
-assert.equal(recovery.hidden, true, 'A suppressed browser request must not reopen the permission popup');
+assert.equal(recovery.hidden, false, 'An unanswered native request offers an optional retry without blocking its eventual success');
 recovery.querySelector('[data-location-entry-allow]').listeners.get('click')();
 assert.equal(suppressed.requests.length, 2, 'The fallback must reach geolocation synchronously during the tap');
 suppressed.requests[0].success(position);
@@ -364,7 +393,7 @@ assert.equal(suppressedApp.appliedSamples, 1);
 assert.equal(recovery.hidden, true, 'Allow must finalize and close the popup');
 
 const closed = createHarness();
-[...closed.timers.values()].find(timer => timer.delay === 1500).callback();
+[...closed.timers.values()].find(timer => timer.delay === 8000).callback();
 closed.panels[0].querySelector('[data-location-entry-dismiss]').listeners.get('click')();
 closed.requests[0].error({ code: 1 });
 assert.equal(closed.panels[0].hidden, true, 'Not now stays dismissed after the pending request fails');
@@ -467,7 +496,7 @@ for (const connected of [false, true]) {
   assert.equal(visit.watches.length, 1, 'Allow must register the desktop subscription in the same gesture');
   assert.equal(visit.watches[0].options.maximumAge, 0, 'Desktop recovery must acquire a fresh device fix');
   assert.equal(visit.watches[0].options.enableHighAccuracy, false);
-  assert.ok(![...visit.timers.values()].some(timer => timer.delay === 1500), 'A desktop acquisition must not reopen Allow while the device is still finding a position');
+  assert.ok(![...visit.timers.values()].some(timer => timer.delay === 8000), 'A desktop acquisition must not reopen Allow while the device is still finding a position');
   visit.requests[0].error({ code: 2, message: 'Position unavailable' });
   if (app) visit.requests[1].error({ code: 3, message: 'Position timed out' });
   visit.watches[0].error({ code: 2 });

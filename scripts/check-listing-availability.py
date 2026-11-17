@@ -141,7 +141,7 @@ def classify(row, status, body, resolved_url=""):
         return tokens
     for node in own_headings:
         own_title = node.get_text(" ", strip=True)
-        marker = re.search(r"^\s*SOLD\s*[*|]+|[|*]\s*SOLD(?:\s*[|*]\s*SOLD)*\s*[|*]*\s*$", own_title, re.I)
+        marker = re.search(r"^\s*SOLD\s*[-–—*|]+|[-–—|*]\s*SOLD(?:\s*[-–—|*]\s*SOLD)*\s*[-–—|*]*\s*$", own_title, re.I)
         if marker and len(title_words(title)) >= 2 and title_words(own_title) == title_words(title):
             return "sold", "Exact source heading explicitly marks this listing SOLD"
     for script in soup.select('script[type="application/ld+json"]'):

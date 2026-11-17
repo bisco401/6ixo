@@ -138,6 +138,15 @@ class AvailabilityTest(unittest.TestCase):
         self.assertEqual(module.classify(self.row, 200, '<h1>Toyota Corolla 2022</h1><div class="up-sells"><span>Out of stock</span></div>')[0], "active")
         self.assertEqual(module.classify(self.row, 200, '<h1>Toyota Corolla 2022</h1><span>Out of stock</span>')[0], "unavailable")
 
+    def test_delimited_sold_heading_outranks_stale_available_offer(self):
+        offer = '<script type="application/ld+json">' + json.dumps({"@type": "Product", "url": self.row["source_url"], "offers": {"availability": "https://schema.org/InStock"}}) + '</script>'
+        for title in ("Toyota Corolla 2022 - SOLD", "Toyota Corolla 2022 — SOLD ****", "SOLD - Toyota Corolla 2022"):
+            with self.subTest(title=title):
+                self.assertEqual(module.classify(self.row, 200, '<h1>' + title + '</h1>' + offer)[0], "sold")
+        for title in ("Toyota Corolla 2025 - SOLD", "Toyota Corolla 2022 - SOLD AS IS", "Toyota Corolla 2022 - NEVER SOLD"):
+            with self.subTest(title=title):
+                self.assertNotEqual(module.classify(self.row, 200, '<h1>' + title + '</h1>' + offer)[0], "sold")
+
     def test_stock_with_available_variant(self):
         body = '<h1>Toyota Corolla 2022</h1><script type="application/ld+json">{"@type":"Product","url":"https://example.com/car/1","offers":[{"availability":"https://schema.org/SoldOut"},{"availability":"https://schema.org/InStock"}]}</script>'
         self.assertEqual(module.classify(self.row, 200, body)[0], "active")

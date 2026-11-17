@@ -50,7 +50,7 @@ class SebuScrapeTests(unittest.TestCase):
             {"services", "gigs-and-freelance", "travel-and-tourism"},
         )
 
-    def test_csv_mapping_omits_phone_and_keeps_source_url(self):
+    def test_csv_mapping_keeps_missing_contact_pending_and_source_url(self):
         candidate = {
             "id": "251", "url": "https://sebu.co.ke/casio-watches-4915n",
             "lastmod": "2026-08-27", "title": "Casio Watches", "amount": 1000,
@@ -82,6 +82,46 @@ class SebuScrapeTests(unittest.TestCase):
             self.assertEqual(saved["status"], "rejected")
             self.assertEqual(saved["sync_visibility"], "foreign_gallery")
             self.assertEqual(saved["sync_visibility_reason"], held["sync_visibility_reason"])
+
+    def test_public_contact_is_bound_to_primary_listing_and_seller(self):
+        ref = {"url": "https://sebu.co.ke/watch.html"}
+        ad = {"id": "251", "userid": 81, "titleid": "watch.html", "title": "Casio Watch",
+              "category": "fashion", "images": [{"url": "https://pictures.sebu.co.ke/watch.webp"}],
+              "seller": {"userid": "81", "name": "Alice", "phone": "+254 712 345 678", "private_token": "excluded"}}
+        candidate = sebu_scrape.sanitize_ad(ad, ref)
+        row = sebu_scrape.candidate_to_csv(candidate, "2026-11-17T21:00:00Z")
+        self.assertEqual(row["phone"], "+254 712 345 678")
+        self.assertEqual(row["status"], "pending")
+        self.assertEqual(row["sync_visibility"], "source_identity_unverified")
+        self.assertEqual(json.loads(row["attributes"])["sellerId"], "81")
+        self.assertNotIn("private_token", json.dumps(candidate))
+        for changed in ({**ad, "userid": 82}, {**ad, "titleid": "another-watch.html"},
+                        {**ad, "seller": {"userid": "81", "phone": "07xx xxx xxx"}},
+                        {**ad, "seller": {"userid": "81"}, "support_phone": "0712345678"}):
+            with self.subTest(changed=changed):
+                self.assertEqual(sebu_scrape.sanitize_ad(changed, ref)["seller_phone"], "")
+
+    def test_mileage_units_are_not_inferred_and_other_specs_are_retained(self):
+        candidate = {"id": "1", "url": "https://sebu.co.ke/car", "title": "Toyota Probox",
+                     "category": "vehicles", "images": ["https://pictures.sebu.co.ke/car.jpg"],
+                     "dynamic": {"mileage": "323280", "engine_size": "1500", "fuel_type": "Petrol"}}
+        row = sebu_scrape.candidate_to_csv(candidate, "2026-11-17T21:00:00Z")
+        self.assertEqual(row["mileage_km"], "")
+        self.assertIn({"label": "Mileage (source units)", "value": "323280"}, json.loads(row["attributes"])["details"])
+        self.assertIn({"label": "Fuel type", "value": "Petrol"}, json.loads(row["attributes"])["details"])
+        candidate["dynamic"]["mileage_km"] = "120000"
+        self.assertEqual(sebu_scrape.candidate_to_csv(candidate, "2026-11-17T21:00:00Z")["mileage_km"], "120000")
+
+    def test_regulated_nicotine_inventory_is_not_imported(self):
+        self.assertIsNone(sebu_scrape.sanitize_ad({"title": "Selling Vapes And Velo", "category": "business-and-industrial",
+                                                 "images": [{"url": "https://pictures.sebu.co.ke/item.jpg"}]},
+                                                {"url": "https://sebu.co.ke/item"}))
+
+    def test_service_types_use_supported_profile_filter_categories(self):
+        for title, expected in (("Poster Design", "other"), ("Taekwondo Training", "fitness"),
+                                ("Event Decoration", "events_services"), ("Photographer", "entertainment")):
+            with self.subTest(title=title):
+                self.assertEqual(sebu_scrape.infer_subcategory({"title": title}, "services"), expected)
 
     def test_redacts_contact_details_from_cached_description(self):
         cleaned = sebu_scrape.redact_contact_details(

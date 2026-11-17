@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """Sync recent Kenyan marketplace listings from Sebu's public sitemap.
 
-The crawler identifies itself, honors robots.txt, keeps a sanitized local cache,
-and deliberately omits seller phone numbers and private tokens. Listings retain
-their source URL so contact can happen on the original listing page.
+The crawler identifies itself, honors robots.txt, and keeps a sanitized local
+cache. Public contacts must belong to the exact listing's seller; private tokens
+and site support contacts are excluded. Publication still requires gallery QA.
 """
 
 from __future__ import annotations
@@ -23,7 +23,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Iterable
 from urllib.error import HTTPError, URLError
-from urllib.parse import urljoin
+from urllib.parse import urljoin, urlsplit
 from urllib.request import Request, urlopen
 from urllib.robotparser import RobotFileParser
 
@@ -206,7 +206,18 @@ def sanitize_ad(ad: dict[str, Any], ref: dict[str, str]) -> dict[str, Any] | Non
         images = [ref["image"]]
     if not title or not category or category not in SOURCE_CATEGORY_MAP or status != "active" or not images:
         return None
+    if re.search(r"\b(?:vapes?|nicotine|tobacco|cigarettes?)\b", title, re.I):
+        return None
     seller = ad.get("seller") if isinstance(ad.get("seller"), dict) else {}
+    seller_id = str(seller.get("userid") or "").strip()
+    phone = clean_text(seller.get("phone"))
+    primary = urlsplit(urljoin("https://sebu.co.ke/", str(ad.get("titleid") or "")))
+    requested = urlsplit(ref["url"])
+    own_seller = seller_id and seller_id == str(ad.get("userid") or "")
+    own_url = (bool(ad.get("titleid")) and requested.netloc.removeprefix("www.") == "sebu.co.ke"
+               and primary.netloc == "sebu.co.ke" and primary.path.rstrip("/") == requested.path.rstrip("/"))
+    if not own_seller or not own_url or not re.fullmatch(r"(?:0\d{9}|254\d{9})", re.sub(r"\D", "", phone)):
+        phone = ""
     dynamic = ad.get("dynamic") if isinstance(ad.get("dynamic"), dict) else {}
     return {
         "id": str(ad.get("id") or "").strip(),
@@ -228,6 +239,8 @@ def sanitize_ad(ad: dict[str, Any], ref: dict[str, str]) -> dict[str, Any] | Non
         "images": images[:4],
         "dynamic": dynamic,
         "seller": clean_text(seller.get("bizname") or seller.get("name")),
+        "seller_id": seller_id if phone else "",
+        "seller_phone": phone,
         "seller_phone_verified": str(seller.get("phone_verified") or "").lower() == "verified",
     }
 
@@ -256,11 +269,13 @@ def infer_subcategory(candidate: dict[str, Any], app_category: str) -> str:
         return "other"
     if app_category == "services":
         for key, pattern in (
-            ("classes_lessons", r"\b(education|training|class|lesson|tutor|course)\b"),
+            ("fitness", r"\b(fitness|workout|gym|yoga|martial|taekwondo)\b"),
+            ("other", r"\b(education|training|class|lesson|tutor|course)\b"),
             ("home_services", r"\b(clean|home|house|moving|gardening|laundry)\b"),
             ("skilled_trades", r"\b(repair|mechanic|plumb|electric|construct|roof|install)\b"),
             ("travel", r"\b(travel|tour|hotel|holiday|flight)\b"),
-            ("creative", r"\b(design|photo|video|music|event|freelance|writing)\b"),
+            ("events_services", r"\b(event|wedding|party|decoration)\b"),
+            ("entertainment", r"\b(photo|photographer|video|music|musician|dj|performer)\b"),
         ):
             if re.search(pattern, text):
                 return key
@@ -293,6 +308,14 @@ def candidate_to_csv(candidate: dict[str, Any], checked_at: str) -> dict[str, st
         "sellerPhoneVerified": bool(candidate.get("seller_phone_verified")),
         "tags": [value for value in [candidate.get("category_name"), candidate.get("subcategory_name"), "Kenya"] if value],
     }
+    attributes["details"] = [
+        {"label": "Mileage (source units)" if key == "mileage" else str(key).replace("_", " ").capitalize(),
+         "value": ", ".join(map(str, value)) if isinstance(value, list) else str(value)}
+        for key, value in dynamic.items() if value not in (None, "") and not isinstance(value, dict)
+    ]
+    if candidate.get("seller_phone") and candidate.get("seller_id"):
+        attributes.update(sellerId=candidate["seller_id"], publicContactSource="primary_listing_ad_json.seller.phone")
+    phone = candidate.get("seller_phone") or ""
     lower_dynamic = {str(key).lower(): value for key, value in dynamic.items()}
     for source_key, target_key in (
         ("make", "make"), ("brand", "make"), ("model", "model"),
@@ -322,7 +345,7 @@ def candidate_to_csv(candidate: dict[str, Any], checked_at: str) -> dict[str, st
         "city": area or region,
         "country": "Kenya",
         "seller": clean_text(candidate.get("seller")) or "Sebu seller",
-        "phone": "",
+        "phone": phone,
         "description": clean_text(candidate.get("description")),
         "image_urls": " | ".join(candidate.get("images") or []),
         "source_site": "Sebu",
@@ -339,12 +362,12 @@ def candidate_to_csv(candidate: dict[str, Any], checked_at: str) -> dict[str, st
         "source_availability": "active",
         "source_availability_checked_at": checked_at,
         "source_http_status": "200",
-        "sync_visibility": "no_phone",
-        "sync_visibility_reason": "A complete publicly visible seller phone is required before publication.",
+        "sync_visibility": "source_identity_unverified" if phone else "no_phone",
+        "sync_visibility_reason": "Current source gallery and contact QA is required before publication." if phone else "A complete publicly visible seller phone is required before publication.",
         "source_last_seen_at": checked_at,
         "source_resolved_url": candidate["url"],
     })
-    mileage = lower_dynamic.get("mileage") or lower_dynamic.get("mileage_km")
+    mileage = lower_dynamic.get("mileage_km")
     if mileage not in (None, ""):
         row["mileage_km"] = clean_text(mileage)
     return row

@@ -4476,13 +4476,18 @@ class DatingApp {
             row = [];
         };
         const input = String(text || '').replace(/^\uFEFF/, '');
-        for (let i = 0; i < input.length; i += 1) {
-            const char = input[i];
-            const next = input[i + 1];
+        // Append whole text spans, not one character at a time. Descriptions
+        // and JSON fields make the inventory tens of megabytes long.
+        const separators = /[",\r\n]/g;
+        let start = 0;
+        let match;
+        while ((match = separators.exec(input))) {
+            cell += input.slice(start, match.index);
+            const char = match[0];
             if (quoted) {
-                if (char === '"' && next === '"') {
+                if (char === '"' && input[separators.lastIndex] === '"') {
                     cell += '"';
-                    i += 1;
+                    separators.lastIndex += 1;
                 } else if (char === '"') {
                     quoted = false;
                 } else {
@@ -4494,10 +4499,10 @@ class DatingApp {
                 pushCell();
             } else if (char === '\n') {
                 pushRow();
-            } else if (char !== '\r') {
-                cell += char;
             }
+            start = separators.lastIndex;
         }
+        cell += input.slice(start);
         if (cell || row.length) pushRow();
         const headers = (rows.shift() || []).map((header) => String(header || '').trim());
         return rows.map((values) => headers.reduce((acc, header, index) => {
@@ -6224,9 +6229,18 @@ class DatingApp {
                     const availability = String(row.source_availability || '').trim().toLowerCase();
                     return !['sold', 'unavailable', 'gone'].includes(availability);
                 });
-            const normalizedRows = this.dedupeScrapedListingRows(activeRows)
-                .map((row) => this.normalizeCsvScrapedListingRow(row))
-                .filter((entry) => entry && entry.item);
+            const uniqueRows = this.dedupeScrapedListingRows(activeRows);
+            const normalizedRows = [];
+            // Imported inventory can contain thousands of detailed records.
+            // Let smaller feeds paint and location/UI callbacks run between
+            // batches instead of freezing the page until every row is ready.
+            for (let index = 0; index < uniqueRows.length; index += 1) {
+                const entry = this.normalizeCsvScrapedListingRow(uniqueRows[index]);
+                if (entry?.item) normalizedRows.push(entry);
+                if ((index + 1) % 75 === 0 && index + 1 < uniqueRows.length) {
+                    await new Promise(resolve => window.setTimeout(resolve, 0));
+                }
+            }
             const ids = new Set(normalizedRows.map((entry) => String(entry.item?.sourceRowId || '').trim()).filter(Boolean));
             const idsToRemove = new Set([
                 ...Array.from(this.csvScrapedListingIds || []),

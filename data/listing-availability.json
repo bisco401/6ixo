@@ -1,5 +1,5 @@
 {
-  "checkedAt": "2026-11-17T21:38:53.498495+00:00",
+  "checkedAt": "2026-11-18T06:40:57Z",
   "listings": {
     "craigslist.org/view/d/bastrop-used-2025-cadillac-xt4-fwd-4d/fuqr_3uo8rgowpq1ctwx-a": {
       "availability": "sold",
@@ -24252,11 +24252,8 @@
     },
     "craigslist.org/view/d/hollywood-2011-chrysler-200-clean-title/t3qjvux6hbwzjozm9wen41": {
       "availability": "gone",
-      "checkedAt": "2026-11-17T21:13:34Z",
-      "reason": "Exact source URL returned HTTP 410",
-      "httpStatus": 410,
-      "sourceUrl": "https://www.craigslist.org/view/d/hollywood-2011-chrysler-200-clean-title/t3QjVUx6HbwzJoZM9WeN41",
-      "resolvedUrl": "https://www.craigslist.org/view/d/hollywood-2011-chrysler-200-clean-title/t3QjVUx6HbwzJoZM9WeN41"
+      "checkedAt": "2026-11-18T06:40:57Z",
+      "reason": "Exact source URL returned HTTP 410"
     },
     "kijiji.ca/v-cars-trucks/cambridge/car-for-sale/1744986520": {
       "availability": "unavailable",
@@ -24316,11 +24313,8 @@
     },
     "albacars.ae/buy-used-cars/vehicle/2394-volkswagen-teramont-trendline": {
       "availability": "sold",
-      "checkedAt": "2026-11-17T21:13:34Z",
-      "reason": "All offers for this exact listing are unavailable",
-      "httpStatus": 200,
-      "sourceUrl": "https://albacars.ae/buy-used-cars/vehicle/2394-volkswagen-teramont-trendline",
-      "resolvedUrl": "https://albacars.ae/buy-used-cars/vehicle/2394-volkswagen-teramont-trendline"
+      "checkedAt": "2026-11-18T06:40:57Z",
+      "reason": "All offers for this exact listing are unavailable"
     },
     "kijiji.ca/v-driver-security-jobs/kitchener-waterloo/az-team-driver-needed-immidatly/1745161099": {
       "availability": "unavailable",
@@ -24356,11 +24350,8 @@
     },
     "craigslist.org/view/d/sullivan-city-2020-gmc-sierra-slt-texas/97ypfmysh7a8i9jqkljpzy": {
       "availability": "gone",
-      "checkedAt": "2026-11-17T21:13:34Z",
-      "reason": "Exact source URL returned HTTP 410",
-      "httpStatus": 410,
-      "sourceUrl": "https://www.craigslist.org/view/d/sullivan-city-2020-gmc-sierra-slt-texas/97YpfmySh7a8i9JqKLJPZy",
-      "resolvedUrl": "https://www.craigslist.org/view/d/sullivan-city-2020-gmc-sierra-slt-texas/97YpfmySh7a8i9JqKLJPZy"
+      "checkedAt": "2026-11-18T06:40:57Z",
+      "reason": "Exact source URL returned HTTP 410"
     },
     "kijiji.ca/v-tires-rims/mississauga-peel-region/4-brand-new-bmw-x5-rims-275-45-20-doublestar-winter-tiresdot2025/1745771179": {
       "availability": "unavailable",
@@ -24388,27 +24379,18 @@
     },
     "albacars.ae/buy-used-cars/vehicle/2014-jetour-t2-other": {
       "availability": "sold",
-      "checkedAt": "2026-11-17T21:13:34Z",
-      "reason": "All offers for this exact listing are unavailable",
-      "httpStatus": 200,
-      "sourceUrl": "https://albacars.ae/buy-used-cars/vehicle/2014-jetour-t2-other",
-      "resolvedUrl": "https://albacars.ae/buy-used-cars/vehicle/2014-jetour-t2-other"
+      "checkedAt": "2026-11-18T06:40:57Z",
+      "reason": "All offers for this exact listing are unavailable"
     },
     "centralhomeappliances.com/products/bush-td3cnbb-3kg-vented-tumble-dryer-black-unused-grade-a": {
       "availability": "unavailable",
-      "checkedAt": "2026-11-17T21:13:34Z",
-      "reason": "All offers for this exact listing are unavailable",
-      "httpStatus": 200,
-      "sourceUrl": "https://centralhomeappliances.com/products/bush-td3cnbb-3kg-vented-tumble-dryer-black-unused-grade-a",
-      "resolvedUrl": "https://centralhomeappliances.com/products/bush-td3cnbb-3kg-vented-tumble-dryer-black-unused-grade-a"
+      "checkedAt": "2026-11-18T06:40:57Z",
+      "reason": "All offers for this exact listing are unavailable"
     },
     "centralhomeappliances.com/products/hisense-hde3211bbuk-60cm-double-oven-electric-ceramic-cooker-unused-grade-b-black-2": {
       "availability": "unavailable",
-      "checkedAt": "2026-11-17T21:13:34Z",
-      "reason": "All offers for this exact listing are unavailable",
-      "httpStatus": 200,
-      "sourceUrl": "https://centralhomeappliances.com/products/hisense-hde3211bbuk-60cm-double-oven-electric-ceramic-cooker-unused-grade-b-black-2",
-      "resolvedUrl": "https://centralhomeappliances.com/products/hisense-hde3211bbuk-60cm-double-oven-electric-ceramic-cooker-unused-grade-b-black-2"
+      "checkedAt": "2026-11-18T06:40:57Z",
+      "reason": "All offers for this exact listing are unavailable"
     },
     "kijiji.ca/v-room-rental-roommate/markham-york-region/large-furnished-room-in-bright-basement-in-markham/1745775256": {
       "availability": "unavailable",
@@ -24476,19 +24458,13 @@
     },
     "craigslist.org/view/d/kissimmee-fully-furnished-with/vuonw6rkuas3mdg6qiqmtg": {
       "availability": "gone",
-      "checkedAt": "2026-11-17T21:13:34Z",
-      "reason": "Exact source URL returned HTTP 410",
-      "httpStatus": 410,
-      "sourceUrl": "https://www.craigslist.org/view/d/kissimmee-fully-furnished-with/vUoNw6RkUaS3MDG6QiQMtG",
-      "resolvedUrl": "https://www.craigslist.org/view/d/kissimmee-fully-furnished-with/vUoNw6RkUaS3MDG6QiQMtG"
+      "checkedAt": "2026-11-18T06:40:57Z",
+      "reason": "Exact source URL returned HTTP 410"
     },
     "craigslist.org/view/d/lubbock-2020-challenger/fgmmigxyqlq8x5aux751es": {
       "availability": "gone",
-      "checkedAt": "2026-11-17T21:13:34Z",
-      "reason": "Exact source URL returned HTTP 410",
-      "httpStatus": 410,
-      "sourceUrl": "https://www.craigslist.org/view/d/lubbock-2020-challenger/fGMMigXyqLQ8x5AUx751Es",
-      "resolvedUrl": "https://www.craigslist.org/view/d/lubbock-2020-challenger/fGMMigXyqLQ8x5AUx751Es"
+      "checkedAt": "2026-11-18T06:40:57Z",
+      "reason": "Exact source URL returned HTTP 410"
     },
     "kijiji.ca/v-apartments-condos/hamilton/all-inclusive-private-rooms-650-00-monthly/1734735784": {
       "availability": "unavailable",
@@ -24500,211 +24476,133 @@
     },
     "craigslist.org/view/d/houston-chevrolet-caprice-100ride-and/vxkgudmc9eagghdeopl2w8": {
       "availability": "gone",
-      "checkedAt": "2026-11-17T21:13:34Z",
-      "reason": "Exact source URL returned HTTP 410",
-      "httpStatus": 410,
-      "sourceUrl": "https://www.craigslist.org/view/d/houston-chevrolet-caprice-100ride-and/vxKGUDMc9eaggHDeopL2w8",
-      "resolvedUrl": "https://www.craigslist.org/view/d/houston-chevrolet-caprice-100ride-and/vxKGUDMc9eaggHDeopL2w8"
+      "checkedAt": "2026-11-18T06:40:57Z",
+      "reason": "Exact source URL returned HTTP 410"
     },
     "craigslist.org/view/d/houston-pontiac-trans-am-1997-call-make/iyu1kgfhz7vlevtpzd5qga": {
       "availability": "gone",
-      "checkedAt": "2026-11-17T21:13:34Z",
-      "reason": "Exact source URL returned HTTP 410",
-      "httpStatus": 410,
-      "sourceUrl": "https://www.craigslist.org/view/d/houston-pontiac-trans-am-1997-call-make/iYu1kGfhZ7VLevtpzD5qga",
-      "resolvedUrl": "https://www.craigslist.org/view/d/houston-pontiac-trans-am-1997-call-make/iYu1kGfhZ7VLevtpzD5qga"
+      "checkedAt": "2026-11-18T06:40:57Z",
+      "reason": "Exact source URL returned HTTP 410"
     },
     "craigslist.org/view/d/grayson-2019-toyota-highlander/uoksax_k8rgkc9mrkypdia": {
       "availability": "gone",
-      "checkedAt": "2026-11-17T21:13:34Z",
-      "reason": "Exact source URL returned HTTP 410",
-      "httpStatus": 410,
-      "sourceUrl": "https://www.craigslist.org/view/d/grayson-2019-toyota-highlander/UoksAX_K8RGKC9mRkYPDIA",
-      "resolvedUrl": "https://www.craigslist.org/view/d/grayson-2019-toyota-highlander/UoksAX_K8RGKC9mRkYPDIA"
+      "checkedAt": "2026-11-18T06:40:57Z",
+      "reason": "Exact source URL returned HTTP 410"
     },
     "craigslist.org/view/d/grayson-2018-nissan-maxima-financing/rnp5-h7k8rg_cijn9ff4eq": {
       "availability": "gone",
-      "checkedAt": "2026-11-17T21:13:34Z",
-      "reason": "Exact source URL returned HTTP 410",
-      "httpStatus": 410,
-      "sourceUrl": "https://www.craigslist.org/view/d/grayson-2018-nissan-maxima-financing/rNP5-H7K8RG_CIJn9ff4EQ",
-      "resolvedUrl": "https://www.craigslist.org/view/d/grayson-2018-nissan-maxima-financing/rNP5-H7K8RG_CIJn9ff4EQ"
+      "checkedAt": "2026-11-18T06:40:57Z",
+      "reason": "Exact source URL returned HTTP 410"
     },
     "craigslist.org/view/d/houston-2019-jeep-cherokee-latitude/6ggt2npolc2rvw8jyvughg": {
       "availability": "gone",
-      "checkedAt": "2026-11-17T21:13:34Z",
-      "reason": "Exact source URL returned HTTP 410",
-      "httpStatus": 410,
-      "sourceUrl": "https://www.craigslist.org/view/d/houston-2019-jeep-cherokee-latitude/6GGt2NPoLc2rVW8jyVUghG",
-      "resolvedUrl": "https://www.craigslist.org/view/d/houston-2019-jeep-cherokee-latitude/6GGt2NPoLc2rVW8jyVUghG"
+      "checkedAt": "2026-11-18T06:40:57Z",
+      "reason": "Exact source URL returned HTTP 410"
     },
     "craigslist.org/view/d/houston-2017-buick-enclave-premium/cfm4evchwzyjupehwkdb9w": {
       "availability": "gone",
-      "checkedAt": "2026-11-17T21:13:34Z",
-      "reason": "Exact source URL returned HTTP 410",
-      "httpStatus": 410,
-      "sourceUrl": "https://www.craigslist.org/view/d/houston-2017-buick-enclave-premium/cfm4EvchWZYjupeHwKDB9w",
-      "resolvedUrl": "https://www.craigslist.org/view/d/houston-2017-buick-enclave-premium/cfm4EvchWZYjupeHwKDB9w"
+      "checkedAt": "2026-11-18T06:40:57Z",
+      "reason": "Exact source URL returned HTTP 410"
     },
     "craigslist.org/view/d/mount-vernon-1970-chevrolet-el-camino/326qwlusbbcfu5qz6jfo9l": {
       "availability": "gone",
-      "checkedAt": "2026-11-17T21:13:34Z",
-      "reason": "Exact source URL returned HTTP 410",
-      "httpStatus": 410,
-      "sourceUrl": "https://www.craigslist.org/view/d/mount-vernon-1970-chevrolet-el-camino/326QWLUSBBCFU5qZ6jfo9L",
-      "resolvedUrl": "https://www.craigslist.org/view/d/mount-vernon-1970-chevrolet-el-camino/326QWLUSBBCFU5qZ6jfo9L"
+      "checkedAt": "2026-11-18T06:40:57Z",
+      "reason": "Exact source URL returned HTTP 410"
     },
     "craigslist.org/view/d/longwood-1978-jeep-cj7-cyl-automatic-we/7chxir9y8hylpvs8nerebb": {
       "availability": "gone",
-      "checkedAt": "2026-11-17T21:13:34Z",
-      "reason": "Exact source URL returned HTTP 410",
-      "httpStatus": 410,
-      "sourceUrl": "https://www.craigslist.org/view/d/longwood-1978-jeep-cj7-cyl-automatic-we/7cHXiR9Y8hYLpVS8NErEbb",
-      "resolvedUrl": "https://www.craigslist.org/view/d/longwood-1978-jeep-cj7-cyl-automatic-we/7cHXiR9Y8hYLpVS8NErEbb"
+      "checkedAt": "2026-11-18T06:40:57Z",
+      "reason": "Exact source URL returned HTTP 410"
     },
     "craigslist.org/view/d/grayson-2018-toyota-camry-financing/3lqp5hbk8rgtr9tpny2yag": {
       "availability": "gone",
-      "checkedAt": "2026-11-17T21:13:34Z",
-      "reason": "Exact source URL returned HTTP 410",
-      "httpStatus": 410,
-      "sourceUrl": "https://www.craigslist.org/view/d/grayson-2018-toyota-camry-financing/3lqP5HbK8RGtr9tpNy2yAg",
-      "resolvedUrl": "https://www.craigslist.org/view/d/grayson-2018-toyota-camry-financing/3lqP5HbK8RGtr9tpNy2yAg"
+      "checkedAt": "2026-11-18T06:40:57Z",
+      "reason": "Exact source URL returned HTTP 410"
     },
     "craigslist.org/view/d/houston-chevrolet-chevelle-malibu/ssgmewkcytzea1g7kks44x": {
       "availability": "gone",
-      "checkedAt": "2026-11-17T21:13:34Z",
-      "reason": "Exact source URL returned HTTP 410",
-      "httpStatus": 410,
-      "sourceUrl": "https://www.craigslist.org/view/d/houston-chevrolet-chevelle-malibu/ssgMEWKCYTZEa1G7KKs44x",
-      "resolvedUrl": "https://www.craigslist.org/view/d/houston-chevrolet-chevelle-malibu/ssgMEWKCYTZEa1G7KKs44x"
+      "checkedAt": "2026-11-18T06:40:57Z",
+      "reason": "Exact source URL returned HTTP 410"
     },
     "craigslist.org/view/d/longwood-1978-jeep-cj7-cyl-manual/4xgrdmojbopubms8c7hja8": {
       "availability": "gone",
-      "checkedAt": "2026-11-17T21:13:34Z",
-      "reason": "Exact source URL returned HTTP 410",
-      "httpStatus": 410,
-      "sourceUrl": "https://www.craigslist.org/view/d/longwood-1978-jeep-cj7-cyl-manual/4XgrdMoJBoPUbMs8C7hJa8",
-      "resolvedUrl": "https://www.craigslist.org/view/d/longwood-1978-jeep-cj7-cyl-manual/4XgrdMoJBoPUbMs8C7hJa8"
+      "checkedAt": "2026-11-18T06:40:57Z",
+      "reason": "Exact source URL returned HTTP 410"
     },
     "craigslist.org/view/d/houston-chevrolet-impala-door-make/2hufgujyke6wnq8whhe9nb": {
       "availability": "gone",
-      "checkedAt": "2026-11-17T21:13:34Z",
-      "reason": "Exact source URL returned HTTP 410",
-      "httpStatus": 410,
-      "sourceUrl": "https://www.craigslist.org/view/d/houston-chevrolet-impala-door-make/2HUFguJykE6wNq8whHe9nb",
-      "resolvedUrl": "https://www.craigslist.org/view/d/houston-chevrolet-impala-door-make/2HUFguJykE6wNq8whHe9nb"
+      "checkedAt": "2026-11-18T06:40:57Z",
+      "reason": "Exact source URL returned HTTP 410"
     },
     "craigslist.org/view/d/houston-chevrolet-chevelle-malibu/qsydlsa1eesmwjatwfnpyg": {
       "availability": "gone",
-      "checkedAt": "2026-11-17T21:13:34Z",
-      "reason": "Exact source URL returned HTTP 410",
-      "httpStatus": 410,
-      "sourceUrl": "https://www.craigslist.org/view/d/houston-chevrolet-chevelle-malibu/qSYDLsA1eESmWJAtWFNpyG",
-      "resolvedUrl": "https://www.craigslist.org/view/d/houston-chevrolet-chevelle-malibu/qSYDLsA1eESmWJAtWFNpyG"
+      "checkedAt": "2026-11-18T06:40:57Z",
+      "reason": "Exact source URL returned HTTP 410"
     },
     "craigslist.org/view/d/houston-chevrolet-silverado-1987-long/9yus5quufvxxee1jicdkmw": {
       "availability": "gone",
-      "checkedAt": "2026-11-17T21:13:34Z",
-      "reason": "Exact source URL returned HTTP 410",
-      "httpStatus": 410,
-      "sourceUrl": "https://www.craigslist.org/view/d/houston-chevrolet-silverado-1987-long/9YuS5QUUfvxxee1JiCdkMW",
-      "resolvedUrl": "https://www.craigslist.org/view/d/houston-chevrolet-silverado-1987-long/9YuS5QUUfvxxee1JiCdkMW"
+      "checkedAt": "2026-11-18T06:40:57Z",
+      "reason": "Exact source URL returned HTTP 410"
     },
     "craigslist.org/view/d/avondale-estates-2019-mercedes-benz/whegbifk8rg_0rurnyq8ww": {
       "availability": "gone",
-      "checkedAt": "2026-11-17T21:13:34Z",
-      "reason": "Exact source URL returned HTTP 410",
-      "httpStatus": 410,
-      "sourceUrl": "https://www.craigslist.org/view/d/avondale-estates-2019-mercedes-benz/WhegbIfK8RG_0rURNyq8Ww",
-      "resolvedUrl": "https://www.craigslist.org/view/d/avondale-estates-2019-mercedes-benz/WhegbIfK8RG_0rURNyq8Ww"
+      "checkedAt": "2026-11-18T06:40:57Z",
+      "reason": "Exact source URL returned HTTP 410"
     },
     "craigslist.org/view/d/houston-ford-torino-station-wagon/fsjqsqseprs75q6fxulayc": {
       "availability": "gone",
-      "checkedAt": "2026-11-17T21:13:34Z",
-      "reason": "Exact source URL returned HTTP 410",
-      "httpStatus": 410,
-      "sourceUrl": "https://www.craigslist.org/view/d/houston-ford-torino-station-wagon/fsJqSQsepRs75Q6fxuLAyC",
-      "resolvedUrl": "https://www.craigslist.org/view/d/houston-ford-torino-station-wagon/fsJqSQsepRs75Q6fxuLAyC"
+      "checkedAt": "2026-11-18T06:40:57Z",
+      "reason": "Exact source URL returned HTTP 410"
     },
     "craigslist.org/view/d/brooklyn-bushwick-bed-bath-duplex/4mr3objxdhfyoyrhvcmafj": {
       "availability": "gone",
-      "checkedAt": "2026-11-17T21:13:34Z",
-      "reason": "Exact source URL returned HTTP 410",
-      "httpStatus": 410,
-      "sourceUrl": "https://www.craigslist.org/view/d/brooklyn-bushwick-bed-bath-duplex/4Mr3obJxDHfYoYrhVcMafJ",
-      "resolvedUrl": "https://www.craigslist.org/view/d/brooklyn-bushwick-bed-bath-duplex/4Mr3obJxDHfYoYrhVcMafJ"
+      "checkedAt": "2026-11-18T06:40:57Z",
+      "reason": "Exact source URL returned HTTP 410"
     },
     "craigslist.org/view/d/avondale-estates-2015-bmw-series-buy/gvsofyfk8rgaqyrv63vzlg": {
       "availability": "gone",
-      "checkedAt": "2026-11-17T21:13:34Z",
-      "reason": "Exact source URL returned HTTP 410",
-      "httpStatus": 410,
-      "sourceUrl": "https://www.craigslist.org/view/d/avondale-estates-2015-bmw-series-buy/GvsOfYfK8RGaqYRv63vzlg",
-      "resolvedUrl": "https://www.craigslist.org/view/d/avondale-estates-2015-bmw-series-buy/GvsOfYfK8RGaqYRv63vzlg"
+      "checkedAt": "2026-11-18T06:40:57Z",
+      "reason": "Exact source URL returned HTTP 410"
     },
     "craigslist.org/view/d/bronx-2002-mercedes-benz-clk-55-amg/1swp3hxzzzqjfdgdeu1pdc": {
       "availability": "gone",
-      "checkedAt": "2026-11-17T21:13:34Z",
-      "reason": "Exact source URL returned HTTP 410",
-      "httpStatus": 410,
-      "sourceUrl": "https://www.craigslist.org/view/d/bronx-2002-mercedes-benz-clk-55-amg/1Swp3HxzzzQjfdgdEU1pDc",
-      "resolvedUrl": "https://www.craigslist.org/view/d/bronx-2002-mercedes-benz-clk-55-amg/1Swp3HxzzzQjfdgdEU1pDc"
+      "checkedAt": "2026-11-18T06:40:57Z",
+      "reason": "Exact source URL returned HTTP 410"
     },
     "craigslist.org/view/d/brooklyn-bright-spacious-bedroom/nygpqfgygn7smxxoj1xj1e": {
       "availability": "gone",
-      "checkedAt": "2026-11-17T21:13:34Z",
-      "reason": "Exact source URL returned HTTP 410",
-      "httpStatus": 410,
-      "sourceUrl": "https://www.craigslist.org/view/d/brooklyn-bright-spacious-bedroom/nygPqFGYGN7smxXoJ1XJ1E",
-      "resolvedUrl": "https://www.craigslist.org/view/d/brooklyn-bright-spacious-bedroom/nygPqFGYGN7smxXoJ1XJ1E"
+      "checkedAt": "2026-11-18T06:40:57Z",
+      "reason": "Exact source URL returned HTTP 410"
     },
     "craigslist.org/view/d/mount-vernon-1970-chevrolet-el-camino/mrhim9jzsxz9fkbkrhcwsg": {
       "availability": "gone",
-      "checkedAt": "2026-11-17T21:13:34Z",
-      "reason": "Exact source URL returned HTTP 410",
-      "httpStatus": 410,
-      "sourceUrl": "https://www.craigslist.org/view/d/mount-vernon-1970-chevrolet-el-camino/mrhiM9jZsxZ9FKBkRHCWsG",
-      "resolvedUrl": "https://www.craigslist.org/view/d/mount-vernon-1970-chevrolet-el-camino/mrhiM9jZsxZ9FKBkRHCWsG"
+      "checkedAt": "2026-11-18T06:40:57Z",
+      "reason": "Exact source URL returned HTTP 410"
     },
     "craigslist.org/view/d/brooklyn-bedroom-top-floor-heat-hot/hg17rxjrikb7bhbuwfjvmt": {
       "availability": "gone",
-      "checkedAt": "2026-11-17T21:13:34Z",
-      "reason": "Exact source URL returned HTTP 410",
-      "httpStatus": 410,
-      "sourceUrl": "https://www.craigslist.org/view/d/brooklyn-bedroom-top-floor-heat-hot/hG17rxJRiKb7bHbuwFJvmt",
-      "resolvedUrl": "https://www.craigslist.org/view/d/brooklyn-bedroom-top-floor-heat-hot/hG17rxJRiKb7bHbuwFJvmt"
+      "checkedAt": "2026-11-18T06:40:57Z",
+      "reason": "Exact source URL returned HTTP 410"
     },
     "craigslist.org/view/d/bronx-castle-hill-bronx-3br-unit/dnjdx8dary8kg2tvyop6vz": {
       "availability": "gone",
-      "checkedAt": "2026-11-17T21:13:34Z",
-      "reason": "Exact source URL returned HTTP 410",
-      "httpStatus": 410,
-      "sourceUrl": "https://www.craigslist.org/view/d/bronx-castle-hill-bronx-3br-unit/dNJdx8DARy8kg2tvyoP6vZ",
-      "resolvedUrl": "https://www.craigslist.org/view/d/bronx-castle-hill-bronx-3br-unit/dNJdx8DARy8kg2tvyoP6vZ"
+      "checkedAt": "2026-11-18T06:40:57Z",
+      "reason": "Exact source URL returned HTTP 410"
     },
     "craigslist.org/view/d/mount-vernon-1970-chevrolet-el-camino/hw3gi2q6q1oeer3sfeztth": {
       "availability": "gone",
-      "checkedAt": "2026-11-17T21:13:34Z",
-      "reason": "Exact source URL returned HTTP 410",
-      "httpStatus": 410,
-      "sourceUrl": "https://www.craigslist.org/view/d/mount-vernon-1970-chevrolet-el-camino/hW3Gi2q6q1oeeR3SfEZttH",
-      "resolvedUrl": "https://www.craigslist.org/view/d/mount-vernon-1970-chevrolet-el-camino/hW3Gi2q6q1oeeR3SfEZttH"
+      "checkedAt": "2026-11-18T06:40:57Z",
+      "reason": "Exact source URL returned HTTP 410"
     },
     "craigslist.org/view/d/bronx-2015-fiat-500-abarth-excellent/wb9u1e5q1edq1azjqbstbe": {
       "availability": "gone",
-      "checkedAt": "2026-11-17T21:13:34Z",
-      "reason": "Exact source URL returned HTTP 410",
-      "httpStatus": 410,
-      "sourceUrl": "https://www.craigslist.org/view/d/bronx-2015-fiat-500-abarth-excellent/wb9U1E5q1EDQ1azJQBStbE",
-      "resolvedUrl": "https://www.craigslist.org/view/d/bronx-2015-fiat-500-abarth-excellent/wb9U1E5q1EDQ1azJQBStbE"
+      "checkedAt": "2026-11-18T06:40:57Z",
+      "reason": "Exact source URL returned HTTP 410"
     },
     "craigslist.org/view/d/floral-park-2016-ford-350-350-super/-tynqh7k8rga84ckbvjukg": {
       "availability": "gone",
-      "checkedAt": "2026-11-17T21:13:34Z",
-      "reason": "Exact source URL returned HTTP 410",
-      "httpStatus": 410,
-      "sourceUrl": "https://www.craigslist.org/view/d/floral-park-2016-ford-350-350-super/-tYNqH7K8RGA84CKbVJUKg",
-      "resolvedUrl": "https://www.craigslist.org/view/d/floral-park-2016-ford-350-350-super/-tYNqH7K8RGA84CKbVJUKg"
+      "checkedAt": "2026-11-18T06:40:57Z",
+      "reason": "Exact source URL returned HTTP 410"
     },
     "kijiji.ca/v-apartments-condos/kitchener-waterloo/bachelor-studio-apartment-in-elmira-all-inclusive/1744275799": {
       "availability": "unavailable",
@@ -24724,19 +24622,13 @@
     },
     "craigslist.org/view/d/houston-chevy-c10-k5-c20-r1500-door/8wqbdnf7qnaiqet4kksdnl": {
       "availability": "gone",
-      "checkedAt": "2026-11-17T21:13:34Z",
-      "reason": "Exact source URL returned HTTP 410",
-      "httpStatus": 410,
-      "sourceUrl": "https://www.craigslist.org/view/d/houston-chevy-c10-k5-c20-r1500-door/8wqbdnF7QnaiqEt4kksDnL",
-      "resolvedUrl": "https://www.craigslist.org/view/d/houston-chevy-c10-k5-c20-r1500-door/8wqbdnF7QnaiqEt4kksDnL"
+      "checkedAt": "2026-11-18T06:40:57Z",
+      "reason": "Exact source URL returned HTTP 410"
     },
     "craigslist.org/view/d/bronx-2012-volvo-xc60-t6-awd-suv/hg1tgnh2mtpvlucud6ewpb": {
       "availability": "gone",
-      "checkedAt": "2026-11-17T21:13:34Z",
-      "reason": "Exact source URL returned HTTP 410",
-      "httpStatus": 410,
-      "sourceUrl": "https://www.craigslist.org/view/d/bronx-2012-volvo-xc60-t6-awd-suv/hg1TgNh2mtpvLucUD6EwPb",
-      "resolvedUrl": "https://www.craigslist.org/view/d/bronx-2012-volvo-xc60-t6-awd-suv/hg1TgNh2mtpvLucUD6EwPb"
+      "checkedAt": "2026-11-18T06:40:57Z",
+      "reason": "Exact source URL returned HTTP 410"
     },
     "kijiji.ca/v-construction-trades-jobs/city-of-toronto/metal-siding-worker-start-monday-full-time/1745868085": {
       "availability": "unavailable",
@@ -24924,11 +24816,8 @@
     },
     "craigslist.org/view/d/weslaco-2019-ford-f150-supercrew-cab/sq4ztv3k8rg6y-h70vsnbg": {
       "availability": "gone",
-      "checkedAt": "2026-11-17T21:13:34Z",
-      "reason": "Exact source URL returned HTTP 410",
-      "httpStatus": 410,
-      "sourceUrl": "https://www.craigslist.org/view/d/weslaco-2019-ford-f150-supercrew-cab/sq4ZtV3K8RG6Y-H70vSnbg",
-      "resolvedUrl": "https://www.craigslist.org/view/d/weslaco-2019-ford-f150-supercrew-cab/sq4ZtV3K8RG6Y-H70vSnbg"
+      "checkedAt": "2026-11-18T06:40:57Z",
+      "reason": "Exact source URL returned HTTP 410"
     },
     "kijiji.ca/v-other-auto-parts-and-accessories/city-of-toronto/mazda-2-mazda-3-mazda-5-mazda-6-brakes/1746137452": {
       "availability": "unavailable",
@@ -24996,11 +24885,8 @@
     },
     "craigslist.org/view/d/mission-2014-gmc-sierra-1500-slt/pufupvhwppb9nm4s4we3je": {
       "availability": "gone",
-      "checkedAt": "2026-11-17T21:13:34Z",
-      "reason": "Exact source URL returned HTTP 410",
-      "httpStatus": 410,
-      "sourceUrl": "https://www.craigslist.org/view/d/mission-2014-gmc-sierra-1500-slt/pufupVHwpPb9nm4s4WE3jE",
-      "resolvedUrl": "https://www.craigslist.org/view/d/mission-2014-gmc-sierra-1500-slt/pufupVHwpPb9nm4s4WE3jE"
+      "checkedAt": "2026-11-18T06:40:57Z",
+      "reason": "Exact source URL returned HTTP 410"
     },
     "kijiji.ca/v-apartments-condos/mississauga-peel-region/2200-newly-renovated-3b-2b-apartment-for-rent-dundas-st-e/1746146833": {
       "availability": "unavailable",
@@ -25036,11 +24922,8 @@
     },
     "craigslist.org/view/d/lithia-springs-2018-toyota-camry-se/22kzqkv2kspqkrmuq1wuy4": {
       "availability": "gone",
-      "checkedAt": "2026-11-17T21:13:34Z",
-      "reason": "Exact source URL returned HTTP 410",
-      "httpStatus": 410,
-      "sourceUrl": "https://www.craigslist.org/view/d/lithia-springs-2018-toyota-camry-se/22Kzqkv2KSPqKRmUQ1wUy4",
-      "resolvedUrl": "https://www.craigslist.org/view/d/lithia-springs-2018-toyota-camry-se/22Kzqkv2KSPqKRmUQ1wUy4"
+      "checkedAt": "2026-11-18T06:40:57Z",
+      "reason": "Exact source URL returned HTTP 410"
     },
     "kijiji.ca/v-driver-security-jobs/hamilton/need-driver/1746067895": {
       "availability": "unavailable",
@@ -25068,35 +24951,23 @@
     },
     "craigslist.org/view/d/dallas-2017-subaru-forester-25i-premium/wyvcbn5torabwh7xmtr3ar": {
       "availability": "gone",
-      "checkedAt": "2026-11-17T21:13:34Z",
-      "reason": "Exact source URL returned HTTP 410",
-      "httpStatus": 410,
-      "sourceUrl": "https://www.craigslist.org/view/d/dallas-2017-subaru-forester-25i-premium/wyvCBN5torABwH7XMTR3AR",
-      "resolvedUrl": "https://www.craigslist.org/view/d/dallas-2017-subaru-forester-25i-premium/wyvCBN5torABwH7XMTR3AR"
+      "checkedAt": "2026-11-18T06:40:57Z",
+      "reason": "Exact source URL returned HTTP 410"
     },
     "craigslist.org/view/d/austin-mint-2015-jeep-grand-cherokee-v6/3i_sn2rf8rgqaixdjkak9w": {
       "availability": "gone",
-      "checkedAt": "2026-11-17T21:13:34Z",
-      "reason": "Exact source URL returned HTTP 410",
-      "httpStatus": 410,
-      "sourceUrl": "https://www.craigslist.org/view/d/austin-mint-2015-jeep-grand-cherokee-v6/3i_SN2rf8RGqaIXdJKaK9w",
-      "resolvedUrl": "https://www.craigslist.org/view/d/austin-mint-2015-jeep-grand-cherokee-v6/3i_SN2rf8RGqaIXdJKaK9w"
+      "checkedAt": "2026-11-18T06:40:57Z",
+      "reason": "Exact source URL returned HTTP 410"
     },
     "craigslist.org/view/d/austin-mint-2015-jeep-grand-cherokee-v6/gmybpgrf8rgm4a5gv3nbeg": {
       "availability": "gone",
-      "checkedAt": "2026-11-17T21:13:34Z",
-      "reason": "Exact source URL returned HTTP 410",
-      "httpStatus": 410,
-      "sourceUrl": "https://www.craigslist.org/view/d/austin-mint-2015-jeep-grand-cherokee-v6/GmYBPGrf8RGM4a5gv3nBEg",
-      "resolvedUrl": "https://www.craigslist.org/view/d/austin-mint-2015-jeep-grand-cherokee-v6/GmYBPGrf8RGM4a5gv3nBEg"
+      "checkedAt": "2026-11-18T06:40:57Z",
+      "reason": "Exact source URL returned HTTP 410"
     },
     "craigslist.org/view/d/port-saint-lucie-2008-mercury-grand/qvztba7tqykm8dcfxmwhy3": {
       "availability": "gone",
-      "checkedAt": "2026-11-17T21:13:34Z",
-      "reason": "Exact source URL returned HTTP 410",
-      "httpStatus": 410,
-      "sourceUrl": "https://www.craigslist.org/view/d/port-saint-lucie-2008-mercury-grand/qvZTba7tQyKM8DCFXmwHy3",
-      "resolvedUrl": "https://www.craigslist.org/view/d/port-saint-lucie-2008-mercury-grand/qvZTba7tQyKM8DCFXmwHy3"
+      "checkedAt": "2026-11-18T06:40:57Z",
+      "reason": "Exact source URL returned HTTP 410"
     },
     "kijiji.ca/v-other-auto-parts-and-accessories/hamilton/brand-new-marine-battery-sold/1745779726": {
       "availability": "sold",
@@ -25113,6 +24984,91 @@
       "httpStatus": 200,
       "sourceUrl": "https://www.kijiji.ca/v-other-auto-parts-and-accessories/hamilton/brand-new-marine-battery-24m-550-cca/1745779726",
       "resolvedUrl": "https://www.kijiji.ca/v-other-auto-parts-and-accessories/hamilton/brand-new-marine-battery-sold/1745779726"
+    },
+    "kijiji.ca/v-general-electronics/city-of-toronto/dmx4-wireless-dimer-receiver/1745802709": {
+      "availability": "unavailable",
+      "checkedAt": "2026-11-18T06:40:57Z",
+      "reason": "Kijiji redirected the exact ad to a confirmed removal"
+    },
+    "craigslist.org/view/d/valley-stream-2014-subaru-impreza-20/ocyaycm3tzbhcqwscyxern": {
+      "availability": "gone",
+      "checkedAt": "2026-11-18T06:40:57Z",
+      "reason": "Exact source URL returned HTTP 410"
+    },
+    "craigslist.org/view/d/valley-stream-2014-subaru-impreza-20/uyxbt3z9z4ckcpze8shmwb": {
+      "availability": "gone",
+      "checkedAt": "2026-11-18T06:40:57Z",
+      "reason": "Exact source URL returned HTTP 410"
+    },
+    "craigslist.org/view/d/valley-stream-2014-subaru-impreza-20/ufnn8ubbicwhwnyu1zvq12": {
+      "availability": "gone",
+      "checkedAt": "2026-11-18T06:40:57Z",
+      "reason": "Exact source URL returned HTTP 410"
+    },
+    "albacars.ae/buy-used-cars/vehicle/2232-bmw-x6-xdrive40i-m": {
+      "availability": "sold",
+      "checkedAt": "2026-11-18T06:40:57Z",
+      "reason": "All offers for this exact listing are unavailable"
+    },
+    "craigslist.org/view/d/valley-stream-2014-subaru-impreza-20/seckfmggxjryuh5exgbwhm": {
+      "availability": "gone",
+      "checkedAt": "2026-11-18T06:40:57Z",
+      "reason": "Exact source URL returned HTTP 410"
+    },
+    "jacars.net/adv/2529005_isuzu-elf-truck-3-0l-2012": {
+      "availability": "gone",
+      "checkedAt": "2026-11-18T06:40:57Z",
+      "reason": "Exact source URL returned HTTP 404"
+    },
+    "craigslist.org/view/d/las-vegas-2021-tesla-model-long-range/hqhqgz7ezyy2xvpzpd6rzy": {
+      "availability": "gone",
+      "checkedAt": "2026-11-18T06:40:57Z",
+      "reason": "Exact source URL returned HTTP 410"
+    },
+    "craigslist.org/view/d/valley-stream-2014-subaru-impreza-20/nvzuxjsvgbdzd9rfmckdwe": {
+      "availability": "gone",
+      "checkedAt": "2026-11-18T06:40:57Z",
+      "reason": "Exact source URL returned HTTP 410"
+    },
+    "jacars.net/adv/2518105_toyota-raize-1-2l-2022": {
+      "availability": "gone",
+      "checkedAt": "2026-11-18T06:40:57Z",
+      "reason": "Exact source URL returned HTTP 404"
+    },
+    "craigslist.org/view/d/miami-2002-ford-explorer-xlt-4x4-40l-v6/taq3puzq4ccravaymhb64f": {
+      "availability": "gone",
+      "checkedAt": "2026-11-18T06:40:57Z",
+      "reason": "Exact source URL returned HTTP 410"
+    },
+    "craigslist.org/view/d/kings-bay-2017-ace-29ft-full-body-slide/oxnck1n4yhf8nioncbowft": {
+      "availability": "gone",
+      "checkedAt": "2026-11-18T06:40:57Z",
+      "reason": "Exact source URL returned HTTP 410"
+    },
+    "centralhomeappliances.com/products/refurbished-beko-wtk62051w-6kg-1200rpm-washing-machine-white": {
+      "availability": "unavailable",
+      "checkedAt": "2026-11-18T06:40:57Z",
+      "reason": "All offers for this exact listing are unavailable"
+    },
+    "craigslist.org/view/d/dallas-2016-dodge-charger-t-sedan-4d/9mrvht9w8nchn1uwrhhsfk": {
+      "availability": "gone",
+      "checkedAt": "2026-11-18T06:40:57Z",
+      "reason": "Exact source URL returned HTTP 410"
+    },
+    "craigslist.org/view/d/valley-stream-2014-subaru-impreza-20/c4zt3fdw1gghkkjlcfarn9": {
+      "availability": "gone",
+      "checkedAt": "2026-11-18T06:40:57Z",
+      "reason": "Exact source URL returned HTTP 410"
+    },
+    "craigslist.org/view/d/san-antonio-2012-nissan-juke-sport-sv/232ptuf3ydaqck15uwpmvt": {
+      "availability": "gone",
+      "checkedAt": "2026-11-18T06:40:57Z",
+      "reason": "Exact source URL returned HTTP 410"
+    },
+    "craigslist.org/view/d/bakersfield-2000-ford-f550-turbo-diesel/rnox8zomezeh63zztp2hwq": {
+      "availability": "gone",
+      "checkedAt": "2026-11-18T06:40:57Z",
+      "reason": "Exact source URL returned HTTP 410"
     }
   }
 }

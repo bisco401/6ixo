@@ -1,5 +1,5 @@
 {
-  "checkedAt": "2026-11-19T06:41:12Z",
+  "checkedAt": "2026-11-19T21:16:55Z",
   "listings": {
     "craigslist.org/view/d/bastrop-used-2025-cadillac-xt4-fwd-4d/fuqr_3uo8rgowpq1ctwx-a": {
       "availability": "sold",
@@ -25389,6 +25389,1142 @@
       "availability": "sold",
       "checkedAt": "2026-11-19T06:41:12Z",
       "reason": "All offers for this exact listing are unavailable"
+    },
+    "kijiji.ca/v-general-electronics/city-of-toronto/led-tv-50-android-google-tv-clearance-sale-in-box-229-no-tax/1746146854": {
+      "availability": "unavailable",
+      "checkedAt": "2026-11-19T21:16:55Z",
+      "reason": "Kijiji redirected the exact ad to a confirmed removal",
+      "httpStatus": 200,
+      "sourceUrl": "https://www.kijiji.ca/v-general-electronics/city-of-toronto/led-tv-50-android-google-tv-clearance-sale-in-box-229-no-tax/1746146854",
+      "resolvedUrl": "https://www.kijiji.ca/b-general-electronics/city-of-toronto/c15l1700273?radius=50.0&ll=43.75845%2C-79.27727&adRemoved=1746146854"
+    },
+    "kijiji.ca/v-room-rental-roommate/city-of-toronto/room-for-rent-at-york-university-village-now/1746206926": {
+      "availability": "unavailable",
+      "checkedAt": "2026-11-19T21:16:55Z",
+      "reason": "Kijiji redirected the exact ad to a confirmed removal",
+      "httpStatus": 200,
+      "sourceUrl": "https://www.kijiji.ca/v-room-rental-roommate/city-of-toronto/room-for-rent-at-york-university-village-now/1746206926",
+      "resolvedUrl": "https://www.kijiji.ca/b-room-rental-roommate/city-of-toronto/c36l1700273?radius=50.0&ll=43.77%2C-79.49&adRemoved=1746206926"
+    },
+    "kijiji.ca/v-apartments-condos/markham-york-region/1-bedroom-apartment-for-rent-10-yorkwoods-gate/1741580387": {
+      "availability": "unavailable",
+      "checkedAt": "2026-11-19T21:16:55Z",
+      "reason": "Kijiji redirected the exact ad to a confirmed removal",
+      "httpStatus": 200,
+      "sourceUrl": "https://www.kijiji.ca/v-apartments-condos/markham-york-region/1-bedroom-apartment-for-rent-10-yorkwoods-gate/1741580387",
+      "resolvedUrl": "https://www.kijiji.ca/b-apartments-condos/markham-york-region/c37l1700274?radius=50.0&ll=43.75167%2C-79.51336&adRemoved=1741580387"
+    },
+    "kijiji.ca/v-short-term-rental/city-of-toronto/short-term-room-north-york/1746197933": {
+      "availability": "unavailable",
+      "checkedAt": "2026-11-19T21:16:55Z",
+      "reason": "Kijiji redirected the exact ad to a confirmed removal",
+      "httpStatus": 200,
+      "sourceUrl": "https://www.kijiji.ca/v-short-term-rental/city-of-toronto/short-term-room-north-york/1746197933",
+      "resolvedUrl": "https://www.kijiji.ca/b-short-term-rental/city-of-toronto/c42l1700273?radius=50.0&ll=43.79%2C-79.33&adRemoved=1746197933"
+    },
+    "kijiji.ca/v-cars-trucks/city-of-toronto/2016-dodge-grand-caravan-wheelchair-van-power-ramp-hand-contro/1744965252": {
+      "availability": "unavailable",
+      "checkedAt": "2026-11-19T21:16:55Z",
+      "reason": "Kijiji redirected the exact ad to a confirmed removal",
+      "httpStatus": 200,
+      "sourceUrl": "https://www.kijiji.ca/v-cars-trucks/city-of-toronto/2016-dodge-grand-caravan-wheelchair-van-power-ramp-hand-contro/1744965252",
+      "resolvedUrl": "https://www.kijiji.ca/b-cars-trucks/city-of-toronto/c174l1700273?adRemoved=1744965252&ll=43.67984%2C-79.47519&radius=150.0&rb=50"
+    },
+    "kijiji.ca/v-cleaning-housekeeper-jobs/kitchener-waterloo/house-cleaning-service/1745117394": {
+      "availability": "unavailable",
+      "checkedAt": "2026-11-19T21:16:55Z",
+      "reason": "Kijiji redirected the exact ad to a confirmed removal",
+      "httpStatus": 200,
+      "sourceUrl": "https://www.kijiji.ca/v-cleaning-housekeeper-jobs/kitchener-waterloo/house-cleaning-service/1745117394",
+      "resolvedUrl": "https://www.kijiji.ca/b-cleaning-housekeeper-jobs/kitchener-waterloo/c146l1700212?radius=50.0&ll=43.49%2C-80.55&adRemoved=1745117394"
+    },
+    "kijiji.ca/v-cars-trucks/city-of-toronto/2008-ford-ranger-sport-4x4-5-speed/1745970002": {
+      "availability": "unavailable",
+      "checkedAt": "2026-11-19T21:16:55Z",
+      "reason": "Kijiji redirected the exact ad to a confirmed removal",
+      "httpStatus": 200,
+      "sourceUrl": "https://www.kijiji.ca/v-cars-trucks/city-of-toronto/2008-ford-ranger-sport-4x4-5-speed/1745970002",
+      "resolvedUrl": "https://www.kijiji.ca/b-cars-trucks/city-of-toronto/c174l1700273?adRemoved=1745970002&ll=43.6693972%2C-79.4863831&radius=150.0&rb=50"
+    },
+    "kijiji.ca/v-general-electronics/hamilton/onn-10-1-tablet-32gb-model-1280-x-800/1746304804": {
+      "availability": "unavailable",
+      "checkedAt": "2026-11-19T21:16:55Z",
+      "reason": "Kijiji redirected the exact ad to a confirmed removal",
+      "httpStatus": 200,
+      "sourceUrl": "https://www.kijiji.ca/v-general-electronics/hamilton/onn-10-1-tablet-32gb-model-1280-x-800/1746304804",
+      "resolvedUrl": "https://www.kijiji.ca/b-general-electronics/hamilton/c15l80014?radius=50.0&ll=43.24%2C-79.9&adRemoved=1746304804"
+    },
+    "kijiji.ca/v-apartments-condos/mississauga-peel-region/brand-new-basement-renting/1745174955": {
+      "availability": "unavailable",
+      "checkedAt": "2026-11-19T21:16:55Z",
+      "reason": "Kijiji redirected the exact ad to a confirmed removal",
+      "httpStatus": 200,
+      "sourceUrl": "https://www.kijiji.ca/v-apartments-condos/mississauga-peel-region/brand-new-basement-renting/1745174955",
+      "resolvedUrl": "https://www.kijiji.ca/b-apartments-condos/mississauga-peel-region/c37l1700276?radius=50.0&ll=43.69686%2C-79.75356&adRemoved=1745174955"
+    },
+    "craigslist.org/view/d/miami-charming-1br-in-the-heart-of-the/91ayq4bgqq8sjaewbzfmqh": {
+      "availability": "gone",
+      "checkedAt": "2026-11-19T21:16:55Z",
+      "reason": "Exact source URL returned HTTP 410",
+      "httpStatus": 410,
+      "sourceUrl": "https://www.craigslist.org/view/d/miami-charming-1br-in-the-heart-of-the/91aYq4bGqq8SjaewbzFmQH",
+      "resolvedUrl": "https://www.craigslist.org/view/d/miami-charming-1br-in-the-heart-of-the/91aYq4bGqq8SjaewbzFmQH"
+    },
+    "kijiji.ca/v-driver-security-jobs/markham-york-region/driver-service-call-or-text-now/1745774537": {
+      "availability": "unavailable",
+      "checkedAt": "2026-11-19T21:16:55Z",
+      "reason": "Kijiji redirected the exact ad to a confirmed removal",
+      "httpStatus": 200,
+      "sourceUrl": "https://www.kijiji.ca/v-driver-security-jobs/markham-york-region/driver-service-call-or-text-now/1745774537",
+      "resolvedUrl": "https://www.kijiji.ca/b-driver-security-jobs/markham-york-region/c148l1700274?radius=50.0&ll=43.84%2C-79.44&adRemoved=1745774537"
+    },
+    "kijiji.ca/v-tires-rims/hamilton/snow-tires-185-65-r15/1746206929": {
+      "availability": "unavailable",
+      "checkedAt": "2026-11-19T21:16:55Z",
+      "reason": "Kijiji redirected the exact ad to a confirmed removal",
+      "httpStatus": 200,
+      "sourceUrl": "https://www.kijiji.ca/v-tires-rims/hamilton/snow-tires-185-65-r15/1746206929",
+      "resolvedUrl": "https://www.kijiji.ca/b-tires-rims/hamilton/c320l80014?adRemoved=1746206929&ll=43.23%2C-79.92&radius=150.0&rb=50"
+    },
+    "kijiji.ca/v-general-electronics/city-of-toronto/new-poly-trio-c60-for-microsoft-teams-ip-conference-phone/1746217402": {
+      "availability": "unavailable",
+      "checkedAt": "2026-11-19T21:16:55Z",
+      "reason": "Kijiji redirected the exact ad to a confirmed removal",
+      "httpStatus": 200,
+      "sourceUrl": "https://www.kijiji.ca/v-general-electronics/city-of-toronto/new-poly-trio-c60-for-microsoft-teams-ip-conference-phone/1746217402",
+      "resolvedUrl": "https://www.kijiji.ca/b-general-electronics/city-of-toronto/c15l1700273?radius=50.0&ll=43.75%2C-79.52&adRemoved=1746217402"
+    },
+    "kijiji.ca/v-apartments-condos/hamilton/promo-2-br-apartment-at-wentworth-st-south-w-1-month-free-rent/1744768927": {
+      "availability": "unavailable",
+      "checkedAt": "2026-11-19T21:16:55Z",
+      "reason": "Kijiji redirected the exact ad to a confirmed removal",
+      "httpStatus": 200,
+      "sourceUrl": "https://www.kijiji.ca/v-apartments-condos/hamilton/promo-2-br-apartment-at-wentworth-st-south-w-1-month-free-rent/1744768927",
+      "resolvedUrl": "https://www.kijiji.ca/b-apartments-condos/hamilton/c37l80014?radius=50.0&ll=43.24942%2C-79.85017&adRemoved=1744768927"
+    },
+    "kijiji.ca/v-general-electronics/city-of-toronto/led-tvs-4k-tvs-smart-tvs-all-size-19-to-85-sale-from-59-no-tax/1746235994": {
+      "availability": "unavailable",
+      "checkedAt": "2026-11-19T21:16:55Z",
+      "reason": "Kijiji redirected the exact ad to a confirmed removal",
+      "httpStatus": 200,
+      "sourceUrl": "https://www.kijiji.ca/v-general-electronics/city-of-toronto/led-tvs-4k-tvs-smart-tvs-all-size-19-to-85-sale-from-59-no-tax/1746235994",
+      "resolvedUrl": "https://www.kijiji.ca/b-general-electronics/city-of-toronto/c15l1700273?radius=50.0&ll=43.75845%2C-79.27727&adRemoved=1746235994"
+    },
+    "kijiji.ca/v-classes-lessons/city-of-toronto/classical-guitar-mcgill-grad-20-yrs-exp-seneca-professor/1746128186": {
+      "availability": "unavailable",
+      "checkedAt": "2026-11-19T21:16:55Z",
+      "reason": "Kijiji redirected the exact ad to a confirmed removal",
+      "httpStatus": 200,
+      "sourceUrl": "https://www.kijiji.ca/v-classes-lessons/city-of-toronto/classical-guitar-mcgill-grad-20-yrs-exp-seneca-professor/1746128186",
+      "resolvedUrl": "https://www.kijiji.ca/b-classes-lessons/city-of-toronto/c4l1700273?radius=50.0&ll=43.7%2C-79.44&adRemoved=1746128186"
+    },
+    "kijiji.ca/v-apartments-condos/hamilton/renovated-2-bedroom-with-huge-eat-in-kitchen-steps-to-ottawa-st/1746255345": {
+      "availability": "unavailable",
+      "checkedAt": "2026-11-19T21:16:55Z",
+      "reason": "Kijiji redirected the exact ad to a confirmed removal",
+      "httpStatus": 200,
+      "sourceUrl": "https://www.kijiji.ca/v-apartments-condos/hamilton/renovated-2-bedroom-with-huge-eat-in-kitchen-steps-to-ottawa-st/1746255345",
+      "resolvedUrl": "https://www.kijiji.ca/b-apartments-condos/hamilton/c37l80014?radius=50.0&ll=43.25%2C-79.8&adRemoved=1746255345"
+    },
+    "kijiji.ca/v-general-electronics/ville-de-montreal/tele-4k-ultra-hd/1744997171": {
+      "availability": "unavailable",
+      "checkedAt": "2026-11-19T21:16:55Z",
+      "reason": "Kijiji redirected the exact ad to a confirmed removal",
+      "httpStatus": 200,
+      "sourceUrl": "https://www.kijiji.ca/v-general-electronics/ville-de-montreal/tele-4k-ultra-hd/1744997171",
+      "resolvedUrl": "https://www.kijiji.ca/b-appareils-electroniques/ville-de-montreal/c15l1700281?radius=50.0&ll=45.62%2C-73.63&adRemoved=1744997171"
+    },
+    "kijiji.ca/v-room-rental-roommate/hamilton/female-only-large-room-now-mohawk-college-st-jo-hosp/1746269008": {
+      "availability": "unavailable",
+      "checkedAt": "2026-11-19T21:16:55Z",
+      "reason": "Kijiji redirected the exact ad to a confirmed removal",
+      "httpStatus": 200,
+      "sourceUrl": "https://www.kijiji.ca/v-room-rental-roommate/hamilton/female-only-large-room-now-mohawk-college-st-jo-hosp/1746269008",
+      "resolvedUrl": "https://www.kijiji.ca/b-room-rental-roommate/hamilton/c36l80014?radius=50.0&ll=43.24%2C-79.88&adRemoved=1746269008"
+    },
+    "kijiji.ca/v-general-electronics/city-of-toronto/apc-back-ups-pro-br1000ms-1000va-600w-battery-not-included/1746225130": {
+      "availability": "unavailable",
+      "checkedAt": "2026-11-19T21:16:55Z",
+      "reason": "Kijiji redirected the exact ad to a confirmed removal",
+      "httpStatus": 200,
+      "sourceUrl": "https://www.kijiji.ca/v-general-electronics/city-of-toronto/apc-back-ups-pro-br1000ms-1000va-600w-battery-not-included/1746225130",
+      "resolvedUrl": "https://www.kijiji.ca/b-general-electronics/city-of-toronto/c15l1700273?radius=50.0&ll=43.67%2C-79.31&adRemoved=1746225130"
+    },
+    "kijiji.ca/v-rideshare-carpool/windsor-area-on/windsor-to-toronto-3pm-today/1745784855": {
+      "availability": "unavailable",
+      "checkedAt": "2026-11-19T21:16:55Z",
+      "reason": "Kijiji redirected the exact ad to a confirmed removal",
+      "httpStatus": 200,
+      "sourceUrl": "https://www.kijiji.ca/v-rideshare-carpool/windsor-area-on/windsor-to-toronto-3pm-today/1745784855",
+      "resolvedUrl": "https://www.kijiji.ca/b-rideshare-carpool/windsor-area-on/c5l1700220?radius=50.0&ll=42.31%2C-83.02&adRemoved=1745784855"
+    },
+    "kijiji.ca/v-general-labour-jobs/edmonton/edmontons-1-helper-at-your-service/1745788208": {
+      "availability": "unavailable",
+      "checkedAt": "2026-11-19T21:16:55Z",
+      "reason": "Kijiji redirected the exact ad to a confirmed removal",
+      "httpStatus": 200,
+      "sourceUrl": "https://www.kijiji.ca/v-general-labour-jobs/edmonton/edmontons-1-helper-at-your-service/1745788208",
+      "resolvedUrl": "https://www.kijiji.ca/b-general-labour-jobs/edmonton/c149l1700203?radius=50.0&ll=53.45%2C-113.46&adRemoved=1745788208"
+    },
+    "kijiji.ca/v-general-electronics/city-of-toronto/the-grandstream-ht502-analog-telephone-adapter-ata/1746165243": {
+      "availability": "unavailable",
+      "checkedAt": "2026-11-19T21:16:55Z",
+      "reason": "Kijiji redirected the exact ad to a confirmed removal",
+      "httpStatus": 200,
+      "sourceUrl": "https://www.kijiji.ca/v-general-electronics/city-of-toronto/the-grandstream-ht502-analog-telephone-adapter-ata/1746165243",
+      "resolvedUrl": "https://www.kijiji.ca/b-general-electronics/city-of-toronto/c15l1700273?radius=50.0&ll=43.7%2C-79.54&adRemoved=1746165243"
+    },
+    "kijiji.ca/v-cars-trucks/hamilton/2006-buick-allure-certified/1746310662": {
+      "availability": "unavailable",
+      "checkedAt": "2026-11-19T21:16:55Z",
+      "reason": "Kijiji redirected the exact ad to a confirmed removal",
+      "httpStatus": 200,
+      "sourceUrl": "https://www.kijiji.ca/v-cars-trucks/hamilton/2006-buick-allure-certified/1746310662",
+      "resolvedUrl": "https://www.kijiji.ca/b-cars-trucks/hamilton/c174l80014?adRemoved=1746310662&ll=43.11%2C-79.55&radius=150.0&rb=50"
+    },
+    "kijiji.ca/v-washer-dryer/hamilton/can-deliver-samsung-27-stainlesssteel-frontload-electric-dryer/1746144499": {
+      "availability": "unavailable",
+      "checkedAt": "2026-11-19T21:16:55Z",
+      "reason": "Kijiji redirected the exact ad to a confirmed removal",
+      "httpStatus": 200,
+      "sourceUrl": "https://www.kijiji.ca/v-washer-dryer/hamilton/can-deliver-samsung-27-stainlesssteel-frontload-electric-dryer/1746144499",
+      "resolvedUrl": "https://www.kijiji.ca/b-washer-dryer/hamilton/c700l80014?radius=50.0&ll=43.25769%2C-79.84019&adRemoved=1746144499"
+    },
+    "kijiji.ca/v-cars-trucks/winnipeg/2023-ford-f-150-lariat-502a-supercrew-clean-carfax-leather/1734070779": {
+      "availability": "unavailable",
+      "checkedAt": "2026-11-19T21:16:55Z",
+      "reason": "Kijiji redirected the exact ad to a confirmed removal",
+      "httpStatus": 200,
+      "sourceUrl": "https://www.kijiji.ca/v-cars-trucks/winnipeg/2023-ford-f-150-lariat-502a-supercrew-clean-carfax-leather/1734070779",
+      "resolvedUrl": "https://www.kijiji.ca/b-cars-trucks/winnipeg/c174l1700192?adRemoved=1734070779&ll=49.8963444%2C-97.2037038&radius=150.0&rb=50"
+    },
+    "kijiji.ca/v-room-rental-roommate/hamilton/bright-beautiful-room-available/1746158724": {
+      "availability": "unavailable",
+      "checkedAt": "2026-11-19T21:16:55Z",
+      "reason": "Kijiji redirected the exact ad to a confirmed removal",
+      "httpStatus": 200,
+      "sourceUrl": "https://www.kijiji.ca/v-room-rental-roommate/hamilton/bright-beautiful-room-available/1746158724",
+      "resolvedUrl": "https://www.kijiji.ca/b-room-rental-roommate/hamilton/c36l80014?radius=50.0&ll=43.26%2C-79.89&adRemoved=1746158724"
+    },
+    "kijiji.ca/v-room-rental-roommate/city-of-toronto/furnished-room-for-rent-for-female-only/1746240780": {
+      "availability": "unavailable",
+      "checkedAt": "2026-11-19T21:16:55Z",
+      "reason": "Kijiji redirected the exact ad to a confirmed removal",
+      "httpStatus": 200,
+      "sourceUrl": "https://www.kijiji.ca/v-room-rental-roommate/city-of-toronto/furnished-room-for-rent-for-female-only/1746240780",
+      "resolvedUrl": "https://www.kijiji.ca/b-room-rental-roommate/city-of-toronto/c36l1700273?radius=50.0&ll=43.79%2C-79.25&adRemoved=1746240780"
+    },
+    "kijiji.ca/v-clothing-men/city-of-toronto/chrome-hearts-winter-beanies/1746241753": {
+      "availability": "unavailable",
+      "checkedAt": "2026-11-19T21:16:55Z",
+      "reason": "Kijiji redirected the exact ad to a confirmed removal",
+      "httpStatus": 200,
+      "sourceUrl": "https://www.kijiji.ca/v-clothing-men/city-of-toronto/chrome-hearts-winter-beanies/1746241753",
+      "resolvedUrl": "https://www.kijiji.ca/b-clothing-men/city-of-toronto/c278l1700273?radius=50.0&ll=43.72%2C-79.3&adRemoved=1746241753"
+    },
+    "kijiji.ca/v-tires-rims/hamilton/4-uniroyal-winters-tires-195-65r15/1746209123": {
+      "availability": "unavailable",
+      "checkedAt": "2026-11-19T21:16:55Z",
+      "reason": "Kijiji redirected the exact ad to a confirmed removal",
+      "httpStatus": 200,
+      "sourceUrl": "https://www.kijiji.ca/v-tires-rims/hamilton/4-uniroyal-winters-tires-195-65r15/1746209123",
+      "resolvedUrl": "https://www.kijiji.ca/b-tires-rims/hamilton/c320l80014?adRemoved=1746209123&ll=43.19%2C-79.77&radius=150.0&rb=50"
+    },
+    "kijiji.ca/v-cars-trucks/city-of-toronto/2019-grand-cherokee/1746292516": {
+      "availability": "unavailable",
+      "checkedAt": "2026-11-19T21:16:55Z",
+      "reason": "Kijiji redirected the exact ad to a confirmed removal",
+      "httpStatus": 200,
+      "sourceUrl": "https://www.kijiji.ca/v-cars-trucks/city-of-toronto/2019-grand-cherokee/1746292516",
+      "resolvedUrl": "https://www.kijiji.ca/b-cars-trucks/city-of-toronto/c174l1700273?adRemoved=1746292516&ll=44.01%2C-79.82&radius=150.0&rb=50"
+    },
+    "kijiji.ca/v-cars-trucks/hamilton/2022-gmc-terrain-sle-carplay-heated-seats-keyless/1738398370": {
+      "availability": "unavailable",
+      "checkedAt": "2026-11-19T21:16:55Z",
+      "reason": "Kijiji redirected the exact ad to a confirmed removal",
+      "httpStatus": 200,
+      "sourceUrl": "https://www.kijiji.ca/v-cars-trucks/hamilton/2022-gmc-terrain-sle-carplay-heated-seats-keyless/1738398370",
+      "resolvedUrl": "https://www.kijiji.ca/b-cars-trucks/hamilton/c174l80014?adRemoved=1738398370&ll=43.2070027%2C-79.8902315&radius=150.0&rb=50"
+    },
+    "kijiji.ca/v-general-electronics/hamilton/aceconn-primeline-linux-tv-box-4k-ultra-hd/1746178724": {
+      "availability": "unavailable",
+      "checkedAt": "2026-11-19T21:16:55Z",
+      "reason": "Kijiji redirected the exact ad to a confirmed removal",
+      "httpStatus": 200,
+      "sourceUrl": "https://www.kijiji.ca/v-general-electronics/hamilton/aceconn-primeline-linux-tv-box-4k-ultra-hd/1746178724",
+      "resolvedUrl": "https://www.kijiji.ca/b-general-electronics/hamilton/c15l80014?radius=50.0&ll=43.25%2C-79.8&adRemoved=1746178724"
+    },
+    "kijiji.ca/v-cars-trucks/hamilton/2013-ford-focus-certified/1746311513": {
+      "availability": "unavailable",
+      "checkedAt": "2026-11-19T21:16:55Z",
+      "reason": "Kijiji redirected the exact ad to a confirmed removal",
+      "httpStatus": 200,
+      "sourceUrl": "https://www.kijiji.ca/v-cars-trucks/hamilton/2013-ford-focus-certified/1746311513",
+      "resolvedUrl": "https://www.kijiji.ca/b-cars-trucks/hamilton/c174l80014?adRemoved=1746311513&ll=43.11%2C-79.55&radius=150.0&rb=50"
+    },
+    "kijiji.ca/v-room-rental-roommate/city-of-toronto/a-bedroom-for-rent-at-finch-warden/1746325294": {
+      "availability": "unavailable",
+      "checkedAt": "2026-11-19T21:16:55Z",
+      "reason": "Kijiji redirected the exact ad to a confirmed removal",
+      "httpStatus": 200,
+      "sourceUrl": "https://www.kijiji.ca/v-room-rental-roommate/city-of-toronto/a-bedroom-for-rent-at-finch-warden/1746325294",
+      "resolvedUrl": "https://www.kijiji.ca/b-room-rental-roommate/city-of-toronto/c36l1700273?radius=50.0&ll=43.79903%2C-79.31152&adRemoved=1746325294"
+    },
+    "kijiji.ca/v-clothing-men/city-of-toronto/designer-tracksuits/1746241734": {
+      "availability": "unavailable",
+      "checkedAt": "2026-11-19T21:16:55Z",
+      "reason": "Kijiji redirected the exact ad to a confirmed removal",
+      "httpStatus": 200,
+      "sourceUrl": "https://www.kijiji.ca/v-clothing-men/city-of-toronto/designer-tracksuits/1746241734",
+      "resolvedUrl": "https://www.kijiji.ca/b-clothing-men/city-of-toronto/c278l1700273?radius=50.0&ll=43.72%2C-79.3&adRemoved=1746241734"
+    },
+    "kijiji.ca/v-clothing-men/city-of-toronto/designer-mens-shorts/1746241637": {
+      "availability": "unavailable",
+      "checkedAt": "2026-11-19T21:16:55Z",
+      "reason": "Kijiji redirected the exact ad to a confirmed removal",
+      "httpStatus": 200,
+      "sourceUrl": "https://www.kijiji.ca/v-clothing-men/city-of-toronto/designer-mens-shorts/1746241637",
+      "resolvedUrl": "https://www.kijiji.ca/b-clothing-men/city-of-toronto/c278l1700273?radius=50.0&ll=43.72%2C-79.3&adRemoved=1746241637"
+    },
+    "kijiji.ca/v-room-rental-roommate/city-of-toronto/a-nice-room-at-york-university/1746169671": {
+      "availability": "unavailable",
+      "checkedAt": "2026-11-19T21:16:55Z",
+      "reason": "Kijiji redirected the exact ad to a confirmed removal",
+      "httpStatus": 200,
+      "sourceUrl": "https://www.kijiji.ca/v-room-rental-roommate/city-of-toronto/a-nice-room-at-york-university/1746169671",
+      "resolvedUrl": "https://www.kijiji.ca/b-room-rental-roommate/city-of-toronto/c36l1700273?radius=50.0&ll=43.77%2C-79.5&adRemoved=1746169671"
+    },
+    "kijiji.ca/v-tires-rims/city-of-toronto/rav4-toyota-oem-rims-silver-brand-new-winter-tires/1746322906": {
+      "availability": "unavailable",
+      "checkedAt": "2026-11-19T21:16:55Z",
+      "reason": "Kijiji redirected the exact ad to a confirmed removal",
+      "httpStatus": 200,
+      "sourceUrl": "https://www.kijiji.ca/v-tires-rims/city-of-toronto/rav4-toyota-oem-rims-silver-brand-new-winter-tires/1746322906",
+      "resolvedUrl": "https://www.kijiji.ca/b-tires-rims/city-of-toronto/c320l1700273?adRemoved=1746322906&ll=43.81%2C-79.19&radius=150.0&rb=50"
+    },
+    "kijiji.ca/v-classes-lessons/hamilton/early-drivers-licence-g2-g-road-test-asap-booking-drive-classes/1746137440": {
+      "availability": "unavailable",
+      "checkedAt": "2026-11-19T21:16:55Z",
+      "reason": "Kijiji redirected the exact ad to a confirmed removal",
+      "httpStatus": 200,
+      "sourceUrl": "https://www.kijiji.ca/v-classes-lessons/hamilton/early-drivers-licence-g2-g-road-test-asap-booking-drive-classes/1746137440",
+      "resolvedUrl": "https://www.kijiji.ca/b-classes-lessons/hamilton/c4l80014?radius=50.0&ll=43.25%2C-79.88&adRemoved=1746137440"
+    },
+    "kijiji.ca/v-cars-trucks/hamilton/2021-cadillac-xt4-fwd-luxury/1742610517": {
+      "availability": "unavailable",
+      "checkedAt": "2026-11-19T21:16:55Z",
+      "reason": "Kijiji redirected the exact ad to a confirmed removal",
+      "httpStatus": 200,
+      "sourceUrl": "https://www.kijiji.ca/v-cars-trucks/hamilton/2021-cadillac-xt4-fwd-luxury/1742610517",
+      "resolvedUrl": "https://www.kijiji.ca/b-cars-trucks/hamilton/c174l80014?adRemoved=1742610517&ll=43.2070027%2C-79.8902315&radius=150.0&rb=50"
+    },
+    "craigslist.org/view/d/pasadena-1bd-1ba-mobile-check-in/ezvgfmtrfpl3c41jhrfgvr": {
+      "availability": "gone",
+      "checkedAt": "2026-11-19T21:16:55Z",
+      "reason": "Exact source URL returned HTTP 410",
+      "httpStatus": 410,
+      "sourceUrl": "https://www.craigslist.org/view/d/pasadena-1bd-1ba-mobile-check-in/eZVGfMtrFpL3c41jHrfgVR",
+      "resolvedUrl": "https://www.craigslist.org/view/d/pasadena-1bd-1ba-mobile-check-in/eZVGfMtrFpL3c41jHrfgVR"
+    },
+    "kijiji.ca/v-cars-trucks/winnipeg/2024-gmc-sierra-1500-elevation-diesel-heated-seats/1735908600": {
+      "availability": "unavailable",
+      "checkedAt": "2026-11-19T21:16:55Z",
+      "reason": "Kijiji redirected the exact ad to a confirmed removal",
+      "httpStatus": 200,
+      "sourceUrl": "https://www.kijiji.ca/v-cars-trucks/winnipeg/2024-gmc-sierra-1500-elevation-diesel-heated-seats/1735908600",
+      "resolvedUrl": "https://www.kijiji.ca/b-cars-trucks/winnipeg/c174l1700192?adRemoved=1735908600&ll=49.8438747%2C-97.2146327&radius=150.0&rb=50"
+    },
+    "kijiji.ca/v-tires-rims/hamilton/michelin-defender-all-season-215-60-16/1746225803": {
+      "availability": "unavailable",
+      "checkedAt": "2026-11-19T21:16:55Z",
+      "reason": "Kijiji redirected the exact ad to a confirmed removal",
+      "httpStatus": 200,
+      "sourceUrl": "https://www.kijiji.ca/v-tires-rims/hamilton/michelin-defender-all-season-215-60-16/1746225803",
+      "resolvedUrl": "https://www.kijiji.ca/b-tires-rims/hamilton/c320l80014?adRemoved=1746225803&ll=43.23%2C-79.77&radius=150.0&rb=50"
+    },
+    "kijiji.ca/v-classes-lessons/hamilton/drive-road-test-g2-g-early-booking-driving-lessons/1746104041": {
+      "availability": "unavailable",
+      "checkedAt": "2026-11-19T21:16:55Z",
+      "reason": "Kijiji redirected the exact ad to a confirmed removal",
+      "httpStatus": 200,
+      "sourceUrl": "https://www.kijiji.ca/v-classes-lessons/hamilton/drive-road-test-g2-g-early-booking-driving-lessons/1746104041",
+      "resolvedUrl": "https://www.kijiji.ca/b-classes-lessons/hamilton/c4l80014?radius=50.0&ll=43.24%2C-79.98&adRemoved=1746104041"
+    },
+    "craigslist.org/view/d/hollywood-2012-jaguar-xk-convertible/7klpmcvt8rgtqvyyr_mh_w": {
+      "availability": "gone",
+      "checkedAt": "2026-11-19T21:16:55Z",
+      "reason": "Exact source URL returned HTTP 410",
+      "httpStatus": 410,
+      "sourceUrl": "https://www.craigslist.org/view/d/hollywood-2012-jaguar-xk-convertible/7klpMCvT8RGTQvYYR_mH_w",
+      "resolvedUrl": "https://www.craigslist.org/view/d/hollywood-2012-jaguar-xk-convertible/7klpMCvT8RGTQvYYR_mH_w"
+    },
+    "kijiji.ca/v-general-electronics/city-of-toronto/4k-crystal-uhd-best-iptv-all-countries/1746180997": {
+      "availability": "unavailable",
+      "checkedAt": "2026-11-19T21:16:55Z",
+      "reason": "Kijiji redirected the exact ad to a confirmed removal",
+      "httpStatus": 200,
+      "sourceUrl": "https://www.kijiji.ca/v-general-electronics/city-of-toronto/4k-crystal-uhd-best-iptv-all-countries/1746180997",
+      "resolvedUrl": "https://www.kijiji.ca/b-general-electronics/city-of-toronto/c15l1700273?radius=50.0&ll=43.66%2C-79.42&adRemoved=1746180997"
+    },
+    "bmsoat.com/product/mercedes-c-180": {
+      "availability": "gone",
+      "checkedAt": "2026-11-19T21:16:55Z",
+      "reason": "Exact source URL returned HTTP 404",
+      "httpStatus": 404,
+      "sourceUrl": "https://bmsoat.com/product/mercedes-c-180/",
+      "resolvedUrl": "https://bmsoat.com/product/mercedes-c-180/"
+    },
+    "kijiji.ca/v-room-rental-roommate/city-of-toronto/room-for-rent-for-working-professional-with-parking/1746149011": {
+      "availability": "unavailable",
+      "checkedAt": "2026-11-19T21:16:55Z",
+      "reason": "Kijiji redirected the exact ad to a confirmed removal",
+      "httpStatus": 200,
+      "sourceUrl": "https://www.kijiji.ca/v-room-rental-roommate/city-of-toronto/room-for-rent-for-working-professional-with-parking/1746149011",
+      "resolvedUrl": "https://www.kijiji.ca/b-room-rental-roommate/city-of-toronto/c36l1700273?radius=50.0&ll=43.76545%2C-79.20723&adRemoved=1746149011"
+    },
+    "kijiji.ca/v-room-rental-roommate/city-of-toronto/couple-private-bedroom-room-rental-free-utilities-internet/1746134108": {
+      "availability": "unavailable",
+      "checkedAt": "2026-11-19T21:16:55Z",
+      "reason": "Kijiji redirected the exact ad to a confirmed removal",
+      "httpStatus": 200,
+      "sourceUrl": "https://www.kijiji.ca/v-room-rental-roommate/city-of-toronto/couple-private-bedroom-room-rental-free-utilities-internet/1746134108",
+      "resolvedUrl": "https://www.kijiji.ca/b-room-rental-roommate/city-of-toronto/c36l1700273?radius=50.0&ll=43.79%2C-79.2&adRemoved=1746134108"
+    },
+    "kijiji.ca/v-heater-humidifier-dehumidifier/city-of-toronto/water-heater-tankless-water-heater-tankless-water-heater/1746146976": {
+      "availability": "unavailable",
+      "checkedAt": "2026-11-19T21:16:55Z",
+      "reason": "Kijiji redirected the exact ad to a confirmed removal",
+      "httpStatus": 200,
+      "sourceUrl": "https://www.kijiji.ca/v-heater-humidifier-dehumidifier/city-of-toronto/water-heater-tankless-water-heater-tankless-water-heater/1746146976",
+      "resolvedUrl": "https://www.kijiji.ca/b-heater-humidifier-dehumidifier/city-of-toronto/c692l1700273?radius=50.0&ll=43.65%2C-79.36&adRemoved=1746146976"
+    },
+    "kijiji.ca/v-driver-security-jobs/winnipeg/truck-driver-1a-mb-to-bc-dedicated-or-us/1745081631": {
+      "availability": "unavailable",
+      "checkedAt": "2026-11-19T21:16:55Z",
+      "reason": "Kijiji redirected the exact ad to a confirmed removal",
+      "httpStatus": 200,
+      "sourceUrl": "https://www.kijiji.ca/v-driver-security-jobs/winnipeg/truck-driver-1a-mb-to-bc-dedicated-or-us/1745081631",
+      "resolvedUrl": "https://www.kijiji.ca/b-driver-security-jobs/winnipeg/c148l1700192?radius=50.0&ll=49.94852%2C-97.19305&adRemoved=1745081631"
+    },
+    "kijiji.ca/v-short-term-rental/city-of-toronto/short-term-room-north-york/1746270650": {
+      "availability": "unavailable",
+      "checkedAt": "2026-11-19T21:16:55Z",
+      "reason": "Kijiji redirected the exact ad to a confirmed removal",
+      "httpStatus": 200,
+      "sourceUrl": "https://www.kijiji.ca/v-short-term-rental/city-of-toronto/short-term-room-north-york/1746270650",
+      "resolvedUrl": "https://www.kijiji.ca/b-short-term-rental/city-of-toronto/c42l1700273?radius=50.0&ll=43.79%2C-79.33&adRemoved=1746270650"
+    },
+    "kijiji.ca/v-classes-lessons/city-of-toronto/road-test-asap-g2-g-booking-driving-lessons/1746138579": {
+      "availability": "unavailable",
+      "checkedAt": "2026-11-19T21:16:55Z",
+      "reason": "Kijiji redirected the exact ad to a confirmed removal",
+      "httpStatus": 200,
+      "sourceUrl": "https://www.kijiji.ca/v-classes-lessons/city-of-toronto/road-test-asap-g2-g-booking-driving-lessons/1746138579",
+      "resolvedUrl": "https://www.kijiji.ca/b-classes-lessons/city-of-toronto/c4l1700273?radius=50.0&ll=43.71%2C-79.27&adRemoved=1746138579"
+    },
+    "kijiji.ca/v-apartments-condos/ville-de-montreal/appartement-3-1-2-a-louer/1745005921": {
+      "availability": "unavailable",
+      "checkedAt": "2026-11-19T21:16:55Z",
+      "reason": "Kijiji redirected the exact ad to a confirmed removal",
+      "httpStatus": 200,
+      "sourceUrl": "https://www.kijiji.ca/v-apartments-condos/ville-de-montreal/appartement-3-1-2-a-louer/1745005921",
+      "resolvedUrl": "https://www.kijiji.ca/b-appartement-condo/ville-de-montreal/c37l1700281?radius=50.0&ll=45.55%2C-73.55&adRemoved=1745005921"
+    },
+    "kijiji.ca/v-room-rental-roommate/hamilton/rooms-by-mohawk-college/1746074404": {
+      "availability": "unavailable",
+      "checkedAt": "2026-11-19T21:16:55Z",
+      "reason": "Kijiji redirected the exact ad to a confirmed removal",
+      "httpStatus": 200,
+      "sourceUrl": "https://www.kijiji.ca/v-room-rental-roommate/hamilton/rooms-by-mohawk-college/1746074404",
+      "resolvedUrl": "https://www.kijiji.ca/b-room-rental-roommate/hamilton/c36l80014?radius=50.0&ll=43.23596%2C-79.88355&adRemoved=1746074404"
+    },
+    "craigslist.org/view/d/new-york-no-fee-the-best-st-marks-place/nnb83n9nrofex4hqdjzq4m": {
+      "availability": "gone",
+      "checkedAt": "2026-11-19T21:16:55Z",
+      "reason": "Exact source URL returned HTTP 410",
+      "httpStatus": 410,
+      "sourceUrl": "https://www.craigslist.org/view/d/new-york-no-fee-the-best-st-marks-place/nnB83N9NroFEX4hqDJzq4m",
+      "resolvedUrl": "https://www.craigslist.org/view/d/new-york-no-fee-the-best-st-marks-place/nnB83N9NroFEX4hqDJzq4m"
+    },
+    "kijiji.ca/v-refrigerator-fridge/city-of-toronto/fridges-stoves-washer-dryer-dishwasher-air-conditioners-heaters/1746145719": {
+      "availability": "unavailable",
+      "checkedAt": "2026-11-19T21:16:55Z",
+      "reason": "Kijiji redirected the exact ad to a confirmed removal",
+      "httpStatus": 200,
+      "sourceUrl": "https://www.kijiji.ca/v-refrigerator-fridge/city-of-toronto/fridges-stoves-washer-dryer-dishwasher-air-conditioners-heaters/1746145719",
+      "resolvedUrl": "https://www.kijiji.ca/b-refrigerator-fridge/city-of-toronto/c696l1700273?radius=50.0&ll=43.75845%2C-79.27727&adRemoved=1746145719"
+    },
+    "kijiji.ca/v-power-tool/ville-de-montreal/batterie-dewalt/1745083193": {
+      "availability": "unavailable",
+      "checkedAt": "2026-11-19T21:16:55Z",
+      "reason": "Kijiji redirected the exact ad to a confirmed removal",
+      "httpStatus": 200,
+      "sourceUrl": "https://www.kijiji.ca/v-power-tool/ville-de-montreal/batterie-dewalt/1745083193",
+      "resolvedUrl": "https://www.kijiji.ca/b-outils-electriques/ville-de-montreal/c703l1700281?radius=50.0&ll=45.62%2C-73.63&adRemoved=1745083193"
+    },
+    "kijiji.ca/v-power-tool/ville-de-montreal/batterie-milwaukee/1745083472": {
+      "availability": "unavailable",
+      "checkedAt": "2026-11-19T21:16:55Z",
+      "reason": "Kijiji redirected the exact ad to a confirmed removal",
+      "httpStatus": 200,
+      "sourceUrl": "https://www.kijiji.ca/v-power-tool/ville-de-montreal/batterie-milwaukee/1745083472",
+      "resolvedUrl": "https://www.kijiji.ca/b-outils-electriques/ville-de-montreal/c703l1700281?radius=50.0&ll=45.62%2C-73.63&adRemoved=1745083472"
+    },
+    "kijiji.ca/v-cars-trucks/city-of-toronto/2009-volkswagen-routan-se-only-159-000-kms-1-owner/1742404783": {
+      "availability": "unavailable",
+      "checkedAt": "2026-11-19T21:16:55Z",
+      "reason": "Kijiji redirected the exact ad to a confirmed removal",
+      "httpStatus": 200,
+      "sourceUrl": "https://www.kijiji.ca/v-cars-trucks/city-of-toronto/2009-volkswagen-routan-se-only-159-000-kms-1-owner/1742404783",
+      "resolvedUrl": "https://www.kijiji.ca/b-cars-trucks/city-of-toronto/c174l1700273?adRemoved=1742404783&ll=43.6693972%2C-79.4863831&radius=150.0&rb=50"
+    },
+    "kijiji.ca/v-buy-sell-desks/mississauga-peel-region/refresh-teknion-wall-system-ufficio-furniture-call-now/1746143421": {
+      "availability": "unavailable",
+      "checkedAt": "2026-11-19T21:16:55Z",
+      "reason": "Kijiji redirected the exact ad to a confirmed removal",
+      "httpStatus": 200,
+      "sourceUrl": "https://www.kijiji.ca/v-buy-sell-desks/mississauga-peel-region/refresh-teknion-wall-system-ufficio-furniture-call-now/1746143421",
+      "resolvedUrl": "https://www.kijiji.ca/b-buy-sell-desks/mississauga-peel-region/c239l1700276?radius=50.0&ll=43.66%2C-79.66&adRemoved=1746143421"
+    },
+    "kijiji.ca/v-heater-humidifier-dehumidifier/city-of-toronto/water-heater-tankless-water-heater-tankless-water-heater/1746146790": {
+      "availability": "unavailable",
+      "checkedAt": "2026-11-19T21:16:55Z",
+      "reason": "Kijiji redirected the exact ad to a confirmed removal",
+      "httpStatus": 200,
+      "sourceUrl": "https://www.kijiji.ca/v-heater-humidifier-dehumidifier/city-of-toronto/water-heater-tankless-water-heater-tankless-water-heater/1746146790",
+      "resolvedUrl": "https://www.kijiji.ca/b-heater-humidifier-dehumidifier/city-of-toronto/c692l1700273?radius=50.0&ll=43.65%2C-79.38&adRemoved=1746146790"
+    },
+    "kijiji.ca/v-short-term-rental/city-of-toronto/clean-quiet-main-flr-of-a-home-to-share-in-scarboro-no-drinking/1746293740": {
+      "availability": "unavailable",
+      "checkedAt": "2026-11-19T21:16:55Z",
+      "reason": "Kijiji redirected the exact ad to a confirmed removal",
+      "httpStatus": 200,
+      "sourceUrl": "https://www.kijiji.ca/v-short-term-rental/city-of-toronto/clean-quiet-main-flr-of-a-home-to-share-in-scarboro-no-drinking/1746293740",
+      "resolvedUrl": "https://www.kijiji.ca/b-short-term-rental/city-of-toronto/c42l1700273?radius=50.0&ll=43.76%2C-79.19&adRemoved=1746293740"
+    },
+    "kijiji.ca/v-cars-trucks/hamilton/2009-honda-cr-v-certified/1746312067": {
+      "availability": "unavailable",
+      "checkedAt": "2026-11-19T21:16:55Z",
+      "reason": "Kijiji redirected the exact ad to a confirmed removal",
+      "httpStatus": 200,
+      "sourceUrl": "https://www.kijiji.ca/v-cars-trucks/hamilton/2009-honda-cr-v-certified/1746312067",
+      "resolvedUrl": "https://www.kijiji.ca/b-cars-trucks/hamilton/c174l80014?adRemoved=1746312067&ll=43.11%2C-79.55&radius=150.0&rb=50"
+    },
+    "kijiji.ca/v-other-auto-parts-and-accessories/hamilton/solid-fold-tonneau-cover/1746152178": {
+      "availability": "unavailable",
+      "checkedAt": "2026-11-19T21:16:55Z",
+      "reason": "Kijiji redirected the exact ad to a confirmed removal",
+      "httpStatus": 200,
+      "sourceUrl": "https://www.kijiji.ca/v-other-auto-parts-and-accessories/hamilton/solid-fold-tonneau-cover/1746152178",
+      "resolvedUrl": "https://www.kijiji.ca/b-other-auto-parts-and-accessories/hamilton/c321l80014?adRemoved=1746152178&ll=43.23%2C-79.77&radius=150.0&rb=50"
+    },
+    "kijiji.ca/v-other-auto-parts-and-accessories/hamilton/all-season-car-mats-for-sale/1746303852": {
+      "availability": "unavailable",
+      "checkedAt": "2026-11-19T21:16:55Z",
+      "reason": "Kijiji redirected the exact ad to a confirmed removal",
+      "httpStatus": 200,
+      "sourceUrl": "https://www.kijiji.ca/v-other-auto-parts-and-accessories/hamilton/all-season-car-mats-for-sale/1746303852",
+      "resolvedUrl": "https://www.kijiji.ca/b-other-auto-parts-and-accessories/hamilton/c321l80014?adRemoved=1746303852&ll=43.25%2C-79.87&radius=150.0&rb=50"
+    },
+    "kijiji.ca/v-room-rental-roommate/city-of-toronto/private-furnished-room-rent-january-1st-rent-800/1746181018": {
+      "availability": "unavailable",
+      "checkedAt": "2026-11-19T21:16:55Z",
+      "reason": "Kijiji redirected the exact ad to a confirmed removal",
+      "httpStatus": 200,
+      "sourceUrl": "https://www.kijiji.ca/v-room-rental-roommate/city-of-toronto/private-furnished-room-rent-january-1st-rent-800/1746181018",
+      "resolvedUrl": "https://www.kijiji.ca/b-room-rental-roommate/city-of-toronto/c36l1700273?radius=50.0&ll=43.78%2C-79.19&adRemoved=1746181018"
+    },
+    "kijiji.ca/v-cars-trucks/cambridge/2019-ford-f-150-xlt-sport-4wd-supercrew-5-5-box-2-7l-6cyl-as-is/1744533401": {
+      "availability": "unavailable",
+      "checkedAt": "2026-11-19T21:16:55Z",
+      "reason": "Kijiji redirected the exact ad to a confirmed removal",
+      "httpStatus": 200,
+      "sourceUrl": "https://www.kijiji.ca/v-cars-trucks/cambridge/2019-ford-f-150-xlt-sport-4wd-supercrew-5-5-box-2-7l-6cyl-as-is/1744533401",
+      "resolvedUrl": "https://www.kijiji.ca/b-cars-trucks/cambridge/c174l1700210?adRemoved=1744533401&ll=43.4071323%2C-80.3936559&radius=150.0&rb=50"
+    },
+    "kijiji.ca/v-general-electronics/city-of-toronto/most-stable-ip-tv-for-all-devices/1746165578": {
+      "availability": "unavailable",
+      "checkedAt": "2026-11-19T21:16:55Z",
+      "reason": "Kijiji redirected the exact ad to a confirmed removal",
+      "httpStatus": 200,
+      "sourceUrl": "https://www.kijiji.ca/v-general-electronics/city-of-toronto/most-stable-ip-tv-for-all-devices/1746165578",
+      "resolvedUrl": "https://www.kijiji.ca/b-general-electronics/city-of-toronto/c15l1700273?radius=50.0&ll=43.66%2C-79.4&adRemoved=1746165578"
+    },
+    "craigslist.org/view/d/fort-pierce-ford-250-xl-long-bed-4x4/7aeccfw6zwnchpvpotdwdf": {
+      "availability": "gone",
+      "checkedAt": "2026-11-19T21:16:55Z",
+      "reason": "Exact source URL returned HTTP 410",
+      "httpStatus": 410,
+      "sourceUrl": "https://www.craigslist.org/view/d/fort-pierce-ford-250-xl-long-bed-4x4/7aeCCfw6zWncHPvPotdWDF",
+      "resolvedUrl": "https://www.craigslist.org/view/d/fort-pierce-ford-250-xl-long-bed-4x4/7aeCCfw6zWncHPvPotdWDF"
+    },
+    "kijiji.ca/v-tires-rims/city-of-toronto/235-40-18-pirelli-winter-2-pair-90-tread/1746323532": {
+      "availability": "unavailable",
+      "checkedAt": "2026-11-19T21:16:55Z",
+      "reason": "Kijiji redirected the exact ad to a confirmed removal",
+      "httpStatus": 200,
+      "sourceUrl": "https://www.kijiji.ca/v-tires-rims/city-of-toronto/235-40-18-pirelli-winter-2-pair-90-tread/1746323532",
+      "resolvedUrl": "https://www.kijiji.ca/b-tires-rims/city-of-toronto/c320l1700273?adRemoved=1746323532&ll=43.81%2C-79.19&radius=150.0&rb=50"
+    },
+    "kijiji.ca/v-other-auto-parts-and-accessories/hamilton/all-season-car-mats-for-sale/1746166750": {
+      "availability": "unavailable",
+      "checkedAt": "2026-11-19T21:16:55Z",
+      "reason": "Kijiji redirected the exact ad to a confirmed removal",
+      "httpStatus": 200,
+      "sourceUrl": "https://www.kijiji.ca/v-other-auto-parts-and-accessories/hamilton/all-season-car-mats-for-sale/1746166750",
+      "resolvedUrl": "https://www.kijiji.ca/b-other-auto-parts-and-accessories/hamilton/c321l80014?adRemoved=1746166750&ll=43.25%2C-79.87&radius=150.0&rb=50"
+    },
+    "kijiji.ca/v-room-rental-roommate/city-of-toronto/spacious-room-for-rent-north-york/1746270672": {
+      "availability": "unavailable",
+      "checkedAt": "2026-11-19T21:16:55Z",
+      "reason": "Kijiji redirected the exact ad to a confirmed removal",
+      "httpStatus": 200,
+      "sourceUrl": "https://www.kijiji.ca/v-room-rental-roommate/city-of-toronto/spacious-room-for-rent-north-york/1746270672",
+      "resolvedUrl": "https://www.kijiji.ca/b-room-rental-roommate/city-of-toronto/c36l1700273?radius=50.0&ll=43.79%2C-79.33&adRemoved=1746270672"
+    },
+    "kijiji.ca/v-tires-rims/city-of-toronto/winter-tires-michelin-x-ice-215-60r16/1746212549": {
+      "availability": "unavailable",
+      "checkedAt": "2026-11-19T21:16:55Z",
+      "reason": "Kijiji redirected the exact ad to a confirmed removal",
+      "httpStatus": 200,
+      "sourceUrl": "https://www.kijiji.ca/v-tires-rims/city-of-toronto/winter-tires-michelin-x-ice-215-60r16/1746212549",
+      "resolvedUrl": "https://www.kijiji.ca/b-tires-rims/city-of-toronto/c320l1700273?adRemoved=1746212549&ll=43.79%2C-79.35&radius=150.0&rb=50"
+    },
+    "kijiji.ca/v-general-electronics/city-of-toronto/4k-ip-tv-for-firetv-formuler-buzz-tv-android/1746165487": {
+      "availability": "unavailable",
+      "checkedAt": "2026-11-19T21:16:55Z",
+      "reason": "Kijiji redirected the exact ad to a confirmed removal",
+      "httpStatus": 200,
+      "sourceUrl": "https://www.kijiji.ca/v-general-electronics/city-of-toronto/4k-ip-tv-for-firetv-formuler-buzz-tv-android/1746165487",
+      "resolvedUrl": "https://www.kijiji.ca/b-general-electronics/city-of-toronto/c15l1700273?radius=50.0&ll=43.66%2C-79.4&adRemoved=1746165487"
+    },
+    "kijiji.ca/v-general-electronics/city-of-toronto/family-entertainment-setup/1746270813": {
+      "availability": "unavailable",
+      "checkedAt": "2026-11-19T21:16:55Z",
+      "reason": "Kijiji redirected the exact ad to a confirmed removal",
+      "httpStatus": 200,
+      "sourceUrl": "https://www.kijiji.ca/v-general-electronics/city-of-toronto/family-entertainment-setup/1746270813",
+      "resolvedUrl": "https://www.kijiji.ca/b-general-electronics/city-of-toronto/c15l1700273?radius=50.0&ll=43.64%2C-79.39&adRemoved=1746270813"
+    },
+    "kijiji.ca/v-construction-trades-jobs/city-of-toronto/local-painter-gta/1746145307": {
+      "availability": "unavailable",
+      "checkedAt": "2026-11-19T21:16:55Z",
+      "reason": "Kijiji redirected the exact ad to a confirmed removal",
+      "httpStatus": 200,
+      "sourceUrl": "https://www.kijiji.ca/v-construction-trades-jobs/city-of-toronto/local-painter-gta/1746145307",
+      "resolvedUrl": "https://www.kijiji.ca/b-construction-trades-jobs/city-of-toronto/c50l1700273?radius=50.0&ll=43.67761%2C-79.46463&adRemoved=1746145307"
+    },
+    "craigslist.org/view/d/new-york-no-fee-live-in-comfort/texby6lfjtg9p4cjkx58s4": {
+      "availability": "gone",
+      "checkedAt": "2026-11-19T21:16:55Z",
+      "reason": "Exact source URL returned HTTP 410",
+      "httpStatus": 410,
+      "sourceUrl": "https://www.craigslist.org/view/d/new-york-no-fee-live-in-comfort/texBY6LfJTg9p4cjkX58s4",
+      "resolvedUrl": "https://www.craigslist.org/view/d/new-york-no-fee-live-in-comfort/texBY6LfJTg9p4cjkX58s4"
+    },
+    "kijiji.ca/v-tires-rims/hamilton/235-55r18-michelin-x-ice-winter-tires/1746313295": {
+      "availability": "unavailable",
+      "checkedAt": "2026-11-19T21:16:55Z",
+      "reason": "Kijiji redirected the exact ad to a confirmed removal",
+      "httpStatus": 200,
+      "sourceUrl": "https://www.kijiji.ca/v-tires-rims/hamilton/235-55r18-michelin-x-ice-winter-tires/1746313295",
+      "resolvedUrl": "https://www.kijiji.ca/b-tires-rims/hamilton/c320l80014?adRemoved=1746313295&ll=43.23%2C-79.8&radius=150.0&rb=50"
+    },
+    "kijiji.ca/v-rideshare-carpool/city-of-toronto/toronto-to-windsor-everyday-rideshare/1745008890": {
+      "availability": "unavailable",
+      "checkedAt": "2026-11-19T21:16:55Z",
+      "reason": "Kijiji redirected the exact ad to a confirmed removal",
+      "httpStatus": 307,
+      "sourceUrl": "https://www.kijiji.ca/v-rideshare-carpool/city-of-toronto/toronto-to-windsor-everyday-rideshare/1745008890",
+      "resolvedUrl": "https://www.kijiji.ca/b-rideshare-carpool/city-of-toronto/c5l1700273?radius=50.0&ll=43.72%2C-79.46&adRemoved=1745008890"
+    },
+    "kijiji.ca/v-cars-trucks/city-of-toronto/2015-toyota-camry-4-cylinder-hybrid-car-for-sale/1746242093": {
+      "availability": "unavailable",
+      "checkedAt": "2026-11-19T21:16:55Z",
+      "reason": "Kijiji redirected the exact ad to a confirmed removal",
+      "httpStatus": 200,
+      "sourceUrl": "https://www.kijiji.ca/v-cars-trucks/city-of-toronto/2015-toyota-camry-4-cylinder-hybrid-car-for-sale/1746242093",
+      "resolvedUrl": "https://www.kijiji.ca/b-cars-trucks/city-of-toronto/c174l1700273?adRemoved=1746242093&ll=43.71%2C-79.26&radius=150.0&rb=50"
+    },
+    "kijiji.ca/v-cars-trucks/hamilton/2014-bmw-x1-xdrive35i-just-in-for-sale-at-pic-n-save/1745087066": {
+      "availability": "unavailable",
+      "checkedAt": "2026-11-19T21:16:55Z",
+      "reason": "Kijiji redirected the exact ad to a confirmed removal",
+      "httpStatus": 200,
+      "sourceUrl": "https://www.kijiji.ca/v-cars-trucks/hamilton/2014-bmw-x1-xdrive35i-just-in-for-sale-at-pic-n-save/1745087066",
+      "resolvedUrl": "https://www.kijiji.ca/b-cars-trucks/hamilton/c174l80014?adRemoved=1745087066&ll=43.229357%2C-79.6958116&radius=150.0&rb=50"
+    },
+    "kijiji.ca/v-apartments-condos/ville-de-montreal/loft-3-1-2-1-chambre-a-louer-for-rent-hochelaga-maisonneuve/1744909677": {
+      "availability": "unavailable",
+      "checkedAt": "2026-11-19T21:16:55Z",
+      "reason": "Kijiji redirected the exact ad to a confirmed removal",
+      "httpStatus": 200,
+      "sourceUrl": "https://www.kijiji.ca/v-apartments-condos/ville-de-montreal/loft-3-1-2-1-chambre-a-louer-for-rent-hochelaga-maisonneuve/1744909677",
+      "resolvedUrl": "https://www.kijiji.ca/b-appartement-condo/ville-de-montreal/c37l1700281?radius=50.0&ll=45.54844%2C-73.54208&adRemoved=1744909677"
+    },
+    "kijiji.ca/v-tires-rims/hamilton/michelin-defender-all-season-215-60-16/1746181163": {
+      "availability": "unavailable",
+      "checkedAt": "2026-11-19T21:16:55Z",
+      "reason": "Kijiji redirected the exact ad to a confirmed removal",
+      "httpStatus": 200,
+      "sourceUrl": "https://www.kijiji.ca/v-tires-rims/hamilton/michelin-defender-all-season-215-60-16/1746181163",
+      "resolvedUrl": "https://www.kijiji.ca/b-tires-rims/hamilton/c320l80014?adRemoved=1746181163&ll=43.23%2C-79.77&radius=150.0&rb=50"
+    },
+    "kijiji.ca/v-cars-trucks/winnipeg/2026-cadillac-ct5-sport/1739312152": {
+      "availability": "unavailable",
+      "checkedAt": "2026-11-19T21:16:55Z",
+      "reason": "Kijiji redirected the exact ad to a confirmed removal",
+      "httpStatus": 200,
+      "sourceUrl": "https://www.kijiji.ca/v-cars-trucks/winnipeg/2026-cadillac-ct5-sport/1739312152",
+      "resolvedUrl": "https://www.kijiji.ca/b-cars-trucks/winnipeg/c174l1700192?adRemoved=1739312152&ll=49.8130225%2C-97.1835639&radius=150.0&rb=50"
+    },
+    "kijiji.ca/v-rideshare-carpool/city-of-toronto/toronto-to-windsor-daily-ride-available/1745008903": {
+      "availability": "unavailable",
+      "checkedAt": "2026-11-19T21:16:55Z",
+      "reason": "Kijiji redirected the exact ad to a confirmed removal",
+      "httpStatus": 307,
+      "sourceUrl": "https://www.kijiji.ca/v-rideshare-carpool/city-of-toronto/toronto-to-windsor-daily-ride-available/1745008903",
+      "resolvedUrl": "https://www.kijiji.ca/b-rideshare-carpool/city-of-toronto/c5l1700273?radius=50.0&ll=43.72%2C-79.46&adRemoved=1745008903"
+    },
+    "kijiji.ca/v-cars-trucks/city-of-toronto/2013-ford-f-150-crew-cab-4x4-sold-pending/1743957083": {
+      "availability": "unavailable",
+      "checkedAt": "2026-11-19T21:16:55Z",
+      "reason": "Kijiji redirected the exact ad to a confirmed removal",
+      "httpStatus": 200,
+      "sourceUrl": "https://www.kijiji.ca/v-cars-trucks/city-of-toronto/2013-ford-f-150-crew-cab-4x4-sold-pending/1743957083",
+      "resolvedUrl": "https://www.kijiji.ca/b-cars-trucks/city-of-toronto/c174l1700273?adRemoved=1743957083&ll=43.692391%2C-79.2628222&radius=150.0&rb=50"
+    },
+    "kijiji.ca/v-room-rental-roommate/city-of-toronto/freshly-painted-large-furnished-room-downtown-toronto/1746251610": {
+      "availability": "unavailable",
+      "checkedAt": "2026-11-19T21:16:55Z",
+      "reason": "Kijiji redirected the exact ad to a confirmed removal",
+      "httpStatus": 200,
+      "sourceUrl": "https://www.kijiji.ca/v-room-rental-roommate/city-of-toronto/freshly-painted-large-furnished-room-downtown-toronto/1746251610",
+      "resolvedUrl": "https://www.kijiji.ca/b-room-rental-roommate/city-of-toronto/c36l1700273?radius=50.0&ll=43.73%2C-79.27&adRemoved=1746251610"
+    },
+    "kijiji.ca/v-general-electronics/hamilton/samsung-55-smart-tv-with-box-used/1746284748": {
+      "availability": "unavailable",
+      "checkedAt": "2026-11-19T21:16:55Z",
+      "reason": "Kijiji redirected the exact ad to a confirmed removal",
+      "httpStatus": 200,
+      "sourceUrl": "https://www.kijiji.ca/v-general-electronics/hamilton/samsung-55-smart-tv-with-box-used/1746284748",
+      "resolvedUrl": "https://www.kijiji.ca/b-general-electronics/hamilton/c15l80014?radius=50.0&ll=43.25628%2C-79.83491&adRemoved=1746284748"
+    },
+    "kijiji.ca/v-apartments-condos/city-of-toronto/beautiful-condo-with-1-bedroom-den-with-huge-terrace/1746212837": {
+      "availability": "unavailable",
+      "checkedAt": "2026-11-19T21:16:55Z",
+      "reason": "Kijiji redirected the exact ad to a confirmed removal",
+      "httpStatus": 200,
+      "sourceUrl": "https://www.kijiji.ca/v-apartments-condos/city-of-toronto/beautiful-condo-with-1-bedroom-den-with-huge-terrace/1746212837",
+      "resolvedUrl": "https://www.kijiji.ca/b-apartments-condos/city-of-toronto/c37l1700273?radius=50.0&ll=43.72%2C-79.6&adRemoved=1746212837"
+    },
+    "kijiji.ca/v-cars-trucks/markham-york-region/2025-buick-enclave-sport-touring-clear-out-event/1745767804": {
+      "availability": "unavailable",
+      "checkedAt": "2026-11-19T21:16:55Z",
+      "reason": "Kijiji redirected the exact ad to a confirmed removal",
+      "httpStatus": 200,
+      "sourceUrl": "https://www.kijiji.ca/v-cars-trucks/markham-york-region/2025-buick-enclave-sport-touring-clear-out-event/1745767804",
+      "resolvedUrl": "https://www.kijiji.ca/b-cars-trucks/markham-york-region/c174l1700274?adRemoved=1745767804&ll=44.06826239999999%2C-79.48655889999999&radius=150.0&rb=50"
+    },
+    "kijiji.ca/v-other-auto-parts-and-accessories/hamilton/all-season-car-mats-for-sale/1746260019": {
+      "availability": "unavailable",
+      "checkedAt": "2026-11-19T21:16:55Z",
+      "reason": "Kijiji redirected the exact ad to a confirmed removal",
+      "httpStatus": 200,
+      "sourceUrl": "https://www.kijiji.ca/v-other-auto-parts-and-accessories/hamilton/all-season-car-mats-for-sale/1746260019",
+      "resolvedUrl": "https://www.kijiji.ca/b-other-auto-parts-and-accessories/hamilton/c321l80014?adRemoved=1746260019&ll=43.25%2C-79.87&radius=150.0&rb=50"
+    },
+    "craigslist.org/view/d/staten-island-21-br-bathroom-1st-fl-2350/wgjdnqkex18odqwvomsgde": {
+      "availability": "gone",
+      "checkedAt": "2026-11-19T21:16:55Z",
+      "reason": "Exact source URL returned HTTP 410",
+      "httpStatus": 410,
+      "sourceUrl": "https://www.craigslist.org/view/d/staten-island-21-br-bathroom-1st-fl-2350/wGJDNQkeX18oDqwVoMSGDE",
+      "resolvedUrl": "https://www.craigslist.org/view/d/staten-island-21-br-bathroom-1st-fl-2350/wGJDNQkeX18oDqwVoMSGDE"
+    },
+    "craigslist.org/view/d/east-elmhurst-cuarto-disponible-room/fw4y3cs1fmna4vxay2qmfs": {
+      "availability": "gone",
+      "checkedAt": "2026-11-19T21:16:55Z",
+      "reason": "Exact source URL returned HTTP 410",
+      "httpStatus": 410,
+      "sourceUrl": "https://www.craigslist.org/view/d/east-elmhurst-cuarto-disponible-room/fW4Y3cS1FMna4vxaY2qMFS",
+      "resolvedUrl": "https://www.craigslist.org/view/d/east-elmhurst-cuarto-disponible-room/fW4Y3cS1FMna4vxaY2qMFS"
+    },
+    "craigslist.org/view/d/hollis-clean-cozy-duplex-style-studio/sx5tm7ws2lafexxscuz8a2": {
+      "availability": "gone",
+      "checkedAt": "2026-11-19T21:16:55Z",
+      "reason": "Exact source URL returned HTTP 410",
+      "httpStatus": 410,
+      "sourceUrl": "https://www.craigslist.org/view/d/hollis-clean-cozy-duplex-style-studio/sX5tM7WS2LaFeXxScUz8A2",
+      "resolvedUrl": "https://www.craigslist.org/view/d/hollis-clean-cozy-duplex-style-studio/sX5tM7WS2LaFeXxScUz8A2"
+    },
+    "craigslist.org/view/d/new-york-no-fee-mint-union-square-3br/s5brqdzwvnlqadr37myblw": {
+      "availability": "gone",
+      "checkedAt": "2026-11-19T21:16:55Z",
+      "reason": "Exact source URL returned HTTP 410",
+      "httpStatus": 410,
+      "sourceUrl": "https://www.craigslist.org/view/d/new-york-no-fee-mint-union-square-3br/s5brqDzWvnLqadR37mYbLW",
+      "resolvedUrl": "https://www.craigslist.org/view/d/new-york-no-fee-mint-union-square-3br/s5brqDzWvnLqadR37mYbLW"
+    },
+    "craigslist.org/view/d/brooklyn-fort-greene-oasis-private/bdf9ekd58ihetrzhbjuojx": {
+      "availability": "gone",
+      "checkedAt": "2026-11-19T21:16:55Z",
+      "reason": "Exact source URL returned HTTP 410",
+      "httpStatus": 410,
+      "sourceUrl": "https://www.craigslist.org/view/d/brooklyn-fort-greene-oasis-private/bdf9eKD58iHEtrZHBjUojX",
+      "resolvedUrl": "https://www.craigslist.org/view/d/brooklyn-fort-greene-oasis-private/bdf9eKD58iHEtrZHBjUojX"
+    },
+    "kijiji.ca/v-cars-trucks/windsor-area-on/2022-ford-f-150-lariat-5-0l-v8-fx4-off-road-package-twin/1743984896": {
+      "availability": "unavailable",
+      "checkedAt": "2026-11-19T21:16:55Z",
+      "reason": "Kijiji redirected the exact ad to a confirmed removal",
+      "httpStatus": 200,
+      "sourceUrl": "https://www.kijiji.ca/v-cars-trucks/windsor-area-on/2022-ford-f-150-lariat-5-0l-v8-fx4-off-road-package-twin/1743984896",
+      "resolvedUrl": "https://www.kijiji.ca/b-cars-trucks/windsor-area-on/c174l1700220?adRemoved=1743984896&ll=42.3106487%2C-82.94713089999999&radius=150.0&rb=50"
+    },
+    "kijiji.ca/v-stove-oven-range/hamilton/can-deliver-kenmore-30-white-electric-ceramic-top-stove-oven/1746205198": {
+      "availability": "unavailable",
+      "checkedAt": "2026-11-19T21:16:55Z",
+      "reason": "Kijiji redirected the exact ad to a confirmed removal",
+      "httpStatus": 200,
+      "sourceUrl": "https://www.kijiji.ca/v-stove-oven-range/hamilton/can-deliver-kenmore-30-white-electric-ceramic-top-stove-oven/1746205198",
+      "resolvedUrl": "https://www.kijiji.ca/b-stove-oven-range/hamilton/c697l80014?radius=50.0&ll=43.25769%2C-79.84019&adRemoved=1746205198"
+    },
+    "craigslist.org/view/d/brooklyn-double-entry-full-floor/nh1_jtbm8rgnapzcu-xqoq": {
+      "availability": "gone",
+      "checkedAt": "2026-11-19T21:16:55Z",
+      "reason": "Exact source URL returned HTTP 410",
+      "httpStatus": 410,
+      "sourceUrl": "https://www.craigslist.org/view/d/brooklyn-double-entry-full-floor/nh1_jTbM8RGnaPzcU-XqOQ",
+      "resolvedUrl": "https://www.craigslist.org/view/d/brooklyn-double-entry-full-floor/nh1_jTbM8RGnaPzcU-XqOQ"
+    },
+    "craigslist.org/view/d/copiague-2016-nissan-altima-25-4dr-sedan/af486bzm8rghiyzj5mhkkw": {
+      "availability": "gone",
+      "checkedAt": "2026-11-19T21:16:55Z",
+      "reason": "Exact source URL returned HTTP 410",
+      "httpStatus": 410,
+      "sourceUrl": "https://www.craigslist.org/view/d/copiague-2016-nissan-altima-25-4dr-sedan/AF486BzM8RGhiYzJ5MHkKw",
+      "resolvedUrl": "https://www.craigslist.org/view/d/copiague-2016-nissan-altima-25-4dr-sedan/AF486BzM8RGhiYzJ5MHkKw"
+    },
+    "craigslist.org/view/d/copiague-2014-volkswagen-jetta-tdi/7k9m7hzm8rgluaeqtrq_wq": {
+      "availability": "gone",
+      "checkedAt": "2026-11-19T21:16:55Z",
+      "reason": "Exact source URL returned HTTP 410",
+      "httpStatus": 410,
+      "sourceUrl": "https://www.craigslist.org/view/d/copiague-2014-volkswagen-jetta-tdi/7k9M7hzM8RGLuaeqtrQ_wQ",
+      "resolvedUrl": "https://www.craigslist.org/view/d/copiague-2014-volkswagen-jetta-tdi/7k9M7hzM8RGLuaeqtrQ_wQ"
+    },
+    "craigslist.org/view/d/copiague-2011-bmw-series-535i-xdrive/iul58xzm8rg35ecd5makya": {
+      "availability": "gone",
+      "checkedAt": "2026-11-19T21:16:55Z",
+      "reason": "Exact source URL returned HTTP 410",
+      "httpStatus": 410,
+      "sourceUrl": "https://www.craigslist.org/view/d/copiague-2011-bmw-series-535i-xdrive/iuL58xzM8RG35ecd5mAKyA",
+      "resolvedUrl": "https://www.craigslist.org/view/d/copiague-2011-bmw-series-535i-xdrive/iuL58xzM8RG35ecd5mAKyA"
+    },
+    "craigslist.org/view/d/copiague-2013-audi-q5-20t-quattro/sns79hzm8rgte6udmk3o6q": {
+      "availability": "gone",
+      "checkedAt": "2026-11-19T21:16:55Z",
+      "reason": "Exact source URL returned HTTP 410",
+      "httpStatus": 410,
+      "sourceUrl": "https://www.craigslist.org/view/d/copiague-2013-audi-q5-20t-quattro/sNS79hzM8RGte6Udmk3O6Q",
+      "resolvedUrl": "https://www.craigslist.org/view/d/copiague-2013-audi-q5-20t-quattro/sNS79hzM8RGte6Udmk3O6Q"
+    },
+    "craigslist.org/view/d/copiague-2017-nissan-sentra-4dr-sedan/rc5iax3m8rgdbyjt3bf5rg": {
+      "availability": "gone",
+      "checkedAt": "2026-11-19T21:16:55Z",
+      "reason": "Exact source URL returned HTTP 410",
+      "httpStatus": 410,
+      "sourceUrl": "https://www.craigslist.org/view/d/copiague-2017-nissan-sentra-4dr-sedan/RC5iAx3M8RGDbYjt3bF5Rg",
+      "resolvedUrl": "https://www.craigslist.org/view/d/copiague-2017-nissan-sentra-4dr-sedan/RC5iAx3M8RGDbYjt3bF5Rg"
+    },
+    "craigslist.org/view/d/copiague-2018-chevrolet-traverse-lt/nechax3m8rgbn_2f3y6w9g": {
+      "availability": "gone",
+      "checkedAt": "2026-11-19T21:16:55Z",
+      "reason": "Exact source URL returned HTTP 410",
+      "httpStatus": 410,
+      "sourceUrl": "https://www.craigslist.org/view/d/copiague-2018-chevrolet-traverse-lt/NEChAx3M8RGBN_2F3y6w9g",
+      "resolvedUrl": "https://www.craigslist.org/view/d/copiague-2018-chevrolet-traverse-lt/NEChAx3M8RGBN_2F3y6w9g"
+    },
+    "craigslist.org/view/d/cumming-2026-nissan-murano-awd-suv/jfyc0c_m8rgnj9bfm5hdmq": {
+      "availability": "gone",
+      "checkedAt": "2026-11-19T21:16:55Z",
+      "reason": "Exact source URL returned HTTP 410",
+      "httpStatus": 410,
+      "sourceUrl": "https://www.craigslist.org/view/d/cumming-2026-nissan-murano-awd-suv/JFyc0C_M8RGnj9BfM5HdmQ",
+      "resolvedUrl": "https://www.craigslist.org/view/d/cumming-2026-nissan-murano-awd-suv/JFyc0C_M8RGnj9BfM5HdmQ"
+    },
+    "craigslist.org/view/d/cumming-2024-mercedes-benz-glb-fwd-suv/pq4qhthm8rgyh4eejk1cva": {
+      "availability": "gone",
+      "checkedAt": "2026-11-19T21:16:55Z",
+      "reason": "Exact source URL returned HTTP 410",
+      "httpStatus": 410,
+      "sourceUrl": "https://www.craigslist.org/view/d/cumming-2024-mercedes-benz-glb-fwd-suv/Pq4QhTHM8RGyH4EeJK1CVA",
+      "resolvedUrl": "https://www.craigslist.org/view/d/cumming-2024-mercedes-benz-glb-fwd-suv/Pq4QhTHM8RGyH4EeJK1CVA"
+    },
+    "craigslist.org/view/d/houston-2015-chevrolet-tahoe-ltz-in/6drmhcdasrtpe1tjb9sql6": {
+      "availability": "gone",
+      "checkedAt": "2026-11-19T21:16:55Z",
+      "reason": "Exact source URL returned HTTP 410",
+      "httpStatus": 410,
+      "sourceUrl": "https://www.craigslist.org/view/d/houston-2015-chevrolet-tahoe-ltz-in/6dRmHcDaSRTPe1tJB9sQL6",
+      "resolvedUrl": "https://www.craigslist.org/view/d/houston-2015-chevrolet-tahoe-ltz-in/6dRmHcDaSRTPe1tJB9sQL6"
+    },
+    "craigslist.org/view/d/georgetown-2017-ford-250-lariat-4x4/v57fzvrfdjdwcpc9bcuqxu": {
+      "availability": "gone",
+      "checkedAt": "2026-11-19T21:16:55Z",
+      "reason": "Exact source URL returned HTTP 410",
+      "httpStatus": 410,
+      "sourceUrl": "https://www.craigslist.org/view/d/georgetown-2017-ford-250-lariat-4x4/v57fzVRFDJdWCPc9BcUqxU",
+      "resolvedUrl": "https://www.craigslist.org/view/d/georgetown-2017-ford-250-lariat-4x4/v57fzVRFDJdWCPc9BcUqxU"
+    },
+    "craigslist.org/view/d/adkins-2007-international-bucket-truck/bg7ubjw1pbdwxogqzwfipp": {
+      "availability": "gone",
+      "checkedAt": "2026-11-19T21:16:55Z",
+      "reason": "Exact source URL returned HTTP 410",
+      "httpStatus": 410,
+      "sourceUrl": "https://www.craigslist.org/view/d/adkins-2007-international-bucket-truck/bG7UBJW1pBDWxogqzwFipP",
+      "resolvedUrl": "https://www.craigslist.org/view/d/adkins-2007-international-bucket-truck/bG7UBJW1pBDWxogqzwFipP"
+    },
+    "kijiji.ca/v-stove-oven-range/hamilton/frigidaire-30-white-gas-stove-oven-range-can-deliver/1746205238": {
+      "availability": "unavailable",
+      "checkedAt": "2026-11-19T21:16:55Z",
+      "reason": "Kijiji redirected the exact ad to a confirmed removal",
+      "httpStatus": 200,
+      "sourceUrl": "https://www.kijiji.ca/v-stove-oven-range/hamilton/frigidaire-30-white-gas-stove-oven-range-can-deliver/1746205238",
+      "resolvedUrl": "https://www.kijiji.ca/b-stove-oven-range/hamilton/c697l80014?radius=50.0&ll=43.25769%2C-79.84019&adRemoved=1746205238"
+    },
+    "kijiji.ca/v-general-electronics/edmonton/1-000-tenergy-3-7v-2200mah-lipo-batteries-new-bare-cells/1743184058": {
+      "availability": "unavailable",
+      "checkedAt": "2026-11-19T21:16:55Z",
+      "reason": "Kijiji redirected the exact ad to a confirmed removal",
+      "httpStatus": 200,
+      "sourceUrl": "https://www.kijiji.ca/v-general-electronics/edmonton/1-000-tenergy-3-7v-2200mah-lipo-batteries-new-bare-cells/1743184058",
+      "resolvedUrl": "https://www.kijiji.ca/b-general-electronics/edmonton/c15l1700203?radius=50.0&ll=53.51072%2C-113.59011&adRemoved=1743184058"
+    },
+    "kijiji.ca/v-general-electronics/edmonton/10-tenergy-3-7v-2200mah-lipo-batteries-new-bare-cells-2-0/1743184185": {
+      "availability": "unavailable",
+      "checkedAt": "2026-11-19T21:16:55Z",
+      "reason": "Kijiji redirected the exact ad to a confirmed removal",
+      "httpStatus": 200,
+      "sourceUrl": "https://www.kijiji.ca/v-general-electronics/edmonton/10-tenergy-3-7v-2200mah-lipo-batteries-new-bare-cells-2-0/1743184185",
+      "resolvedUrl": "https://www.kijiji.ca/b-general-electronics/edmonton/c15l1700203?radius=50.0&ll=53.51072%2C-113.59011&adRemoved=1743184185"
+    },
+    "kijiji.ca/v-room-rental-roommate/city-of-toronto/a-bedroom-for-rent-at-finch-warden/1746261441": {
+      "availability": "unavailable",
+      "checkedAt": "2026-11-19T21:16:55Z",
+      "reason": "Kijiji redirected the exact ad to a confirmed removal",
+      "httpStatus": 200,
+      "sourceUrl": "https://www.kijiji.ca/v-room-rental-roommate/city-of-toronto/a-bedroom-for-rent-at-finch-warden/1746261441",
+      "resolvedUrl": "https://www.kijiji.ca/b-room-rental-roommate/city-of-toronto/c36l1700273?radius=50.0&ll=43.79903%2C-79.31152&adRemoved=1746261441"
+    },
+    "kijiji.ca/v-cars-trucks/city-of-toronto/new-car-new-engine-new-brakes-new-starter/1746216854": {
+      "availability": "unavailable",
+      "checkedAt": "2026-11-19T21:16:55Z",
+      "reason": "Kijiji redirected the exact ad to a confirmed removal",
+      "httpStatus": 200,
+      "sourceUrl": "https://www.kijiji.ca/v-cars-trucks/city-of-toronto/new-car-new-engine-new-brakes-new-starter/1746216854",
+      "resolvedUrl": "https://www.kijiji.ca/b-cars-trucks/city-of-toronto/c174l1700273?adRemoved=1746216854&ll=43.69%2C-79.4&radius=150.0&rb=50"
+    },
+    "kijiji.ca/v-cars-trucks/hamilton/2027-honda-hr-v-ex-l/1743851349": {
+      "availability": "unavailable",
+      "checkedAt": "2026-11-19T21:16:55Z",
+      "reason": "Kijiji redirected the exact ad to a confirmed removal",
+      "httpStatus": 200,
+      "sourceUrl": "https://www.kijiji.ca/v-cars-trucks/hamilton/2027-honda-hr-v-ex-l/1743851349",
+      "resolvedUrl": "https://www.kijiji.ca/b-cars-trucks/hamilton/c174l80014?adRemoved=1743851349&ll=43.2070027%2C-79.8902315&radius=150.0&rb=50"
+    },
+    "kijiji.ca/v-general-electronics/city-of-toronto/led-tvs-4k-tvs-smart-tvs-all-size-19-to-85-sale-from-59-no-tax/1746320895": {
+      "availability": "unavailable",
+      "checkedAt": "2026-11-19T21:16:55Z",
+      "reason": "Kijiji redirected the exact ad to a confirmed removal",
+      "httpStatus": 200,
+      "sourceUrl": "https://www.kijiji.ca/v-general-electronics/city-of-toronto/led-tvs-4k-tvs-smart-tvs-all-size-19-to-85-sale-from-59-no-tax/1746320895",
+      "resolvedUrl": "https://www.kijiji.ca/b-general-electronics/city-of-toronto/c15l1700273?radius=50.0&ll=43.75845%2C-79.27727&adRemoved=1746320895"
+    },
+    "kijiji.ca/v-stove-oven-range/hamilton/whirlpool-30-stainless-steel-electric-stove-oven-range-can-deli/1746318485": {
+      "availability": "unavailable",
+      "checkedAt": "2026-11-19T21:16:55Z",
+      "reason": "Kijiji redirected the exact ad to a confirmed removal",
+      "httpStatus": 200,
+      "sourceUrl": "https://www.kijiji.ca/v-stove-oven-range/hamilton/whirlpool-30-stainless-steel-electric-stove-oven-range-can-deli/1746318485",
+      "resolvedUrl": "https://www.kijiji.ca/b-stove-oven-range/hamilton/c697l80014?radius=50.0&ll=43.25769%2C-79.84019&adRemoved=1746318485"
+    },
+    "kijiji.ca/v-power-tool/hamilton/garage-doors/1746315416": {
+      "availability": "unavailable",
+      "checkedAt": "2026-11-19T21:16:55Z",
+      "reason": "Kijiji redirected the exact ad to a confirmed removal",
+      "httpStatus": 200,
+      "sourceUrl": "https://www.kijiji.ca/v-power-tool/hamilton/garage-doors/1746315416",
+      "resolvedUrl": "https://www.kijiji.ca/b-power-tool/hamilton/c703l80014?radius=50.0&ll=43.25%2C-79.85&adRemoved=1746315416"
+    },
+    "kijiji.ca/v-heater-humidifier-dehumidifier/hamilton/furnace-furnace-furnace-furnace-furnace-furnace-furnace-furnace/1746310617": {
+      "availability": "unavailable",
+      "checkedAt": "2026-11-19T21:16:55Z",
+      "reason": "Kijiji redirected the exact ad to a confirmed removal",
+      "httpStatus": 200,
+      "sourceUrl": "https://www.kijiji.ca/v-heater-humidifier-dehumidifier/hamilton/furnace-furnace-furnace-furnace-furnace-furnace-furnace-furnace/1746310617",
+      "resolvedUrl": "https://www.kijiji.ca/b-heater-humidifier-dehumidifier/hamilton/c692l80014?radius=50.0&ll=43.26%2C-79.87&adRemoved=1746310617"
+    },
+    "kijiji.ca/v-heater-humidifier-dehumidifier/hamilton/n4a342-27/1746306223": {
+      "availability": "unavailable",
+      "checkedAt": "2026-11-19T21:16:55Z",
+      "reason": "Kijiji redirected the exact ad to a confirmed removal",
+      "httpStatus": 200,
+      "sourceUrl": "https://www.kijiji.ca/v-heater-humidifier-dehumidifier/hamilton/n4a342-27/1746306223",
+      "resolvedUrl": "https://www.kijiji.ca/b-heater-humidifier-dehumidifier/hamilton/c692l80014?radius=50.0&ll=43.25%2C-79.89&adRemoved=1746306223"
+    },
+    "kijiji.ca/v-room-rental-roommate/city-of-toronto/luxury-huge-room-rental-don-mills-rd-north-york/1746343805": {
+      "availability": "unavailable",
+      "checkedAt": "2026-11-19T21:16:55Z",
+      "reason": "Kijiji redirected the exact ad to a confirmed removal",
+      "httpStatus": 200,
+      "sourceUrl": "https://www.kijiji.ca/v-room-rental-roommate/city-of-toronto/luxury-huge-room-rental-don-mills-rd-north-york/1746343805",
+      "resolvedUrl": "https://www.kijiji.ca/b-room-rental-roommate/city-of-toronto/c36l1700273?radius=50.0&ll=43.76%2C-79.35&adRemoved=1746343805"
+    },
+    "craigslist.org/view/d/loganville-2019-ford-transit-xl/7kb7vtapqb5ydhj3gx8ybp": {
+      "availability": "gone",
+      "checkedAt": "2026-11-19T21:16:55Z",
+      "reason": "Exact source URL returned HTTP 410",
+      "httpStatus": 410,
+      "sourceUrl": "https://www.craigslist.org/view/d/loganville-2019-ford-transit-xl/7kb7VTApqB5ydHj3GX8ybP",
+      "resolvedUrl": "https://www.craigslist.org/view/d/loganville-2019-ford-transit-xl/7kb7VTApqB5ydHj3GX8ybP"
+    },
+    "kijiji.ca/v-commercial-office-space/hamilton/omvic-car-dealer-sales-office-lot-for-rent-west-niagara-beamsvi/1745721956": {
+      "availability": "unavailable",
+      "checkedAt": "2026-11-19T21:16:55Z",
+      "reason": "Kijiji redirected the exact ad to a confirmed removal",
+      "httpStatus": 200,
+      "sourceUrl": "https://www.kijiji.ca/v-commercial-office-space/hamilton/omvic-car-dealer-sales-office-lot-for-rent-west-niagara-beamsvi/1745721956",
+      "resolvedUrl": "https://www.kijiji.ca/b-commercial-office-space/hamilton/c40l80014?radius=50.0&ll=43.17%2C-79.48&adRemoved=1745721956"
+    },
+    "craigslist.org/view/d/dallas-2017-subaru-forester-premium-25/5mmbs4nzocgbhvjc9tnrfh": {
+      "availability": "gone",
+      "checkedAt": "2026-11-19T21:16:55Z",
+      "reason": "Exact source URL returned HTTP 410",
+      "httpStatus": 410,
+      "sourceUrl": "https://www.craigslist.org/view/d/dallas-2017-subaru-forester-premium-25/5MMbS4nZoCgBhVjc9tNRFh",
+      "resolvedUrl": "https://www.craigslist.org/view/d/dallas-2017-subaru-forester-premium-25/5MMbS4nZoCgBhVjc9tNRFh"
+    },
+    "craigslist.org/view/d/new-york-no-fee-chelsea-stunning-spac/g4uh39betg5ufdxgamzlmt": {
+      "availability": "gone",
+      "checkedAt": "2026-11-19T21:16:55Z",
+      "reason": "Exact source URL returned HTTP 410",
+      "httpStatus": 410,
+      "sourceUrl": "https://www.craigslist.org/view/d/new-york-no-fee-chelsea-stunning-spac/g4uH39betG5ufDXgAMzLmT",
+      "resolvedUrl": "https://www.craigslist.org/view/d/new-york-no-fee-chelsea-stunning-spac/g4uH39betG5ufDXgAMzLmT"
+    },
+    "craigslist.org/view/d/fort-worth-volkswagen-jetta-automatic/apkfhcnebvqls9iue46xry": {
+      "availability": "gone",
+      "checkedAt": "2026-11-19T21:16:55Z",
+      "reason": "Exact source URL returned HTTP 410",
+      "httpStatus": 410,
+      "sourceUrl": "https://www.craigslist.org/view/d/fort-worth-volkswagen-jetta-automatic/apkFhCneBVQLS9iUE46xry",
+      "resolvedUrl": "https://www.craigslist.org/view/d/fort-worth-volkswagen-jetta-automatic/apkFhCneBVQLS9iUE46xry"
+    },
+    "craigslist.org/view/d/richardson-2017-nissan-rogue-sl-4dr-suv/xbdvfrabqgwgnxi714yi5j": {
+      "availability": "gone",
+      "checkedAt": "2026-11-19T21:16:55Z",
+      "reason": "Exact source URL returned HTTP 410",
+      "httpStatus": 410,
+      "sourceUrl": "https://www.craigslist.org/view/d/richardson-2017-nissan-rogue-sl-4dr-suv/xbdVfrabqgwGNXi714yi5j",
+      "resolvedUrl": "https://www.craigslist.org/view/d/richardson-2017-nissan-rogue-sl-4dr-suv/xbdVfrabqgwGNXi714yi5j"
+    },
+    "craigslist.org/view/d/fort-worth-jeep-grand-cherokee/efhrqxavakr92xnzfhldca": {
+      "availability": "gone",
+      "checkedAt": "2026-11-19T21:16:55Z",
+      "reason": "Exact source URL returned HTTP 410",
+      "httpStatus": 410,
+      "sourceUrl": "https://www.craigslist.org/view/d/fort-worth-jeep-grand-cherokee/efhrqXaVakR92XNzFhLDCA",
+      "resolvedUrl": "https://www.craigslist.org/view/d/fort-worth-jeep-grand-cherokee/efhrqXaVakR92XNzFhLDCA"
+    },
+    "craigslist.org/view/d/fort-worth-ford-fiesta-automatic/iqd4zvb4phdkmdhvz6dzex": {
+      "availability": "gone",
+      "checkedAt": "2026-11-19T21:16:55Z",
+      "reason": "Exact source URL returned HTTP 410",
+      "httpStatus": 410,
+      "sourceUrl": "https://www.craigslist.org/view/d/fort-worth-ford-fiesta-automatic/iQd4ZvB4pHdkMdhvz6DzEX",
+      "resolvedUrl": "https://www.craigslist.org/view/d/fort-worth-ford-fiesta-automatic/iQd4ZvB4pHdkMdhvz6DzEX"
+    },
+    "craigslist.org/view/d/margate-2014-chrysler-town-co-touring/2yrpd2zuffm4cuhanfcfs9": {
+      "availability": "gone",
+      "checkedAt": "2026-11-19T21:16:55Z",
+      "reason": "Exact source URL returned HTTP 410",
+      "httpStatus": 410,
+      "sourceUrl": "https://www.craigslist.org/view/d/margate-2014-chrysler-town-co-touring/2yRpd2zuFfm4cuHAnFcfS9",
+      "resolvedUrl": "https://www.craigslist.org/view/d/margate-2014-chrysler-town-co-touring/2yRpd2zuFfm4cuHAnFcfS9"
+    },
+    "craigslist.org/view/d/san-antonio-2010-mercedes-benz/ka8xytyxe2dyrlgivvzsr7": {
+      "availability": "gone",
+      "checkedAt": "2026-11-19T21:16:55Z",
+      "reason": "Exact source URL returned HTTP 410",
+      "httpStatus": 410,
+      "sourceUrl": "https://www.craigslist.org/view/d/san-antonio-2010-mercedes-benz/kA8xYtYxE2dyRLgivvzsr7",
+      "resolvedUrl": "https://www.craigslist.org/view/d/san-antonio-2010-mercedes-benz/kA8xYtYxE2dyRLgivvzsr7"
+    },
+    "craigslist.org/view/d/cumming-2014-subaru-xv-crosstrek/dcb81duazutbc5zauqiuvj": {
+      "availability": "gone",
+      "checkedAt": "2026-11-19T21:16:55Z",
+      "reason": "Exact source URL returned HTTP 410",
+      "httpStatus": 410,
+      "sourceUrl": "https://www.craigslist.org/view/d/cumming-2014-subaru-xv-crosstrek/dcb81DuAzUtBC5ZAuQiUVj",
+      "resolvedUrl": "https://www.craigslist.org/view/d/cumming-2014-subaru-xv-crosstrek/dcb81DuAzUtBC5ZAuQiUVj"
+    },
+    "craigslist.org/view/d/cumming-2013-volkswagen-jetta/t3jfvxytdubyj5vkka7nfq": {
+      "availability": "gone",
+      "checkedAt": "2026-11-19T21:16:55Z",
+      "reason": "Exact source URL returned HTTP 410",
+      "httpStatus": 410,
+      "sourceUrl": "https://www.craigslist.org/view/d/cumming-2013-volkswagen-jetta/t3JfvxyTDuByJ5vkKA7nfQ",
+      "resolvedUrl": "https://www.craigslist.org/view/d/cumming-2013-volkswagen-jetta/t3JfvxyTDuByJ5vkKA7nfQ"
+    },
+    "craigslist.org/view/d/cumming-2015-jeep-compass-sport-24l-cyl/h8vrqpap5odjh87ruwammk": {
+      "availability": "gone",
+      "checkedAt": "2026-11-19T21:16:55Z",
+      "reason": "Exact source URL returned HTTP 410",
+      "httpStatus": 410,
+      "sourceUrl": "https://www.craigslist.org/view/d/cumming-2015-jeep-compass-sport-24l-cyl/h8VRqPAP5odjH87rUwamMK",
+      "resolvedUrl": "https://www.craigslist.org/view/d/cumming-2015-jeep-compass-sport-24l-cyl/h8VRqPAP5odjH87rUwamMK"
+    },
+    "craigslist.org/view/d/cumming-2014-mazda-sport-gx-automatic/3j4u8s1szdpqmnpoezuk1f": {
+      "availability": "gone",
+      "checkedAt": "2026-11-19T21:16:55Z",
+      "reason": "Exact source URL returned HTTP 410",
+      "httpStatus": 410,
+      "sourceUrl": "https://www.craigslist.org/view/d/cumming-2014-mazda-sport-gx-automatic/3J4U8S1sZDPQmNpoezUk1f",
+      "resolvedUrl": "https://www.craigslist.org/view/d/cumming-2014-mazda-sport-gx-automatic/3J4U8S1sZDPQmNpoezUk1f"
+    },
+    "craigslist.org/view/d/san-antonio-2000-ford-excursion/7n8tquexgvzkjwuyhbe5bu": {
+      "availability": "gone",
+      "checkedAt": "2026-11-19T21:16:55Z",
+      "reason": "Exact source URL returned HTTP 410",
+      "httpStatus": 410,
+      "sourceUrl": "https://www.craigslist.org/view/d/san-antonio-2000-ford-excursion/7n8tqUeXGvzkJwuYHBE5bu",
+      "resolvedUrl": "https://www.craigslist.org/view/d/san-antonio-2000-ford-excursion/7n8tqUeXGvzkJwuYHBE5bu"
+    },
+    "craigslist.org/view/d/san-antonio-2013-kia-rio-lx26kmileslow/pzh6zvtlxrgiyyk8mms9t2": {
+      "availability": "gone",
+      "checkedAt": "2026-11-19T21:16:55Z",
+      "reason": "Exact source URL returned HTTP 410",
+      "httpStatus": 410,
+      "sourceUrl": "https://www.craigslist.org/view/d/san-antonio-2013-kia-rio-lx26kmileslow/pzh6zvTLXRGiYYK8mms9t2",
+      "resolvedUrl": "https://www.craigslist.org/view/d/san-antonio-2013-kia-rio-lx26kmileslow/pzh6zvTLXRGiYYK8mms9t2"
+    },
+    "craigslist.org/view/d/new-york-no-fee-extra-lg-1br-elev-lndry/jgnly64w2cfshzwurdzqdb": {
+      "availability": "gone",
+      "checkedAt": "2026-11-19T21:16:55Z",
+      "reason": "Exact source URL returned HTTP 410",
+      "httpStatus": 410,
+      "sourceUrl": "https://www.craigslist.org/view/d/new-york-no-fee-extra-lg-1br-elev-lndry/jgNLY64w2CFSHzwurDZQDB",
+      "resolvedUrl": "https://www.craigslist.org/view/d/new-york-no-fee-extra-lg-1br-elev-lndry/jgNLY64w2CFSHzwurDZQDB"
+    },
+    "craigslist.org/view/d/irving-2024-cadillac-escaladelow/t6xsfrjd5nbbqxktwgfqid": {
+      "availability": "gone",
+      "checkedAt": "2026-11-19T21:16:55Z",
+      "reason": "Exact source URL returned HTTP 410",
+      "httpStatus": 410,
+      "sourceUrl": "https://www.craigslist.org/view/d/irving-2024-cadillac-escaladelow/t6xsfRjD5nBBqXKTwGfqid",
+      "resolvedUrl": "https://www.craigslist.org/view/d/irving-2024-cadillac-escaladelow/t6xsfRjD5nBBqXKTwGfqid"
     }
   }
 }

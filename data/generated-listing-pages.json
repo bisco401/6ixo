@@ -1,6 +1,864 @@
 {
-  "count": 8673,
+  "count": 8727,
   "listings": [
+    {
+      "id": "category-8123e4f0da74f95b91",
+      "slug": "iphone-16-pro-max-256gb-da74f95b91",
+      "url": "https://6ixo.com/listing/iphone-16-pro-max-256gb-da74f95b91/",
+      "images": [
+        "https://gadgetcraze.ug/web/image/product.product/1947/image_1920?unique=c7c8f12",
+        "https://gadgetcraze.ug/web/image/product.product/1948/image_1920?unique=c7c8f12",
+        "https://gadgetcraze.ug/web/image/product.product/1949/image_1920?unique=c7c8f12",
+        "https://gadgetcraze.ug/web/image/product.product/3881/image_1920?unique=c7c8f12"
+      ],
+      "categoryKey": "electronics"
+    },
+    {
+      "id": "craigslist-9r_Yrj7l8RGPXcKrpZB56w",
+      "slug": "2019-ford-transit-350-wagon-low-roof-xlt-60-40-pass-148-in-xckrpzb56w",
+      "url": "https://6ixo.com/listing/2019-ford-transit-350-wagon-low-roof-xlt-60-40-pass-148-in-xckrpzb56w/",
+      "images": [
+        "https://images.craigslist.org/00101_aSmzRgJVm2a_0cg09c_1200x900.jpg",
+        "https://images.craigslist.org/00L0L_acXwFQvIDx_0cg09c_1200x900.jpg",
+        "https://images.craigslist.org/00C0C_cKfwRIQi3Yv_0cg09c_1200x900.jpg",
+        "https://images.craigslist.org/00J0J_9j1YGQRJewZ_0cg09c_1200x900.jpg"
+      ],
+      "categoryKey": "vehicles"
+    },
+    {
+      "id": "craigslist-mmveGdxuQQ73m2v81nx9im",
+      "slug": "2021-volkswagen-tiguan-se-4motion-awd-leather-sunroof-warr-m2v81nx9im",
+      "url": "https://6ixo.com/listing/2021-volkswagen-tiguan-se-4motion-awd-leather-sunroof-warr-m2v81nx9im/",
+      "images": [
+        "https://images.craigslist.org/01414_7KUStutJGmj_0bG09G_1200x900.jpg",
+        "https://images.craigslist.org/01414_9czFV6cydSr_0cU09z_1200x900.jpg",
+        "https://images.craigslist.org/00303_1RGlXzvZbOo_0cU07z_1200x900.jpg",
+        "https://images.craigslist.org/01313_5lad9wyrYGf_0cU09n_1200x900.jpg"
+      ],
+      "categoryKey": "vehicles"
+    },
+    {
+      "id": "craigslist-iUiM4q6S8bwpc7pZ8Dyj6k",
+      "slug": "subaru-forester-awd-service-history-one-owner-automatic-c7pz8dyj6k",
+      "url": "https://6ixo.com/listing/subaru-forester-awd-service-history-one-owner-automatic-c7pz8dyj6k/",
+      "images": [
+        "https://images.craigslist.org/00M0M_kw8aOj15eFJ_0cU09G_1200x900.jpg",
+        "https://images.craigslist.org/00E0E_1oUTgJxsjRq_0cU07D_1200x900.jpg",
+        "https://images.craigslist.org/00j0j_9yDqCY55aIe_0c909G_1200x900.jpg",
+        "https://images.craigslist.org/00I0I_hMcm9vSwnXJ_0cU09v_1200x900.jpg"
+      ],
+      "categoryKey": "vehicles"
+    },
+    {
+      "id": "craigslist-yItDIjbl8RGLS_npZid4ZQ",
+      "slug": "2013-chevrolet-impala-great-deal-queens-lsnpzid4zq",
+      "url": "https://6ixo.com/listing/2013-chevrolet-impala-great-deal-queens-lsnpzid4zq/",
+      "images": [
+        "https://images.craigslist.org/00s0s_c8Iqu3CAoJ4_0ew0aT_1200x900.jpg",
+        "https://images.craigslist.org/00a0a_3gILATLTEhA_0ew0aT_1200x900.jpg",
+        "https://images.craigslist.org/00E0E_kQEnIBWB56s_0ew0aT_1200x900.jpg",
+        "https://images.craigslist.org/00808_lSr86J6j7ae_0ew0aT_1200x900.jpg"
+      ],
+      "categoryKey": "vehicles"
+    },
+    {
+      "id": "craigslist-nnafCEsic7SEqhbYjSYtE8",
+      "slug": "immaculate-waterfront-property-2-bedroom-in-new-rochelle-3-qhbyjsyte8",
+      "url": "https://6ixo.com/listing/immaculate-waterfront-property-2-bedroom-in-new-rochelle-3-qhbyjsyte8/",
+      "images": [
+        "https://images.craigslist.org/00y0y_iTeA5AMgEzI_0fu0kE_1200x900.jpg"
+      ],
+      "categoryKey": "real-estate"
+    },
+    {
+      "id": "craigslist-7VeeTUQMwDSVub9btkCsN9",
+      "slug": "rye-sun-filled-1-bedroom-with-an-updated-kitchen-near-town-ub9btkcsn9",
+      "url": "https://6ixo.com/listing/rye-sun-filled-1-bedroom-with-an-updated-kitchen-near-town-ub9btkcsn9/",
+      "images": [
+        "https://images.craigslist.org/00S0S_5sgoK6pTLpv_0lM0t2_1200x900.jpg"
+      ],
+      "categoryKey": "real-estate"
+    },
+    {
+      "id": "craigslist-d3gadRQWqzdBVUaJPVQjbi",
+      "slug": "3-bedroom-apartment-very-clean-3300-00-best-offer-vuajpvqjbi",
+      "url": "https://6ixo.com/listing/3-bedroom-apartment-very-clean-3300-00-best-offer-vuajpvqjbi/",
+      "images": [
+        "https://images.craigslist.org/00404_hHWCMqxvFpH_0t20CI_1200x900.jpg"
+      ],
+      "categoryKey": "real-estate"
+    },
+    {
+      "id": "craigslist-v8f1dhmpMZ57AyMGBimKFf",
+      "slug": "1-bedroom-apartment-very-clean-aymgbimkff",
+      "url": "https://6ixo.com/listing/1-bedroom-apartment-very-clean-aymgbimkff/",
+      "images": [
+        "https://images.craigslist.org/01717_8WSAhhBtCJS_0t20CI_1200x900.jpg"
+      ],
+      "categoryKey": "real-estate"
+    },
+    {
+      "id": "craigslist-54UgM2CLL9Q7CHk9ey76rG",
+      "slug": "enormous-2-bed-2-bath-office-newly-renovated-wont-last-chk9ey76rg",
+      "url": "https://6ixo.com/listing/enormous-2-bed-2-bath-office-newly-renovated-wont-last-chk9ey76rg/",
+      "images": [
+        "https://images.craigslist.org/00k0k_2xHn5bNgHzE_0oM0gw_1200x900.jpg"
+      ],
+      "categoryKey": "real-estate"
+    },
+    {
+      "id": "craigslist-1p7DAioyQmBPut6PQpzcXd",
+      "slug": "dumbo-downtown-bk-loft-2-bed-private-yard-everything-brand-ut6pqpzcxd",
+      "url": "https://6ixo.com/listing/dumbo-downtown-bk-loft-2-bed-private-yard-everything-brand-ut6pqpzcxd/",
+      "images": [
+        "https://images.craigslist.org/00404_cPqIiAsi5Tf_0li0fN_1200x900.jpg"
+      ],
+      "categoryKey": "real-estate"
+    },
+    {
+      "id": "craigslist-ghkkEe43zcA8Gs5TnYXr6y",
+      "slug": "2020-ford-f-350-f350-xl-utility-service-truck-crew-cab-drw-gs5tnyxr6y",
+      "url": "https://6ixo.com/listing/2020-ford-f-350-f350-xl-utility-service-truck-crew-cab-drw-gs5tnyxr6y/",
+      "images": [
+        "https://images.craigslist.org/00V0V_86ZrORhn1F8_0jm0ew_1200x900.jpg",
+        "https://images.craigslist.org/00C0C_5ElwsAGZWlr_0jm0ew_1200x900.jpg",
+        "https://images.craigslist.org/00808_kv88sJSd6WD_0jm0ew_1200x900.jpg",
+        "https://images.craigslist.org/01717_8CnqEZ4xSFt_0jm0ew_1200x900.jpg"
+      ],
+      "categoryKey": "vehicles"
+    },
+    {
+      "id": "craigslist-WBhyfy7l8RGhhbxFkqeGHg",
+      "slug": "2022-kia-sportage-buy-here-pay-here-available-hbxfkqeghg",
+      "url": "https://6ixo.com/listing/2022-kia-sportage-buy-here-pay-here-available-hbxfkqeghg/",
+      "images": [
+        "https://images.craigslist.org/01313_jJoqM8NAKXI_0jm0ew_1200x900.jpg",
+        "https://images.craigslist.org/00404_hzFVUbgt7E9_0jm0ew_1200x900.jpg",
+        "https://images.craigslist.org/00o0o_6u0rULvupmh_0jm0ew_1200x900.jpg",
+        "https://images.craigslist.org/00000_42lJ4xJGyMv_0jm0ew_1200x900.jpg"
+      ],
+      "categoryKey": "vehicles"
+    },
+    {
+      "id": "craigslist-ioRrQpyV644vg2Q5rNosW9",
+      "slug": "2011-mercedes-benz-s-class-s550-5-5l-v8-amg-sport-package--g2q5rnosw9",
+      "url": "https://6ixo.com/listing/2011-mercedes-benz-s-class-s550-5-5l-v8-amg-sport-package--g2q5rnosw9/",
+      "images": [
+        "https://images.craigslist.org/00b0b_bwb8M4dESG2_0CI0t9_1200x900.jpg",
+        "https://images.craigslist.org/00202_11yeKDYmNct_0CI0t9_1200x900.jpg",
+        "https://images.craigslist.org/01717_ilwsbFyRBmd_0jT0CI_1200x900.jpg",
+        "https://images.craigslist.org/00303_kneLXpcphPb_0CI0t9_1200x900.jpg"
+      ],
+      "categoryKey": "vehicles"
+    },
+    {
+      "id": "craigslist-xgree3VWeiUHT5s1qSQRBV",
+      "slug": "2019-chevrolet-silverado-t5s1qsqrbv",
+      "url": "https://6ixo.com/listing/2019-chevrolet-silverado-t5s1qsqrbv/",
+      "images": [
+        "https://images.craigslist.org/00q0q_ikGbvQuCKjw_0kE0fu_1200x900.jpg",
+        "https://images.craigslist.org/00G0G_afDxm0D1s1n_0kE0fu_1200x900.jpg",
+        "https://images.craigslist.org/00R0R_8UcRwlauS4B_0kE0fu_1200x900.jpg",
+        "https://images.craigslist.org/00w0w_lh88CERWxs2_0kE0fu_1200x900.jpg"
+      ],
+      "categoryKey": "vehicles"
+    },
+    {
+      "id": "craigslist-8Mw7RrkNoVNBZXgtjA6EEf",
+      "slug": "2005-ford-f250-super-duty-fx4-zxgtja6eef",
+      "url": "https://6ixo.com/listing/2005-ford-f250-super-duty-fx4-zxgtja6eef/",
+      "images": [
+        "https://images.craigslist.org/00D0D_48HrpuuJbQ_0kE0fu_1200x900.jpg",
+        "https://images.craigslist.org/00w0w_HNKHHaMxRI_0kE0fu_1200x900.jpg",
+        "https://images.craigslist.org/00r0r_15qXLRFYKBc_0kE0fu_1200x900.jpg",
+        "https://images.craigslist.org/00808_5fIN6qY5Mjc_0kE0fu_1200x900.jpg"
+      ],
+      "categoryKey": "vehicles"
+    },
+    {
+      "id": "craigslist-2BpLCgqQ8r1PM9F2U4Dit2",
+      "slug": "2007-chevrolet-kodiak-c6500-m9f2u4dit2",
+      "url": "https://6ixo.com/listing/2007-chevrolet-kodiak-c6500-m9f2u4dit2/",
+      "images": [
+        "https://images.craigslist.org/00202_1AwL2aF1g4L_0kE0fu_1200x900.jpg",
+        "https://images.craigslist.org/00u0u_hThVpmKgmn2_0kE0fu_1200x900.jpg",
+        "https://images.craigslist.org/00b0b_7nih7DLv0I8_0bC0fu_1200x900.jpg",
+        "https://images.craigslist.org/00x0x_lzDKaMXgBqH_0bC0fu_1200x900.jpg"
+      ],
+      "categoryKey": "vehicles"
+    },
+    {
+      "id": "craigslist-tLQ8LLwd8mXVwKXMWWaA1B",
+      "slug": "2018-bmw-330i-with-m-package-and-red-interior-big-screen-c-wkxmwwaa1b",
+      "url": "https://6ixo.com/listing/2018-bmw-330i-with-m-package-and-red-interior-big-screen-c-wkxmwwaa1b/",
+      "images": [
+        "https://images.craigslist.org/00V0V_gqOd9PIv87y_0CI0t2_1200x900.jpg",
+        "https://images.craigslist.org/00m0m_cug14V4okWs_0CI0t2_1200x900.jpg",
+        "https://images.craigslist.org/00606_a26CAvpUWHs_0CI0t2_1200x900.jpg",
+        "https://images.craigslist.org/00a0a_fXdG5uR6n3O_0CI0t2_1200x900.jpg"
+      ],
+      "categoryKey": "vehicles"
+    },
+    {
+      "id": "craigslist-4SK3iNRHsuDWDAjxZAeVeK",
+      "slug": "2015-ford-mustang-premium-convertible-6-speed-manual-trans-dajxzaevek",
+      "url": "https://6ixo.com/listing/2015-ford-mustang-premium-convertible-6-speed-manual-trans-dajxzaevek/",
+      "images": [
+        "https://images.craigslist.org/00h0h_akMEXq8OKf5_0CI0t2_1200x900.jpg",
+        "https://images.craigslist.org/01111_18RZXnnuWEs_0CI0t2_1200x900.jpg",
+        "https://images.craigslist.org/00K0K_7FZmtMwJ3X_0CI0t2_1200x900.jpg",
+        "https://images.craigslist.org/00E0E_9NDfy3rXAAf_0CI0t2_1200x900.jpg"
+      ],
+      "categoryKey": "vehicles"
+    },
+    {
+      "id": "craigslist-jJrMhsNgsieC7BTvmbiumd",
+      "slug": "2023-mercedes-benz-cla-250-panoramic-roof-sport-seats-7btvmbiumd",
+      "url": "https://6ixo.com/listing/2023-mercedes-benz-cla-250-panoramic-roof-sport-seats-7btvmbiumd/",
+      "images": [
+        "https://images.craigslist.org/01414_jQxtGumoADj_0CI0t2_1200x900.jpg",
+        "https://images.craigslist.org/00F0F_bqrKMvQfPm2_0CI0t2_1200x900.jpg",
+        "https://images.craigslist.org/00c0c_aeIWJKUBNrc_0CI0t2_1200x900.jpg",
+        "https://images.craigslist.org/00J0J_6ZFwXQm3tSl_0t20CI_1200x900.jpg"
+      ],
+      "categoryKey": "vehicles"
+    },
+    {
+      "id": "craigslist-nNCANyHgrt4BPQTytiVWUb",
+      "slug": "2012-mercedes-benz-gl-super-clean-buy-here-pay-here-pqtytivwub",
+      "url": "https://6ixo.com/listing/2012-mercedes-benz-gl-super-clean-buy-here-pay-here-pqtytivwub/",
+      "images": [
+        "https://images.craigslist.org/00m0m_drbG6VviDr5_0nm0hw_1200x900.jpg",
+        "https://images.craigslist.org/00Z0Z_dKxl8tAqZEY_0nm0hw_1200x900.jpg",
+        "https://images.craigslist.org/00707_447IxAAgkhW_0nm0hw_1200x900.jpg",
+        "https://images.craigslist.org/00o0o_j5PhLAhGgN1_0jm0ew_1200x900.jpg"
+      ],
+      "categoryKey": "vehicles"
+    },
+    {
+      "id": "craigslist-7NJiGxVaDUDLXGnTioNL3D",
+      "slug": "2022-audi-q3-s-line-premium-plus-360-camera-panoramic-roof-xgntionl3d",
+      "url": "https://6ixo.com/listing/2022-audi-q3-s-line-premium-plus-360-camera-panoramic-roof-xgntionl3d/",
+      "images": [
+        "https://images.craigslist.org/00202_iWuMMtXwTX_0CI0t2_1200x900.jpg",
+        "https://images.craigslist.org/01515_aPEublhlgsh_0t20CI_1200x900.jpg",
+        "https://images.craigslist.org/00J0J_ec3iTL05ZWQ_0CI0t2_1200x900.jpg",
+        "https://images.craigslist.org/01717_iCQYbXgyaT3_0t20CI_1200x900.jpg"
+      ],
+      "categoryKey": "vehicles"
+    },
+    {
+      "id": "craigslist-oma242PtuuV54oNvyq6ZDc",
+      "slug": "2022-mercedes-benz-c-300-sedan-luxury-4onvyq6zdc",
+      "url": "https://6ixo.com/listing/2022-mercedes-benz-c-300-sedan-luxury-4onvyq6zdc/",
+      "images": [
+        "https://images.craigslist.org/00C0C_1mOBU8dWSGU_0CI0t2_1200x900.jpg",
+        "https://images.craigslist.org/00c0c_6gG5BA2ynZx_0t20CI_1200x900.jpg",
+        "https://images.craigslist.org/00O0O_4q2eiZT8API_0CI0t2_1200x900.jpg",
+        "https://images.craigslist.org/00M0M_cGnBHwE8k5L_0t20CI_1200x900.jpg"
+      ],
+      "categoryKey": "vehicles"
+    },
+    {
+      "id": "craigslist-tnYe9ALUqWVjThbSgfKjyP",
+      "slug": "2001-honda-stepwagon-minivan-automatic-tr-2-0l-gas-jdm-imp-thbsgfkjyp",
+      "url": "https://6ixo.com/listing/2001-honda-stepwagon-minivan-automatic-tr-2-0l-gas-jdm-imp-thbsgfkjyp/",
+      "images": [
+        "https://images.craigslist.org/00i0i_b0bcwLAXi4V_0CI0t2_1200x900.jpg",
+        "https://images.craigslist.org/00000_3I3cS9Os6lz_0CI0t2_1200x900.jpg",
+        "https://images.craigslist.org/00606_cIMhxNsHi02_0CI0t2_1200x900.jpg",
+        "https://images.craigslist.org/00z0z_cWyn1MQA3WF_0CI0t2_1200x900.jpg"
+      ],
+      "categoryKey": "vehicles"
+    },
+    {
+      "id": "craigslist-mrW6XD3l8RGITYt84bHUSQ",
+      "slug": "2012-cadillac-escalade-esv-awd-luxury-buy-here-pay-here-tyt84bhusq",
+      "url": "https://6ixo.com/listing/2012-cadillac-escalade-esv-awd-luxury-buy-here-pay-here-tyt84bhusq/",
+      "images": [
+        "https://images.craigslist.org/00j0j_6bn03KMk6A6_0jm0ew_1200x900.jpg",
+        "https://images.craigslist.org/00H0H_dsdklM4ctkF_0jm0ew_1200x900.jpg",
+        "https://images.craigslist.org/00Z0Z_gq3FAf4RaOD_0jm0ew_1200x900.jpg",
+        "https://images.craigslist.org/00e0e_hrbr49HDtgG_0jm0ew_1200x900.jpg"
+      ],
+      "categoryKey": "vehicles"
+    },
+    {
+      "id": "craigslist-jYRKp9gV6P8tFxwSPAsNyc",
+      "slug": "2014-ford-escape-44-000-miles-fxwspasnyc",
+      "url": "https://6ixo.com/listing/2014-ford-escape-44-000-miles-fxwspasnyc/",
+      "images": [
+        "https://images.craigslist.org/00W0W_etHFwiSpq3h_0CI0t2_1200x900.jpg",
+        "https://images.craigslist.org/00P0P_hMV0GKybx2O_0CI0t2_1200x900.jpg",
+        "https://images.craigslist.org/00l0l_hG8RW6mhYbk_0CI0t2_1200x900.jpg",
+        "https://images.craigslist.org/00L0L_kG45CoxY1XB_0CI0t2_1200x900.jpg"
+      ],
+      "categoryKey": "vehicles"
+    },
+    {
+      "id": "craigslist-usUPCdTnPSx5UiRJztxkEz",
+      "slug": "2017-audi-a3-uirjztxkez",
+      "url": "https://6ixo.com/listing/2017-audi-a3-uirjztxkez/",
+      "images": [
+        "https://images.craigslist.org/00g0g_jSkwd5NtYQh_0CI0t2_1200x900.jpg",
+        "https://images.craigslist.org/00l0l_8eg6Zg7ikzu_0CI0t2_1200x900.jpg",
+        "https://images.craigslist.org/00202_hb3Ms2CdVra_0CI0t2_1200x900.jpg",
+        "https://images.craigslist.org/01111_1uOsm2x2aHy_0CI0t2_1200x900.jpg"
+      ],
+      "categoryKey": "vehicles"
+    },
+    {
+      "id": "craigslist-7hg7fkQdfnHdY95CARGTgB",
+      "slug": "2022-ford-f250-super-duty-platinum-roush-edition-59999-cal-y95cargtgb",
+      "url": "https://6ixo.com/listing/2022-ford-f250-super-duty-platinum-roush-edition-59999-cal-y95cargtgb/",
+      "images": [
+        "https://images.craigslist.org/01616_5xEeiyb7t8A_0CI0t2_1200x900.jpg",
+        "https://images.craigslist.org/00z0z_eTJpeRoQDNU_0CI0t2_1200x900.jpg",
+        "https://images.craigslist.org/00L0L_bbxItQNxoYN_0CI0t2_1200x900.jpg",
+        "https://images.craigslist.org/00b0b_dnDOziNg9bR_0CI0t2_1200x900.jpg"
+      ],
+      "categoryKey": "vehicles"
+    },
+    {
+      "id": "craigslist-uAqjSDLl8RGdQcf5pwCB0A",
+      "slug": "2014-hyundai-veloster-fwd-guaranteed-credit-approval-qcf5pwcb0a",
+      "url": "https://6ixo.com/listing/2014-hyundai-veloster-fwd-guaranteed-credit-approval-qcf5pwcb0a/",
+      "images": [
+        "https://images.craigslist.org/00B0B_3rP1nh2gYQj_0gw0co_1200x900.jpg",
+        "https://images.craigslist.org/00707_aWA5LCSHk7W_0gw0co_1200x900.jpg",
+        "https://images.craigslist.org/01616_3U0WXrASZjY_0gw0co_1200x900.jpg",
+        "https://images.craigslist.org/00c0c_j7zfJbmclY8_0gw0co_1200x900.jpg"
+      ],
+      "categoryKey": "vehicles"
+    },
+    {
+      "id": "craigslist-CGPKt0Pl8RGKfdVW8A6fOQ",
+      "slug": "2016-ford-f-350-f350-f-350-super-duty-xlt-4x4-4dr-crew-cab-fdvw8a6foq",
+      "url": "https://6ixo.com/listing/2016-ford-f-350-f350-f-350-super-duty-xlt-4x4-4dr-crew-cab-fdvw8a6foq/",
+      "images": [
+        "https://images.craigslist.org/00707_8XAyGt16CpR_0jm0ew_1200x900.jpg",
+        "https://images.craigslist.org/00o0o_1GK2aa3BE4k_0jm0ew_1200x900.jpg",
+        "https://images.craigslist.org/00d0d_5ZbgeC8tIF7_0jm0ew_1200x900.jpg",
+        "https://images.craigslist.org/00s0s_1QRgJQcAWf8_0jm0ew_1200x900.jpg"
+      ],
+      "categoryKey": "vehicles"
+    },
+    {
+      "id": "craigslist-BNQGOkDl8RGCmcF9K1KwFw",
+      "slug": "2017-ram-2500-laramie-4x4-4dr-crew-cab-6-3-ft-sb-pickup-mcf9k1kwfw",
+      "url": "https://6ixo.com/listing/2017-ram-2500-laramie-4x4-4dr-crew-cab-6-3-ft-sb-pickup-mcf9k1kwfw/",
+      "images": [
+        "https://images.craigslist.org/00E0E_8s4YeK70z8M_0jm0ew_1200x900.jpg",
+        "https://images.craigslist.org/00H0H_2cNvnCwXlka_0jm0ew_1200x900.jpg",
+        "https://images.craigslist.org/00z0z_2MNPALlRPKe_0jm0ew_1200x900.jpg",
+        "https://images.craigslist.org/00O0O_cGpwmsP9lPm_0jm0ew_1200x900.jpg"
+      ],
+      "categoryKey": "vehicles"
+    },
+    {
+      "id": "craigslist-h6FehJvoQEg8q1PdXPS1NM",
+      "slug": "2017-nissan-rogue-sv-blue-q1pdxps1nm",
+      "url": "https://6ixo.com/listing/2017-nissan-rogue-sv-blue-q1pdxps1nm/",
+      "images": [
+        "https://images.craigslist.org/01313_fKbSxJTFiMX_0CI0t2_1200x900.jpg",
+        "https://images.craigslist.org/01212_3IsvUIltb4a_0CI0t2_1200x900.jpg",
+        "https://images.craigslist.org/01616_eBUgKgZRueH_0CI0t2_1200x900.jpg",
+        "https://images.craigslist.org/00H0H_ioOzj5kgxCe_0t20CI_1200x900.jpg"
+      ],
+      "categoryKey": "vehicles"
+    },
+    {
+      "id": "craigslist-eFS789VPPfHXfnLFhUxGRq",
+      "slug": "2016-nissan-altima-2-5-sr-fnlfhuxgrq",
+      "url": "https://6ixo.com/listing/2016-nissan-altima-2-5-sr-fnlfhuxgrq/",
+      "images": [
+        "https://images.craigslist.org/00n0n_jeLveQ0lpZS_0CI0t2_1200x900.jpg",
+        "https://images.craigslist.org/00303_kEmeDDv7aJs_0CI0t2_1200x900.jpg",
+        "https://images.craigslist.org/00u0u_5NS66EVHsJt_0CI0t2_1200x900.jpg",
+        "https://images.craigslist.org/00a0a_8eXiByQSrql_0t20CI_1200x900.jpg"
+      ],
+      "categoryKey": "vehicles"
+    },
+    {
+      "id": "craigslist-uP_Ivjzl8RGxRvhGtP7mtA",
+      "slug": "2023-ram-1500-lone-star-4x4-4dr-crew-cab-5-6-ft-sb-pickup-rvhgtp7mta",
+      "url": "https://6ixo.com/listing/2023-ram-1500-lone-star-4x4-4dr-crew-cab-5-6-ft-sb-pickup-rvhgtp7mta/",
+      "images": [
+        "https://images.craigslist.org/00505_cR2Pnr49tgl_0jm0ew_1200x900.jpg",
+        "https://images.craigslist.org/00S0S_22EVQUZmsl9_0jm0ew_1200x900.jpg",
+        "https://images.craigslist.org/00u0u_c3NdAdRTtpk_0jm0ew_1200x900.jpg",
+        "https://images.craigslist.org/01313_exWnEhfiOw4_0jm0ew_1200x900.jpg"
+      ],
+      "categoryKey": "vehicles"
+    },
+    {
+      "id": "craigslist-imiIQDnl8RGvofnId8OyFg",
+      "slug": "2017-ram-2500-slt-4x4-4dr-crew-cab-8-ft-lb-pickup-ofnid8oyfg",
+      "url": "https://6ixo.com/listing/2017-ram-2500-slt-4x4-4dr-crew-cab-8-ft-lb-pickup-ofnid8oyfg/",
+      "images": [
+        "https://images.craigslist.org/00a0a_lsXiwT4zWnZ_0gw0co_1200x900.jpg",
+        "https://images.craigslist.org/00d0d_7fyp8CPeElT_0gw0co_1200x900.jpg",
+        "https://images.craigslist.org/00M0M_hCmDF4hoUw5_0jm0ew_1200x900.jpg",
+        "https://images.craigslist.org/00j0j_6paz0yq1mTj_0gw0co_1200x900.jpg"
+      ],
+      "categoryKey": "vehicles"
+    },
+    {
+      "id": "craigslist-xoacRTnl8RGAhv0GxWF1ig",
+      "slug": "2018-chevrolet-chevy-silverado-1500-lt-4x4-4dr-crew-cab-6--hv0gxwf1ig",
+      "url": "https://6ixo.com/listing/2018-chevrolet-chevy-silverado-1500-lt-4x4-4dr-crew-cab-6--hv0gxwf1ig/",
+      "images": [
+        "https://images.craigslist.org/00J0J_7OavJOpiFzx_0jm0ew_1200x900.jpg",
+        "https://images.craigslist.org/00Z0Z_f2MlKuVfM0N_0gw0co_1200x900.jpg",
+        "https://images.craigslist.org/00g0g_9pphaS2xzeY_0gw0co_1200x900.jpg",
+        "https://images.craigslist.org/00W0W_kQiLQ2Gf3zC_0gw0co_1200x900.jpg"
+      ],
+      "categoryKey": "vehicles"
+    },
+    {
+      "id": "craigslist-gq8AfEBfuwHQ7GeSWpyy9J",
+      "slug": "2026-kia-carnival-hybrid-ex-4dr-mini-van-7geswpyy9j",
+      "url": "https://6ixo.com/listing/2026-kia-carnival-hybrid-ex-4dr-mini-van-7geswpyy9j/",
+      "images": [
+        "https://images.craigslist.org/00i0i_1iHcI0uhVAP_0kE0fu_1200x900.jpg",
+        "https://images.craigslist.org/00B0B_6T7wTP7Bwg_0kE0fu_1200x900.jpg",
+        "https://images.craigslist.org/00v0v_ltW35yB5uid_0kE0fu_1200x900.jpg",
+        "https://images.craigslist.org/00R0R_iNQ3DgTpTK4_0kE0fu_1200x900.jpg"
+      ],
+      "categoryKey": "vehicles"
+    },
+    {
+      "id": "craigslist-h6SeCKbkCvY2wwpsu5GWDz",
+      "slug": "2002-ford-f350-v8-7-3-liter-diesel-enclosed-service-utilit-wwpsu5gwdz",
+      "url": "https://6ixo.com/listing/2002-ford-f350-v8-7-3-liter-diesel-enclosed-service-utilit-wwpsu5gwdz/",
+      "images": [
+        "https://images.craigslist.org/00I0I_9o8p1eT8ey2_0ak07K_1200x900.jpg",
+        "https://images.craigslist.org/00202_eHqCEqpZ4yY_0ak07K_1200x900.jpg",
+        "https://images.craigslist.org/00V0V_d6UscXuPL1K_0ak07K_1200x900.jpg",
+        "https://images.craigslist.org/00Y0Y_i0UvVtNfJS1_0ak07K_1200x900.jpg"
+      ],
+      "categoryKey": "vehicles"
+    },
+    {
+      "id": "craigslist-4tV7p9gqJYBkSnNA5bxxrV",
+      "slug": "2008-ford-f350-crew-cab-diesel-only-50-000-miles-3200-lb-c-snna5bxxrv",
+      "url": "https://6ixo.com/listing/2008-ford-f350-crew-cab-diesel-only-50-000-miles-3200-lb-c-snna5bxxrv/",
+      "images": [
+        "https://images.craigslist.org/00Z0Z_bPKneSGJZXu_0ak07K_1200x900.jpg",
+        "https://images.craigslist.org/00U0U_dMty1ZlOEzi_0ak07K_1200x900.jpg",
+        "https://images.craigslist.org/01515_j1PrMpgsSyH_0ak07K_1200x900.jpg",
+        "https://images.craigslist.org/00B0B_7RFb6F0pcyS_0ak07K_1200x900.jpg"
+      ],
+      "categoryKey": "vehicles"
+    },
+    {
+      "id": "craigslist-HuoYTivl8RGpupaLHN69Pg",
+      "slug": "2019-ford-f-250-f250-f-250-super-duty-xlt-4x4-4dr-crew-cab-upalhn69pg",
+      "url": "https://6ixo.com/listing/2019-ford-f-250-f250-f-250-super-duty-xlt-4x4-4dr-crew-cab-upalhn69pg/",
+      "images": [
+        "https://images.craigslist.org/00J0J_dtgX4zXKRgg_0jm0ew_1200x900.jpg",
+        "https://images.craigslist.org/00m0m_1Rwn6zFK6CU_0jm0ew_1200x900.jpg",
+        "https://images.craigslist.org/00h0h_9GHQvkYVeoe_0jm0ew_1200x900.jpg",
+        "https://images.craigslist.org/00x0x_66ZgizqNwfs_0jm0ew_1200x900.jpg"
+      ],
+      "categoryKey": "vehicles"
+    },
+    {
+      "id": "craigslist-mKS1uEib5H8oBrFkL4YL4o",
+      "slug": "2025-nissan-frontier-pro-x-the-right-car-for-you-call-vict-brfkl4yl4o",
+      "url": "https://6ixo.com/listing/2025-nissan-frontier-pro-x-the-right-car-for-you-call-vict-brfkl4yl4o/",
+      "images": [
+        "https://images.craigslist.org/00L0L_5K6lu12JABk_0nm0hw_1200x900.jpg",
+        "https://images.craigslist.org/00H0H_jmNxTyfYJv6_0pO0jm_1200x900.jpg",
+        "https://images.craigslist.org/00x0x_jXHwdJ1qG1v_0pO0jm_1200x900.jpg",
+        "https://images.craigslist.org/00h0h_lYwgADXKvvC_0pO0jm_1200x900.jpg"
+      ],
+      "categoryKey": "vehicles"
+    },
+    {
+      "id": "craigslist-2fecPou6snZdBoLQgcFgNA",
+      "slug": "2024-gmc-sierra-2500-hd-at4-bestdeals-upfront-price-832-24-bolqgcfgna",
+      "url": "https://6ixo.com/listing/2024-gmc-sierra-2500-hd-at4-bestdeals-upfront-price-832-24-bolqgcfgna/",
+      "images": [
+        "https://images.craigslist.org/00k0k_5c5JGuw5jct_0nm0hw_1200x900.jpg",
+        "https://images.craigslist.org/00000_1LklXnb71tp_0nm0hw_1200x900.jpg",
+        "https://images.craigslist.org/01313_i7sXDKKYcQT_0CI0t2_1200x900.jpg",
+        "https://images.craigslist.org/00t0t_6XZtP4kCzSQ_0CI0t2_1200x900.jpg"
+      ],
+      "categoryKey": "vehicles"
+    },
+    {
+      "id": "craigslist-4LTrLxykVNGLctQuCsT25C",
+      "slug": "2010-hyundai-genesis-sedan-v6-technology-pkg-low-46k-miles-ctqucst25c",
+      "url": "https://6ixo.com/listing/2010-hyundai-genesis-sedan-v6-technology-pkg-low-46k-miles-ctqucst25c/",
+      "images": [
+        "https://images.craigslist.org/01515_he4hWjCLwkT_0C80t2_1200x900.jpg",
+        "https://images.craigslist.org/00808_bvopwagEjm3_0CI0t2_1200x900.jpg",
+        "https://images.craigslist.org/00O0O_4fzkcEkQgZQ_0BX0t2_1200x900.jpg",
+        "https://images.craigslist.org/00B0B_4clnyjhTPQc_0Cj0t2_1200x900.jpg"
+      ],
+      "categoryKey": "vehicles"
+    },
+    {
+      "id": "craigslist-9dpqDLMVgvNBmdurPLDnKi",
+      "slug": "2017-bmw-x5-credit-problems-ok-we-work-with-you-mdurpldnki",
+      "url": "https://6ixo.com/listing/2017-bmw-x5-credit-problems-ok-we-work-with-you-mdurpldnki/",
+      "images": [
+        "https://images.craigslist.org/00x0x_bamL7TVxPcd_0cU09G_1200x900.jpg",
+        "https://images.craigslist.org/00M0M_gQ3UizbgdyG_0cU09G_1200x900.jpg",
+        "https://images.craigslist.org/00P0P_9tbWOObqrCc_0cU09G_1200x900.jpg",
+        "https://images.craigslist.org/00a0a_1prpzh0r8Lj_0cU09G_1200x900.jpg"
+      ],
+      "categoryKey": "vehicles"
+    },
+    {
+      "id": "craigslist-oLpWS1YDFq5rorqnAaaNaX",
+      "slug": "2017-nissan-maxima-100-in-house-finance-car-dealership-sw--orqnaaanax",
+      "url": "https://6ixo.com/listing/2017-nissan-maxima-100-in-house-finance-car-dealership-sw--orqnaaanax/",
+      "images": [
+        "https://images.craigslist.org/00o0o_2w42YNzIDEh_0cU09G_1200x900.jpg",
+        "https://images.craigslist.org/01111_gEh4lHqi5XH_0cU09G_1200x900.jpg",
+        "https://images.craigslist.org/00H0H_bj2ovwJmY9y_0cU09G_1200x900.jpg",
+        "https://images.craigslist.org/01414_cWbAhlFo8jg_0cU09G_1200x900.jpg"
+      ],
+      "categoryKey": "vehicles"
+    },
+    {
+      "id": "craigslist-vW34PhjEbSyra3CGxaXLGq",
+      "slug": "2018-dodge-charger-credit-problems-ok-we-finance-a3cgxaxlgq",
+      "url": "https://6ixo.com/listing/2018-dodge-charger-credit-problems-ok-we-finance-a3cgxaxlgq/",
+      "images": [
+        "https://images.craigslist.org/00G0G_erGhDYOQVgj_0cU09G_1200x900.jpg",
+        "https://images.craigslist.org/00c0c_2nJefjSRc8Q_0cU09G_1200x900.jpg",
+        "https://images.craigslist.org/00R0R_cF7wEvoDAIz_0cU09G_1200x900.jpg",
+        "https://images.craigslist.org/00n0n_9k8ghiVaWy_0cU09G_1200x900.jpg"
+      ],
+      "categoryKey": "vehicles"
+    },
+    {
+      "id": "craigslist-jf14KzZpJtMuvAdN4M196A",
+      "slug": "bad-credit-welcomed-call-me-vadn4m196a",
+      "url": "https://6ixo.com/listing/bad-credit-welcomed-call-me-vadn4m196a/",
+      "images": [
+        "https://images.craigslist.org/00B0B_72g791eVUUv_0t20CI_1200x900.jpg",
+        "https://images.craigslist.org/00I0I_jmtUxqsVXCM_0t20CI_1200x900.jpg",
+        "https://images.craigslist.org/00N0N_9CZu33spmJc_0t20CI_1200x900.jpg",
+        "https://6ixo.com/data/listing-image-cache/055396d79e45a0f6c36b49639644e70362665d636b3312dffa88f7d78a5bf96a.jpg"
+      ],
+      "categoryKey": "vehicles"
+    },
+    {
+      "id": "craigslist-odhaVkUxC5dyXyWVz3zeZL",
+      "slug": "easy-approval-clean-rides-xywvz3zezl",
+      "url": "https://6ixo.com/listing/easy-approval-clean-rides-xywvz3zezl/",
+      "images": [
+        "https://images.craigslist.org/00s0s_4VoF9Bx5gGm_0t20CI_1200x900.jpg",
+        "https://images.craigslist.org/01414_ae4Wu9jwCNp_0t20CI_1200x900.jpg",
+        "https://images.craigslist.org/00Z0Z_jFKyi6Fpko_0t20CI_1200x900.jpg",
+        "https://images.craigslist.org/00000_jb7MVKsV9bb_0t20CI_1200x900.jpg"
+      ],
+      "categoryKey": "vehicles"
+    },
+    {
+      "id": "craigslist-sGDKihfwM1AsdDNSFKa657",
+      "slug": "whats-a-credit-score-i-dont-know-ddnsfka657",
+      "url": "https://6ixo.com/listing/whats-a-credit-score-i-dont-know-ddnsfka657/",
+      "images": [
+        "https://images.craigslist.org/00k0k_gepAhXA4Oub_0t20CI_1200x900.jpg",
+        "https://6ixo.com/data/listing-image-cache/23f62e1741e7858ce40a58601634e143609211a8ebfe6ea2b965fc9319199a59.jpg",
+        "https://6ixo.com/data/listing-image-cache/055396d79e45a0f6c36b49639644e70362665d636b3312dffa88f7d78a5bf96a.jpg",
+        "https://images.craigslist.org/00N0N_1t3V5gjqGTC_0t20CI_1200x900.jpg"
+      ],
+      "categoryKey": "vehicles"
+    },
+    {
+      "id": "craigslist-qyCSMW9CNT9FBWZXR3GHJ6",
+      "slug": "2020-ram-2500-big-horn-4x4-only-146k-miles-clean-title-bwzxr3ghj6",
+      "url": "https://6ixo.com/listing/2020-ram-2500-big-horn-4x4-only-146k-miles-clean-title-bwzxr3ghj6/",
+      "images": [
+        "https://images.craigslist.org/01111_hdWCZ4AT7BK_0CI0t2_1200x900.jpg",
+        "https://images.craigslist.org/00a0a_dAy0odBgswP_0CI0t2_1200x900.jpg",
+        "https://images.craigslist.org/00z0z_4U7lhScaZJ3_0CI0sM_1200x900.jpg",
+        "https://images.craigslist.org/00505_cJRzutiLaeS_0CI0pi_1200x900.jpg"
+      ],
+      "categoryKey": "vehicles"
+    },
+    {
+      "id": "craigslist-kfqJ8PnGMuKqDntThnJTnp",
+      "slug": "2019-jeep-grand-cherokee-limited-4x2-104k-miles-clean-titl-dntthnjtnp",
+      "url": "https://6ixo.com/listing/2019-jeep-grand-cherokee-limited-4x2-104k-miles-clean-titl-dntthnjtnp/",
+      "images": [
+        "https://images.craigslist.org/00808_hr9LQXM3Emj_0Co0t2_1200x900.jpg",
+        "https://images.craigslist.org/00F0F_7413V7O2Vox_0CI0t2_1200x900.jpg",
+        "https://images.craigslist.org/00B0B_hDT9DdUdZBx_0CI0t2_1200x900.jpg",
+        "https://images.craigslist.org/00u0u_jdYB7wVH8A6_0CI0qz_1200x900.jpg"
+      ],
+      "categoryKey": "vehicles"
+    },
+    {
+      "id": "craigslist-nLAxoiNHr3W7eZ4Gj1EQ4o",
+      "slug": "2018-volvo-xc90-t5-momentum-7p-only-102k-miles-clean-title-ez4gj1eq4o",
+      "url": "https://6ixo.com/listing/2018-volvo-xc90-t5-momentum-7p-only-102k-miles-clean-title-ez4gj1eq4o/",
+      "images": [
+        "https://images.craigslist.org/00J0J_2Oymn9YhPkA_0CI0t2_1200x900.jpg",
+        "https://images.craigslist.org/00G0G_kI5b2CHPe46_0CI0t2_1200x900.jpg",
+        "https://images.craigslist.org/00j0j_kwvuViF7aRj_0CI0t2_1200x900.jpg",
+        "https://images.craigslist.org/00v0v_BauME9853K_0CI0t2_1200x900.jpg"
+      ],
+      "categoryKey": "vehicles"
+    },
+    {
+      "id": "craigslist-1UVYbN2kbYqZNpMfubB21i",
+      "slug": "2007-2008-hyundai-accent-automatic-transmission-ms4801-npmfubb21i",
+      "url": "https://6ixo.com/listing/2007-2008-hyundai-accent-automatic-transmission-ms4801-npmfubb21i/",
+      "images": [
+        "https://images.craigslist.org/00T0T_bIl8kKjAXBG_0t20CI_1200x900.jpg",
+        "https://images.craigslist.org/00c0c_1vXoyw312Uh_0CI0t2_1200x900.jpg",
+        "https://images.craigslist.org/00L0L_iQxfGoF1dH0_0t20CI_1200x900.jpg",
+        "https://images.craigslist.org/00w0w_6LoTSua72yv_0dF06C_1200x900.jpg"
+      ],
+      "categoryKey": "auto-parts"
+    },
+    {
+      "id": "craigslist-6d1ERDL8gpAc29sbK8HLe5",
+      "slug": "2006-2010-ford-mustang-4-0l-engine-for-sale-stock-m19687-29sbk8hle5",
+      "url": "https://6ixo.com/listing/2006-2010-ford-mustang-4-0l-engine-for-sale-stock-m19687-29sbk8hle5/",
+      "images": [
+        "https://images.craigslist.org/00A0A_17Ob88REpq5_0t20CI_1200x900.jpg",
+        "https://images.craigslist.org/01313_4N0w1rHQt9i_0nl0hx_1200x900.jpg",
+        "https://images.craigslist.org/01616_axDupoBqv44_0t20CI_1200x900.jpg",
+        "https://images.craigslist.org/00i0i_dzhlpKimq55_0ew0ew_1200x900.jpg"
+      ],
+      "categoryKey": "auto-parts"
+    },
+    {
+      "id": "craigslist-o1j6rE77axCgPybvvUnABE",
+      "slug": "2004-2005-cadillac-deville-4-6l-engine-for-sale-stock-m196-pybvvunabe",
+      "url": "https://6ixo.com/listing/2004-2005-cadillac-deville-4-6l-engine-for-sale-stock-m196-pybvvunabe/",
+      "images": [
+        "https://images.craigslist.org/00Y0Y_apRNZNgKdWz_0t20CI_1200x900.jpg",
+        "https://images.craigslist.org/01313_4N0w1rHQt9i_0nl0hx_1200x900.jpg",
+        "https://images.craigslist.org/00101_1pRdqhjKfyl_0t20CI_1200x900.jpg",
+        "https://images.craigslist.org/00i0i_dzhlpKimq55_0ew0ew_1200x900.jpg"
+      ],
+      "categoryKey": "auto-parts"
+    },
+    {
+      "id": "craigslist-sCvtHCX82RcSPGTghyzuQV",
+      "slug": "2007-2008-honda-fit-automatic-floor-fwd-transmission-for-s-pgtghyzuqv",
+      "url": "https://6ixo.com/listing/2007-2008-honda-fit-automatic-floor-fwd-transmission-for-s-pgtghyzuqv/",
+      "images": [
+        "https://images.craigslist.org/00B0B_kibn4XB0nx2_0CI0t2_1200x900.jpg",
+        "https://images.craigslist.org/01313_4N0w1rHQt9i_0nl0hx_1200x900.jpg",
+        "https://images.craigslist.org/00i0i_4ZTv99T6d8i_0t20CI_1200x900.jpg",
+        "https://images.craigslist.org/00i0i_dzhlpKimq55_0ew0ew_1200x900.jpg"
+      ],
+      "categoryKey": "auto-parts"
+    },
+    {
+      "id": "craigslist-5mr75L1yPRzQof6cWeXo3Z",
+      "slug": "2018-2019-chevrolet-equinox-1-5l-engine-for-sale-stock-m19-of6cwexo3z",
+      "url": "https://6ixo.com/listing/2018-2019-chevrolet-equinox-1-5l-engine-for-sale-stock-m19-of6cwexo3z/",
+      "images": [
+        "https://images.craigslist.org/00y0y_AfmADizc0I_0t20CI_1200x900.jpg",
+        "https://images.craigslist.org/01313_4N0w1rHQt9i_0nl0hx_1200x900.jpg",
+        "https://images.craigslist.org/00505_k0qTNHcoaRV_0t20CI_1200x900.jpg",
+        "https://images.craigslist.org/00i0i_dzhlpKimq55_0ew0ew_1200x900.jpg"
+      ],
+      "categoryKey": "auto-parts"
+    },
+    {
+      "id": "craigslist-bgiSQz1XT38JL9NwK9bVuD",
+      "slug": "2003-2011-saab-9-3-parting-out-stock-f36552-l9nwk9bvud",
+      "url": "https://6ixo.com/listing/2003-2011-saab-9-3-parting-out-stock-f36552-l9nwk9bvud/",
+      "images": [
+        "https://images.craigslist.org/00m0m_euDZ9I3bQJl_0CI0t2_1200x900.jpg",
+        "https://images.craigslist.org/01313_4N0w1rHQt9i_0nl0hx_1200x900.jpg",
+        "https://images.craigslist.org/00e0e_lABKdwO5gJr_0CI0t2_1200x900.jpg",
+        "https://images.craigslist.org/00d0d_fhgxMK3EQuo_0t20CI_1200x900.jpg"
+      ],
+      "categoryKey": "auto-parts"
+    },
+    {
+      "id": "craigslist-af96NjMnLahkShhJ9UstpU",
+      "slug": "american-range-heritage-classic-series-48-range-shhj9ustpu",
+      "url": "https://6ixo.com/listing/american-range-heritage-classic-series-48-range-shhj9ustpu/",
+      "images": [
+        "https://images.craigslist.org/00404_lq4KZ05uU7r_0kC0eP_1200x900.jpg",
+        "https://images.craigslist.org/00B0B_gOtmol8lTpD_0kO0rg_1200x900.jpg",
+        "https://images.craigslist.org/00S0S_6eI0GVEIu8X_0li0gs_1200x900.jpg",
+        "https://images.craigslist.org/00C0C_2vijfDr39kf_0kE0r6_1200x900.jpg"
+      ],
+      "categoryKey": "buy-and-sell"
+    },
+    {
+      "id": "craigslist-CFGxo0Hl8RGQr-vN-buQEg",
+      "slug": "2018-jeep-wrangler-unlimited-all-new-sahara-sport-utility--gqrvnbuqeg",
+      "url": "https://6ixo.com/listing/2018-jeep-wrangler-unlimited-all-new-sahara-sport-utility--gqrvnbuqeg/",
+      "images": [
+        "https://images.craigslist.org/00g0g_4pM0ULUeyQ8_0jm0cU_1200x900.jpg",
+        "https://images.craigslist.org/00q0q_kPdbuhVPVCS_0jm0cU_1200x900.jpg",
+        "https://images.craigslist.org/00k0k_iUBxMhTebir_0jm0cU_1200x900.jpg",
+        "https://images.craigslist.org/00k0k_1oZsP2oyGN5_0jm0cU_1200x900.jpg"
+      ],
+      "categoryKey": "vehicles"
+    },
+    {
+      "id": "craigslist-sAT9NFmMd9tk3XwE7p4F4W",
+      "slug": "2018-ford-focus-sel-1-owner-3xwe7p4f4w",
+      "url": "https://6ixo.com/listing/2018-ford-focus-sel-1-owner-3xwe7p4f4w/",
+      "images": [
+        "https://images.craigslist.org/01212_aSp0YB5IJsV_0kE0fu_1200x900.jpg",
+        "https://images.craigslist.org/00C0C_h8qH2SPN2Qc_0790fu_1200x900.jpg",
+        "https://images.craigslist.org/01313_ec3Z2XuGg46_0kE0fu_1200x900.jpg",
+        "https://images.craigslist.org/00x0x_bGIKjaGi3T_0kE0fu_1200x900.jpg"
+      ],
+      "categoryKey": "vehicles"
+    },
+    {
+      "id": "craigslist-iiCyrum5tHvtTkdsMeh5LW",
+      "slug": "2009-subaru-tribeca-sport-utility-limited-7-passenger-tkdsmeh5lw",
+      "url": "https://6ixo.com/listing/2009-subaru-tribeca-sport-utility-limited-7-passenger-tkdsmeh5lw/",
+      "images": [
+        "https://images.craigslist.org/00C0C_k1NDcvzTzoK_0t20CI_1200x900.jpg",
+        "https://images.craigslist.org/00O0O_3SgcQoXnuc4_0t20CI_1200x900.jpg",
+        "https://images.craigslist.org/00e0e_dEGoGdmn6sp_0t20CI_1200x900.jpg",
+        "https://images.craigslist.org/00D0D_7HMvRFnji29_0t20CI_1200x900.jpg"
+      ],
+      "categoryKey": "vehicles"
+    },
+    {
+      "id": "craigslist-prFtUzbl8RG9mvnF7_xpJA",
+      "slug": "2023-ram-2500-big-horn-4x4-4-x-4-4-x-4-crew-cab-8-ft-box-f-9mvnf7xpja",
+      "url": "https://6ixo.com/listing/2023-ram-2500-big-horn-4x4-4-x-4-4-x-4-crew-cab-8-ft-box-f-9mvnf7xpja/",
+      "images": [
+        "https://images.craigslist.org/01010_a5w4jwMVEfE_0fe0bq_1200x900.jpg",
+        "https://images.craigslist.org/00H0H_cMC9XRezUXw_0fe0bq_1200x900.jpg",
+        "https://images.craigslist.org/00r0r_iikEySX0oun_0fe0bq_1200x900.jpg",
+        "https://images.craigslist.org/00V0V_bL6HXxcyBox_0fe0bq_1200x900.jpg"
+      ],
+      "categoryKey": "vehicles"
+    },
+    {
+      "id": "craigslist-9oNB4i7l8RGVBqncGSfXWQ",
+      "slug": "chevrolet-silverado-1500-crew-cab-bad-credit-bankruptcy-re-bqncgsfxwq",
+      "url": "https://6ixo.com/listing/chevrolet-silverado-1500-crew-cab-bad-credit-bankruptcy-re-bqncgsfxwq/",
+      "images": [
+        "https://images.craigslist.org/00I0I_8Verk7uZNdx_0aM08b_1200x900.jpg",
+        "https://images.craigslist.org/00c0c_bJgNSPLXI3I_0aP087_1200x900.jpg",
+        "https://images.craigslist.org/00000_iki4gqOhVyk_0aZ08c_1200x900.jpg",
+        "https://images.craigslist.org/01111_i1Nk774X9jC_0aV084_1200x900.jpg"
+      ],
+      "categoryKey": "vehicles"
+    },
+    {
+      "id": "craigslist-xpAv6inl8RGyYYawJ0munw",
+      "slug": "2017-nissan-frontier-crew-cab-sv-pickup-4d-5-ft-price-yyawj0munw",
+      "url": "https://6ixo.com/listing/2017-nissan-frontier-crew-cab-sv-pickup-4d-5-ft-price-yyawj0munw/",
+      "images": [
+        "https://images.craigslist.org/00909_1TNIAOwnMrw_0jm0by_1200x900.jpg",
+        "https://images.craigslist.org/00j0j_7R4WYLncwoB_0jm0cA_1200x900.jpg",
+        "https://images.craigslist.org/00l0l_fP0bX8PdDop_0jm0d0_1200x900.jpg",
+        "https://images.craigslist.org/00L0L_iVKGblNyZ7c_0jm07J_1200x900.jpg"
+      ],
+      "categoryKey": "vehicles"
+    },
+    {
+      "id": "craigslist-_lenGJ7k8RG_I5v39MPMhQ",
+      "slug": "2015-ford-super-duty-f-250-srw-2wd-reg-cab-long-bed-6-2l-g-i5v39mpmhq",
+      "url": "https://6ixo.com/listing/2015-ford-super-duty-f-250-srw-2wd-reg-cab-long-bed-6-2l-g-i5v39mpmhq/",
+      "images": [
+        "https://images.craigslist.org/00Q0Q_2Rlie8OZ4h_0kE0fu_1200x900.jpg",
+        "https://images.craigslist.org/01616_bNXpKu8WnTk_0ak07K_1200x900.jpg",
+        "https://images.craigslist.org/00o0o_9r57dbNs5Lc_0ak07K_1200x900.jpg",
+        "https://images.craigslist.org/01212_g3CwVCfDNHG_0ak07K_1200x900.jpg"
+      ],
+      "categoryKey": "vehicles"
+    },
+    {
+      "id": "craigslist-pv545AHl8RG_64-s56EaSw",
+      "slug": "2019-dodge-challenger-gt-coupe-2d-coupe-g64s56easw",
+      "url": "https://6ixo.com/listing/2019-dodge-challenger-gt-coupe-2d-coupe-g64s56easw/",
+      "images": [
+        "https://images.craigslist.org/00V0V_fRA0hweTaKh_0jm0ew_1200x900.jpg",
+        "https://images.craigslist.org/00202_exB1OQJHM1L_0jm0ew_1200x900.jpg",
+        "https://images.craigslist.org/00303_3AET3yRFqh8_0jm0ew_1200x900.jpg",
+        "https://images.craigslist.org/00n0n_7EtzpsXMrKi_0jm0ew_1200x900.jpg"
+      ],
+      "categoryKey": "vehicles"
+    },
+    {
+      "id": "craigslist-ZkvxxADl8RG44Z0WkI2svg",
+      "slug": "2015-ford-f150-supercrew-cab-f-150-truck-xlt-pickup-4d-5-1-4z0wki2svg",
+      "url": "https://6ixo.com/listing/2015-ford-f150-supercrew-cab-f-150-truck-xlt-pickup-4d-5-1-4z0wki2svg/",
+      "images": [
+        "https://images.craigslist.org/00Z0Z_kR9uyaoHlfo_0jm0ew_1200x900.jpg",
+        "https://images.craigslist.org/00y0y_jPUrEHpXn4J_0jm0ew_1200x900.jpg",
+        "https://images.craigslist.org/00a0a_job4Gxi8OdU_0jm0ew_1200x900.jpg",
+        "https://images.craigslist.org/00A0A_dPvfxahLpLV_0jm0ew_1200x900.jpg"
+      ],
+      "categoryKey": "vehicles"
+    },
+    {
+      "id": "craigslist-SFhTu__k8RGvLsCt2_6bBg",
+      "slug": "2018-ford-escape-se-sport-utility-4d-suv-vlsct26bbg",
+      "url": "https://6ixo.com/listing/2018-ford-escape-se-sport-utility-4d-suv-vlsct26bbg/",
+      "images": [
+        "https://images.craigslist.org/00z0z_4aLl2R3o190_0jm0ew_1200x900.jpg",
+        "https://images.craigslist.org/00j0j_kGtOkptNNTk_0jm0ew_1200x900.jpg",
+        "https://images.craigslist.org/00K0K_aYGeDGSZVdz_0jm0ew_1200x900.jpg",
+        "https://images.craigslist.org/00t0t_8qAcujncmiF_0jm0ew_1200x900.jpg"
+      ],
+      "categoryKey": "vehicles"
+    },
+    {
+      "id": "craigslist-vAZw4f7k8RGrpdeXMVnlIA",
+      "slug": "2018-ford-f150-supercrew-cab-f-150-truck-xlt-pickup-4d-5-1-pdexmvnlia",
+      "url": "https://6ixo.com/listing/2018-ford-f150-supercrew-cab-f-150-truck-xlt-pickup-4d-5-1-pdexmvnlia/",
+      "images": [
+        "https://images.craigslist.org/00w0w_b1ZN1MPouOJ_0jm0ew_1200x900.jpg",
+        "https://images.craigslist.org/00S0S_ctx14mlB6ZO_0jm0ew_1200x900.jpg",
+        "https://images.craigslist.org/00C0C_cP7Xcu56e2Q_0jm0ew_1200x900.jpg",
+        "https://images.craigslist.org/00g0g_hXHd9kz3X24_0jl0ew_1200x900.jpg"
+      ],
+      "categoryKey": "vehicles"
+    },
+    {
+      "id": "craigslist-qE4VfPnk8RGNXqcvH-Cnig",
+      "slug": "2020-ford-fusion-se-sedan-4d-sedan-nxqcvhcnig",
+      "url": "https://6ixo.com/listing/2020-ford-fusion-se-sedan-4d-sedan-nxqcvhcnig/",
+      "images": [
+        "https://images.craigslist.org/00z0z_6sym1TebIni_0jm0ew_1200x900.jpg",
+        "https://images.craigslist.org/00202_iGyrUu5Ygv9_0jm0ew_1200x900.jpg",
+        "https://images.craigslist.org/00i0i_c6Lo76ptEwH_0jm0ew_1200x900.jpg",
+        "https://images.craigslist.org/01717_cRiwZD82kLK_0jm0ew_1200x900.jpg"
+      ],
+      "categoryKey": "vehicles"
+    },
+    {
+      "id": "craigslist-ztEGYPjk8RGPAZa0NEYyCQ",
+      "slug": "2019-honda-civic-lx-sedan-4d-sedan-aza0neyycq",
+      "url": "https://6ixo.com/listing/2019-honda-civic-lx-sedan-4d-sedan-aza0neyycq/",
+      "images": [
+        "https://images.craigslist.org/00F0F_9O7qas2MeQE_0jm0ew_1200x900.jpg",
+        "https://images.craigslist.org/00101_6aNhcCrcS6r_0jm0ew_1200x900.jpg",
+        "https://images.craigslist.org/00J0J_3F5sXUIHORw_0jm0ew_1200x900.jpg",
+        "https://images.craigslist.org/01111_5rCQyn5Yhwy_0jm0ew_1200x900.jpg"
+      ],
+      "categoryKey": "vehicles"
+    },
+    {
+      "id": "craigslist-xsWGvhGzWcoisaYnZaPuh8",
+      "slug": "2015-chevy-impala-1-500k-down-no-credit-check-saynzapuh8",
+      "url": "https://6ixo.com/listing/2015-chevy-impala-1-500k-down-no-credit-check-saynzapuh8/",
+      "images": [
+        "https://images.craigslist.org/00000_9zOtgXYSlj8_0CI0vK_1200x900.jpg",
+        "https://images.craigslist.org/00D0D_98O8diZsblQ_0CI0kS_1200x900.jpg",
+        "https://images.craigslist.org/00K0K_2D4SRkjAR3L_0CI0t2_1200x900.jpg",
+        "https://images.craigslist.org/00c0c_dIqr3RP8l7b_0CI0t2_1200x900.jpg"
+      ],
+      "categoryKey": "vehicles"
+    },
     {
       "id": "craigslist-2otSgx3l8RGc3pTPo0WKlQ",
       "slug": "2021-mercedes-benz-glc-great-deal-staten-island-3ptpo0wklq",
@@ -451,18 +1309,6 @@
         "https://images.craigslist.org/00O0O_aaHKvdlwnqd_0kE0fu_1200x900.jpg",
         "https://images.craigslist.org/00J0J_5HU0FRtbXTw_0kE0fu_1200x900.jpg",
         "https://images.craigslist.org/00F0F_lTo0ycAo713_0kE0fu_1200x900.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "craigslist-8qxbUB3l8RGrj_6AKo1_mQ",
-      "slug": "2019-ford-f-250-f250-f-250-super-duty-xlt-4x4-4dr-crew-cab-grj6ako1mq",
-      "url": "https://6ixo.com/listing/2019-ford-f-250-f250-f-250-super-duty-xlt-4x4-4dr-crew-cab-grj6ako1mq/",
-      "images": [
-        "https://6ixo.com/data/listing-image-cache/2be5636cc324ebe1dc5588f232da298958a77abc912ea38e879145f23e54ce8f.jpg",
-        "https://images.craigslist.org/01212_kzejMTFIJVp_0gw0co_1200x900.jpg",
-        "https://images.craigslist.org/00V0V_SZlqqnRfVa_0gw0co_1200x900.jpg",
-        "https://images.craigslist.org/00W0W_cCMA86Tiipl_0jm0ew_1200x900.jpg"
       ],
       "categoryKey": "vehicles"
     },
@@ -1736,18 +2582,6 @@
         "https://images.craigslist.org/00n0n_39mUb3RCLCf_0ak07K_1200x900.jpg",
         "https://images.craigslist.org/00i0i_7Wrf6oLO3Ip_0ak07K_1200x900.jpg",
         "https://images.craigslist.org/00R0R_beD0p8AA1oy_0ak07K_1200x900.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "craigslist-MIAur57k8RGNvPGQXRu-vw",
-      "slug": "2015-ford-super-duty-f-250-srw-2wd-reg-cab-long-bed-6-2l-g-nvpgqxruvw",
-      "url": "https://6ixo.com/listing/2015-ford-super-duty-f-250-srw-2wd-reg-cab-long-bed-6-2l-g-nvpgqxruvw/",
-      "images": [
-        "https://images.craigslist.org/00Q0Q_2Rlie8OZ4h_0kE0fu_1200x900.jpg",
-        "https://images.craigslist.org/01616_bNXpKu8WnTk_0ak07K_1200x900.jpg",
-        "https://images.craigslist.org/00o0o_9r57dbNs5Lc_0ak07K_1200x900.jpg",
-        "https://images.craigslist.org/01212_g3CwVCfDNHG_0ak07K_1200x900.jpg"
       ],
       "categoryKey": "vehicles"
     },
@@ -3093,30 +3927,6 @@
       "categoryKey": "vehicles"
     },
     {
-      "id": "craigslist-weNZAWSRQFeuNg1Qu4QTWf",
-      "slug": "easy-approval-clean-rides-ng1qu4qtwf",
-      "url": "https://6ixo.com/listing/easy-approval-clean-rides-ng1qu4qtwf/",
-      "images": [
-        "https://images.craigslist.org/00s0s_4VoF9Bx5gGm_0t20CI_1200x900.jpg",
-        "https://images.craigslist.org/00202_htQ1iHr04Xv_0t20CI_1200x900.jpg",
-        "https://images.craigslist.org/00V0V_5A9oTz8sozC_0t20CI_1200x900.jpg",
-        "https://images.craigslist.org/00l0l_bmqB3rqxLBP_0t20CI_1200x900.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "craigslist-gWRUWRffn73pCraL4zZEzf",
-      "slug": "bad-credit-welcomed-call-me-cral4zzezf",
-      "url": "https://6ixo.com/listing/bad-credit-welcomed-call-me-cral4zzezf/",
-      "images": [
-        "https://images.craigslist.org/00R0R_dlccArnM6v3_0t20CI_1200x900.jpg",
-        "https://images.craigslist.org/00l0l_fxGFXnH4MxQ_0t20CI_1200x900.jpg",
-        "https://6ixo.com/data/listing-image-cache/055396d79e45a0f6c36b49639644e70362665d636b3312dffa88f7d78a5bf96a.jpg",
-        "https://images.craigslist.org/00707_hDq2k5seq0E_0t20CI_1200x900.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
       "id": "craigslist-1qboR4rfZH1NE3ck5fSH4v",
       "slug": "income-approves-you-e3ck5fsh4v",
       "url": "https://6ixo.com/listing/income-approves-you-e3ck5fsh4v/",
@@ -3344,18 +4154,6 @@
         "https://images.craigslist.org/00R0R_klVrTgWOHA0_0cU09G_1200x900.jpg",
         "https://images.craigslist.org/00r0r_2L7FwqlAyWF_0cU09G_1200x900.jpg",
         "https://images.craigslist.org/00W0W_25xOEKRQoMm_0cU09G_1200x900.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "craigslist-Gtx9hHXk8RG8JM-RyigRPQ",
-      "slug": "2019-ford-transit-350-wagon-low-roof-xlt-60-40-pass-148-in-8jmryigrpq",
-      "url": "https://6ixo.com/listing/2019-ford-transit-350-wagon-low-roof-xlt-60-40-pass-148-in-8jmryigrpq/",
-      "images": [
-        "https://images.craigslist.org/00606_kxjMPq2VPMP_0cg09c_1200x900.jpg",
-        "https://images.craigslist.org/00f0f_7ghnP24oLIm_0cg09c_1200x900.jpg",
-        "https://images.craigslist.org/00b0b_j8f4tPnBXVE_0cg09c_1200x900.jpg",
-        "https://images.craigslist.org/00C0C_8IZ1hJx7q7A_0cg09c_1200x900.jpg"
       ],
       "categoryKey": "vehicles"
     },
@@ -3788,18 +4586,6 @@
       "categoryKey": "vehicles"
     },
     {
-      "id": "craigslist-koYuKFKAHZ8QsxGhh1pPrR",
-      "slug": "whats-a-credit-score-i-dont-know-sxghh1pprr",
-      "url": "https://6ixo.com/listing/whats-a-credit-score-i-dont-know-sxghh1pprr/",
-      "images": [
-        "https://6ixo.com/data/listing-image-cache/5b30510490caa71419c517d1b838b24fa20229fbd65a39bffe6db0a5c18ca5d9.jpg",
-        "https://images.craigslist.org/00X0X_b8FRqrHjIfv_0t20CI_1200x900.jpg",
-        "https://images.craigslist.org/00N0N_hoIniPwzjUL_0t20CI_1200x900.jpg",
-        "https://images.craigslist.org/00X0X_cvOLq5CUL67_0t20CI_1200x900.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
       "id": "craigslist-gNYAk1NiAwW4VjEn1DhnUy",
       "slug": "good-income-no-credit-get-told-yes-with-me-vjen1dhnuy",
       "url": "https://6ixo.com/listing/good-income-no-credit-get-told-yes-with-me-vjen1dhnuy/",
@@ -4059,17 +4845,6 @@
         "https://images.craigslist.org/00b0b_6luxJAFyOEg_0CI0lM_1200x900.jpg"
       ],
       "categoryKey": "vehicles"
-    },
-    {
-      "id": "craigslist-jc6vuXmPkcB7BzGxu9uBad",
-      "slug": "rye-sun-filled-1-bedroom-with-an-updated-kitchen-near-town-bzgxu9ubad",
-      "url": "https://6ixo.com/listing/rye-sun-filled-1-bedroom-with-an-updated-kitchen-near-town-bzgxu9ubad/",
-      "images": [
-        "https://6ixo.com/data/listing-image-cache/48b70680b7d8d0465d9c16821f27b8d6354e501f50d3c68a573f4466d3d999c2.jpg",
-        "https://images.craigslist.org/00202_bif5ufMCKNG_0CI0t2_1200x900.jpg",
-        "https://images.craigslist.org/00d0d_kYBe9iSwQkW_0t20CI_1200x900.jpg"
-      ],
-      "categoryKey": "real-estate"
     },
     {
       "id": "craigslist-IKZ1F4Tf8RGfMIDhCeKH9g",
@@ -15731,18 +16506,6 @@
       "categoryKey": "vehicles"
     },
     {
-      "id": "craigslist-yCkI-8_i8RGzM47P1-Ej9g",
-      "slug": "2016-ford-f-350-f350-f-350-super-duty-xlt-4x4-4dr-crew-cab-zm47p1ej9g",
-      "url": "https://6ixo.com/listing/2016-ford-f-350-f350-f-350-super-duty-xlt-4x4-4dr-crew-cab-zm47p1ej9g/",
-      "images": [
-        "https://images.craigslist.org/00707_8XAyGt16CpR_0jm0ew_1200x900.jpg",
-        "https://images.craigslist.org/00o0o_1GK2aa3BE4k_0jm0ew_1200x900.jpg",
-        "https://images.craigslist.org/00d0d_5ZbgeC8tIF7_0jm0ew_1200x900.jpg",
-        "https://images.craigslist.org/00s0s_1QRgJQcAWf8_0jm0ew_1200x900.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
       "id": "craigslist-YlQWr-Ti8RGzldEQWwccKg",
       "slug": "2022-chevrolet-tahoe-financing-available-ldeqwwcckg",
       "url": "https://6ixo.com/listing/2022-chevrolet-tahoe-financing-available-ldeqwwcckg/",
@@ -21585,18 +22348,6 @@
       "categoryKey": "auto-parts"
     },
     {
-      "id": "craigslist-ipmSkXqGYmrVqrjHZWio46",
-      "slug": "american-range-heritage-classic-series-48-range-qrjhzwio46",
-      "url": "https://6ixo.com/listing/american-range-heritage-classic-series-48-range-qrjhzwio46/",
-      "images": [
-        "https://6ixo.com/data/listing-image-cache/7c82174ea907b0d4f435c6288086271d1f8e2dbb5db67dfb892d5d93754c40aa.jpg",
-        "https://images.craigslist.org/00N0N_965gHvuEveb_0kw0qY_1200x900.jpg",
-        "https://images.craigslist.org/00606_iahgEDGZCGO_0la0gk_1200x900.jpg",
-        "https://images.craigslist.org/00b0b_bL5j6GoEj5V_0lC0s4_1200x900.jpg"
-      ],
-      "categoryKey": "buy-and-sell"
-    },
-    {
       "id": "craigslist-uvYu6gDi8RGsG-ISY5S0yg",
       "slug": "2014-ford-cmax-hybrid-c-max-hybrid-c-max-hybrid-hb-se-for--sgisy5s0yg",
       "url": "https://6ixo.com/listing/2014-ford-cmax-hybrid-c-max-hybrid-c-max-hybrid-hb-se-for--sgisy5s0yg/",
@@ -25067,18 +25818,6 @@
       "categoryKey": "vehicles"
     },
     {
-      "id": "craigslist-IJPv513d8RGg4qIHbTQnnA",
-      "slug": "2017-ram-2500-laramie-4x4-4dr-crew-cab-6-3-ft-sb-pickup-4qihbtqnna",
-      "url": "https://6ixo.com/listing/2017-ram-2500-laramie-4x4-4dr-crew-cab-6-3-ft-sb-pickup-4qihbtqnna/",
-      "images": [
-        "https://images.craigslist.org/00E0E_8s4YeK70z8M_0jm0ew_1200x900.jpg",
-        "https://images.craigslist.org/00H0H_2cNvnCwXlka_0jm0ew_1200x900.jpg",
-        "https://images.craigslist.org/00z0z_2MNPALlRPKe_0jm0ew_1200x900.jpg",
-        "https://images.craigslist.org/00O0O_cGpwmsP9lPm_0jm0ew_1200x900.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
       "id": "craigslist-rJTEgtBmyMrPmwq6z5xcWF",
       "slug": "2019-ram-promaster-2500-high-roof-15k-original-miles-mwq6z5xcwf",
       "url": "https://6ixo.com/listing/2019-ram-promaster-2500-high-roof-15k-original-miles-mwq6z5xcwf/",
@@ -26480,18 +27219,6 @@
         "https://images.craigslist.org/00V0V_9daMSBPXpLp_0CI0t2_1200x900.jpg",
         "https://images.craigslist.org/00T0T_f4JLSEApI1p_0CI0t2_1200x900.jpg",
         "https://images.craigslist.org/00505_lAhZUEEiuip_0lM0t2_1200x900.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "craigslist-11VXEj7nmeFH1s3GARHdkp",
-      "slug": "2017-bmw-x5-credit-problems-ok-we-work-with-you-1s3garhdkp",
-      "url": "https://6ixo.com/listing/2017-bmw-x5-credit-problems-ok-we-work-with-you-1s3garhdkp/",
-      "images": [
-        "https://images.craigslist.org/00x0x_bamL7TVxPcd_0cU09G_1200x900.jpg",
-        "https://images.craigslist.org/00M0M_gQ3UizbgdyG_0cU09G_1200x900.jpg",
-        "https://images.craigslist.org/00P0P_9tbWOObqrCc_0cU09G_1200x900.jpg",
-        "https://images.craigslist.org/00a0a_1prpzh0r8Lj_0cU09G_1200x900.jpg"
       ],
       "categoryKey": "vehicles"
     },
@@ -31869,18 +32596,6 @@
       "categoryKey": "vehicles"
     },
     {
-      "id": "craigslist-8ql4oK7f8RGmoKWeltMU8A",
-      "slug": "chevrolet-silverado-1500-crew-cab-bad-credit-bankruptcy-re-okweltmu8a",
-      "url": "https://6ixo.com/listing/chevrolet-silverado-1500-crew-cab-bad-credit-bankruptcy-re-okweltmu8a/",
-      "images": [
-        "https://images.craigslist.org/00q0q_k3aKeKw0TWa_0jm0aU_1200x900.jpg",
-        "https://images.craigslist.org/00P0P_7oimkhfhDNk_0jm0aU_1200x900.jpg",
-        "https://images.craigslist.org/00X0X_5a59LF76kOX_0jm0aU_1200x900.jpg",
-        "https://images.craigslist.org/00j0j_z7YgdAvqbN_0jm0aU_1200x900.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
       "id": "craigslist-pPNs3UQZrcc6GrS43DCtiE",
       "slug": "rotary-lift-spoa9-200-9-000-pound-capacity-asymmetrical-ca-grs43dctie",
       "url": "https://6ixo.com/listing/rotary-lift-spoa9-200-9-000-pound-capacity-asymmetrical-ca-grs43dctie/",
@@ -33053,18 +33768,6 @@
         "https://media.kijiji.ca/api/v1/ca-prod-fsbo-ads/images/69/69fa2c47-f31a-477d-a0d5-1d6249433cb3?rule=kijijica-1600-webp"
       ],
       "categoryKey": "buy-and-sell"
-    },
-    {
-      "id": "craigslist-hZwTNj6wNEtmsPn4BBXA5X",
-      "slug": "2007-chevrolet-kodiak-c6500-spn4bbxa5x",
-      "url": "https://6ixo.com/listing/2007-chevrolet-kodiak-c6500-spn4bbxa5x/",
-      "images": [
-        "https://images.craigslist.org/00T0T_eHhEm4YKfBh_0kE0fu_1200x900.jpg",
-        "https://images.craigslist.org/00Q0Q_fMDmYljhoS4_0kE0fu_1200x900.jpg",
-        "https://images.craigslist.org/00202_1AwL2aF1g4L_0kE0fu_1200x900.jpg",
-        "https://images.craigslist.org/00S0S_egKzoyPHS62_0kE0fu_1200x900.jpg"
-      ],
-      "categoryKey": "vehicles"
     },
     {
       "id": "craigslist-69GMNBsr2pbECeszW35cf3",
@@ -34672,18 +35375,6 @@
         "https://images.craigslist.org/00Q0Q_1e1ihrvojje_0cU09G_1200x900.jpg",
         "https://images.craigslist.org/00m0m_37E9HVFhpjz_0cU09G_1200x900.jpg",
         "https://images.craigslist.org/00x0x_feAfTnq1Gws_0cU09G_1200x900.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "craigslist-ddwhXyuGumzg1uPqoGVGNp",
-      "slug": "2017-nissan-maxima-100-in-house-finance-car-dealership-sw--1upqogvgnp",
-      "url": "https://6ixo.com/listing/2017-nissan-maxima-100-in-house-finance-car-dealership-sw--1upqogvgnp/",
-      "images": [
-        "https://images.craigslist.org/00o0o_2w42YNzIDEh_0cU09G_1200x900.jpg",
-        "https://images.craigslist.org/01111_gEh4lHqi5XH_0cU09G_1200x900.jpg",
-        "https://images.craigslist.org/00H0H_bj2ovwJmY9y_0cU09G_1200x900.jpg",
-        "https://images.craigslist.org/01414_cWbAhlFo8jg_0cU09G_1200x900.jpg"
       ],
       "categoryKey": "vehicles"
     },
@@ -41762,17 +42453,6 @@
         "https://images.craigslist.org/01717_8azcKdE7LMc_0jm0ew_1200x900.jpg",
         "https://images.craigslist.org/01616_2XeMPTOwd61_0i90dC_1200x900.jpg",
         "https://images.craigslist.org/00q0q_4RFh0ngouvJ_0i90dC_1200x900.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "craigslist-qPaTERnaFpD1DGBJgNjHfR",
-      "slug": "2024-gmc-sierra-2500-hd-at4-bestdeals-upfront-price-832-24-dgbjgnjhfr",
-      "url": "https://6ixo.com/listing/2024-gmc-sierra-2500-hd-at4-bestdeals-upfront-price-832-24-dgbjgnjhfr/",
-      "images": [
-        "https://images.craigslist.org/00k0k_5c5JGuw5jct_0nm0hw_1200x900.jpg",
-        "https://images.craigslist.org/01313_i7sXDKKYcQT_0CI0t2_1200x900.jpg",
-        "https://images.craigslist.org/00t0t_6XZtP4kCzSQ_0CI0t2_1200x900.jpg"
       ],
       "categoryKey": "vehicles"
     },
@@ -52949,30 +53629,6 @@
         "https://images.craigslist.org/00U0U_6OJ9qwpMlmq_0CI0t2_1200x900.jpg",
         "https://images.craigslist.org/00d0d_8RWqHVd7yA3_0CI0t2_1200x900.jpg",
         "https://images.craigslist.org/00505_aXGLbC4kSM7_0CI0t2_1200x900.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "craigslist-lJRS4N3X8RGFhdWnQ12ooQ",
-      "slug": "2023-ram-1500-lone-star-4x4-4dr-crew-cab-5-6-ft-sb-pickup-hdwnq12ooq",
-      "url": "https://6ixo.com/listing/2023-ram-1500-lone-star-4x4-4dr-crew-cab-5-6-ft-sb-pickup-hdwnq12ooq/",
-      "images": [
-        "https://images.craigslist.org/00505_cR2Pnr49tgl_0jm0ew_1200x900.jpg",
-        "https://images.craigslist.org/00S0S_22EVQUZmsl9_0jm0ew_1200x900.jpg",
-        "https://images.craigslist.org/00u0u_c3NdAdRTtpk_0jm0ew_1200x900.jpg",
-        "https://images.craigslist.org/01313_exWnEhfiOw4_0jm0ew_1200x900.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "craigslist-LpFv97PX8RGXQMUF4KosRw",
-      "slug": "2017-ram-2500-slt-4x4-4dr-crew-cab-8-ft-lb-pickup-qmuf4kosrw",
-      "url": "https://6ixo.com/listing/2017-ram-2500-slt-4x4-4dr-crew-cab-8-ft-lb-pickup-qmuf4kosrw/",
-      "images": [
-        "https://images.craigslist.org/00a0a_lsXiwT4zWnZ_0gw0co_1200x900.jpg",
-        "https://images.craigslist.org/00d0d_7fyp8CPeElT_0gw0co_1200x900.jpg",
-        "https://images.craigslist.org/00M0M_hCmDF4hoUw5_0jm0ew_1200x900.jpg",
-        "https://images.craigslist.org/00j0j_6paz0yq1mTj_0gw0co_1200x900.jpg"
       ],
       "categoryKey": "vehicles"
     },
@@ -66633,18 +67289,6 @@
       "categoryKey": "real-estate"
     },
     {
-      "id": "craigslist-n7FYh3E7Py2KKQLCVn3KyJ",
-      "slug": "immaculate-waterfront-property-2-bedroom-in-new-rochelle-3-kqlcvn3kyj",
-      "url": "https://6ixo.com/listing/immaculate-waterfront-property-2-bedroom-in-new-rochelle-3-kqlcvn3kyj/",
-      "images": [
-        "https://images.craigslist.org/00303_iw0eMqFa6A5_0kE0fu_1200x900.jpg",
-        "https://images.craigslist.org/00y0y_iTeA5AMgEzI_0fu0kE_1200x900.jpg",
-        "https://images.craigslist.org/00H0H_gDt6OoPOqF7_0lM0t2_1200x900.jpg",
-        "https://images.craigslist.org/00Q0Q_nI7gRhM0KM_0lM0t2_1200x900.jpg"
-      ],
-      "categoryKey": "real-estate"
-    },
-    {
       "id": "allsopp-dubai-dub207199",
       "slug": "studio-apartment-for-rent-sadaf-jumeirah-beach-residence-idub207199",
       "url": "https://6ixo.com/listing/studio-apartment-for-rent-sadaf-jumeirah-beach-residence-idub207199/",
@@ -70693,18 +71337,6 @@
         "https://images.craigslist.org/00k0k_hn66ZtrGey7_0CI0t2_1200x900.jpg",
         "https://images.craigslist.org/00303_b6f8fvGGPoB_0CI0t2_1200x900.jpg",
         "https://images.craigslist.org/01717_g8zeNym1gIi_0CI0t2_1200x900.jpg"
-      ],
-      "categoryKey": "vehicles"
-    },
-    {
-      "id": "craigslist-Tu4q3qPN8RGM_5u-7lAMfg",
-      "slug": "2022-kia-sportage-buy-here-pay-here-available-gm5u7lamfg",
-      "url": "https://6ixo.com/listing/2022-kia-sportage-buy-here-pay-here-available-gm5u7lamfg/",
-      "images": [
-        "https://images.craigslist.org/01313_jJoqM8NAKXI_0jm0ew_1200x900.jpg",
-        "https://images.craigslist.org/00404_hzFVUbgt7E9_0jm0ew_1200x900.jpg",
-        "https://images.craigslist.org/00o0o_6u0rULvupmh_0jm0ew_1200x900.jpg",
-        "https://images.craigslist.org/00000_42lJ4xJGyMv_0jm0ew_1200x900.jpg"
       ],
       "categoryKey": "vehicles"
     },
@@ -102877,6 +103509,12 @@
       "url": "https://6ixo.com/listings/page/241/"
     },
     {
+      "url": "https://6ixo.com/listings/page/242/"
+    },
+    {
+      "url": "https://6ixo.com/listings/page/243/"
+    },
+    {
       "url": "https://6ixo.com/listings/electronics/"
     },
     {
@@ -103262,6 +103900,9 @@
     },
     {
       "url": "https://6ixo.com/listings/vehicles/page/114/"
+    },
+    {
+      "url": "https://6ixo.com/listings/vehicles/page/115/"
     },
     {
       "url": "https://6ixo.com/listings/auto-parts/"
@@ -104824,6 +105465,9 @@
       "url": "https://6ixo.com/listings/country/united-states/page/113/"
     },
     {
+      "url": "https://6ixo.com/listings/country/united-states/page/114/"
+    },
+    {
       "url": "https://6ixo.com/apartments-for-rent/"
     },
     {
@@ -105359,6 +106003,9 @@
     },
     {
       "url": "https://6ixo.com/cars-for-sale/united-states/page/83/"
+    },
+    {
+      "url": "https://6ixo.com/cars-for-sale/united-states/page/84/"
     }
   ],
   "retired": [
@@ -126746,6 +127393,101 @@
       "id": "craigslist-surkD3EkxyPTUXWfRsBVZr",
       "slug": "2024-gmc-sierra-2500-hd-at4-bestdeals-upfront-price-832-24-uxwfrsbvzr",
       "url": "https://6ixo.com/listing/2024-gmc-sierra-2500-hd-at4-bestdeals-upfront-price-832-24-uxwfrsbvzr/"
+    },
+    {
+      "id": "craigslist-8qxbUB3l8RGrj_6AKo1_mQ",
+      "slug": "2019-ford-f-250-f250-f-250-super-duty-xlt-4x4-4dr-crew-cab-grj6ako1mq",
+      "url": "https://6ixo.com/listing/2019-ford-f-250-f250-f-250-super-duty-xlt-4x4-4dr-crew-cab-grj6ako1mq/"
+    },
+    {
+      "id": "craigslist-MIAur57k8RGNvPGQXRu-vw",
+      "slug": "2015-ford-super-duty-f-250-srw-2wd-reg-cab-long-bed-6-2l-g-nvpgqxruvw",
+      "url": "https://6ixo.com/listing/2015-ford-super-duty-f-250-srw-2wd-reg-cab-long-bed-6-2l-g-nvpgqxruvw/"
+    },
+    {
+      "id": "craigslist-weNZAWSRQFeuNg1Qu4QTWf",
+      "slug": "easy-approval-clean-rides-ng1qu4qtwf",
+      "url": "https://6ixo.com/listing/easy-approval-clean-rides-ng1qu4qtwf/"
+    },
+    {
+      "id": "craigslist-gWRUWRffn73pCraL4zZEzf",
+      "slug": "bad-credit-welcomed-call-me-cral4zzezf",
+      "url": "https://6ixo.com/listing/bad-credit-welcomed-call-me-cral4zzezf/"
+    },
+    {
+      "id": "craigslist-Gtx9hHXk8RG8JM-RyigRPQ",
+      "slug": "2019-ford-transit-350-wagon-low-roof-xlt-60-40-pass-148-in-8jmryigrpq",
+      "url": "https://6ixo.com/listing/2019-ford-transit-350-wagon-low-roof-xlt-60-40-pass-148-in-8jmryigrpq/"
+    },
+    {
+      "id": "craigslist-koYuKFKAHZ8QsxGhh1pPrR",
+      "slug": "whats-a-credit-score-i-dont-know-sxghh1pprr",
+      "url": "https://6ixo.com/listing/whats-a-credit-score-i-dont-know-sxghh1pprr/"
+    },
+    {
+      "id": "craigslist-jc6vuXmPkcB7BzGxu9uBad",
+      "slug": "rye-sun-filled-1-bedroom-with-an-updated-kitchen-near-town-bzgxu9ubad",
+      "url": "https://6ixo.com/listing/rye-sun-filled-1-bedroom-with-an-updated-kitchen-near-town-bzgxu9ubad/"
+    },
+    {
+      "id": "craigslist-yCkI-8_i8RGzM47P1-Ej9g",
+      "slug": "2016-ford-f-350-f350-f-350-super-duty-xlt-4x4-4dr-crew-cab-zm47p1ej9g",
+      "url": "https://6ixo.com/listing/2016-ford-f-350-f350-f-350-super-duty-xlt-4x4-4dr-crew-cab-zm47p1ej9g/"
+    },
+    {
+      "id": "craigslist-ipmSkXqGYmrVqrjHZWio46",
+      "slug": "american-range-heritage-classic-series-48-range-qrjhzwio46",
+      "url": "https://6ixo.com/listing/american-range-heritage-classic-series-48-range-qrjhzwio46/"
+    },
+    {
+      "id": "craigslist-IJPv513d8RGg4qIHbTQnnA",
+      "slug": "2017-ram-2500-laramie-4x4-4dr-crew-cab-6-3-ft-sb-pickup-4qihbtqnna",
+      "url": "https://6ixo.com/listing/2017-ram-2500-laramie-4x4-4dr-crew-cab-6-3-ft-sb-pickup-4qihbtqnna/"
+    },
+    {
+      "id": "craigslist-11VXEj7nmeFH1s3GARHdkp",
+      "slug": "2017-bmw-x5-credit-problems-ok-we-work-with-you-1s3garhdkp",
+      "url": "https://6ixo.com/listing/2017-bmw-x5-credit-problems-ok-we-work-with-you-1s3garhdkp/"
+    },
+    {
+      "id": "craigslist-8ql4oK7f8RGmoKWeltMU8A",
+      "slug": "chevrolet-silverado-1500-crew-cab-bad-credit-bankruptcy-re-okweltmu8a",
+      "url": "https://6ixo.com/listing/chevrolet-silverado-1500-crew-cab-bad-credit-bankruptcy-re-okweltmu8a/"
+    },
+    {
+      "id": "craigslist-hZwTNj6wNEtmsPn4BBXA5X",
+      "slug": "2007-chevrolet-kodiak-c6500-spn4bbxa5x",
+      "url": "https://6ixo.com/listing/2007-chevrolet-kodiak-c6500-spn4bbxa5x/"
+    },
+    {
+      "id": "craigslist-ddwhXyuGumzg1uPqoGVGNp",
+      "slug": "2017-nissan-maxima-100-in-house-finance-car-dealership-sw--1upqogvgnp",
+      "url": "https://6ixo.com/listing/2017-nissan-maxima-100-in-house-finance-car-dealership-sw--1upqogvgnp/"
+    },
+    {
+      "id": "craigslist-qPaTERnaFpD1DGBJgNjHfR",
+      "slug": "2024-gmc-sierra-2500-hd-at4-bestdeals-upfront-price-832-24-dgbjgnjhfr",
+      "url": "https://6ixo.com/listing/2024-gmc-sierra-2500-hd-at4-bestdeals-upfront-price-832-24-dgbjgnjhfr/"
+    },
+    {
+      "id": "craigslist-lJRS4N3X8RGFhdWnQ12ooQ",
+      "slug": "2023-ram-1500-lone-star-4x4-4dr-crew-cab-5-6-ft-sb-pickup-hdwnq12ooq",
+      "url": "https://6ixo.com/listing/2023-ram-1500-lone-star-4x4-4dr-crew-cab-5-6-ft-sb-pickup-hdwnq12ooq/"
+    },
+    {
+      "id": "craigslist-LpFv97PX8RGXQMUF4KosRw",
+      "slug": "2017-ram-2500-slt-4x4-4dr-crew-cab-8-ft-lb-pickup-qmuf4kosrw",
+      "url": "https://6ixo.com/listing/2017-ram-2500-slt-4x4-4dr-crew-cab-8-ft-lb-pickup-qmuf4kosrw/"
+    },
+    {
+      "id": "craigslist-n7FYh3E7Py2KKQLCVn3KyJ",
+      "slug": "immaculate-waterfront-property-2-bedroom-in-new-rochelle-3-kqlcvn3kyj",
+      "url": "https://6ixo.com/listing/immaculate-waterfront-property-2-bedroom-in-new-rochelle-3-kqlcvn3kyj/"
+    },
+    {
+      "id": "craigslist-Tu4q3qPN8RGM_5u-7lAMfg",
+      "slug": "2022-kia-sportage-buy-here-pay-here-available-gm5u7lamfg",
+      "url": "https://6ixo.com/listing/2022-kia-sportage-buy-here-pay-here-available-gm5u7lamfg/"
     }
   ]
 }

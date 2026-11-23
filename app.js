@@ -99,6 +99,8 @@ function createListingIntegrity() {
     if (kijiji) return `kijiji.ca/ad/${kijiji[1]}`;
     const jacars = normalized.match(/^jacars\.net\/adv\/(\d+)(?:_|\/|$)/);
     if (jacars) return `jacars.net/ad/${jacars[1]}`;
+    const sebu = normalized.match(/^sebu\.co\.ke\/([^/]+?)(?:\.html)?$/);
+    if (sebu) return `sebu.co.ke/ad/${sebu[1]}`;
     const craigslist = decode(value).trim().replace(/^https?:\/\//i, '').replace(/[?#].*$/, '').replace(/\/$/, '')
       .match(/^(?:[a-z0-9-]+\.)?craigslist\.org\/view\/d\/[^/]+\/([^/]+)$/i);
     return craigslist ? `craigslist.org/ad/${craigslist[1]}` : normalized;
@@ -4838,7 +4840,10 @@ class DatingApp {
     isImportedListingPublishable(item = {}) {
         if (!this.isScrapedMarketplaceItem(item)) return true;
         const sourceUrl = item.source?.url || item.sourceUrl || item.source_url;
-        if (ListingIntegrity.resolveRepair({ source_url: sourceUrl }, this.scrapedListingIntegrityRepairs)?.holdReason) return false;
+        const repair = ListingIntegrity.resolveRepair({ source_url: sourceUrl }, this.scrapedListingIntegrityRepairs);
+        if (repair?.holdReason) return false;
+        if (repair?.supersededBy && ListingIntegrity.key(repair.supersededBy) !== ListingIntegrity.key(sourceUrl)
+            && ListingIntegrity.sourceIdentity(repair.supersededBy) === ListingIntegrity.sourceIdentity(sourceUrl)) return false;
         const availability = this.scrapedListingAvailability?.[ListingIntegrity.key(sourceUrl)];
         if (['sold', 'unavailable', 'gone'].includes(String(availability?.availability || item.sourceAvailability || '').toLowerCase())) return false;
         return !ListingIntegrity.publicationIssue({

@@ -1,5 +1,5 @@
 {
-  "count": 9252,
+  "count": 9249,
   "listings": [
     {
       "id": "category-ae37a1de663b7b5821",
@@ -588,15 +588,6 @@
         "https://images.craigslist.org/00w0w_9aSzGOvjfcj_0x20nU_1200x900.jpg"
       ],
       "categoryKey": "vehicles"
-    },
-    {
-      "id": "category-92c73ac25046677818",
-      "slug": "refurbished-beko-wtl72051w-7kg-1200rpm-washing-machine-whi-5046677818",
-      "url": "https://6ixo.com/listing/refurbished-beko-wtl72051w-7kg-1200rpm-washing-machine-whi-5046677818/",
-      "images": [
-        "https://centralhomeappliances.com/cdn/shop/files/WhatsAppImage2026-11-22at13.15.08.jpg?v=1795373772&width=1920"
-      ],
-      "categoryKey": "buy-and-sell"
     },
     {
       "id": "category-39adb11caea8f9822a",
@@ -1192,15 +1183,6 @@
         "https://images.craigslist.org/01515_kwUbVuzknAo_0ak07K_1200x900.jpg"
       ],
       "categoryKey": "vehicles"
-    },
-    {
-      "id": "craigslist-bssf9s1V3djQ4PwyyPCcZg",
-      "slug": "estudio-renovado-gimnasio-24-horas-sala-de-juegos-4pwyypcczg",
-      "url": "https://6ixo.com/listing/estudio-renovado-gimnasio-24-horas-sala-de-juegos-4pwyypcczg/",
-      "images": [
-        "https://images.craigslist.org/00K0K_f2H29iJKXa1_0kE0dL_1200x900.jpg"
-      ],
-      "categoryKey": "real-estate"
     },
     {
       "id": "craigslist-qp4zSgt4CvZZ5g8W4ed83a",
@@ -99812,15 +99794,6 @@
       "categoryKey": "vehicles"
     },
     {
-      "id": "sebu-76",
-      "slug": "magic-mug-printing-sebu76",
-      "url": "https://6ixo.com/listing/magic-mug-printing-sebu76/",
-      "images": [
-        "https://6ixo.com/data/listing-image-cache/924c067ce8c4d6326df49dccc6052ca158c8a239f74ea901e13c944c6013b860.webp"
-      ],
-      "categoryKey": "services"
-    },
-    {
       "id": "kijiji-1742355527",
       "slug": "roku-32-smart-tv-open-box-like-new-1742355527",
       "url": "https://6ixo.com/listing/roku-32-smart-tv-open-box-like-new-1742355527/",
@@ -135671,6 +135644,21 @@
       "id": "craigslist-ijDJ3JCVeEhY3KYdgPnUj1",
       "slug": "2021-nissan-altima-2-5-in-house-finance-credit-prob-ok-sw--3kydgpnuj1",
       "url": "https://6ixo.com/listing/2021-nissan-altima-2-5-in-house-finance-credit-prob-ok-sw--3kydgpnuj1/"
+    },
+    {
+      "id": "sebu-76",
+      "slug": "magic-mug-printing-sebu76",
+      "url": "https://6ixo.com/listing/magic-mug-printing-sebu76/"
+    },
+    {
+      "id": "category-92c73ac25046677818",
+      "slug": "refurbished-beko-wtl72051w-7kg-1200rpm-washing-machine-whi-5046677818",
+      "url": "https://6ixo.com/listing/refurbished-beko-wtl72051w-7kg-1200rpm-washing-machine-whi-5046677818/"
+    },
+    {
+      "id": "craigslist-bssf9s1V3djQ4PwyyPCcZg",
+      "slug": "estudio-renovado-gimnasio-24-horas-sala-de-juegos-4pwyypcczg",
+      "url": "https://6ixo.com/listing/estudio-renovado-gimnasio-24-horas-sala-de-juegos-4pwyypcczg/"
     }
   ]
 }

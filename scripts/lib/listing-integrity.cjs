@@ -11,6 +11,8 @@ function createListingIntegrity() {
     if (kijiji) return `kijiji.ca/ad/${kijiji[1]}`;
     const jacars = normalized.match(/^jacars\.net\/adv\/(\d+)(?:_|\/|$)/);
     if (jacars) return `jacars.net/ad/${jacars[1]}`;
+    const sebu = normalized.match(/^sebu\.co\.ke\/([^/]+?)(?:\.html)?$/);
+    if (sebu) return `sebu.co.ke/ad/${sebu[1]}`;
     const craigslist = decode(value).trim().replace(/^https?:\/\//i, '').replace(/[?#].*$/, '').replace(/\/$/, '')
       .match(/^(?:[a-z0-9-]+\.)?craigslist\.org\/view\/d\/[^/]+\/([^/]+)$/i);
     return craigslist ? `craigslist.org/ad/${craigslist[1]}` : normalized;

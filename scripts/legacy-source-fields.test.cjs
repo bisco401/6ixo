@@ -50,4 +50,16 @@ app.vehicleListings=[cachedAlias];app.deduplicateImportedListingFeeds();assert.e
 assert.equal(integrity.sourceIdentity('https://www.jacars.net/adv/123456_old-title/'),integrity.sourceIdentity('https://www.jacars.net/adv/123456_new-title/'));
 assert.equal(integrity.sourceIdentity('https://www.craigslist.org/view/d/old-title/AbC123'),integrity.sourceIdentity('https://www.craigslist.org/view/d/new-title/AbC123'));
 assert.notEqual(integrity.key(reviewed.source_url),integrity.key(editedUrl),'Exact source URL proof binding stays strict');
+const sebuUrl='https://sebu.co.ke/reviewed-item-source123',sebuCanonical=sebuUrl+'.html';
+const sebuRow={...row('Oxglow','other','miscellaneous'),source_url:sebuUrl,url:sebuUrl,source_site:'Sebu',attributes:'{}'};
+app.scrapedListingIntegrityRepairs={};
+const sebuCached=app.normalizeCsvScrapedListingRow(sebuRow).item;
+assert.ok(sebuCached);
+app.scrapedListingIntegrityRepairs={[integrity.key(sebuUrl)]:{sourceUrl:sebuUrl,title:sebuRow.title,supersededBy:sebuCanonical}};
+assert.equal(integrity.applyRepair(sebuRow,app.scrapedListingIntegrityRepairs[integrity.key(sebuUrl)]).sync_visibility,'source_url_superseded');
+assert.equal(app.isImportedListingPublishable(sebuCached),false,'Cached Sebu cards must not republish a superseded URL');
+app.scrapedListingIntegrityRepairs={[integrity.key(sebuUrl)]:{sourceUrl:sebuUrl,holdReason:'reviewed_image_mismatch'}};
+assert.equal(integrity.resolveRepair({source_url:sebuCanonical},app.scrapedListingIntegrityRepairs).holdReason,'reviewed_image_mismatch','The HTML alias cannot evade a Sebu review hold');
+assert.equal(integrity.resolveRepair({source_url:sebuCanonical.replace('source123','source124')},app.scrapedListingIntegrityRepairs),undefined);
+assert.notEqual(integrity.key(sebuUrl),integrity.key(sebuCanonical),'Sebu gallery and phone proofs still bind to their exact URL');
 console.log('Legacy source fields passed: seller, location, vehicle facts, unknown condition/mileage, stable IDs, confirmed removals and buying-service routing.');

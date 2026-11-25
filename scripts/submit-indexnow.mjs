@@ -75,15 +75,13 @@ for (const url of urls) {
 }
 
 const keyLocation = `${origin}/${keyFile}`;
-const payload = {
-  host: originUrl.host,
-  key,
-  keyLocation,
-  urlList: urls
-};
+const batches = [];
+for (let start = 0; start < urls.length; start += 10000) {
+  batches.push(urls.slice(start, start + 10000));
+}
 
 if (dryRun) {
-  console.log(`IndexNow dry run passed for ${urls.length} URL(s).`);
+  console.log(`IndexNow dry run passed for ${urls.length} URL(s) in ${batches.length} batch(es).`);
   console.log(`Key location: ${keyLocation}`);
   console.log(`Endpoint: ${config.endpoint}`);
   process.exit(0);
@@ -99,19 +97,22 @@ if (!keyResponse.ok || keyResponse.text.trim() !== key) {
   throw new Error(`Deploy ${keyFile} at ${keyLocation} before submitting URLs to IndexNow`);
 }
 
-const response = await fetch(config.endpoint, {
-  method: 'POST',
-  signal: AbortSignal.timeout(30000),
-  headers: {
-    'content-type': 'application/json; charset=utf-8',
-    'user-agent': '6ixo-indexnow/1.0'
-  },
-  body: JSON.stringify(payload)
-});
+for (const [index, urlList] of batches.entries()) {
+  const response = await fetch(config.endpoint, {
+    method: 'POST',
+    signal: AbortSignal.timeout(30000),
+    headers: {
+      'content-type': 'application/json; charset=utf-8',
+      'user-agent': '6ixo-indexnow/1.0'
+    },
+    body: JSON.stringify({ host: originUrl.host, key, keyLocation, urlList })
+  });
 
-if (response.status !== 200 && response.status !== 202) {
-  const responseBody = (await response.text()).trim();
-  throw new Error(`IndexNow returned HTTP ${response.status}${responseBody ? `: ${responseBody}` : ''}`);
+  if (response.status !== 200 && response.status !== 202) {
+    const responseBody = (await response.text()).trim();
+    throw new Error(`IndexNow batch ${index + 1}/${batches.length} returned HTTP ${response.status}${responseBody ? `: ${responseBody}` : ''}`);
+  }
+
+  console.log(`IndexNow accepted batch ${index + 1}/${batches.length}: ${urlList.length} URL(s) with HTTP ${response.status}.`);
 }
-
-console.log(`IndexNow accepted ${urls.length} URL(s) with HTTP ${response.status}.`);
+console.log(`IndexNow accepted all ${urls.length} URL(s).`);

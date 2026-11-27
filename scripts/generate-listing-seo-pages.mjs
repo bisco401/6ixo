@@ -137,6 +137,12 @@ export async function generate(root = ROOT) {
     const location = [clean(row.city), clean(row.country)].filter(Boolean).join(', ');
     let seoTitle = `${truncate(`${row.title}${location ? ` in ${location}` : ''}`, 57)} | 6ixo`;
     if (titles.has(seoTitle.toLowerCase())) seoTitle = `${truncate(row.title, 45)} ${shortId} | 6ixo`;
+    // Different source IDs can share their last ten characters, so the first
+    // fallback can collide too. Keep each ad and give its page a unique title.
+    for (let collision = 0; titles.has(seoTitle.toLowerCase()); collision++) {
+      const suffix = `${crypto.createHash('sha256').update(row.id).digest('hex').slice(0, 8)}${collision ? `-${collision}` : ''}`;
+      seoTitle = `${truncate(row.title, Math.max(1, 56 - suffix.length))} ${suffix} | 6ixo`;
+    }
     titles.add(seoTitle.toLowerCase());
     // Match the published display price, including imports whose numeric field supplied cents.
     const rawPrice = clean(row.price_value), displayPrice = Number(clean(row.price_text).replace(/[^0-9.]/g, ''));

@@ -134,6 +134,37 @@ test('topic pages are crawlable and retired location pages stop allowing indexin
   assert.ok((await fs.readFile(path.join(root, 'phones-for-sale/index.html'), 'utf8')).includes('No matching listings are published right now'));
 });
 
+test('long ad titles remain unique when different source IDs share the same suffix', async t => {
+  const root = await fs.mkdtemp(path.join(os.tmpdir(), '6ixo-title-collision-'));
+  t.after(() => fs.rm(root, { recursive: true, force: true }));
+  await fs.mkdir(path.join(root, 'data'), { recursive: true });
+  await fs.writeFile(path.join(root, 'sitemap.xml'), '<urlset></urlset>');
+  const title = '2006 DODGE RAM 3500 SLT 4X4 0-RUST 5.9L HO LB 117K 2500 2007 2005 2004';
+  const rows = ['Atlanta', 'Jacksonville Beach', 'Miami', 'Houston'].map((city, i) => ({
+    id: `craigslist-distinct-${i}-df5LaRWwXw`, status: 'published', app_category: 'vehicles',
+    title, description: 'This source offers the pictured truck with its advertised specifications.',
+    image_urls: `https://example.com/truck-${i}.jpg`, phone: '+19047876155', city,
+    country: 'United States', source_url: `https://example.com/truck/${i}`
+  }));
+  const columns = Object.keys(rows[0]);
+  await fs.writeFile(path.join(root, 'data/scraped-listings.csv'), columns.join(',') + '\n' + rows.map(row => columns.map(c => `"${row[c]}"`).join(',')).join('\n'));
+  const first = await generate(root);
+  assert.equal(first.count, rows.length);
+  const titles = [];
+  for (const listing of first.listings) {
+    const html = await fs.readFile(path.join(root, 'listing', listing.slug, 'index.html'), 'utf8');
+    titles.push(html.match(/<title>(.*?)<\/title>/)[1].toLowerCase());
+    assert.ok(html.includes(`<h1>${title}</h1>`));
+  }
+  assert.equal(new Set(titles).size, rows.length);
+  const second = await generate(root);
+  assert.deepEqual(second.listings, first.listings);
+  for (const [i, listing] of second.listings.entries()) {
+    const html = await fs.readFile(path.join(root, 'listing', listing.slug, 'index.html'), 'utf8');
+    assert.equal(html.match(/<title>(.*?)<\/title>/)[1].toLowerCase(), titles[i]);
+  }
+});
+
 test('CSV parser preserves quoted descriptions, commas, multiline text and escaped quotes', () => {
   assert.deepEqual(parseCsv('\uFEFFid,description\r\n1,"A, B\nHe said ""yes"""\r\n'), [{ id: '1', description: 'A, B\nHe said "yes"' }]);
 });

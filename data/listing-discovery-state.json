@@ -1,59 +1,59 @@
 {
   "sources": {
     "regional": {
-      "lastAttemptAt": "2026-11-28T06:46:03.651888+00:00",
+      "lastAttemptAt": "2026-11-28T11:27:18.180754+00:00",
       "outcome": "failure"
     },
     "general": {
-      "lastAttemptAt": "2026-11-28T06:46:03.651888+00:00",
+      "lastAttemptAt": "2026-11-28T11:27:18.180754+00:00",
       "outcome": "success",
-      "lastSuccessfulSlot": "2026-11-28T06:32:26Z"
+      "lastSuccessfulSlot": "2026-11-28T11:19:55Z"
     },
     "ghana": {
-      "lastAttemptAt": "2026-11-28T06:46:03.651888+00:00",
+      "lastAttemptAt": "2026-11-28T11:27:18.180754+00:00",
       "outcome": "success",
-      "lastSuccessfulSlot": "2026-11-28T06:32:26Z"
+      "lastSuccessfulSlot": "2026-11-28T11:19:55Z"
     },
     "kenya": {
-      "lastAttemptAt": "2026-11-28T06:46:03.651888+00:00",
+      "lastAttemptAt": "2026-11-28T11:27:18.180754+00:00",
       "outcome": "failure"
     },
     "china": {
-      "lastAttemptAt": "2026-11-28T06:46:03.651888+00:00",
+      "lastAttemptAt": "2026-11-28T11:27:18.180754+00:00",
       "outcome": "failure"
     },
     "expansion": {
-      "lastAttemptAt": "2026-11-28T06:46:03.651888+00:00",
+      "lastAttemptAt": "2026-11-28T11:27:18.180754+00:00",
       "outcome": "failure",
       "lastSuccessfulSlot": "2026-11-06T00:00:00+00:00"
     },
     "guyana": {
-      "lastAttemptAt": "2026-11-28T06:46:03.651888+00:00",
+      "lastAttemptAt": "2026-11-28T11:27:18.180754+00:00",
       "outcome": "failure"
     },
     "dubai_vehicles": {
-      "lastAttemptAt": "2026-11-28T06:46:03.651888+00:00",
+      "lastAttemptAt": "2026-11-28T11:27:18.180754+00:00",
       "outcome": "success",
-      "lastSuccessfulSlot": "2026-11-28T06:32:26Z"
+      "lastSuccessfulSlot": "2026-11-28T11:19:55Z"
     },
     "dubai_marketplace": {
-      "lastAttemptAt": "2026-11-28T06:46:03.651888+00:00",
+      "lastAttemptAt": "2026-11-28T11:27:18.180754+00:00",
       "outcome": "success",
-      "lastSuccessfulSlot": "2026-11-28T06:32:26Z"
+      "lastSuccessfulSlot": "2026-11-28T11:19:55Z"
     },
     "products": {
-      "lastAttemptAt": "2026-11-28T06:46:03.651888+00:00",
+      "lastAttemptAt": "2026-11-28T11:27:18.180754+00:00",
       "outcome": "failure"
     },
     "jobs": {
-      "lastAttemptAt": "2026-11-28T06:46:03.651888+00:00",
+      "lastAttemptAt": "2026-11-28T11:27:18.180754+00:00",
       "outcome": "success",
-      "lastSuccessfulSlot": "2026-11-28T06:32:26Z"
+      "lastSuccessfulSlot": "2026-11-28T11:19:55Z"
     },
     "uganda_property": {
-      "lastAttemptAt": "2026-11-28T06:46:03.651888+00:00",
-      "outcome": "failure",
-      "lastSuccessfulSlot": "2026-11-27T16:21:56Z"
+      "lastAttemptAt": "2026-11-28T11:27:18.180754+00:00",
+      "outcome": "success",
+      "lastSuccessfulSlot": "2026-11-28T11:19:55Z"
     }
   }
 }
